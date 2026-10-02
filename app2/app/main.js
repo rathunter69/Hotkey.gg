@@ -12,6 +12,7 @@
 //   #/due/<shortcut>   a refresher rep from today's queue (app/due-page.js)
 //   #/desk             a Teams desk; #/desk/join/<code> its join page (app/desk-page.js)
 //   #/checkout         Phase E checkout; #/checkout/done the return from Stripe (app/checkout-page.js)
+//   #/ops              errors, billing alerts and the weekly digests, for ops_admins only (app/ops-page.js)
 //   anything else      404
 //
 // Page modules load lazily with import(); a failed load renders an error card with Retry, never
@@ -77,6 +78,7 @@ export function parseRoute(hash) {
   else if ((m = /^\/desk\/join\/([A-Za-z0-9-]{1,32})$/.exec(path))) { name = 'desk'; params.join = true; params.code = m[1].toUpperCase(); }   // a Teams desk's invite link (Phase F)
   else if (path === '/checkout') name = 'checkout';
   else if (path === '/checkout/done') { name = 'checkout'; params.done = true; }
+  else if (path === '/ops') name = 'ops';   // the operators' page (app/ops-page.js): linked from nowhere, the server decides who reads it
   else if (['/leaderboard', '/reference', '/pricing', '/teams', '/account', '/about', '/terms', '/privacy', '/eula', '/contact'].includes(path)) name = path.slice(1);
   else name = 'notfound';
   return { name, params, query, path };
@@ -115,7 +117,7 @@ export function titleFor(name, extra) {
     lesson: (extra ? extra + ' · ' : '') + 'hotkey.gg', locked: (extra ? extra + ' · ' : '') + 'Full Access · hotkey.gg', practice: 'Practice · hotkey.gg', drill: (extra ? extra + ' · ' : '') + 'Practice · hotkey.gg', leaderboard: 'Leaderboards · hotkey.gg',
     reference: 'Reference · hotkey.gg', pricing: 'Pricing · hotkey.gg', teams: 'Teams · hotkey.gg', account: 'Account · hotkey.gg', about: 'About · hotkey.gg',
     terms: 'Terms · hotkey.gg', privacy: 'Privacy · hotkey.gg', eula: 'EULA · hotkey.gg', contact: 'Contact · hotkey.gg', notfound: 'Page not found · hotkey.gg',
-    due: 'Due today · hotkey.gg', checkout: 'Get Full Access · hotkey.gg', desk: 'Your desk · hotkey.gg' };
+    due: 'Due today · hotkey.gg', checkout: 'Get Full Access · hotkey.gg', desk: 'Your desk · hotkey.gg', ops: 'Ops · hotkey.gg' };
   return T[name] || 'hotkey.gg';
 }
 
@@ -180,6 +182,7 @@ const LOADERS = {
   profile: { file: './profile-page.js', pick: m => m.mountProfilePage },   // #/account (profile, certificate): the band, the shelf, the level titles; the certificate as progress
   checkout: { file: './checkout-page.js', pick: m => m.mountCheckoutPage },   // Phase E: the embedded form, behind the payments flag
   desk: { file: './desk-page.js', pick: m => m.mountDeskPage },   // Phase F desks v1: #/desk and #/desk/join/<code>
+  ops: { file: './ops-page.js', pick: m => m.mountOpsPage },   // errors, billing alerts, weekly digests (0015_ops.sql)
   about: { file: './legal-pages.js', pick: m => m.mountAboutPage },
   terms: { file: './legal-pages.js', pick: m => r => m.mountLegalPage(r, 'terms') },
   privacy: { file: './legal-pages.js', pick: m => r => m.mountLegalPage(r, 'privacy') },

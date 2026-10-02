@@ -494,3 +494,18 @@ a.pn:focus-visible{outline:var(--cursor-w) solid var(--mode); outline-offset:var
 .teams-plan .ticks{margin-top:var(--s1)}
 .desk-tab-row{border-bottom:0; margin-bottom:var(--s3)}
 .desk-tab-row .panel-h{margin:0}
+
+/* ---------- the ops page (#/ops): errors that open to their stack, alerts with Resolve, the digests ---------- */
+.tbl-ops-errors td[data-col="msg"]{white-space:normal; width:100%; padding-top:var(--s2); padding-bottom:var(--s2)}
+.tbl-ops-errors td, .tbl-ops-alerts td{vertical-align:top; padding-top:var(--s2); padding-bottom:var(--s2)}
+.pg-ops td[data-col="time"]{font-family:var(--mono); font-size:var(--fs-key); color:var(--ink-2)}
+.ops-err summary{cursor:pointer; font-size:var(--fs-name); overflow-wrap:anywhere}
+.ops-err[open] summary{font-weight:var(--fw-semi)}
+.ops-err-more{display:grid; grid-template-columns:auto minmax(0,1fr); gap:var(--s1) var(--s3); margin:var(--s2) 0 0; font-size:var(--fs-label)}
+.ops-err-more dt{color:var(--ink-2)}
+.ops-err-more dd{margin:0; overflow-wrap:anywhere}
+.ops-stack{margin:var(--s2) 0 0; padding:var(--s2) var(--s3); background:var(--chrome); font-family:var(--font); font-size:var(--fs-min); line-height:var(--lh-body); white-space:pre-wrap; overflow-wrap:anywhere; max-height:calc(var(--row-h) * 8); overflow:auto}
+.tbl-ops-alerts .row-sub{overflow-wrap:anywhere; white-space:normal}
+.pg-ops .pg-two{grid-template-columns:minmax(0,1fr) calc(var(--side-col) * 1.4)}
+.tbl-ops-alerts td[data-col="act"], .tbl-ops-digests td[data-col="act"]{width:1%}
+@media (max-width:900px){ .pg-ops .pg-two{grid-template-columns:minmax(0,1fr)} }

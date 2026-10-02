@@ -20,3 +20,13 @@ verify_jwt = true
 
 [functions.stripe-webhook]
 verify_jwt = false
+
+# Ops functions (REBUILD_PLAN section 6; 0015_ops.sql). Kept in the repo, deployed only with Wolf's
+# go-ahead. health is public by design (the uptime workflow pings it). weekly-digest checks its own
+# caller (the service-role key, or a member of ops_admins), so the gateway's JWT check is off; it
+# sends no email.
+[functions.health]
+verify_jwt = false
+
+[functions.weekly-digest]
+verify_jwt = false

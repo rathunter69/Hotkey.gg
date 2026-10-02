@@ -1,0 +1,64 @@
+# Uptime (REBUILD_PLAN section 6): every 30 minutes, ping hotkey.gg, its static health file and, once
+# the repository variable HEALTH_URL is set, the health edge function. Never runs on a push or a pull
+# request, so it can never block one. A failure is loud three ways: an error annotation, a red run
+# (GitHub emails the repository's owner about failed scheduled runs), and one open issue that gets a
+# comment on every further failure and closes itself when the site is back.
+name: uptime
+on:
+  schedule:
+    - cron: '7,37 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+  issues: write
+concurrency:
+  group: uptime
+  cancel-in-progress: false
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      ISSUE_TITLE: 'Uptime: hotkey.gg check failing'
+    steps:
+      - name: Ping the site and the health endpoints
+        env:
+          HEALTH_URL: ${{ vars.HEALTH_URL }}
+        run: |
+          set -u
+          fail=0
+          check() {   # name, url, text the body must contain
+            code=$(curl -sS -o body.txt -w '%{http_code}' --max-time 20 --retry 2 --retry-delay 15 --retry-all-errors "$2" || true)
+            if [ "$code" = "200" ] && grep -Eq "$3" body.txt; then
+              echo "$1: up ($code)"
+            else
+              echo "::error title=$1 is down::$2 answered ${code:-nothing}"
+              fail=1
+            fi
+          }
+          check "hotkey.gg" "https://hotkey.gg/" "hotkey\.gg"
+          check "health.json" "https://hotkey.gg/health.json" '"ok": *true'
+          if [ -n "$HEALTH_URL" ]; then
+            check "health function" "$HEALTH_URL" '"ok": *true'
+          else
+            echo "::notice::HEALTH_URL is not set, so the health function is not pinged yet"
+          fi
+          if [ "$fail" != "0" ]; then exit 1; fi
+      - name: Open or update the outage issue
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          n=$(gh issue list --state open --search "\"$ISSUE_TITLE\" in:title" --json number --jq '.[0].number // empty')
+          body="The uptime check failed at $(date -u +%Y-%m-%dT%H:%M:%SZ). Run: $RUN_URL"
+          if [ -n "$n" ]; then gh issue comment "$n" --body "$body"; else gh issue create --title "$ISSUE_TITLE" --body "$body"; fi
+      - name: Close the outage issue once the site is back
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          n=$(gh issue list --state open --search "\"$ISSUE_TITLE\" in:title" --json number --jq '.[0].number // empty')
+          if [ -n "$n" ]; then gh issue close "$n" --comment "Back up at $(date -u +%Y-%m-%dT%H:%M:%SZ)."; fi
