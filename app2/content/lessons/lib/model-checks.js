@@ -101,6 +101,21 @@ export function moves(ses, target, input) {
   finally { ic.value = old; recalc(); }
 }
 
+/**
+ * A what-if with a verdict: type `values` ({ 'Inputs!G21': 18 }) over the typed inputs, recalculate,
+ * run `fn(ses)`, then put every input back and recalculate, so the sheet ends exactly as it was.
+ */
+export function under(ses, values, fn) {
+  const kept = [];
+  for (const [key, v] of Object.entries(values)) {
+    const [name, ref] = key.split('!'); const c = sheetIn(ses, name) && sheetIn(ses, name).cells[ref];
+    if (!c || c.formula) { kept.forEach(([k, old]) => { k.value = old; }); return false; }
+    kept.push([c, c.value]); c.value = v;
+  }
+  try { ses.recalcAll(); return !!fn(ses); }
+  finally { kept.forEach(([c, old]) => { c.value = old; }); ses.recalcAll(); }
+}
+
 /** The formula in `ref` reads every cell in `keys` ('C31' on its own sheet, 'IS!C31' on another), directly or inside a range: a token check on a cell the goal names. */
 export function reads(sh, ref, keys) {
   const f = sh && sh.cells[ref] && sh.cells[ref].formula; if (typeof f !== 'string' || !f) return false;

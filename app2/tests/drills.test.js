@@ -55,7 +55,7 @@ const CH1 = [['get-around', 80], ['enter-and-fill', 90], ['find-and-fix', 60], [
   ['insert-and-amend', 90], ['formula-sprint', 120], ['combine-two-tabs', 120], ['before-you-send', 120], ['weekly-sales-report', 180]];
 
 test("Chapter 1's eleven drills: 6.1's set and order, eight to twenty goals, pars from the reference route", () => {
-  const keyed = DRILLS.filter(d => d.kind !== 'challenge');
+  const keyed = DRILLS.filter(d => d.kind !== 'challenge' && d.chapter === 'foundations');
   assert.deepEqual(keyed.map(d => d.id), CH1.map(([id]) => id));
   for (const [id, pass] of CH1) {
     const d = DRILLS_BY_ID[id];
@@ -66,7 +66,7 @@ test("Chapter 1's eleven drills: 6.1's set and order, eight to twenty goals, par
     assert.ok(d.optimalKeys / d.route <= 4, `${id}: ${d.optimalKeys} keys in a ${d.route} s route is faster than a fast hand`);
     assert.equal(d.access, 'free', `${id}: Chapter 1 is free`);
   }
-  assert.deepEqual(BENCHMARKS.filter(d => d.kind !== 'challenge').map(d => d.id), ['weekly-sales-report'], 'the weekly report is the benchmark');
+  assert.deepEqual(BENCHMARKS.filter(d => d.kind !== 'challenge').map(d => d.id), ['weekly-sales-report', 'ch5-revenue-build'], 'the weekly report and Chapter 5\'s revenue build are the benchmarks');
   for (const [id] of CH1) assert.ok(DAILY_POOL.includes(id), `${id} is in the Daily's pool`);
 });
 

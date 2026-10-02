@@ -11,7 +11,9 @@ import { stateOf } from '../workbooks/clearcoat-model.js';
 import { blocksOf, blockKeys, pick, built, figures } from './lib/model-build.js';
 import { sheetIn, finished, moves } from './lib/model-checks.js';
 
-const ALL = blocksOf('B5A');
+// the blocks are read off the two states on first use, not when the catalogue loads
+let BLOCKS = null;
+const ALL = () => (BLOCKS = BLOCKS || blocksOf('B5A'));
 /** The seeded debt terms on Inputs: ref → [low, high, step]. */
 const TERMS = { C73: [0.06, 0.08, 0.005], C74: [2500, 3500, 250], F75: [10000, 15000, 500], C76: [0.065, 0.085, 0.005], C78: [0.07, 0.09, 0.005], C80: [4000, 6000, 500] };
 const SEEDED = [...Object.keys(TERMS), 'G75'];
@@ -33,24 +35,24 @@ const want = ses => { const I = sheetIn(ses, 'Inputs'); return finished(Object.f
 const balanced = ses => { const c = sheetIn(ses, 'Checks'); return !!c && ['C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'].every(col => c.value(col + '6') === 0) && c.value('C45') === 'OK'; };
 
 const PARTS = [
-  { id: 'term-balance', blocks: pick(ALL, 'Schedules', 79, 82), text: 'Build the term loan on Schedules, rows 79 to 82: opening, drawn, repaid at the scheduled amortization or the balance if less, closing.' },
-  { id: 'term-interest', blocks: pick(ALL, 'Schedules', 83, 85), text: 'Add the term loan’s average balance, its interest behind the breaker, and the effective rate in Schedules C83:J85.' },
-  { id: 'dd-balance', blocks: pick(ALL, 'Schedules', 88, 92), text: 'Build the delayed draw on Schedules, rows 88 to 92: opening, draws to date, drawn, repaid and closing.' },
-  { id: 'dd-interest', blocks: pick(ALL, 'Schedules', 93, 95), text: 'Add the delayed draw’s average balance, its interest behind the breaker, and the effective rate in Schedules C93:J95.' },
-  { id: 'revolver', blocks: pick(ALL, 'Schedules', 98, 103), text: 'Build the revolver in Schedules C98:J103: cash before it, the minimum, a draw to cover a gap and a repayment from a surplus.' },
-  { id: 'rev-interest', blocks: pick(ALL, 'Schedules', 104, 106), text: 'Add the revolver’s average balance, its interest behind the breaker, and the effective rate in Schedules C104:J106.' },
-  { id: 'totals', blocks: pick(ALL, 'Schedules', 109, 111), text: 'Total the debt and the interest in rows 109 and 110, and net debt against the BS cash in row 111.' },
-  { id: 'is', blocks: pick(ALL, 'IS'), text: 'Link interest on the IS, row 28, to the total on Schedules, as a cost, through the projection flag.' },
-  { id: 'cf', blocks: pick(ALL, 'CF'), text: 'Link the draws and repayments on CF: the term loan in C18:J19, the delayed draw in C20:J21, the revolver in C24:J24.' },
-  { id: 'bs', blocks: pick(ALL, 'BS'), text: 'Link the three closing balances to the BS, rows 15 to 17, until the balance check reads 0 in every year.' },
+  { id: 'term-balance', of: () => pick(ALL(), 'Schedules', 79, 82), text: 'Build the term loan on Schedules, rows 79 to 82: opening, drawn, repaid at the scheduled amortization or the balance if less, closing.' },
+  { id: 'term-interest', of: () => pick(ALL(), 'Schedules', 83, 85), text: 'Add the term loan’s average balance, its interest behind the breaker, and the effective rate in Schedules C83:J85.' },
+  { id: 'dd-balance', of: () => pick(ALL(), 'Schedules', 88, 92), text: 'Build the delayed draw on Schedules, rows 88 to 92: opening, draws to date, drawn, repaid and closing.' },
+  { id: 'dd-interest', of: () => pick(ALL(), 'Schedules', 93, 95), text: 'Add the delayed draw’s average balance, its interest behind the breaker, and the effective rate in Schedules C93:J95.' },
+  { id: 'revolver', of: () => pick(ALL(), 'Schedules', 98, 103), text: 'Build the revolver in Schedules C98:J103: cash before it, the minimum, a draw to cover a gap and a repayment from a surplus.' },
+  { id: 'rev-interest', of: () => pick(ALL(), 'Schedules', 104, 106), text: 'Add the revolver’s average balance, its interest behind the breaker, and the effective rate in Schedules C104:J106.' },
+  { id: 'totals', of: () => pick(ALL(), 'Schedules', 109, 111), text: 'Total the debt and the interest in rows 109 and 110, and net debt against the BS cash in row 111.' },
+  { id: 'is', of: () => pick(ALL(), 'IS'), text: 'Link interest on the IS, row 28, to the total on Schedules, as a cost, through the projection flag.' },
+  { id: 'cf', of: () => pick(ALL(), 'CF'), text: 'Link the draws and repayments on CF: the term loan in C18:J19, the delayed draw in C20:J21, the revolver in C24:J24.' },
+  { id: 'bs', of: () => pick(ALL(), 'BS'), text: 'Link the three closing balances to the BS, rows 15 to 17, until the balance check reads 0 in every year.' },
 ];
 const REQUIRES = ['ctrl-enter-fill', 'go-to', 'cross-sheet-ref', 'if-function', 'min-max-cap', 'iterative-calc', 'sum-family', 'iferror-function', 'index-match'];
-const GOALS = PARTS.map(p => ({ id: p.id, text: p.text, keys: p.blocks.map(blockKeys).join(' '), requires: REQUIRES, convention: p.id === 'cf' || p.id === 'bs' || p.id === 'is' ? 'B2' : 'C3',
-  check: (s, ses) => !ses.editing && !ses.dialog && built(ses, p.blocks, want(ses)) }));
+const GOALS = PARTS.map(p => ({ id: p.id, text: p.text, get keys() { return p.of().map(blockKeys).join(' '); }, requires: REQUIRES, convention: p.id === 'cf' || p.id === 'bs' || p.id === 'is' ? 'B2' : 'C3',
+  check: (s, ses) => !ses.editing && !ses.dialog && built(ses, p.of(), want(ses)) }));
 
 export const GRADERS = [
-  ses => figures(ses, ALL.filter(b => b.sheet === 'Schedules'), want(ses)) ? { ok: true } : { ok: false, why: 'the debt schedule does not reach the finished figures on these terms. Each tranche is a corkscrew, and interest reads the average balance behind the breaker' },
-  ses => figures(ses, ALL.filter(b => b.sheet !== 'Schedules'), want(ses)) && moves(ses, 'IS!G28', 'Inputs!C76') && moves(ses, 'BS!G16', 'Inputs!F75') && moves(ses, 'CF!F20', 'Inputs!F75') ? { ok: true } : { ok: false, why: 'a link from the schedule is missing. Interest goes to the IS, draws and repayments to the cash flow, closing balances to the BS' },
+  ses => figures(ses, ALL().filter(b => b.sheet === 'Schedules'), want(ses)) ? { ok: true } : { ok: false, why: 'the debt schedule does not reach the finished figures on these terms. Each tranche is a corkscrew, and interest reads the average balance behind the breaker' },
+  ses => figures(ses, ALL().filter(b => b.sheet !== 'Schedules'), want(ses)) && moves(ses, 'IS!G28', 'Inputs!C76') && moves(ses, 'BS!G16', 'Inputs!F75') && moves(ses, 'CF!F20', 'Inputs!F75') ? { ok: true } : { ok: false, why: 'a link from the schedule is missing. Interest goes to the IS, draws and repayments to the cash flow, closing balances to the BS' },
   ses => balanced(ses) ? { ok: true } : { ok: false, why: 'the balance check is not 0 in every year, so the flag does not read OK' },
 ];
 
@@ -85,5 +87,5 @@ export default {
     'Fresh terms, an empty schedule, and fifteen minutes later the debt ties: three tranches, the circle closed behind the breaker, every link in place and the balance check at 0 in every year.',
     'That is the schedule a lender’s model is checked against, and you built it under a clock.',
   ],
-  solution: hintToScript(GOALS.map(g => g.keys).join(' ')),
+  get solution() { return hintToScript(GOALS.map(g => g.keys).join(' ')); },
 };

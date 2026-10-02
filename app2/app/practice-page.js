@@ -48,12 +48,16 @@ export const DRILL_MODULE = {
   'format-the-weekly-page': 'format',
   'insert-and-amend': 'formulas', 'formula-sprint': 'formulas', 'combine-two-tabs': 'formulas',
   'before-you-send': 'present-and-audit', 'weekly-sales-report': 'present-and-audit',
+  // Chapter 5 (script-ch5.md's module ids)
+  'ch5-statement-link': 'linking-the-statements', 'ch5-schedule-fill': 'schedules', 'ch5-balance-it': 'linking-the-statements',
+  'ch5-discount-it': 'dcf', 'ch5-sweep': 'linking-the-statements', 'ch5-checks': 'auditing-a-model',
+  'ch5-revenue-build': 'model-speed', 'puzzle-ch5': 'linking-the-statements',
 };
 
 /** A drill's teaching module ({ id, n, title, lessons }) or null. */
 export function drillModule(drill) {
   const id = (drill && (drill.kind === 'challenge' ? drill.module : DRILL_MODULE[drill.id])) || null;
-  const ch = (drill && drill.kind === 'challenge' && CHAPTERS.find(c => c.id === drill.chapter)) || CHAPTERS[0];
+  const ch = (drill && CHAPTERS.find(c => c.id === drill.chapter)) || CHAPTERS[0];
   const k = id && ch ? modulesOf(ch).findIndex(m => m.id === id) : -1;
   if (k < 0) return null;
   const m = modulesOf(ch)[k];

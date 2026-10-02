@@ -570,7 +570,10 @@ export function validateDrill(d) {
   need(ACCESS.includes(d.access), 'access must be free | paid');
   need(d.benchmark === undefined || typeof d.benchmark === 'boolean', 'benchmark must be true or false');
   need(d.seed === undefined || typeof d.seed === 'function', 'seed must be a function (rng) => cells patch');
-  need(isObject(d.sheet), 'sheet (starting sheet) missing');
+  // a drill starts from its own sheet, or (Chapter 5 on) from a named workbook state with a planting over it
+  const onWorkbook = typeof d.workbook === 'string' && isObject(d.state) && typeof d.state.before === 'string';
+  need(isObject(d.sheet) || onWorkbook, 'sheet (starting sheet) or workbook and state.before missing');
+  need(!onWorkbook || d.seed === undefined, 'a workbook drill plants its fault with plant, not a seed');
   need(d.sheets === undefined || (Array.isArray(d.sheets) && d.sheets.every(isObject)), 'sheets must be an array of { name, cells } records');
   need(Number.isInteger(d.optimalKeys) && d.optimalKeys > 0, 'optimalKeys must be a positive integer');
   const p = d.pars;
@@ -591,6 +594,7 @@ export function validateDrill(d) {
   const ends = Array.isArray(d.endState) ? d.endState.filter(isObject) : [];
   for (const e of ends) { need(typeof e.text === 'string', 'endState entries need text'); need(typeof e.check === 'function', 'endState entries need a check'); }
   need(typeof d.solution === 'string' && d.solution.trim(), 'solution keystrokes missing');
-  if (isObject(d.sheet)) validateStartingSheet(d, goals, ends, need);
+  if (onWorkbook) validateStartingSheet(d, goals, ends, need, { moduleLesson: true, kind: 'drill' });
+  else if (isObject(d.sheet)) validateStartingSheet(d, goals, ends, need);
   return errs;
 }
