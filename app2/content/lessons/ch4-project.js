@@ -89,7 +89,7 @@ export const keysFor = (sites = SITES) => {
     window: [one('Summary!C50', '=SUMIFS(Export!$E$5:$E$94,Export!$A$5:$A$94,">="&C48,Export!$A$5:$A$94,"<="&C49)'), `'=SUMIFS(Export!$F$5:$F$94,Export!$A$5:$A$94,">="&C48,Export!$A$5:$A$94,"<="&C49)' ↵`].join(' '),
     names: [DEF('Scenarios!C11', 'Case'), DEF('Lists!L5:L7', 'Cases'), DEF('Inputs!C5', 'Cost_Per_Wash'), DEF('Lists!N5:N10', 'Sites'), DEF('Inputs!C15', 'Ticket'), 'Ctrl+G "Inputs!B19" ↵ F3 Alt+L'].join(' '),
     pickers: [PICK('Scenarios!C10', 'Cases'), PICK('Summary!C34', 'Sites')].join(' '),
-    switch: [one('Scenarios!C11', '=MATCH(C10,Lists!$L$5:$L$7,0)'), one('G5', '=CHOOSE(Case,C5,D5,E5)'), 'Shift+↓ ×2 "=INDEX(C6:E6,Case)" Ctrl+↵'].join(' '),
+    switch: [one('Scenarios!G5', '=CHOOSE(Case,C5,D5,E5)'), 'Shift+↓ ×2 "=INDEX(C6:E6,Case)" Ctrl+↵', one('Case', '=MATCH(C10,Lists!$L$5:$L$7,0)')].join(' '),
     driver: one('Scenarios!C14', '=IF(C13="",Inputs!$C$15,C13)'),
     outputs: ['Ctrl+G "Scenarios!C17" ↵', ...['=G8*G5*Inputs!$C$10', '=C17*C14', '=-C17*Inputs!$C$5', '=-C17*(1-G7)*Inputs!$C$7', '=-G8*Inputs!$C$10*Inputs!$C$8', '=SUM(C18:C21)', '=-Inputs!$C$9', '=C22+C23', '=C24/C18'].map(f => `"${f}" ↵`)].join(' '),
     'break-even': ['Ctrl+G "Scenarios!C41" ↵ "=INDEX(Lists!$H$5:$H$10,MATCH(C40,Lists!$B$5:$B$10,0))" ↵ "=C14-Inputs!$C$5-(1-G7)*Inputs!$C$7" ↵ ↓ "=C43*C42-C41" ↵ "=C41/C42" ↵',
@@ -97,7 +97,7 @@ export const keysFor = (sites = SITES) => {
     checks: [one('Summary!C72', '=F21-SUM(Export!$E$5:$E$94)'), '"=F31-SUM(Export!$F$5:$F$94)" ↵ "=ROUND(M11*H11-L11,0)" ↵ "=H11-F21" ↵ "=F67-F21" ↵ "=IF(AND(C72=0,C73=0,C74=0,C75=0,C76=0),0,1)" ↵',
       one('Scenarios!C58', '=INDEX($C$54:$E$54,Case)-C24'), '"=ROUND(C45,0)-C46" ↵ "=IF(AND(C25>=0,C25<=1),0,1)" ↵'].join(' '),
     log: ['Ctrl+G "\'Q&A\'!E6" ↵', ...['=Summary!I5', '=Summary!M11', '=Summary!C44', '=Summary!F21', '=Summary!J11'].map(f => `"Answered" Tab "${f}" ↵`),
-      'Ctrl+G "E12" ↵', ...['=Summary!C51', '=Scenarios!E54', '=Scenarios!C46'].map(f => `"Answered" Tab "${f}" ↵`)].join(' '),
+      '↓', ...['=Summary!C51', '=Scenarios!E54', '=Scenarios!C46'].map(f => `"Answered" Tab "${f}" ↵`)].join(' '),
   };
 };
 
@@ -135,7 +135,7 @@ export const TEXTS = {
   window: 'Sum the washes and the retail revenue between the window’s two dates in Summary C50:C51 with SUMIFS.',
   names: 'Define Case, Cases, Cost_Per_Wash, Sites and Ticket with Alt M M D, then paste the list on Inputs from B19.',
   pickers: 'Point the case picker in Scenarios C10 at =Cases and the site picker in Summary C34 at =Sites.',
-  switch: 'Wire the switch on Scenarios: C11 by MATCH on the picker, then the live column G5:G8 by CHOOSE and INDEX on Case.',
+  switch: 'Wire the switch on Scenarios: the live column G5:G8 by CHOOSE and INDEX on Case, then Case itself in C11 by MATCH on the picker.',
   driver: 'Put the pass-through driver in Scenarios C14: the ticket on Inputs unless C13 holds a figure.',
   outputs: 'Build the outputs in Scenarios C17:C25 from the live column, from washes a year down to EBITDA and its margin.',
   'break-even': 'Build break-even in Scenarios C41:C45, Goal Seek C44 to 0 by changing C43, and note the answer in C46.',

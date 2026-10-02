@@ -60,3 +60,11 @@ test('F3 Paste List writes the names and their references from the active cell, 
   S.goTo(1, 5); s.run('F3 Down Down Down Enter'); assert.equal(s.editing, true, 'OK starts a formula with the name'); s.run('Enter'); assert.equal(S.value('E1'), 14);
   s.run('Alt M N'); assert.equal(s.dialog, 'namemgr', 'Alt M N opens the Name Manager too');
 });
+
+test('a planting can carry names: #names merges into the workbook names, alphabetical, null deletes', async () => {
+  const { applyStatePatch } = await import('../content/workbooks/index.js');
+  const st = { names: { Ticket: 'Inputs!$C$15', Case: 'Scenarios!$C$11' }, sheets: [{ name: 'Inputs', cells: {} }] };
+  applyStatePatch(st, { '#names': { OldTicket: 'Scenarios!$G$6', Case: null }, 'Inputs!B17': { value: 'Names' } });
+  assert.deepEqual(Object.entries(st.names), [['OldTicket', 'Scenarios!$G$6'], ['Ticket', 'Inputs!$C$15']]);
+  assert.equal(st.sheets[0].cells.B17.value, 'Names');
+});

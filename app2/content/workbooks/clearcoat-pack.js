@@ -873,6 +873,8 @@ const NAMES_HEAD = ['B17', 'C18'];
 /** What Paste List writes from Inputs!B19 for a set of names: the names alphabetical in B, what they refer to (as text) in C. */
 export const pasteListCells = (names, at = 19) => Object.fromEntries(Object.entries(sortNames(names)).flatMap(([n, ref], i) => [['B' + (at + i), { value: n }], ['C' + (at + i), { value: '=' + ref }]]));
 const S462start = derive(S461, s => { s.names = sortNames({ ...s.names, ...STRAY_NAMES }); take(s, SOLVED, 'Inputs', NAMES_HEAD); });
+/** 4.6.2's planting over S461 (the chain stays S461 to S462): the stray in the Name Manager and the list's heading on Inputs, as S462start holds them. */
+export const NAME_MANAGER_PLANT = { '#names': STRAY_NAMES, ...Object.fromEntries(NAMES_HEAD.map(ref => ['Inputs!' + ref, clone(sheetOf(S462start, 'Inputs').cells[ref])])) };
 // 4.6.2 The Name Manager: the stray deleted, CostPerWash renamed Cost_Per_Wash, the list pasted on Inputs from B19
 const S462 = derive(S462start, s => {
   s.names = sortNames({ Case: NAMES.Case, Ticket: NAMES.Ticket, Cost_Per_Wash: NAMES.Cost_Per_Wash });
@@ -951,12 +953,12 @@ export const DALLAS = [
   { code: 'DAL-KNO', name: 'Knox Park', tab: 'KnoxPark', cluster: 'Dallas', opened: dateToSerial(2026, 8, 24), capacity: 140, hours: 14, costs: 1250, target: 185, ticket: 13.5 },
 ];
 export const EXPORT_DALLAS = { ...EXPORT_NEXT, seed: 20261002, city: 'Dallas' };
-/** The assessment's pack (4.A): Dallas on its own fortnight, cut the way the project's is. A seed reruns the export's figures over the same cells. */
+/** The assessment's pack (4.A): Dallas on its own fortnight, cut the way the project's is. A seed reruns the export’s figures over the same cells. */
 export const buildAssessment = (seed = EXPORT_DALLAS.seed) => buildSolved({ ex: { ...EXPORT_DALLAS, seed }, sites: DALLAS });
 const ASSESS = buildAssessment();
 const SAraw = cutPack(ASSESS);
 const SAdone = ASSESS.state;
-/** The cells a reseeded export changes: the export's typed figures (C, D, F, G; the codes and dates stay) and each site tab's weekly figures. */
+/** The cells a reseeded export changes: the export’s typed figures (C, D, F, G; the codes and dates stay) and each site tab's weekly figures. */
 export function freshFigures(seed) {
   const fresh = buildAssessment(seed).state; const patch = {};
   const ex = sheetOf(fresh, 'Export').cells;

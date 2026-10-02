@@ -1,4 +1,4 @@
-// Chapter 4 · 4.6.2 The Name Manager (clearcoat-pack, S462start → S462)
+// Chapter 4 · 4.6.2 The Name Manager (clearcoat-pack, S461 → S462, planted)
 // The pack holds the three names of 4.6.1 and a stray, OldTicket, still pointing at the ticket's old
 // cell on Scenarios. The learner opens the Name Manager (Ctrl+F3), deletes the stray, renames
 // CostPerWash to Cost_Per_Wash, goes to the renamed name, and pastes the list of names under its
@@ -6,7 +6,7 @@
 // Name Manager's picked row while it is open, the cell Go To lands on, and the pasted list against
 // the names themselves (so any order of the steps that ends in the same list passes).
 import { hintToScript } from '../../app/runner.js';
-import { NAMES } from '../workbooks/clearcoat-pack.js';
+import { NAMES, NAME_MANAGER_PLANT } from '../workbooks/clearcoat-pack.js';
 
 const sheetOf = (ses, name) => { const e = ses.sheets.find(x => x.name === name); return e ? e.sheet : null; };
 const settled = ses => !ses.editing && !ses.dialog;
@@ -28,7 +28,8 @@ export default {
   section: 'Names and structure',
   module: 'names-and-structure',
   workbook: 'clearcoat-pack',
-  state: { before: 'S462start', after: 'S462' },
+  state: { before: 'S461', after: 'S462' },
+  plant: NAME_MANAGER_PLANT,
   title: 'The Name Manager',
   difficulty: 'medium',
   tags: ['names', 'structure', 'audit'],

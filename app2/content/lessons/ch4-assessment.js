@@ -1,7 +1,7 @@
 // Chapter 4 · 4.7.A Assessment: a fresh export, twelve minutes (seeded over SAraw; also the test-out)
 // The project's diligence pack again, against a twelve-minute clock, on another cluster: Dallas's
 // six sites on their own fortnight, cut the way the project's pack is (buildSolved with Dallas's
-// sites, then the same cells taken out). The seed reruns the export's figures with a new seed over
+// sites, then the same cells taken out). The seed reruns the export’s figures with a new seed over
 // the same cells (the retail and member counts, the revenue, the hours, and each site tab's weekly
 // figures), so the route never depends on the numbers. The goals are the project's, read
 // structurally (each formula against the finished pack, spacing and case ignored), so any seed

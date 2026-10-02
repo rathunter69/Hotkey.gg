@@ -9157,7 +9157,7 @@ export const COPY = {
    {
     "lesson_id": "ch4-project",
     "goal_index": "8",
-    "text": "Wire the switch on Scenarios: C11 by MATCH on the picker, then the live column G5:G8 by CHOOSE and INDEX on Case.",
+    "text": "Wire the switch on Scenarios: the live column G5:G8 by CHOOSE and INDEX on Case, then Case itself in C11 by MATCH on the picker.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -9279,7 +9279,7 @@ export const COPY = {
    {
     "lesson_id": "ch4-assessment",
     "goal_index": "8",
-    "text": "Wire the switch on Scenarios: C11 by MATCH on the picker, then the live column G5:G8 by CHOOSE and INDEX on Case.",
+    "text": "Wire the switch on Scenarios: the live column G5:G8 by CHOOSE and INDEX on Case, then Case itself in C11 by MATCH on the picker.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -9501,14 +9501,14 @@ export const COPY = {
    "name": "Project and assessment",
    "objective": "Build the San Antonio databook end to end, then prove it against the clock; or test out of the chapter.",
    "story_beat": "The databook, tied out. || A fresh export, a fresh site list, a Summary someone else abandoned. Rebuild it so every number reads the export and the flag reads OK, then value the next site on the list. Build it, then build it again on the clock. The assessment is the test-out.",
-   "page_name": "The diligence packThe KPI databook"
+   "page_name": "The KPI databook"
   },
   "names-and-structure": {
    "id": "names-and-structure",
    "name": "Names and structure",
    "objective": "Naming the toggles and key inputs, sparingly; the Name Manager; a validation list driven by a name.",
    "story_beat": "Name the switch, not everything. || The pack is thirteen sheets now, and the case switch is read from all over it. A name turns Scenarios!$C$11 into Case, so a formula reads like English and a reviewer finds the switch by name. But a model with a hundred names is worse than one with none. Name the toggles and the key inputs, manage them, and let the picker read its list by name.",
-   "page_name": "The pack"
+   "page_name": "The pack, wired by name"
   },
   "ch4-project-and-assessment": {
    "id": "ch4-project-and-assessment",
