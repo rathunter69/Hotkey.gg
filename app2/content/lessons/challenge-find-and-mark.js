@@ -49,8 +49,8 @@ export default {
         : { formula: `=C${r}*D${r}` };
     }
     patch['Raw!C33'] = { value: 240 };   // the washes typed as text would poison =C33*D33; the seed feeds them clean
-    // the export's layout, the same on every seed: headers left over their numbers, row 1 at the
-    // default height, the site column too narrow for any cluster's names
+    // the layout of the export, the same on every seed: headers left over their numbers, row 1 at
+    // the default height, the site column too narrow for the names of any cluster
     for (const [ref, value] of Object.entries(HEADERS)) patch['Raw!' + ref] = { value, bold: true };
     const rowH = { ...S2A_RAW.rowH }; delete rowH[1];
     patch['Raw!#rowH'] = rowH;
