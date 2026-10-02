@@ -190,9 +190,11 @@ body[data-route="lesson"] #hkToast, body[data-route="due"] #hkToast, body[data-r
 .tc[data-pointer="top"]::before{display:block; top:calc(-1 * var(--s2)); left:calc(var(--tc-at) - var(--s2)); border-bottom:0; border-right:0}
 .tc[data-pointer="bottom"]::before{display:block; bottom:calc(-1 * var(--s2)); left:calc(var(--tc-at) - var(--s2)); border-top:0; border-left:0}
 .tc-head{display:flex; align-items:center; justify-content:space-between; gap:var(--s3); font-size:var(--fs-label); color:var(--ink-2)}
-.tc-segs i{width:var(--s5)}
-.tc-count{white-space:nowrap}
+.tc-segs{flex:0 1 auto; min-width:0; overflow:hidden}   /* the segments give way first: "Goal 2 of 10" always shows whole */
+.tc-segs i{width:var(--s5); flex:0 1 var(--s5); min-width:var(--s1)}
+.tc-count{white-space:nowrap; flex:none}
 .tc-goal{font-size:var(--fs-panel); font-weight:var(--fw-bold); line-height:1.35; color:var(--ink)}
+.tc-goal, .tc-teach, .tc-intro, .tc-keys, .tc-type, .tc-alt, .tc-live{overflow-wrap:anywhere; min-width:0}   /* a long formula breaks inside the card, never past its edge */
 .tc-teach{font-size:var(--fs-name); color:var(--ink-2); line-height:var(--lh-body)}
 .tc-intro{font-size:var(--fs-name); color:var(--learn-ink); line-height:var(--lh-body); padding-bottom:var(--s2); border-bottom:1px solid var(--line)}
 .tc-keys{display:flex; flex-wrap:wrap; gap:var(--s2); align-items:center}
