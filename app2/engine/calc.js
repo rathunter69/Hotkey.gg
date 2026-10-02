@@ -36,6 +36,7 @@ export class CalcGraph {
     this.cyclic = new Set();    // the cells in a circular reference after the last recalc
     this.known = new Map();     // cid → sheet, for every sheet the graph has touched (the list, plus sheets reached through a resolver)
     this.evals = 0;             // formula evaluations in the last recalc (the benchmark reads it)
+    this.created = null;        // while a caller collects them (the liveness probe): [{ sheet, key }] of the cells a spill created, so it can remove them again
   }
   /** Forget everything: the next recalc evaluates every formula (a sheet renamed, added or removed; names changed). */
   invalidate() { this.deps.clear(); this.rdeps.clear(); this.stat.clear(); this.seen.clear(); this.volatile.clear(); this.cyclic.clear(); this.known.clear(); }
@@ -89,9 +90,10 @@ export class CalcGraph {
   /**
    * Bring every formula the last changes reach up to date. `trigger` is the sheet whose commit
    * asked (diffed first; every known sheet is diffed, since a workbook operation may have touched
-   * several). Sets each sheet's `circular`.
+   * several). Sets each sheet's `circular`. `only` ([{ sheet, key }]) narrows the diff to the
+   * cells named, for a caller that knows exactly what it changed since the last recalc.
    */
-  recalc(trigger) {
+  recalc(trigger, only) {
     this.refreshKnown();
     const dirty = new Set(); const touched = new Set();   // touched: cells whose record changed under us (spills), to re-snapshot
     const push = (fk) => { const stack = [fk]; while (stack.length) { const k = stack.pop(); if (dirty.has(k)) continue; dirty.add(k); const r = this.rdeps.get(k); if (r) for (const x of r) if (!dirty.has(x)) stack.push(x); } };
@@ -99,16 +101,21 @@ export class CalcGraph {
     const markReaders = fk => { const r = this.rdeps.get(fk); if (r) for (const x of r) push(x); };
     // 1. what changed since the last recalc
     const sheets = [...this.known.values()]; if (trigger && !this.known.has(sheetId(trigger))) { sheets.push(trigger); this.known.set(sheetId(trigger), trigger); }
-    for (const S of sheets) {
+    const diffKey = (S, cid, seen, k) => {   // one cell against what the last recalc saw: its record, its edges, its readers
+      const c = S.cells[k];
+      if (!c) { const s0 = seen.get(k); if (!s0) return; seen.delete(k); const fk = cid + '!' + k; if (s0.f) { this.setDeps(fk, new Set()); this.stat.delete(fk); this.volatile.delete(fk); this.cyclic.delete(fk); } if (s0.f || s0.v !== null) markReaders(fk); return; }
+      const f = c.formula || null, v = c.value; const s0 = seen.get(k);
+      if (s0 ? (s0.f === f && same(s0.v, v)) : (!f && v === null)) return;
+      const fk = cid + '!' + k; if (f || v !== null) seen.set(k, { f, v }); else seen.delete(k);   // a blank is what no record means: not kept
+      if (f) { this.setDeps(fk, this.staticDeps(S, k, c)); push(fk); } else if (s0 && s0.f) { this.setDeps(fk, new Set()); this.stat.delete(fk); this.volatile.delete(fk); this.cyclic.delete(fk); }
+      markReaders(fk);
+    };
+    if (only) {   // the caller names every cell it changed since the last recalc (the liveness probe): diff those, not every sheet
+      for (const { sheet: S, key } of only) { if (!this.known.has(sheetId(S))) this.known.set(sheetId(S), S); diffKey(S, sheetId(S), seenOf(sheetId(S)), key); }
+    } else for (const S of sheets) {
       const cid = sheetId(S); const seen = seenOf(cid);
-      for (const k in S.cells) {
-        const c = S.cells[k]; const f = c ? c.formula || null : null, v = c ? c.value : null; const s0 = seen.get(k);
-        if (s0 ? (s0.f === f && same(s0.v, v)) : (!f && v === null)) continue;
-        const fk = cid + '!' + k; seen.set(k, { f, v });
-        if (f) { this.setDeps(fk, this.staticDeps(S, k, c)); push(fk); } else if (s0 && s0.f) { this.setDeps(fk, new Set()); this.stat.delete(fk); this.volatile.delete(fk); this.cyclic.delete(fk); }
-        markReaders(fk);
-      }
-      for (const k of [...seen.keys()]) if (!S.cells[k]) { const s0 = seen.get(k); seen.delete(k); const fk = cid + '!' + k; if (s0.f) { this.setDeps(fk, new Set()); this.stat.delete(fk); this.volatile.delete(fk); this.cyclic.delete(fk); } if (s0.f || s0.v !== null) markReaders(fk); }
+      for (const k in S.cells) diffKey(S, cid, seen, k);
+      for (const k of [...seen.keys()]) if (!S.cells[k]) diffKey(S, cid, seen, k);
     }
     for (const fk of this.volatile) push(fk);
     // the calculation settings changed (iteration on or off, its limits): every circle runs again under the new rule
@@ -138,14 +145,14 @@ export class CalcGraph {
     const settleSpill = (S, key, snap, rect) => {   // the cells of the old and new blocks whose value moved: their readers run again, and the snapshot follows
       const keys = new Set(snap.keys()); if (rect) for (const kk of rectKeys(rect)) keys.add(kk);
       const seen = seenOf(sheetId(S));
-      for (const kk of keys) { if (kk === key) continue; const t = S.cells[kk]; const v1 = t ? t.value : null, v0 = snap.has(kk) ? snap.get(kk) : null; if (!same(v0, v1)) { touched.add(this.fk(S, kk)); seen.set(kk, { f: t ? t.formula || null : null, v: v1 }); } }
+      for (const kk of keys) { if (kk === key) continue; const t = S.cells[kk]; const v1 = t ? t.value : null, v0 = snap.has(kk) ? snap.get(kk) : null; if (!same(v0, v1)) { touched.add(this.fk(S, kk)); const f1 = t ? t.formula || null : null; if (f1 || v1 !== null) seen.set(kk, { f: f1, v: v1 }); else seen.delete(kk); } }
     };
     const applySpill = (S, key, c, rows) => {   // the anchor's block; false when a cell in the way (or the sheet's edge) blocks it
       const p = parseRef(key); const h = rows.length, w = rows[0].length;
       const want = { r1: p.r, c1: p.c, r2: p.r + h - 1, c2: p.c + w - 1 };
       if (want.r2 > S.rows || want.c2 > S.cols) { c.spillWant = want; return false; }
       for (let r = 0; r < h; r++) for (let cc = 0; cc < w; cc++) { if (!r && !cc) continue; const t = S.cells[refKey(p.r + r, p.c + cc)]; if (t && (t.formula || t.spill || (t.value !== null && t.value !== '' && t.value !== undefined))) { c.spillWant = want; return false; } }
-      for (let r = 0; r < h; r++) for (let cc = 0; cc < w; cc++) { if (!r && !cc) continue; const t = S.ensure(p.r + r, p.c + cc); const v = rows[r][cc]; t.value = v === null || v === undefined ? 0 : v; t.txt = typeof t.value === 'string' && !isErrVal(t.value); t.spill = key; t.spillVal = t.value; }
+      for (let r = 0; r < h; r++) for (let cc = 0; cc < w; cc++) { if (!r && !cc) continue; if (this.created && !S.cells[refKey(p.r + r, p.c + cc)]) this.created.push({ sheet: S, key: refKey(p.r + r, p.c + cc) }); const t = S.ensure(p.r + r, p.c + cc); const v = rows[r][cc]; t.value = v === null || v === undefined ? 0 : v; t.txt = typeof t.value === 'string' && !isErrVal(t.value); t.spill = key; t.spillVal = t.value; }
       c.spillTo = want; delete c.spillWant;
       return true;
     };
