@@ -36,7 +36,7 @@ export function summaryHtml({ student = false } = {}) {
     <ul class="ticks">${inc.map(r => `<li><i class="plan-tick" aria-hidden="true"></i><span>${esc(r)}</span></li>`).join('')}</ul>
     <ul class="plan-trust">
       <li class="fine">${esc(t('checkout_cancel', 'Cancel any time from your account.'))}</li>
-      <li class="fine">${esc(t('checkout_guarantee', 'If it’s not for you, you get your money back within 14 days.'))}</li>
+      <li class="fine">${esc(t('checkout_guarantee', 'If it’s not for you, you get your first payment back in full within 14 days.'))}</li>
       <li class="fine">${esc(t('checkout_stripe', 'Payment is handled by Stripe. Your receipt comes from Link.'))}</li>
     </ul>`;
   return panelHtml({ heading: esc(t('checkout_summary', 'Full Access')), body, mode: 'learn', cls: 'co-summary', id: 'coSummary' });

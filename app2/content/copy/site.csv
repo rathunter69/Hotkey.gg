@@ -653,7 +653,7 @@ checkout_inc_1,"All six chapters, and everything added later"
 checkout_inc_2,"Every drill, challenge and assessment"
 checkout_inc_3,"The certificate, with a page anyone can check"
 checkout_cancel,Cancel any time from your account.
-checkout_guarantee,"If it’s not for you, you get your money back within 14 days."
+checkout_guarantee,"If it’s not for you, you get your first payment back in full within 14 days."
 checkout_stripe,Payment is handled by Stripe. Your receipt comes from Link.
 checkout_have_head,You already have Full Access
 checkout_have_line,"Your plan is on the Account page, with your card and receipts under Manage billing."
