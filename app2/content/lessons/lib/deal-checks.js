@@ -95,21 +95,27 @@ export const quoted = f => (String(f).includes('"') ? `'${f}'` : `"${f}"`);
 export function fill(id, name, range) {
   const first = range.split(':')[0];
   const c = cellsAt(id, name)[first];
-  const what = c.formula || String(c.value);
+  const what = entry(c);
   return `Ctrl+G "${name}!${range}" ↵ ${quoted(what)} ${range.includes(':') ? 'Ctrl+↵' : '↵'}`;
 }
 /** Keyed lines over columns, each filled across (see fill). */
 export const fillKeys = (id, name, keys, cols, rows = ROW) => [].concat(keys).map(k => fill(id, name, cols.length > 1 ? `${cols[0]}${R(name, k, rows)}:${cols[cols.length - 1]}${R(name, k, rows)}` : cols[0] + R(name, k, rows))).join(' ');
+/** What a learner types for a cell: its formula, or its figure as the cell shows it (a percent cell takes the bare number, 2 for 2%, as Excel's automatic percent entry reads it, and keeps its format). */
+export function entry(c) {
+  if (c.formula) return c.formula;
+  if (typeof c.value === 'number' && c.fmtStyle === 'percent') return String(+(c.value * 100).toPrecision(12));
+  return String(c.value);
+}
 /** A run of cells down one column from `first`, each typed as state `id` holds it (formula or figure): Enter stays put on this workbook, so ↓ between. */
 export function typeDown(id, name, refs) {
   const cells = cellsAt(id, name);
-  const runs = refs.map(ref => { const c = cells[ref]; return quoted(c.formula || String(c.value)); });
+  const runs = refs.map(ref => quoted(entry(cells[ref])));
   return `Ctrl+G "${name}!${refs[0]}" ↵ ` + runs.join(' ↵ ↓ ') + ' ↵';
 }
 /** A run of cells across one row from the first, each typed as state `id` holds it: Tab between, Enter at the end. */
 export function typeAcross(id, name, refs) {
   const cells = cellsAt(id, name);
-  const runs = refs.map(ref => { const c = cells[ref]; return quoted(c.formula || String(c.value)); });
+  const runs = refs.map(ref => quoted(entry(cells[ref])));
   return `Ctrl+G "${name}!${refs[0]}" ↵ ` + runs.join(' Tab ') + ' ↵';
 }
 /** A hint as a replayable script: glyphs become key names, ×N expands, quoted runs stay. */
