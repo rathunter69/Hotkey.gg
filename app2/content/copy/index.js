@@ -1419,6 +1419,18 @@ export const COPY = {
    "mac_note": "",
    "story_beat": ""
   },
+  "ch4-assessment": {
+   "id": "ch4-assessment",
+   "module": "ch4-project-and-assessment",
+   "order": "4.7.A",
+   "title": "Assessment: a fresh export, twelve minutes",
+   "brief": "Dallas has sent its own fortnight: six sites you have not seen, the same misspelling in another code, a KPI page and a case sheet cut back the same way, and eight questions open. Build the same diligence pack on the clock with no help and the keyboard only, until every check reads 0. Pass, and the chapter is Verified; this is also the test-out. The key is `Ctrl+Enter`.",
+   "closing": "A cluster you had never seen, a pack to the standard: the export cleaned, the KPI page reading it, the case wired by name, break-even found, every check at 0 and the log answered. || That is the pack a buyer’s analyst opens first in the data room, and you built it under a clock.",
+   "wow": "You built the diligence pack on another cluster’s export, on the clock, and the chapter is Verified.",
+   "convention_line": "Write once, fill right; Name toggles and key inputs only; A case toggle, never copies of the file; The check is a live difference → 0; Links green; external links avoided",
+   "mac_note": "",
+   "story_beat": ""
+  },
   "remix-format-on-the-pnl": {
    "id": "remix-format-on-the-pnl",
    "module": "remixes",
@@ -9198,6 +9210,128 @@ export const COPY = {
     "why": "",
     "hint_stuck": ""
    }
+  ],
+  "ch4-assessment": [
+   {
+    "lesson_id": "ch4-assessment",
+    "goal_index": "0",
+    "text": "On Export replace the misspelt site code with the right one (Ctrl+H), so every row in B carries one of the six codes.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch4-assessment",
+    "goal_index": "1",
+    "text": "List the six site codes in Lists N5:N10, prove them with COUNTIF in O5:O11, and add the check in C26.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch4-assessment",
+    "goal_index": "2",
+    "text": "Fill the site block on Summary C5:E10 by INDEX and MATCH from Lists: the site, its capacity and its hours open.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch4-assessment",
+    "goal_index": "3",
+    "text": "Fill the KPI block on Summary F5:M11: capacity, days, washes, utilization, the peak, member washes and share, with totals.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch4-assessment",
+    "goal_index": "4",
+    "text": "Fill both cubes on Summary by SUMIFS on site and week: washes in C15:F21 and retail revenue in C25:F31, totals included.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch4-assessment",
+    "goal_index": "5",
+    "text": "Sum the washes and the retail revenue between the window’s two dates in Summary C50:C51 with SUMIFS.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch4-assessment",
+    "goal_index": "6",
+    "text": "Define Case, Cases, Cost_Per_Wash, Sites and Ticket with Alt M M D, then paste the list on Inputs from B19.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch4-assessment",
+    "goal_index": "7",
+    "text": "Point the case picker in Scenarios C10 at =Cases and the site picker in Summary C34 at =Sites.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch4-assessment",
+    "goal_index": "8",
+    "text": "Wire the switch on Scenarios: C11 by MATCH on the picker, then the live column G5:G8 by CHOOSE and INDEX on Case.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch4-assessment",
+    "goal_index": "9",
+    "text": "Put the pass-through driver in Scenarios C14: the ticket on Inputs unless C13 holds a figure.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch4-assessment",
+    "goal_index": "10",
+    "text": "Build the outputs in Scenarios C17:C25 from the live column, from washes a year down to EBITDA and its margin.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch4-assessment",
+    "goal_index": "11",
+    "text": "Build break-even in Scenarios C41:C45, Goal Seek C44 to 0 by changing C43, and note the answer in C46.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch4-assessment",
+    "goal_index": "12",
+    "text": "Fill the checks in Summary C72:C77 and Scenarios C58:C60, every one a live difference reading 0.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch4-assessment",
+    "goal_index": "13",
+    "text": "Answer the eight open questions on Q&A: mark each Answered in E and link its answer in F to the cell that holds it.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch4-assessment",
+    "goal_index": "14",
+    "text": "Does it tie? Watch the first retail count on Export jump to 500, the cubes and the KPI block move, and every check hold at 0.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
   ]
  },
  "modules": {
@@ -9367,21 +9501,21 @@ export const COPY = {
    "name": "Project and assessment",
    "objective": "Build the San Antonio databook end to end, then prove it against the clock; or test out of the chapter.",
    "story_beat": "The databook, tied out. || A fresh export, a fresh site list, a Summary someone else abandoned. Rebuild it so every number reads the export and the flag reads OK, then value the next site on the list. Build it, then build it again on the clock. The assessment is the test-out.",
-   "page_name": "The KPI databook"
+   "page_name": "The diligence packThe KPI databook"
   },
   "names-and-structure": {
    "id": "names-and-structure",
    "name": "Names and structure",
    "objective": "Naming the toggles and key inputs, sparingly; the Name Manager; a validation list driven by a name.",
    "story_beat": "Name the switch, not everything. || The pack is thirteen sheets now, and the case switch is read from all over it. A name turns Scenarios!$C$11 into Case, so a formula reads like English and a reviewer finds the switch by name. But a model with a hundred names is worse than one with none. Name the toggles and the key inputs, manage them, and let the picker read its list by name.",
-   "page_name": ""
+   "page_name": "The pack"
   },
   "ch4-project-and-assessment": {
    "id": "ch4-project-and-assessment",
    "name": "Project and assessment",
    "objective": "Build the weekly report end to end, then prove it against the clock; or test out of the chapter.",
    "story_beat": "The diligence pack. || A fresh export, a question log with eight questions open, a case sheet with three columns and no switch wired. Answer the log, build the KPI page, wire the case and name what deserves it. Build it, then build it again on another cluster’s export against the clock. The assessment is the test-out.",
-   "page_name": ""
+   "page_name": "The diligence pack"
   }
  },
  "site": {

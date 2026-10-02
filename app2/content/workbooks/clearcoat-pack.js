@@ -323,8 +323,8 @@ function summaryPage(weeks, sites, ex) {
   return page;
 }
 /** Where things sit on Summary (the rows the lessons name), read from the built page. */
-function summaryMap(at) {
-  const codes = SITES.map(s => s.code);
+function summaryMap(at, sites = SITES) {
+  const codes = sites.map(s => s.code);
   return { siteRows: codes.map(k => at[k]), totalRow: at['kpi-total'], cubeTitle: at['wc-' + codes[0]] - 2, cubeHeader: at['wc-' + codes[0]] - 1, cubeRows: codes.map(k => at['wc-' + k]), cubeTotal: at['wc-total'],
     revTitle: at['rc-' + codes[0]] - 2, revHeader: at['rc-' + codes[0]] - 1, revRows: codes.map(k => at['rc-' + k]), revTotal: at['rc-total'],
     twoWay: { title: at['tw-site'] - 1, site: at['tw-site'], week: at['tw-week'], row: at['tw-row'], col: at['tw-col'], answer: at['tw-ans'] },
@@ -509,7 +509,7 @@ export function buildSolved({ ex = EXPORT, sites = SITES } = {}) {
   const rows = exportRows(ex, sites);
   const weeks = weeksOf(rows);
   const summary = summaryPage(weeks, sites, ex), scenarios = scenariosPage(ex, sites);
-  const S = summaryMap(summary.at), C = scenariosMap(scenarios.at);
+  const S = summaryMap(summary.at, sites), C = scenariosMap(scenarios.at);
   const pages = { qa: qaPage(S, C, sites), summary, scenarios, dashboard: dashboardPage(weeks, sites, ex), lists: listsPage(weeks, sites), inputs: inputsPage(ex) };
   const exportSh = exportSheet(rows, ex.label, ex.city);
   Object.assign(exportSh.cells, EXPORT_WORK.key, EXPORT_WORK.totals);
