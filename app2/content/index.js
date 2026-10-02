@@ -66,6 +66,17 @@ import grouping_and_outline_levels from './lessons/grouping-and-outline-levels.j
 import hide_group_or_separate_sheet from './lessons/hide-group-or-separate-sheet.js';
 import navigation_column from './lessons/navigation-column.js';
 import challenge_grouped_navigable from './lessons/challenge-grouped-navigable.js';
+import highlight_rules from './lessons/highlight-rules.js';
+import formula_driven_rules from './lessons/formula-driven-rules.js';
+import data_bars_and_scales from './lessons/data-bars-and-scales.js';
+import managing_rules from './lessons/managing-rules.js';
+import challenge_checks_flags from './lessons/challenge-checks-flags.js';
+import text_for_labels from './lessons/text-for-labels.js';
+import eomonth_edate from './lessons/eomonth-edate.js';
+import dynamic_titles from './lessons/dynamic-titles.js';
+import cleaning_imported_labels from './lessons/cleaning-imported-labels.js';
+import units_and_period_line from './lessons/units-and-period-line.js';
+import challenge_dynamic_header_block from './lessons/challenge-dynamic-header-block.js';
 import remix_format_on_the_pnl from './remixes/formatting-on-the-pnl.js';   // Chapter 1's format challenge, re-clothed (content/remix.js)
 
 export const CHAPTERS = [
@@ -106,6 +117,8 @@ export const CHAPTERS = [
       { name: 'Custom number formats', blurb: 'Custom number formats: the four-section code, units in the format, custom date codes for the timeline, conditions and hidden zeros.' },
       { name: 'The page a buyer reads', blurb: 'The anatomy of a financial page: title, units, timeline, sections and the answer; the actuals-to-estimates divider; borders that mean something; labels, footnotes and sources; widths and the label column; one page’s formats carried to the next.' },
       { name: 'Alignment and structure', blurb: 'Alignment and outline at scale: headers and wraps on a long page; grouping; hiding against grouping against a separate sheet; a navigation column.' },
+      { name: 'Conditional formatting', blurb: 'Conditional formatting: highlight rules for negatives and exceptions, formula-driven rules, data bars and scales and when not to use them, managing the rules.' },
+      { name: 'Dates and text for presentation', blurb: 'Text and date functions for presentation: TEXT for labels and headers, EOMONTH and EDATE for period ends, dynamic titles with &, cleaning imported labels, a units line that writes itself.' },
       { name: 'Remixes', blurb: 'Chapter 1’s challenges re-clothed in this chapter’s material: the same keys on a new sheet, so old skills stay warm.' },
     ],
     lessons: [
@@ -113,6 +126,8 @@ export const CHAPTERS = [
       the_four_section_format, units_in_the_format, dynamic_headers_with_text, conditional_codes_and_hidden_zeros, challenge_house_format_set,
       title_units_timeline_answer, actuals_vs_estimates_divider, borders_that_mean_something, labels_footnotes_sources, widths_and_the_label_column, cell_styles_format_painter, challenge_pnl_presentation_quality,
       alignment_at_scale, grouping_and_outline_levels, hide_group_or_separate_sheet, navigation_column, challenge_grouped_navigable,
+      highlight_rules, formula_driven_rules, data_bars_and_scales, managing_rules, challenge_checks_flags,
+      text_for_labels, eomonth_edate, dynamic_titles, cleaning_imported_labels, units_and_period_line, challenge_dynamic_header_block,
       remix_format_on_the_pnl,
     ],
   },

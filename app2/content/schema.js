@@ -211,6 +211,16 @@ export const CONCEPTS = {
   'outline-detail': 'Hide Detail (Alt, A, H) folds a group to its total and Show Detail (Alt, A, J) opens it again',
   'group-not-hide': 'hidden rows get forgotten: group detail that belongs on the page, and give a different page its own sheet',
   'navigation-column': 'a navigation column lists a long sheet’s named blocks at the top, and Go To with a name lands on each one',
+  // Chapter 2, modules 2.5 and 2.6: conditional formatting, and dates and text for presentation
+  'highlight-rule': 'Conditional Formatting (Alt, H, L) › Highlight Cells Rules: Less Than, Greater Than, Between, Equal To paint a cell whose value meets the test',
+  'manage-rules': 'Manage Rules (Alt, H, L, R) lists the sheet\u2019s rules in the order they run: read, delete, move up or down, Stop If True',
+  'formula-rule': 'New Rule › Use a formula (Alt, H, L, N): written for the top-left cell of the selection and read in every cell as if filled, so $A7 locks the column and lets the row move',
+  'rule-order': 'rules run top-down; Move Up puts one first, and Stop If True ends the walk for a cell where it holds',
+  'data-bars': 'Data Bars and Color Scales (Alt, H, L, D and S) draw a chart inside the cells; Clear Rules (Alt, H, L, C) takes rules off the selection or the sheet',
+  'eomonth-edate': 'EOMONTH(date, n) is the last day of the month n months on; EDATE(date, n) the same day n months on',
+  'clean-text': 'TRIM strips stray spaces, PROPER capitalizes each word, SUBSTITUTE swaps one piece of text for another: together they clean an imported label',
+  'dynamic-title': 'a title built with & from the inputs: the company name lives in one cell and every page reads it',
+  'single-source-line': 'a line every page shows is built once from the inputs and read everywhere, so one edit changes every page',
 };
 
 /**
