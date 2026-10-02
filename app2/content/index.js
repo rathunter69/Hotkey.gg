@@ -63,6 +63,7 @@ import challenge_flags_block from './lessons/challenge-flags-block.js';
 import date_serials from './lessons/date-serials.js';
 import member_tenure from './lessons/member-tenure.js';
 import period_keys from './lessons/period-keys.js';
+import yearfrac_and_fiscal_periods from './lessons/yearfrac-and-fiscal-periods.js';
 
 export const CHAPTERS = [
   {
@@ -125,7 +126,7 @@ export const CHAPTERS = [
     ],
     lessons: [
       if_on_a_threshold, nested_if_ifs_min_max, and_or_not, iferror_and_the_override, challenge_flags_block,
-      date_serials, member_tenure, period_keys,
+      date_serials, member_tenure, period_keys, yearfrac_and_fiscal_periods,
     ],
   },
 ];
