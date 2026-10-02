@@ -13,6 +13,7 @@
 
 import { COMMANDS, MENUS, TABS, RIBBON_ICONS, RIBBON_MENU_ICONS, QAT_COMMANDS } from '../engine/ribbon.js';
 import { NO_GROUP_NOTE, COMMA_STYLE_CODE } from '../engine/keyboard.js';
+import { TOOL_DIALOGS } from '../engine/tools.js';
 
 /* ---------------- mouse recording (SITE_SPEC §6) ---------------- */
 /**
@@ -29,9 +30,9 @@ export function recordMouse(session, what) {
 }
 
 /** Dialogs that own the input while open: the sheet and the bar behind them ignore clicks (Excel's modal cards). */
-export const MODAL_DIALOGS = new Set(['fmt', 'paste', 'colw', 'rowh', 'sortwarn', 'series', 'fxfix', 'goto', 'options', 'pagesetup', 'renamesheet', 'deletesheet', 'movesheet', 'find', 'gotospecial', 'group', 'numfmt', 'condfmt', 'condrules', 'databar', 'colorscale', 'formatcells', 'zoom', 'definename', 'note']);
+export const MODAL_DIALOGS = new Set(['fmt', 'paste', 'colw', 'rowh', 'sortwarn', 'series', 'fxfix', 'goto', 'options', 'pagesetup', 'renamesheet', 'deletesheet', 'movesheet', 'find', 'gotospecial', 'group', 'numfmt', 'condfmt', 'condrules', 'databar', 'colorscale', 'formatcells', 'zoom', 'definename', 'note', ...TOOL_DIALOGS]);
 /** The dialogs drawn as floating cards over the sheet (ribbon-view drawDialog), not as anchored dropdowns. */
-export const CARD_DIALOGS = new Set(['fmt', 'paste', 'goto', 'options', 'pagesetup', 'renamesheet', 'deletesheet', 'movesheet', 'find', 'gotospecial', 'group', 'numfmt', 'condfmt', 'condrules', 'databar', 'colorscale', 'formatcells', 'series', 'zoom', 'definename', 'note']);
+export const CARD_DIALOGS = new Set(['fmt', 'paste', 'goto', 'options', 'pagesetup', 'renamesheet', 'deletesheet', 'movesheet', 'find', 'gotospecial', 'group', 'numfmt', 'condfmt', 'condrules', 'databar', 'colorscale', 'formatcells', 'series', 'zoom', 'definename', 'note', ...TOOL_DIALOGS]);
 
 /** Leave the Alt walk without acting (a mouse command supersedes any open KeyTip path or dropdown). */
 export function leaveRibbon(session) { if (session.mode === 'ribbon') session.exitRibbon(false); }

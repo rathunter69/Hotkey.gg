@@ -1000,6 +1000,28 @@ const methods = {
     return n > 0;
   },
 
+  /* ---------------- what the workbook keeps beside its sheets (the saved lesson state) ---------------- */
+  /**
+   * The workbook-level records a saved state carries beyond the sheets: the custom cell styles
+   * (New Cell Style), the Watch Window's watches and the values kept with each link to another
+   * workbook (Edit Links). Only what is set: an untouched workbook adds nothing to its state.
+   */
+  workbookExtras() {
+    const out = {};
+    if (this.cellStyles && this.cellStyles.length) out.cellStyles = clone(this.cellStyles);
+    if (this.watches && this.watches.length) out.watches = clone(this.watches);
+    if (this.externalValues && Object.keys(this.externalValues).length) out.externalValues = clone(this.externalValues);
+    return out;
+  },
+  /** Load what workbookExtras wrote (a state's cellStyles / watches / externalValues); returns true when the cached link values changed, so the caller recalculates. */
+  loadWorkbookExtras(st) {
+    if (!st || typeof st !== 'object') return false;
+    if (Array.isArray(st.cellStyles)) this.cellStyles = clone(st.cellStyles).filter(x => x && typeof x.name === 'string' && x.includes && x.fmt);
+    if (Array.isArray(st.watches)) this.watches = clone(st.watches).filter(w => w && typeof w.sheet === 'string' && typeof w.key === 'string');
+    if (st.externalValues && typeof st.externalValues === 'object') { const ev = {}; for (const k in st.externalValues) ev[k.toLowerCase()] = clone(st.externalValues[k]); this.externalValues = ev; return true; }
+    return false;
+  },
+
   /* ---------------- references typed into a tool's box ---------------- */
   /** A single-cell reference typed in a dialog (B5, $B$5, Inputs!B5, 'Rate Card'!$B$5, a defined name): { sheet, key, name } or null. */
   toolRef(text, { sameSheet = false } = {}) {

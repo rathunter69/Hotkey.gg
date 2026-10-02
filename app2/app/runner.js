@@ -68,6 +68,8 @@ export class LessonRun {
     // the workbook's defined names ({ CostPerWash: 'Inputs!$B$4' }, from 1.3.5's Define Name)
     // (the setter recalculates the workbook); otherwise one recalculation now, so cross-sheet links read
     // their sheets once every sheet exists and a chain across sheets settles (no #REF! until the first edit)
+    // the workbook's own records beside its sheets: custom cell styles, watches, the values kept with links to other workbooks
+    if (moduleState && this.session.loadWorkbookExtras) this.session.loadWorkbookExtras(moduleState);
     if (moduleState && moduleState.names && typeof moduleState.names === 'object' && Object.keys(moduleState.names).length) this.session.names = moduleState.names;
     else this.session.recalcAll();
     this.landedAt = [];   // when each goal landed (the session clock), for split times

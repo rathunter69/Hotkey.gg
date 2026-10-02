@@ -748,6 +748,7 @@ export function sessionToState(ses) {
     settings: { calcMode: ses.settings.calcMode, iterative: ses.settings.iterative, qat: ses.settings.qat.slice(), pageSetup: clone(ses.settings.pageSetup),
       ...(ses.settings.enterMoves === false ? { enterMoves: false } : {}) },
     ...(ses.names && Object.keys(ses.names).length ? { names: { ...ses.names } } : {}),
+    ...(ses.workbookExtras ? ses.workbookExtras() : {}),   // custom cell styles, watches, the values kept with external links
   };
 }
 /** The engine's Page Setup default: what a state means when it says nothing about printing. */
@@ -788,6 +789,7 @@ export function diffStates(a, b) {
     if (!same(cfNorm(sa.condFmt), cfNorm(sb.condFmt))) out.push({ sheet: name, kind: 'condFmt', key: 'condFmt', a: sa.condFmt, b: sb.condFmt });
   }
   if (!same(a.names || {}, b.names || {})) out.push({ sheet: '*', kind: 'names', key: 'names', a: a.names, b: b.names });
+  for (const k of ['cellStyles', 'watches', 'externalValues']) if (!same(a[k] || null, b[k] || null)) out.push({ sheet: '*', kind: k, key: k, a: a[k], b: b[k] });
   if (!same(normSettings(a.settings), normSettings(b.settings))) out.push({ sheet: '*', kind: 'settings', key: 'settings', a: a.settings, b: b.settings });
   return out;
 }
