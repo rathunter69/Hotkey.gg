@@ -62,6 +62,7 @@ test('every workbook declares its finished pages, and each one is to standard', 
 test("every drill's solved sheet is to standard", () => {
   for (const d of DRILLS) {
     if (d.kind === 'challenge' || PENDING_DRILLS.has(d.id)) continue;
+    if (d.workbook) continue;   // a workbook drill (Chapter 5) runs on the workbook's own pages, held to the standard by the workbook test above
     const run = new LessonRun(d, { mode: 'timed' });
     run.run(d.solution);
     for (const { name, sheet } of run.session.sheets) {
