@@ -1839,6 +1839,558 @@ export const COPY = {
    "mac_note": "",
    "story_beat": ""
   },
+  "the-income-statement": {
+   "id": "the-income-statement",
+   "module": "the-three-statements",
+   "order": "5.1.1",
+   "title": "The income statement",
+   "brief": "The income statement says what a business earned and spent over a period, and every line has a car-wash meaning: a wash sold is revenue, chemicals are cost of sales, the crew and the rent are site costs, the tunnel wearing out is depreciation, the loan costs interest and the government takes tax. What is left is net income. You built a P&L to EBITDA in Chapter 2; this one goes to the bottom line, for Domain, for September, every line a formula on the inputs above it. The key is `=`.",
+   "closing": "Domain earned $15,561 in September out of $104,250 of washes, and every line between means something the site did. || Best practice: costs go in as negatives and every subtotal is a plain sum, so a reader never has to guess which way a line points. EBITDA is the line a buyer prices; net income is what is left for the owners after the lenders and the government. The next lesson asks why that profit isn’t the cash in the bank.",
+   "wow": "Twenty lines from the first wash to the bottom line, and every one of them means something the site did.",
+   "convention_line": "Income positive, costs negative; One input, one cell; formulas reference it",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "accrual-and-cash": {
+   "id": "accrual-and-cash",
+   "module": "the-three-statements",
+   "order": "5.1.2",
+   "title": "Accrual and cash: why profit isn’t cash",
+   "brief": "A member pays $30 on the 1st for washes they’ll take all month, so on the 1st the cash is in the bank and none of the revenue is earned; the unearned part is deferred revenue, a liability, because the company owes the member washes. The chemical supplier is paid in thirty days, so September’s chemicals are a cost in September and cash in October: a payable. Card revenue settles in three days: a receivable. Profit and cash differ by timing gaps like these, so build them for Domain’s month. The key is `=`.",
+   "closing": "On this page profit and cash differ by three timing gaps, and now you can name each one. || Domain made $15,561 and kept $26,003 of cash from operations: depreciation added back, a payable that grew by $450, a receivable that grew by $425. Best practice: read a working-capital line as a change, and a rise in what the business owes is cash in, a rise in what it’s owed is cash out.",
+   "wow": "Three timing gaps, and now you can say where every dollar between profit and cash went.",
+   "convention_line": "The check is a live difference → 0; One input, one cell; formulas reference it",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "the-cash-flow-statement": {
+   "id": "the-cash-flow-statement",
+   "module": "the-three-statements",
+   "order": "5.1.3",
+   "title": "The cash flow statement",
+   "brief": "The cash flow statement starts from net income and walks back to cash in three parts. Operations adds back depreciation, because nothing was paid for the wear, and adjusts for the working-capital gaps from 5.1.2; investing is the cash spent on tunnels and equipment, capex; financing is loans drawn and repaid. The three sum to the change in cash, and opening cash plus the change is closing cash. Build Domain’s for September, the indirect way. The key is `=`.",
+   "closing": "The statement walks from net income back to the cash in the bank, in three parts. || Domain made $15,561, kept $26,003 from operations, spent $2,085 on equipment and repaid $6,250 of the loan: $17,668 more cash than it started the month with. Best practice: one sign convention, stated once, so a buyer adds the three parts without reading a single label.",
+   "wow": "From net income to the cash in the bank, in three parts, and every line a link.",
+   "convention_line": "Income positive, costs negative; Cash balances the sheet; nothing is forced",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "the-balance-sheet": {
+   "id": "the-balance-sheet",
+   "module": "the-three-statements",
+   "order": "5.1.4",
+   "title": "The balance sheet",
+   "brief": "The balance sheet is a snapshot: what the company owns (cash, receivables, the tunnels net of wear), what it owes (payables, deferred revenue, debt) and what is left for the owners, equity, which grows by net income. The cash flow statement’s closing cash lands in the top line, and if everything else is right, assets equal liabilities plus equity. That equality is the check that proves the other two statements. Build Domain’s at September 30 and watch it balance. The key is `=`.",
+   "closing": "Assets equal liabilities plus equity, and that one zero proves the other two statements. || Cash came from the cash flow, net income from the income statement, and the two sides agreed without a number forced. Best practice: never type cash, never plug the check; when it doesn’t read zero, something upstream is wrong, and 5.4.5 is the order to look in.",
+   "wow": "Assets equal liabilities plus equity, and that one zero proves the other two statements.",
+   "convention_line": "Cash balances the sheet; nothing is forced; The check is a live difference → 0",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "how-the-statements-link": {
+   "id": "how-the-statements-link",
+   "module": "the-three-statements",
+   "order": "5.1.5",
+   "title": "How the three statements link",
+   "brief": "Three statements, three questions: the income statement asks what the business earned over the period, the cash flow statement where the cash went, the balance sheet what it owns and owes at the end. They are one system, joined by five links: net income, depreciation, capex, debt and closing cash. Each link is a formula, so Ctrl+[ follows it from the cell that reads it to the cell it reads. Walk all five on Domain’s page. The key is `Ctrl+[`.",
+   "closing": "Five links join three statements, and you followed each one with Ctrl+[. || Net income, depreciation, capex, debt and closing cash: every model you build or inherit joins its statements with these five. Best practice: when the check leaves zero, follow the links in this order with Ctrl+[ and the break shows itself.",
+   "wow": "Five links join three statements, and you followed each one with Ctrl+[.",
+   "convention_line": "Cash balances the sheet; nothing is forced; Go To Special, show formulas, trace",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "one-week-three-statements": {
+   "id": "one-week-three-statements",
+   "module": "the-three-statements",
+   "order": "5.1.6",
+   "title": "One week of one site through all three statements",
+   "brief": "Now the whole thing by hand, small enough to hold in your head: Domain for one week, 1,750 washes, one chemical delivery on credit, one payroll, one loan payment, one week of wear, with the balance sheet it opened on. Every event lands in at least two statements, and the balance check at the end says whether you placed each one right. It is the exercise every modeling course runs, and the one a buyer’s analyst will ask you to talk through. The key is `=`.",
+   "closing": "One week’s six events went through three statements, and the check reads zero. || The week earned $9,585 and added $15,940 to the bank, and you can say where every dollar of the gap went: depreciation, the unpaid delivery, the unpaid tax, the receivable and the principal. That walk is the one a buyer’s analyst asks for, and now you can talk it through.",
+   "wow": "Six events through three statements, two answers for cash, and both checks read zero.",
+   "convention_line": "The check is a live difference → 0; Cash balances the sheet; nothing is forced",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "read-like-a-buyer": {
+   "id": "read-like-a-buyer",
+   "module": "the-three-statements",
+   "order": "5.1.7",
+   "title": "Reading a set of statements the way a buyer does",
+   "brief": "A buyer reads three ratios before anything else: margin (EBITDA over revenue, how much of a dollar of washes becomes profit), cash conversion (cash from operations over EBITDA, how much of that profit turns into cash) and leverage (net debt over EBITDA, how many years of profit the debt represents). Build them at the foot of Domain’s statements, with interest cover and the return on the site beside them, and read what each says about a car wash. The key is `=`.",
+   "closing": "Margin, cash conversion and leverage are the three numbers a buyer reads first. || Domain turns 38% of its washes into EBITDA, converts all of it to cash, and carries about three years of profit in debt that the earnings cover four and a half times. A buyer reads those before any line above them, so they sit in the same place on every set you build.",
+   "wow": "Margin, cash conversion and leverage: the three numbers a buyer reads first, in one block.",
+   "convention_line": "One decimals setting per line; Title, units, timeline, then the answer",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "challenge-one-site-month": {
+   "id": "challenge-one-site-month",
+   "module": "the-three-statements",
+   "order": "5.1.C",
+   "title": "Challenge: one site’s month through the three statements",
+   "brief": "Mueller’s month: the inputs given and most lines in place, the ones that carry each statement left for you. Write them, from revenue to the balance check at zero and the three ratios.",
+   "closing": "",
+   "wow": "",
+   "convention_line": "The check is a live difference → 0; Cash balances the sheet; nothing is forced",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "model-architecture": {
+   "id": "model-architecture",
+   "module": "model-setup",
+   "order": "5.2.1",
+   "title": "Inputs, calculations, outputs: architecture and sheet order",
+   "brief": "A model reads left to right the way it calculates: Cover, Inputs, the three statements, the schedules that feed them, Checks, then the DCF. Inputs are blue and live on one sheet, calculations never hold a typed number, and outputs are the pages someone reads. The Cover carries the title, the case switch, the checks flag and a map of the sheets with links (2.4.4). Put the eight sheets in order with the Cover first, then finish the Cover. The key is `Alt H O M`.",
+   "closing": "Eight sheets sit in the order they calculate, and the Cover says where everything is. || Every formula from here on has a place to go: typed numbers on Inputs, workings on Schedules, the pages a buyer reads in the middle and the DCF at the end. A reviewer opening the file starts at the Cover and never hunts for a tab.",
+   "wow": "Eight tabs in the order the model calculates, and a Cover that says where everything is.",
+   "convention_line": "Name the tabs; outputs left, data right",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "timeline-flags-counters": {
+   "id": "timeline-flags-counters",
+   "module": "model-setup",
+   "order": "5.2.2",
+   "title": "The timeline row: flags and counters",
+   "brief": "Every sheet in the model shares one timeline: FY24 to FY31 across the same columns, built from one date on Inputs (2.6.2), with the A/E flags underneath (2.1.4). This time the flags do work: a projection flag (1 in a projected year, 0 in a historical one, FY26 included) lets one formula read the actual where there is one and calculate where there isn’t, and a counter drives growth and ramps. Build the row once on Inputs and link it to every sheet. The key is `EOMONTH`.",
+   "closing": "One timeline runs across eight sheets, and its flags let one row hold history and forecast. || The projection flag reads a stated date, so when FY26 closes you move one input and the model shifts a year. The counters are what growth and the ramp of a new site will read from 5.3 on, and the same year sits in the same column everywhere.",
+   "wow": "One date on Inputs, and eight years with their flags and counters on every sheet.",
+   "convention_line": "Inputs blue, formulas black; The check is a live difference → 0",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "fill-patterns": {
+   "id": "fill-patterns",
+   "module": "model-setup",
+   "order": "5.2.3",
+   "title": "The fill patterns: anchor, fill right, AutoSum a block, F4",
+   "brief": "Every skill here is Chapter 1’s: anchors (1.6.3), Ctrl+R (1.6.5), AutoSum over a block (1.6.2) and F4 to repeat (1.5.4), done as one motion across a block the size of a model. Write the first-period formula with its anchors right, select to the last period, Ctrl+R, then the next row. A row of eight is one formula; a block of forty rows is forty formulas and forty fills, and it takes minutes, not an afternoon. Practice on the cost build’s skeleton. The key is `Ctrl+R`.",
+   "closing": "Six rows across eight years took one motion each. || The pattern scales: first cell right, select, Ctrl+R, total, format, repeat. The forecast years read zero for now because the rollout they multiply comes in 5.3; when it does, every cell here answers without another keystroke.",
+   "wow": "Six rows across eight years, a total and the desk format, in five motions.",
+   "convention_line": "Write once, fill right; One decimals setting per line",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "checks-sheet-day-one": {
+   "id": "checks-sheet-day-one",
+   "module": "model-setup",
+   "order": "5.2.4",
+   "title": "The checks sheet from day one",
+   "brief": "The Checks sheet is built before the model is, with a row for every check the model will need: the balance sheet balances, cash ties to the cash flow, the debt and PP&E schedules tie to the balance sheet, revenue ties to its build, the cost build cross-foots, equity rolls, and FY26 EBITDA ties to the Chapter 2 P&L. Each is a live difference (1.7.2), and the roll-up flag (3.6.4) sits on the Cover. As each schedule is built, its check goes live. The key is `=`.",
+   "closing": "Two of eight checks are live, and the other six have their rows waiting. || The model has a conscience before it has a schedule: every check you add from 5.3 on lands in a row already waiting for it, and the Cover says OK or CHECK the moment anything stops tying.",
+   "wow": "Two checks live across eight years, six waiting their turn, and the Cover reading the lot.",
+   "convention_line": "The check is a live difference → 0; Cash balances the sheet; nothing is forced",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "populate-from-data": {
+   "id": "populate-from-data",
+   "module": "model-setup",
+   "order": "5.2.5",
+   "title": "Populate the statements from the data tab: INDEX/MATCH on label and year",
+   "brief": "The three historical years arrive on a Data tab as the accountants sent them: forty lines in their order, years across, labels that don’t match the model’s. The model’s IS should read them by name, not by position: INDEX/MATCH on the label down and the year across (4.1.4), so one formula fills the whole historical block and survives a re-sorted export. Where Data has two lines with one label, SUMIFS on label and year does the same job and adds them (4.1.7). Fill the IS historicals from Data by name. The key is `INDEX`.",
+   "closing": "The historicals read the data tab by name, so the next dump can be any shape. || Three years of actuals fill the IS with four formulas, and none of them knows which row Data put a line on. When the accountants send next year’s export with a line added, the model reads it the same way.",
+   "wow": "Three years of history on the IS, read from the export by name and year.",
+   "convention_line": "One input, one cell; formulas reference it",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "drivers-block": {
+   "id": "drivers-block",
+   "module": "model-setup",
+   "order": "5.2.6",
+   "title": "The drivers block: three cases by year, one selector, one live block",
+   "brief": "A buyer doesn’t want one forecast; they want the company’s case, their own, and the one they can live with, and they want to flip between them without opening a second file. So the drivers, the handful of inputs that move everything, live on Inputs three times, one block per case, by year, and a live block beneath reads whichever case the Cover’s switch names (4.5.1). Every schedule reads the live block and only the live block. The key is `CHOOSE`.",
+   "closing": "Three cases live on one Inputs page, and one cell on the Cover runs the whole model. || A buyer types Downside on the Cover and every schedule you build from 5.3 on answers, while the three years of history stay where the accountants put them. CHOOSE reads plainest with the cases in separate blocks; INDEX does the same job when each driver’s cases are stacked.",
+   "wow": "Three cases on one Inputs page, and one cell on the Cover runs the whole model.",
+   "convention_line": "Inputs blue, formulas black; One input, one cell; formulas reference it",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "challenge-model-shell": {
+   "id": "challenge-model-shell",
+   "module": "model-setup",
+   "order": "5.2.C",
+   "title": "Challenge: a blank model shell to standard in three minutes",
+   "brief": "Eight sheets in the wrong order, no timeline and no live checks. Order the tabs, build the timeline and its flag, link it everywhere, pull the revenue history from Data and make the balance check live.",
+   "closing": "",
+   "wow": "",
+   "convention_line": "Name the tabs; outputs left, data right; The check is a live difference → 0",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "revenue-build": {
+   "id": "revenue-build",
+   "module": "schedules",
+   "order": "5.3.1",
+   "title": "The revenue build: sites × washes × days × ticket, plus members × fee",
+   "brief": "Revenue is built from its drivers, never typed: sites from the rollout, washes a day per site, days in the year and the retail ticket, plus members times the fee. Every driver sits on Inputs and every line on Schedules is a formula, one a row, with the actual years reading Data through the projection flag. Build the rollout and the revenue build, then tie revenue on Checks. The key is `=`.",
+   "closing": "Revenue is built from sites, washes and tickets now, and a buyer can change any of them. || Best practice: a driver-based build is what a buyer will change. A revenue line that grows 8% a year is a number nobody can question or believe.",
+   "wow": "",
+   "convention_line": "Write once, fill right; One input, one cell; formulas reference it; The check is a live difference → 0",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "cost-build": {
+   "id": "cost-build",
+   "module": "schedules",
+   "order": "5.3.2",
+   "title": "The cost build: per wash, per site, fixed",
+   "brief": "Costs come in three kinds and each is built its own way: per wash as a share of revenue, per site as a cost per site × average sites growing with inflation, and fixed as a base growing 3% plus a step per new site. The per-site block is already on Schedules. Build cost of sales, the contribution line, head office and EBITDA around it. The key is `=`.",
+   "closing": "Every cost is built the way it behaves: per wash, per site, or fixed. || EBITDA is now a formula eight years long, and FY26 still reads $16.6m, the figure on the Chapter 2 P&L. Best practice: when a projected cost grows at a rate nobody can explain, rebuild it from the driver it really moves with.",
+   "wow": "",
+   "convention_line": "Write once, fill right; One input, one cell; formulas reference it",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "working-capital-schedule": {
+   "id": "working-capital-schedule",
+   "module": "schedules",
+   "order": "5.3.3",
+   "title": "Working capital: days to balances, deferred membership revenue",
+   "brief": "On a balance sheet, working capital is a set of balances; in a model it’s a set of days: receivables at three days of revenue, payables at thirty days of costs, deferred revenue at fifteen days of membership revenue. Each balance is its driver ÷ 365 × its days, and the change in each from year to year is what moves cash. Build the balances, the implied days, the changes and the cycle. The key is `=`.",
+   "closing": "Three day counts became three balances, and their changes are what move cash. || Best practice: let the implied days from the actuals decide the projection days, and label which balance the days sit on.",
+   "wow": "",
+   "convention_line": "One input, one cell; formulas reference it; Income positive, costs negative",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "ppe-and-depreciation": {
+   "id": "ppe-and-depreciation",
+   "module": "schedules",
+   "order": "5.3.4",
+   "title": "PP&E: capex per new site and the depreciation waterfall",
+   "brief": "The tunnels are the balance sheet’s biggest line, and they roll: opening PP&E plus capex less depreciation is closing PP&E. Capex is new sites × $2.5m plus maintenance at 2% of revenue; depreciation is the existing base over its remaining life plus each year’s capex over twenty years. The waterfall lays each year’s capex on its own row, so the total is a SUM down a column. Build capex, the waterfall and the roll-forward. The key is `=`.",
+   "closing": "The tunnels roll forward, and each year’s capex wears out on its own row. || Closing PP&E is the line the balance sheet will read, and the check on Checks waits for it. Best practice: a waterfall shows where depreciation comes from, which one rate on the whole balance never can.",
+   "wow": "",
+   "convention_line": "Write once, fill right; One input, one cell; formulas reference it; Read the page before anyone else does",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "debt-and-interest-circle": {
+   "id": "debt-and-interest-circle",
+   "module": "schedules",
+   "order": "5.3.5",
+   "title": "Debt and interest: the average-balance circle with a breaker",
+   "brief": "A debt tranche rolls: opening, plus draws, less repayments, is closing, and interest is the rate on the average of opening and closing. That average makes a circle once the revolver is in, which iterative calculation settles, and the Circ breaker on Inputs switches it off when it breaks. Build the term loan, the delayed-draw loan, their rate checks and the totals. The key is `=`.",
+   "closing": "Two tranches roll with interest on the average, and a switch stops the circle when it breaks. || Best practice: one breaker for the whole model, on Inputs, labeled, and circles only where the accounting demands them.",
+   "wow": "",
+   "convention_line": "Write once, fill right; Iterative calc + a circuit breaker; The check is a live difference → 0",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "tax-schedule": {
+   "id": "tax-schedule",
+   "module": "schedules",
+   "order": "5.3.6",
+   "title": "Tax",
+   "brief": "Tax is the rate on earnings before tax, and only when they are positive, which MAX handles: MAX(EBT,0) × the rate. A loss leaves a tax loss the company can use later, and the schedule carries it forward as a balance until profits absorb it. Build the schedule with the carry-forward, and read why a downside case pays less tax than the rate suggests. The key is `=`.",
+   "closing": "Tax runs at the rate when there’s profit, and a loss waits its turn. || Best practice: carry tax losses as a balance of their own, so a buyer can see what they shelter and when they run out.",
+   "wow": "",
+   "convention_line": "Write once, fill right; One input, one cell; formulas reference it",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "challenge-schedules": {
+   "id": "challenge-schedules",
+   "module": "schedules",
+   "order": "5.3.C",
+   "title": "Challenge: the schedules",
+   "brief": "A model with its schedules built and ten projected lines missing, on fresh inputs. Rebuild them across FY27 to FY31 so every line reads its drivers.",
+   "closing": "",
+   "wow": "",
+   "convention_line": "Write once, fill right; One input, one cell; formulas reference it; Iterative calc + a circuit breaker",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "is-from-schedules": {
+   "id": "is-from-schedules",
+   "module": "linking-the-statements",
+   "order": "5.4.1",
+   "title": "The income statement from the schedules",
+   "brief": "Every projected line of the income statement is a link to a schedule: revenue from the revenue build, costs from the cost build, depreciation from PP&E, interest from debt, tax from the tax schedule. The actual years read Data in the same one-formula row, and the flag decides which one a column shows. Link the statement top to bottom and read net income for FY31. The key is `=`.",
+   "closing": "The income statement reads the schedules, and net income is a formula eight years long. || Best practice: one formula a row, history and projection alike, so the only typed numbers in the model sit on Data and Inputs.",
+   "wow": "",
+   "convention_line": "Write once, fill right; Income positive, costs negative; One input, one cell; formulas reference it",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "cf-indirect": {
+   "id": "cf-indirect",
+   "module": "linking-the-statements",
+   "order": "5.4.2",
+   "title": "The cash flow statement, indirect",
+   "brief": "The cash flow statement at model scale: net income from the IS, depreciation added back, the working-capital changes with their signs, capex as a negative, the debt draws and repayments, distributions and the revolver. Then the net change, opening cash from last year’s closing, and closing cash, the line the balance sheet will read. The key is `=`.",
+   "closing": "It runs from net income to closing cash across eight years, and every line is a link. || Best practice: no typed zeros on the cash flow. A line with nothing in it yet still gets its link.",
+   "wow": "",
+   "convention_line": "Income positive, costs negative; One input, one cell; formulas reference it",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "bs-cash-not-a-plug": {
+   "id": "bs-cash-not-a-plug",
+   "module": "linking-the-statements",
+   "order": "5.4.3",
+   "title": "The balance sheet, and cash as the plug that isn’t a plug",
+   "brief": "The balance sheet links last: receivables, payables and deferred revenue from working capital, PP&E from its roll, debt from its schedule, equity as opening plus net income less distributions, and cash from the cash flow’s closing line. Cash looks like a plug but isn’t, because it was built from every other line. Link it, and the check on Checks goes live. The key is `=`.",
+   "closing": "It balances, and it balances because every line was built, not forced. || Best practice: never force the balance with a plug line. A model that balances by construction is the only kind a buyer will run.",
+   "wow": "",
+   "convention_line": "Cash balances the sheet; nothing is forced; The check is a live difference → 0",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "cash-sweep-revolver": {
+   "id": "cash-sweep-revolver",
+   "module": "linking-the-statements",
+   "order": "5.4.4",
+   "title": "The cash sweep and the revolver",
+   "brief": "The revolver draws when cash would fall below the minimum and repays when there is surplus: the draw is MAX(minimum − cash before the revolver, 0) and the repayment is MIN(surplus, opening balance), so it’s MIN and MAX again, never an IF tower. The cash flow and the balance sheet already read its rows. Build the block, and see the circle from 5.3.5 close. The key is `=`.",
+   "closing": "Cash never goes below the minimum, and the revolver is the line that proves it. || Best practice: the revolver is the last line of financing, built from MIN and MAX, and the first thing a buyer looks at.",
+   "wow": "",
+   "convention_line": "One input, one cell; formulas reference it; Iterative calc + a circuit breaker",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "when-it-doesnt-balance": {
+   "id": "when-it-doesnt-balance",
+   "module": "linking-the-statements",
+   "order": "5.4.5",
+   "title": "When it doesn’t balance: the order to check",
+   "brief": "A balance sheet that’s off is off for one of a short list of reasons, and a reviewer checks them in order. The difference is often a clue: exactly one line’s value, or twice a working-capital change. Six breaks are planted, one a year from FY27, and the check reads a number in each. Find each one in order and fix it. The key is `=`.",
+   "closing": "You found six breaks in order, and the difference told you where each one was. || Best practice: read the size of the difference before you look anywhere else, because it usually names the line.",
+   "wow": "",
+   "convention_line": "Cash balances the sheet; nothing is forced; Income positive, costs negative",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "challenge-linked-statements": {
+   "id": "challenge-linked-statements",
+   "module": "linking-the-statements",
+   "order": "5.4.C",
+   "title": "Challenge: schedules linked into balanced statements",
+   "brief": "Schedules done, ten projected links missing across the statements and the revolver, on fresh inputs. Link them, wire the revolver and get the check to zero in every year.",
+   "closing": "",
+   "wow": "",
+   "convention_line": "Income positive, costs negative; Cash balances the sheet; nothing is forced; The check is a live difference → 0",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "tie-outs-cross-foots": {
+   "id": "tie-outs-cross-foots",
+   "module": "auditing-a-model",
+   "order": "5.5.1",
+   "title": "Tie-outs and cross-foots",
+   "brief": "A tie-out proves a figure in two places is the same figure; a cross-foot proves a block adds both ways, down the lines and across the years. Checks already ties the balance sheet, cash, debt, PP&E and revenue. Fill the three rows still marked pending, add two limit checks that count balances gone below zero, and read the flag on the Cover. The key is `=`.",
+   "closing": "Eight checks are live, and each one names the line it guards. || A tie-out proves two places agree, a cross-foot proves a block adds both ways, and a limit check catches what a tie cannot: a balance gone through zero. Best practice: build a check the day you build the line it guards, never the night before it goes out.",
+   "wow": "",
+   "convention_line": "The check is a live difference → 0; Write once, fill right",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "error-flags-checks-summary": {
+   "id": "error-flags-checks-summary",
+   "module": "auditing-a-model",
+   "order": "5.5.2",
+   "title": "Error flags and the checks summary",
+   "brief": "A check that reads zero can’t see a #REF! in a cell no check reads, and when an error reaches a check, the check turns into an error that says nothing about where it started. SUMPRODUCT(--ISERROR(block)) counts the errors on a sheet, and Error Checking (Alt, M, K) walks you to each one. Count the errors sheet by sheet on Checks, fold the counts into the flag, then find and fix the one planted in the model. The key is `ISERROR`.",
+   "closing": "The flag now sees errors as well as differences, and one cell says the model is clean. || A #REF! in a memo cell would have reached no tie and sat in the file until a buyer’s analyst found it. The error count found it in one row, Error Checking walked to it, and the Watch Window keeps the flag in view while you work anywhere else in the model.",
+   "wow": "",
+   "convention_line": "The check is a live difference → 0; Go To Special, show formulas, trace",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "model-wide-sweep": {
+   "id": "model-wide-sweep",
+   "module": "auditing-a-model",
+   "order": "5.5.3",
+   "title": "The model-wide sweep: hardcodes and pattern breaks",
+   "brief": "Two faults hide in a projected block: a typed number where a formula belongs, and a formula that breaks pattern halfway across a row. Go To Special finds both: Constants lights every typed number in a selection, and Row differences every cell whose formula is not the row’s. Sweep the model with both, then count typed numbers sheet by sheet on Checks so the flag catches the next one. The key is `Alt H F D S`.",
+   "closing": "Every projected cell is a formula, and every row is one formula across. || Constants found the two typed figures and Row differences the formula that lost its anchor; the counts on Checks now catch the next of either. Tip from the desk: where one cell in a row has to differ on purpose, border it and say why in the next cell, so Row differences lighting it is a known exception nobody flattens with a fill.",
+   "wow": "",
+   "convention_line": "Write once, fill right; One input, one cell; formulas reference it; Go To Special, show formulas, trace",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "stress-tests": {
+   "id": "stress-tests",
+   "module": "auditing-a-model",
+   "order": "5.5.4",
+   "title": "Stress tests: zero, huge, a loss",
+   "brief": "A model that balances on the base case can still break: take washes to zero and a margin divides by nothing; build a hundred sites and the revolver has to carry it; make the washes cost more than they earn and tax has to stop at zero. A stress test types an input to an extreme, reads what breaks, fixes the formula that should have held, and puts the input back. Run four on Inputs before a buyer’s analyst does. The key is `Ctrl+Z`.",
+   "closing": "The model held at four extremes, and you fixed the one formula that didn’t. || Best practice: run the stress tests before sending, every time. A buyer’s analyst runs them in the first ten minutes, and a model that breaks at zero tells them nobody looked.",
+   "wow": "",
+   "convention_line": "Read the page before anyone else does; MIN/MAX or a lookup instead",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "challenge-eight-faults": {
+   "id": "challenge-eight-faults",
+   "module": "auditing-a-model",
+   "order": "5.5.C",
+   "title": "Challenge: eight planted faults",
+   "brief": "The linked model with eight faults: two typed numbers, a pattern break, a sign, a missing add-back, a #REF!, a check that isn’t a formula and a plug on the balance sheet. Find and fix them all, and the flag reads OK.",
+   "closing": "",
+   "wow": "",
+   "convention_line": "The check is a live difference → 0; Cash balances the sheet; nothing is forced; Write once, fill right",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "what-a-dcf-is": {
+   "id": "what-a-dcf-is",
+   "module": "dcf",
+   "order": "5.6.1",
+   "title": "What a DCF is, and what the statements feed it",
+   "brief": "A discounted cash flow values a business as the cash it will generate, discounted to today: the NPV from Chapter 3 applied to the whole company instead of one site. It needs cash flows, a discount rate and a terminal value, and the model already holds what the cash flows are built from. The DCF page sits next to Checks, laid out and empty. Link it to the model so the next five lessons can fill it. The key is `Ctrl+PgDn`.",
+   "closing": "The page is laid out, and every input it needs already lives in the model. || Best practice: the DCF reads the model. A DCF with its own typed cash flows is a calculator, not a valuation, and it stops moving the first time the rollout does. Picture a house: what the house is worth is enterprise value, the mortgage is net debt, and the owner’s stake is equity. This page prices it off the rent it would earn.",
+   "wow": "",
+   "convention_line": "Links green; external links avoided; Write once, fill right",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "unlevered-free-cash-flow": {
+   "id": "unlevered-free-cash-flow",
+   "module": "dcf",
+   "order": "5.6.2",
+   "title": "Unlevered free cash flow",
+   "brief": "Unlevered free cash flow is the cash the washes generate before anybody gets paid, not the lenders and not the owners. Start from EBIT, take off the tax owed on it as if there were no debt, add depreciation back, then take off capex and the cash tied up in working capital. It ignores how the business is financed, so the operations are valued first and the debt comes off at equity value. Build it from the linked lines. The key is `=`.",
+   "closing": "This is the cash the business throws off for whoever owns it, before the debt is paid. || Best practice: tax here is on EBIT, and interest is nowhere on this page. If either slips in, the value counts the debt twice. Unlevered cash flow goes with WACC and gives enterprise value; cash flow after interest goes with the cost of equity and gives equity value. Mixing the two is the classic error.",
+   "wow": "",
+   "convention_line": "Write once, fill right; Links green; external links avoided",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "wacc-block": {
+   "id": "wacc-block",
+   "module": "dcf",
+   "order": "5.6.3",
+   "title": "The WACC block",
+   "brief": "The discount rate is the weighted average cost of capital: the return equity investors require, blended with the after-tax cost of debt, weighted by how much of the company each funds. Cost of equity is a risk-free rate plus beta times the market premium; cost of debt is what the company could borrow at today, less the tax shield; the weights come from a target capital structure. Build the block from the inputs and read what a car wash’s WACC is. The key is `=`.",
+   "closing": "Seven sourced inputs built the return the company’s investors require. || Best practice: every WACC input carries its source in the next cell on Inputs. It is the number a buyer argues with first, and a source is what ends the argument.",
+   "wow": "",
+   "convention_line": "Links green; external links avoided; Name toggles and key inputs only",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "terminal-value": {
+   "id": "terminal-value",
+   "module": "dcf",
+   "order": "5.6.4",
+   "title": "Terminal value: perpetuity and exit multiple",
+   "brief": "The forecast stops at FY31 and the business doesn’t, so the terminal value stands for everything after. The perpetuity method grows a normalized last year’s cash flow at a steady rate forever; the exit multiple method sells the business in FY31 at a multiple of EBITDA, the way a sponsor will. Build both, then read the implied multiple of one and the implied growth of the other, so each checks the other. The key is `=`.",
+   "closing": "You have two terminal values, and each says whether the other is reasonable. || Best practice: when the two methods disagree by more than a third, one of the inputs is wrong, not the method. Read the implied multiple against the comps and the implied growth against the economy before you trust either value.",
+   "wow": "",
+   "convention_line": "Write once, fill right; Links green; external links avoided; The check is a live difference → 0; A case toggle, never copies of the file",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "discounting-mid-year": {
+   "id": "discounting-mid-year",
+   "module": "dcf",
+   "order": "5.6.5",
+   "title": "Discounting and the mid-year convention",
+   "brief": "A discount factor is 1 over (1 + WACC) to the t, and the question is what t is. Cash arrives through the year, not on December 31, so the mid-year convention discounts year 1 at 0.5, year 2 at 1.5, and so on. The present values, summed, plus the discounted terminal value, are enterprise value; less net debt is equity value. Build it, and read what the convention is worth. The key is `^`.",
+   "closing": "Enterprise value comes from five discounted years and a terminal, and the convention moves the forecast years about 5%. || Best practice: say which convention the page uses wherever the value is quoted. Two analysts a few percent apart are usually one mid-year switch apart.",
+   "wow": "",
+   "convention_line": "Links green; external links avoided; Write once, fill right; The check is a live difference → 0; Read the page before anyone else does",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "dcf-sensitivity": {
+   "id": "dcf-sensitivity",
+   "module": "dcf",
+   "order": "5.6.6",
+   "title": "Sensitivity tables: WACC by growth, WACC by exit multiple",
+   "brief": "No one believes a single DCF number, so the page ends on two tables: enterprise value at five WACCs against five growth rates, and against five exit multiples. Each table reads the value built on its own terminal method, so neither goes flat when the switch moves. The edges are laid out; write each grid as one formula, format both the way the book prints them, and read the range a buyer will negotiate inside. The key is `F4`.",
+   "closing": "Two tables show the range inside which the whole negotiation will happen. || Best practice: keep the steps tight, about half a point of WACC and growth and one turn of multiple, so the corners are a range a buyer will actually discuss. Read across a row before you quote the base case: if one step moves the value by a fifth, say so.",
+   "wow": "",
+   "convention_line": "Links green; external links avoided; Write once, fill right; One decimals setting per line; Read the page before anyone else does",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "challenge-dcf": {
+   "id": "challenge-dcf",
+   "module": "dcf",
+   "order": "5.6.C",
+   "title": "Challenge: a DCF from a given free-cash-flow line",
+   "brief": "Five years of free cash flow are given on DCF, with EBITDA, the periods, the WACC inputs and the tables’ edges. Build the WACC, both terminal values, the mid-year factors, enterprise and equity value, and one sensitivity grid.",
+   "closing": "",
+   "wow": "",
+   "convention_line": "Write once, fill right; Name toggles and key inputs only; Read the page before anyone else does",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "revenue-build-in-three": {
+   "id": "revenue-build-in-three",
+   "module": "model-speed",
+   "order": "5.7.1",
+   "title": "The revenue build in three minutes",
+   "brief": "Everything in this chapter you can now do; the question a desk asks is how fast. The revenue build on Schedules is cut back to each row’s FY24 column, and the job is to take it to a total that ties in three minutes: one formula a row filled right, anchors set with F4 as you type, the revenue check reading zero at the end. The keys are shown this once; in Practice the benchmark runs without them. The key is `F4`.",
+   "closing": "You built revenue in three minutes, and the revenue check held at zero as you finished. || Speed in a model comes from two habits more than from fast fingers: write a row’s formula once and fill it, and anchor as you type so the fill is right the first time. Best practice: read the check the moment a block is done, while you still remember what you changed.",
+   "wow": "You built revenue in three minutes, and the check reads zero.",
+   "convention_line": "Write once, fill right; Know the four anchor states",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "fill-and-format-block": {
+   "id": "fill-and-format-block",
+   "module": "model-speed",
+   "order": "5.7.2",
+   "title": "Fill and format a block in one pass",
+   "brief": "The cost build, working capital and PP&E on Schedules hold their FY24 column and nothing else: forty rows waiting to be filled and finished. Fill each block in one motion with Ctrl+R, then format by whole lines: the desk number format, the top border on every total, italic on the margins, each done once and repeated with F4. One pass, no cell touched twice. The key is `Ctrl+R`.",
+   "closing": "You filled and formatted forty rows without touching a cell twice. || Two presses filled the block and three formats finished it, each set once and repeated with F4. The habit scales: a schedule four times this size takes the same handful of moves. Best practice: format by line, never cell by cell, so a line can only ever look one way.",
+   "wow": "You filled and formatted forty rows without touching a cell twice.",
+   "convention_line": "Ctrl+D down, Ctrl+R across; A top border, never an all-borders grid",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "keyboard-only-linking": {
+   "id": "keyboard-only-linking",
+   "module": "model-speed",
+   "order": "5.7.3",
+   "title": "Link the cash flow by keyboard alone",
+   "brief": "The cash flow statement has its labels, formats and subtotals, and not one link: net income, depreciation, working capital, capex, the debt lines and the revolver are all empty. Link it without touching the mouse: select a row, type the reference once and press Ctrl+Enter, so every year links to its own column. Then the totals the same way, and green on every link through Font Color and F4. The key is `Ctrl+Enter`.",
+   "closing": "You linked a cash flow statement without touching the mouse, and the cash check held at zero. || Eleven link rows took seven entries, because a relative reference typed once reads its own column across the row and its own line down a block. Best practice: link a statement row by row from its FY24 column, and color each link green as you go so nothing typed hides among them.",
+   "wow": "You linked a cash flow statement without touching the mouse.",
+   "convention_line": "Links green; external links avoided; Write once, fill right",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "challenge-model-speed": {
+   "id": "challenge-model-speed",
+   "module": "model-speed",
+   "order": "5.7.C",
+   "title": "Challenge: the three benchmarks in one run",
+   "brief": "Fresh Base drivers, and a piece of each benchmark cut back: the rollout and total revenue, the cost build and its format, the debt links on the cash flow. Put all three back before the clock runs out.",
+   "closing": "",
+   "wow": "",
+   "convention_line": "Write once, fill right; Links green; external links avoided",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "ch5-project": {
+   "id": "ch5-project",
+   "module": "ch5-project-and-assessment",
+   "order": "5.8.P",
+   "title": "Project: the operating model with its DCF page",
+   "brief": "Fresh inputs, an empty shell, three historical years typed and sourced on Data. Build the schedules, link the three statements, value it on the DCF page and get the flag on the Cover to OK. No clock, and nothing here is new. The key is `Ctrl+Enter`.",
+   "closing": "An empty shell in, a model out: seven schedules, three statements linked, a DCF with both terminal values and two grids, and the flag on the Cover at OK. || This is the model a buyer’s team rebuilds before they sign. Now one schedule and its links again, on the clock.",
+   "wow": "An empty shell in, a three statement model with its DCF out, the flag at OK, and that is Chapter 5.",
+   "convention_line": "Write once, fill right; Links green; external links avoided; Name toggles and key inputs only; Know the four anchor states; The check is a live difference → 0",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "ch5-assessment": {
+   "id": "ch5-assessment",
+   "module": "ch5-project-and-assessment",
+   "order": "5.8.A",
+   "title": "Assessment: one schedule and the links from it, fifteen minutes",
+   "brief": "The model is built except its debt: the two tranches, the revolver and every link from them are empty, and the lenders have sent fresh terms. Build the schedule with the breaker, link interest to the IS, the draws and repayments to the cash flow and the balances to the BS, until the balance check reads 0 in every year. No help, the keyboard only. Pass, and the chapter is Verified; this is also the test-out. The key is `Ctrl+Enter`.",
+   "closing": "Fresh terms, an empty schedule, and fifteen minutes later the debt ties: three tranches, the circle closed behind the breaker, every link in place and the balance check at 0 in every year. || That is the schedule a lender’s model is checked against, and you built it under a clock.",
+   "wow": "You built the debt and its links on fresh terms, on the clock, and the chapter is Verified.",
+   "convention_line": "Write once, fill right; Links green; external links avoided",
+   "mac_note": "",
+   "story_beat": ""
+  },
   "remix-format-on-the-pnl": {
    "id": "remix-format-on-the-pnl",
    "module": "remixes",
@@ -11664,6 +12216,2706 @@ export const COPY = {
     "why": "",
     "hint_stuck": ""
    }
+  ],
+  "the-income-statement": [
+   {
+    "lesson_id": "the-income-statement",
+    "goal_index": "0",
+    "text": "Revenue in C33: washes times the blended ticket, =C6*C7, which reads $104,250.",
+    "teach": "Revenue is what the washes earned: washes times the blended ticket. Money that comes in another way, interest on the bank balance or an insurance payout for a damaged arch, is other income, and it sits below operating profit, outside EBITDA.",
+    "why": "",
+    "hint_stuck": "pulse cell C33 · Washes sit in C6 and the ticket in C7."
+   },
+   {
+    "lesson_id": "the-income-statement",
+    "goal_index": "1",
+    "text": "Below it: cost of sales =-C6*C8, gross profit =C33+C34, and gross margin in C36 with IFERROR.",
+    "teach": "Cost of sales is what each wash used up, the chemicals, water and power at $1.50 a wash, and it goes in as a negative (2.1.2). Revenue less cost of sales is gross profit; over revenue it is the gross margin.",
+    "why": "",
+    "hint_stuck": "pulse range C34:C36 · The minus makes the cost a negative, so gross profit is a plain sum."
+   },
+   {
+    "lesson_id": "the-income-statement",
+    "goal_index": "2",
+    "text": "Site costs in C37:C41 as negatives (card fees =-C33*C13), their SUM in C42, and site contribution =C35+C42 in C43.",
+    "teach": "Site costs are what it takes to open the doors: the crew, the rent, the power and the upkeep, each a negative link to its input, plus card fees at 2% of revenue. Gross profit less site costs is site contribution, what one site adds before head office.",
+    "why": "",
+    "hint_stuck": "pulse range C37:C43 · Rent, labor, utilities and maintenance are C9 to C12, each with a minus in front."
+   },
+   {
+    "lesson_id": "the-income-statement",
+    "goal_index": "3",
+    "text": "Head office share in C44 =-C14/C15, EBITDA =C43+C44 in C45 with a double bottom border (Alt H B B), its margin in C46.",
+    "teach": "Head office runs all forty sites, so each carries a fortieth of it. Site contribution less that share is EBITDA, earnings before interest, tax, depreciation and amortization, the profit a buyer prices, and a double bottom border marks it as an answer.",
+    "why": "",
+    "hint_stuck": "pulse range C44:C46 · Alt H B B draws the double bottom border on the active cell."
+   },
+   {
+    "lesson_id": "the-income-statement",
+    "goal_index": "4",
+    "text": "Depreciation in C47, the build over its life for one month, =-C16/C17/12, then EBIT =C45+C47 in C48.",
+    "teach": "Depreciation is the tunnel wearing out: the $2,500,000 build spread over its twenty-year life, one month of it here, and no cash leaves for it. Amortization is the same charge for something bought that you can’t touch, a brand or a customer list; Clearcoat has none, and it isn’t the loan amortization of 5.1.3, which repays principal.",
+    "why": "",
+    "hint_stuck": "pulse range C47:C48 · Twenty years of life, twelve months a year."
+   },
+   {
+    "lesson_id": "the-income-statement",
+    "goal_index": "5",
+    "text": "Interest on the site’s share of the loan in C49, =-C18*C19/12, then earnings before tax =C48+C49 in C50.",
+    "teach": "Interest is what the loan costs for the month: the site’s share of the balance times the rate, over twelve. It sits below EBIT because it pays the lenders, not the running of the site.",
+    "why": "",
+    "hint_stuck": "pulse range C49:C50 · The loan is C18 and its rate C19."
+   },
+   {
+    "lesson_id": "the-income-statement",
+    "goal_index": "6",
+    "text": "Tax in C51 =-MAX(C50,0)*C21, then net income =C50+C51 in C52 with a double bottom border.",
+    "teach": "Tax is 25% of a profit and nothing on a loss, so MAX holds the base at zero when earnings before tax go negative. What is left is net income, the bottom line.",
+    "why": "",
+    "hint_stuck": "pulse range C51:C52 · The tax is a negative, so net income is a plain sum."
+   },
+   {
+    "lesson_id": "the-income-statement",
+    "goal_index": "7",
+    "text": "Does it tie? Watch the ticket in C7 go to $15 and every line from revenue to net income answer.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C52 · Every line reads the inputs, so one change runs to the bottom."
+   }
+  ],
+  "accrual-and-cash": [
+   {
+    "lesson_id": "accrual-and-cash",
+    "goal_index": "0",
+    "text": "Membership cash in C55: members times the fee paid on the 1st, =C22*C23, which reads $45,000.",
+    "teach": "Accrual accounting books revenue when it is earned and a cost when it is incurred, whenever the cash moves. A member’s fee arrives on the 1st, so the cash is in and the revenue is still owed to the member as washes.",
+    "why": "",
+    "hint_stuck": "pulse cell C55 · Members are C22, the fee C23."
+   },
+   {
+    "lesson_id": "accrual-and-cash",
+    "goal_index": "1",
+    "text": "Deferred revenue at September 15 in C56, =C55*(C25-15)/C25, and at September 30 in C57, =C55*(C25-C25)/C25.",
+    "teach": "The fee is earned a thirtieth a day, so the unearned part shrinks as the month runs: half at the 15th, none at the 30th. That unearned balance is deferred revenue, a liability on the balance sheet.",
+    "why": "",
+    "hint_stuck": "pulse range C56:C57 · The days left in the month over the days in it."
+   },
+   {
+    "lesson_id": "accrual-and-cash",
+    "goal_index": "2",
+    "text": "One member who paid on the 20th: in C58, =C23*(C25-10)/C25, two thirds of the fee still unearned on the 30th.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C58 · From the 20th to the 30th is ten days earned, twenty still owed."
+   },
+   {
+    "lesson_id": "accrual-and-cash",
+    "goal_index": "3",
+    "text": "Payables at September 30 in C59: the month’s chemicals, unpaid until October, =-C34.",
+    "teach": "September’s chemicals are a cost in September and cash in October, so at the month end the whole bill is a payable. Chemicals count as used on delivery, so there is no inventory line. A year of insurance paid ahead is a prepaid asset, the mirror of deferred revenue, and wages worked but not yet paid are an accrued liability, the payable’s twin; neither has a row here.",
+    "why": "",
+    "hint_stuck": "pulse cell C59 · Cost of sales is a negative in C34; the payable is the same bill as a positive balance."
+   },
+   {
+    "lesson_id": "accrual-and-cash",
+    "goal_index": "4",
+    "text": "Receivables at September 30 in C60: three days of card revenue, =C33/C25*C24.",
+    "teach": "Card sales land in the bank three days later, so the last three days of the month are revenue booked and cash not yet in: a receivable, an asset.",
+    "why": "",
+    "hint_stuck": "pulse cell C60 · A day of revenue is C33 over the days in C25."
+   },
+   {
+    "lesson_id": "accrual-and-cash",
+    "goal_index": "5",
+    "text": "Cash from operations by hand in C61: =C52-C47+(C59-C27)-(C60-C28)+C57, net income adjusted for every gap.",
+    "teach": "Cash from operations starts at net income, adds back depreciation because no cash left for it, then adjusts for the gaps: a rise in a liability is cash kept, a rise in an asset is cash not yet in. Best practice: it is the change in a balance that moves cash, never the balance itself.",
+    "why": "",
+    "hint_stuck": "pulse cell C61 · Opening payables are C27 and opening receivables C28; deferred revenue opened at nil."
+   },
+   {
+    "lesson_id": "accrual-and-cash",
+    "goal_index": "6",
+    "text": "Does it tie? Watch August’s unpaid bill in C27 go to nil: September pays nothing for it, and cash from operations rises by $10,800.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C61 · A payable that is paid is cash out; one that never existed is not."
+   }
+  ],
+  "the-cash-flow-statement": [
+   {
+    "lesson_id": "the-cash-flow-statement",
+    "goal_index": "0",
+    "text": "Operations starts in C64: net income =C52, then depreciation added back in C65, =-C47.",
+    "teach": "The indirect method starts from net income and adds back what wasn’t cash: depreciation was a cost, but no money left for it. Cash in reads positive and cash out negative, stated once in the heading (2.1.2).",
+    "why": "",
+    "hint_stuck": "pulse range C64:C65 · Depreciation is a negative in C47, so the add-back flips its sign."
+   },
+   {
+    "lesson_id": "the-cash-flow-statement",
+    "goal_index": "1",
+    "text": "The gaps in C66:C68, receivables =-(C60-C28), payables =C59-C27, deferred revenue =C57-0, and SUM them into C69.",
+    "teach": "The working-capital lines are changes, not balances: receivables rose, so that cash isn’t in yet and the line is negative; payables rose, so cash was kept and the line is positive.",
+    "why": "",
+    "hint_stuck": "pulse range C66:C69 · Closing less opening for each; deferred revenue opened at nil."
+   },
+   {
+    "lesson_id": "the-cash-flow-statement",
+    "goal_index": "2",
+    "text": "Investing: maintenance capex in C70, =-C33*C26, and cash from investing =C70 in C71.",
+    "teach": "Investing is the cash spent on what the business will use for years. Here it is maintenance capex, 2% of revenue, and it goes out negative.",
+    "why": "",
+    "hint_stuck": "pulse range C70:C71 · Revenue is C33 and the capex rate C26."
+   },
+   {
+    "lesson_id": "the-cash-flow-statement",
+    "goal_index": "3",
+    "text": "Financing: a month of loan amortization in C72, =-C20/12, and cash from financing =C72 in C73.",
+    "teach": "Financing is cash to and from the lenders and the owners. The site’s share of the loan repays $75,000 a year, so a month of it leaves negative; the interest already sits in net income.",
+    "why": "",
+    "hint_stuck": "pulse range C72:C73 · The yearly amortization is in C20."
+   },
+   {
+    "lesson_id": "the-cash-flow-statement",
+    "goal_index": "4",
+    "text": "Net change =C69+C71+C73 in C74, opening cash =C29 in C75, and closing cash =C75+C74 in C76.",
+    "teach": "The three parts sum to the change in cash, and opening cash plus the change is closing cash. Best practice: depreciation is added back because it was never cash, and capex is where the cash for the tunnel actually went.",
+    "why": "",
+    "hint_stuck": "pulse range C74:C76 · Opening cash is the input in C29."
+   },
+   {
+    "lesson_id": "the-cash-flow-statement",
+    "goal_index": "5",
+    "text": "Does it tie? Watch the capex rate in C26 halve to 1%: closing cash rises by exactly the capex saved.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C76 · Capex is the only line the rate moves."
+   }
+  ],
+  "the-balance-sheet": [
+   {
+    "lesson_id": "the-balance-sheet",
+    "goal_index": "0",
+    "text": "Assets from C79: cash =C76 from the cash flow, receivables =C60, and PP&E net =C16-C30+C47-C70.",
+    "teach": "Assets are what the site owns: the cash, the card revenue not yet collected, and the tunnel at what it cost, less the wear charged so far, plus the month’s capex. Domain’s land is rented, so there is no land on this page.",
+    "why": "",
+    "hint_stuck": "pulse range C79:C81 · Depreciation in C47 and capex in C70 are both negatives, so they flip."
+   },
+   {
+    "lesson_id": "the-balance-sheet",
+    "goal_index": "1",
+    "text": "Total assets in C82, =SUM(C79:C81).",
+    "teach": "Assets list most liquid first and liabilities soonest due first, and current means inside twelve months: receivables are a current asset, payables and deferred revenue current liabilities. Cash is current too, though it sits outside working capital.",
+    "why": "",
+    "hint_stuck": "pulse cell C82 · Three lines above it."
+   },
+   {
+    "lesson_id": "the-balance-sheet",
+    "goal_index": "2",
+    "text": "Liabilities from C83: payables =C59, deferred revenue =C57, the loan =C18+C72, and their SUM in C86.",
+    "teach": "Liabilities are what the site owes: the chemical bill, the washes members have paid for, and the loan less this month’s repayment. Published accounts split next year’s repayments out as the current portion of debt; the model keeps each loan on one row.",
+    "why": "",
+    "hint_stuck": "pulse range C83:C86 · The repayment in C72 is a negative, so the loan is a plain sum."
+   },
+   {
+    "lesson_id": "the-balance-sheet",
+    "goal_index": "3",
+    "text": "Equity: opening =C29+C28+C16-C30-C27-C18 in C87, net income =C52, closing =C87+C88 in C89.",
+    "teach": "Equity is what is left for the owners: what the opening balances leave once the debts are paid, plus what the month earned. Net income is the link from the income statement into the balance sheet.",
+    "why": "",
+    "hint_stuck": "pulse range C87:C89 · Opening cash, receivables and the tunnel net, less payables and the loan."
+   },
+   {
+    "lesson_id": "the-balance-sheet",
+    "goal_index": "4",
+    "text": "Total liabilities and equity =C86+C89 in C90, and the balance check =ROUND(C82-C90,2) in C91, reading zero.",
+    "teach": "The balance check is a live difference (1.7.2): assets less liabilities and equity, rounded so floating-point dust reads as nil. Every figure here is what was paid, not what it would sell for, so this equity isn’t what Clearcoat is worth; Chapter 6 answers that.",
+    "why": "",
+    "hint_stuck": "pulse range C90:C91 · Assets in C82 less the total in C90."
+   },
+   {
+    "lesson_id": "the-balance-sheet",
+    "goal_index": "5",
+    "text": "Break it on purpose: type 60000 over the cash in C79, watch the check leave zero, then Ctrl+Z.",
+    "teach": "A typed cash figure would make the check meaningless, because it can be set to anything. Best practice: cash is never typed on a balance sheet; it is the cash flow statement’s closing line, so the check proves something.",
+    "why": "",
+    "hint_stuck": "pulse cell C79 · Ctrl+↑ climbs the block to the cash line; Ctrl+Z puts the link back."
+   },
+   {
+    "lesson_id": "the-balance-sheet",
+    "goal_index": "6",
+    "text": "Does it tie? Watch the ticket in C7 go to $15: all three statements move, and the check stays at zero.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C91 · Net income, cash and equity all move by the same story."
+   }
+  ],
+  "how-the-statements-link": [
+   {
+    "lesson_id": "how-the-statements-link",
+    "goal_index": "0",
+    "text": "Net income, both ways: land on C88 in equity and press Ctrl+[, then on C64 in the cash flow and press it again.",
+    "teach": "Link one: net income ends the income statement, starts the cash flow statement and grows equity on the balance sheet. Ctrl+[ jumps from a formula to the cells it reads, so from either end it lands on the same cell.",
+    "why": "",
+    "hint_stuck": "pulse cell C52 · Both formulas read C52, the bottom of the income statement."
+   },
+   {
+    "lesson_id": "how-the-statements-link",
+    "goal_index": "1",
+    "text": "Depreciation: jump down to the add-back in C65 and press Ctrl+[ to land on the charge in C47.",
+    "teach": "Link two: depreciation is a cost on the income statement, added back on the cash flow because no cash left for it, and taken off the tunnel on the balance sheet.",
+    "why": "",
+    "hint_stuck": "pulse cell C65 · Ctrl+↓ hops block to block; the add-back is the second line of the cash flow."
+   },
+   {
+    "lesson_id": "how-the-statements-link",
+    "goal_index": "2",
+    "text": "Capex: jump to PP&E in C81 and press Ctrl+[, which selects the build, the wear, depreciation in C47 and capex in C70.",
+    "teach": "Link three: capex leaves on the cash flow and lands in PP&E on the balance sheet. PP&E reads the build, the wear so far, this month’s depreciation and this month’s capex, so one Ctrl+[ selects all four.",
+    "why": "",
+    "hint_stuck": "pulse cell C81 · The balance sheet is the block after the cash flow; PP&E is its third line."
+   },
+   {
+    "lesson_id": "how-the-statements-link",
+    "goal_index": "3",
+    "text": "Debt: land on the loan in C85 and press Ctrl+[, which selects the opening loan and the repayment in C72.",
+    "teach": "Link four: a loan drawn or repaid moves cash on the cash flow and the balance on the balance sheet, by the same amount.",
+    "why": "",
+    "hint_stuck": "pulse cell C85 · The loan is the third liability."
+   },
+   {
+    "lesson_id": "how-the-statements-link",
+    "goal_index": "4",
+    "text": "Cash: Ctrl+End, climb to cash in C79 and press Ctrl+[ to land on closing cash in C76.",
+    "teach": "Link five: closing cash on the cash flow is the cash line on the balance sheet. That is why the balance check proves everything upstream: every other link has to be right for the two sides to agree.",
+    "why": "",
+    "hint_stuck": "pulse cell C79 · From the end of the page, Ctrl+↑ climbs a block at a time."
+   },
+   {
+    "lesson_id": "how-the-statements-link",
+    "goal_index": "5",
+    "text": "Does it tie? Watch the cost per wash in C8 go to $2: the five links carry it to the balance sheet, and the check stays at zero.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C91 · Net income falls, so equity and cash fall by the same story."
+   }
+  ],
+  "one-week-three-statements": [
+   {
+    "lesson_id": "one-week-three-statements",
+    "goal_index": "0",
+    "text": "On One week, the income statement from C30: revenue =C6*C7, the delivery =-C8, payroll =-C10, and EBITDA =SUM(C30:C32).",
+    "teach": "Every event lands in at least two statements. The washes are revenue on the income statement and cash or a receivable on the balance sheet; the delivery is a cost now and a payable until it is paid; the payroll is a cost and cash out.",
+    "why": "",
+    "hint_stuck": "pulse range C30:C33 · The week’s events are the inputs in C6:C16."
+   },
+   {
+    "lesson_id": "one-week-three-statements",
+    "goal_index": "1",
+    "text": "Down to net income: depreciation =-C14, interest =-C12, EBT =C33+C34+C35, tax =-MAX(C36,0)*C16, net income =C36+C37.",
+    "teach": "The loan payment is two events in one: the interest is a cost on the income statement, the principal only moves cash and debt. Tax is accrued this week and paid later, so it is a cost now and a payable on the balance sheet.",
+    "why": "",
+    "hint_stuck": "pulse range C34:C38 · Only the interest part of the payment, C12, is a cost."
+   },
+   {
+    "lesson_id": "one-week-three-statements",
+    "goal_index": "2",
+    "text": "Cash from operations from C41: =C38, =C14, =-(C30/7*C15-C20), =C8-C23, =-C37-C24, and the SUM in C46.",
+    "teach": "Operations walks from net income to cash: depreciation back, the receivable that grew, the delivery still unpaid, and the tax not yet paid.",
+    "why": "",
+    "hint_stuck": "pulse range C41:C46 · The receivable is three days of the week’s revenue, less the one it opened with in C20."
+   },
+   {
+    "lesson_id": "one-week-three-statements",
+    "goal_index": "3",
+    "text": "The principal repaid =-C13, financing =C47, net change =C46+C48, opening cash =C19, closing cash =C50+C49 in C51.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C47:C51 · The principal, C13, is the only financing event."
+   },
+   {
+    "lesson_id": "one-week-three-statements",
+    "goal_index": "4",
+    "text": "The closing balance sheet from C54: cash =C51, receivables =C30/7*C15, PP&E =C21-C14, total assets =SUM(C54:C56).",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C54:C57 · PP&E opened at C21 and wore by a week of depreciation."
+   },
+   {
+    "lesson_id": "one-week-three-statements",
+    "goal_index": "5",
+    "text": "Payables =C23+C8, tax payable =C24-C37, the loan =C25-C13, equity =C26+C38, their SUM in C62, and the check =ROUND(C57-C62,2).",
+    "teach": "Best practice: an event that touches cash touches the cash flow, one that changes what is owned or owed touches the balance sheet, and one that is earned or incurred touches the income statement; most touch two. When the check leaves zero, find the event you put in one statement and not the other.",
+    "why": "",
+    "hint_stuck": "pulse range C58:C63 · Each closing balance is its opening line plus the week’s event."
+   },
+   {
+    "lesson_id": "one-week-three-statements",
+    "goal_index": "6",
+    "text": "Count the week’s cash from C66: =C30+C43, =-C10, =-C11, the SUM in C69, and =ROUND(C69-C49,2) against the statement.",
+    "teach": "A second answer for cash: count what actually moved, the washes collected, the payroll and the loan payment. The delivery isn’t in the count because it is on credit, and neither is the tax because it is unpaid; if the count agrees with the statement, both are right.",
+    "why": "",
+    "hint_stuck": "pulse range C66:C70 · Washes collected are revenue less the rise in receivables from C43."
+   },
+   {
+    "lesson_id": "one-week-three-statements",
+    "goal_index": "7",
+    "text": "Does it tie? Watch one more wash go into C6: it flows through revenue, net income, cash and equity, and both checks stay at zero.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C63 · One wash is $13.90 of revenue, part of it still in receivables."
+   }
+  ],
+  "read-like-a-buyer": [
+   {
+    "lesson_id": "read-like-a-buyer",
+    "goal_index": "0",
+    "text": "EBITDA margin in C94: =IFERROR(C45/C33,\"-\"), which reads 38.3%.",
+    "teach": "EBITDA margin says how much of each dollar of washes becomes profit. Domain’s 38% sits above the company’s 33% on the Chapter 2 P&L, because a mature site carries none of the new sites’ ramp-up.",
+    "why": "",
+    "hint_stuck": "pulse cell C94 · EBITDA is C45 and revenue C33."
+   },
+   {
+    "lesson_id": "read-like-a-buyer",
+    "goal_index": "1",
+    "text": "Cash conversion in C95: =IFERROR((C69-C49-C51)/C45,\"-\"), operations with interest and tax added back, over EBITDA.",
+    "teach": "Cash conversion is cash from operations before interest and tax, over EBITDA: how much of the profit turns into cash. A member business converts well, because members pay on the 1st, before the washes are delivered.",
+    "why": "",
+    "hint_stuck": "pulse cell C95 · Interest in C49 and tax in C51 are negatives, so subtracting them adds them back."
+   },
+   {
+    "lesson_id": "read-like-a-buyer",
+    "goal_index": "2",
+    "text": "Net debt =C85-C79 in C96, and leverage =C96/(C45*12) in C97, on a year of EBITDA.",
+    "teach": "Net debt is the debt less the cash that could repay it. Leverage is net debt over a year of EBITDA, in years, shown as 3.0x (2.2.2): how many years of profit the debt represents.",
+    "why": "",
+    "hint_stuck": "pulse range C96:C97 · The month’s EBITDA times twelve is the year’s."
+   },
+   {
+    "lesson_id": "read-like-a-buyer",
+    "goal_index": "3",
+    "text": "Interest cover in C98: =-C45/C49, a positive multiple because interest is a negative.",
+    "teach": "Interest cover is EBITDA over interest: how many times the profit pays the interest. Leverage says how much debt; cover says whether the earnings can carry it.",
+    "why": "",
+    "hint_stuck": "pulse cell C98 · The minus turns the negative interest into a positive ratio."
+   },
+   {
+    "lesson_id": "read-like-a-buyer",
+    "goal_index": "4",
+    "text": "Return on the site in C99: =C43*12/C16, a year of site contribution over the build.",
+    "teach": "The return on the site is a year of site contribution, which is after rent, over the $2,500,000 Clearcoat spent building it. Best practice: the same ratios on every set of statements, in the same place, in the same formats, so a reader compares sites at a glance.",
+    "why": "",
+    "hint_stuck": "pulse cell C99 · Site contribution is C43 and the build C16."
+   },
+   {
+    "lesson_id": "read-like-a-buyer",
+    "goal_index": "5",
+    "text": "Does it tie? Watch the loan in C18 fall to $1,000,000: leverage drops and cover rises, while the margin doesn’t move.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C97 · Debt sits below EBITDA, so the margin never sees it."
+   }
+  ],
+  "challenge-one-site-month": [
+   {
+    "lesson_id": "challenge-one-site-month",
+    "goal_index": "0",
+    "text": "Revenue in C33, EBITDA in C45 and net income in C52.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-one-site-month",
+    "goal_index": "1",
+    "text": "The payable in C59 and the receivable in C60.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-one-site-month",
+    "goal_index": "2",
+    "text": "Cash from operations in C69 and closing cash in C76.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-one-site-month",
+    "goal_index": "3",
+    "text": "Balance-sheet cash in C79 from the cash flow, closing equity in C89 and the total in C90.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-one-site-month",
+    "goal_index": "4",
+    "text": "The balance check in C91, reading zero.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-one-site-month",
+    "goal_index": "5",
+    "text": "EBITDA margin in C94, cash conversion in C95 and leverage in C97.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "model-architecture": [
+   {
+    "lesson_id": "model-architecture",
+    "goal_index": "0",
+    "text": "Move Cover to the front: Ctrl+PgDn to it, then Alt, H, O, M and ↑ to the top of the list.",
+    "teach": "A model runs in the order it calculates: inputs feed the schedules, the schedules feed the statements, the statements feed the DCF. The tabs read the same way, so a reader follows the money left to right.",
+    "why": "",
+    "hint_stuck": "pulse tab Cover · The list in Move or Copy is the sheet it goes before."
+   },
+   {
+    "lesson_id": "model-architecture",
+    "goal_index": "1",
+    "text": "Inputs goes second, straight after the Cover.",
+    "teach": "Best practice: every typed number lives on Inputs, in blue, and nowhere else. A typed number on any other sheet is a fault the audit in 5.5 will find.",
+    "why": "",
+    "hint_stuck": "pulse tab Inputs · Move it to sit before the sheet now second."
+   },
+   {
+    "lesson_id": "model-architecture",
+    "goal_index": "2",
+    "text": "Then the three statements in the order a DCF reads them: IS, CF, BS.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse tab IS · One sheet at a time, each before the sheet that should follow it."
+   },
+   {
+    "lesson_id": "model-architecture",
+    "goal_index": "3",
+    "text": "Schedules, Checks and DCF close the row, so the tabs read Cover to DCF.",
+    "teach": "The schedules sit behind the statements they feed, Checks behind everything it tests, and the DCF last because it reads the lot.",
+    "why": "",
+    "hint_stuck": "pulse tab Schedules · Only Schedules is out of place now."
+   },
+   {
+    "lesson_id": "model-architecture",
+    "goal_index": "4",
+    "text": "On the Cover, the title in A1 from Inputs: =Inputs!$C$104&\": operating model\".",
+    "teach": "The Cover takes its title from Inputs, where the company name is typed once (2.6.3), so a renamed file renames every page.",
+    "why": "",
+    "hint_stuck": "pulse cell A1 · The company name is Inputs!C104."
+   },
+   {
+    "lesson_id": "model-architecture",
+    "goal_index": "5",
+    "text": "The case number in C6, =MATCH(C5,C23:C25,0), and the checks flag in C7, =Checks!C45.",
+    "teach": "The switch in C5 is the word a buyer types; MATCH turns it into the number the drivers block reads, named Case (4.5.1). The flag reads Checks, so the Cover says at a glance whether the model ties.",
+    "why": "",
+    "hint_stuck": "pulse range C6:C7 · The three cases are listed in C23:C25."
+   },
+   {
+    "lesson_id": "model-architecture",
+    "goal_index": "6",
+    "text": "The map: =HYPERLINK(\"#Inputs!A1\",\"Inputs\") in C11, and the same for IS in C12.",
+    "teach": "A link per sheet makes the Cover the contents page (2.4.4). The rest of the map is in place; these two show the pattern.",
+    "why": "",
+    "hint_stuck": "pulse range C11:C12 · The # says the link is inside this file."
+   },
+   {
+    "lesson_id": "model-architecture",
+    "goal_index": "7",
+    "text": "Does it tie? Watch the tabs go by from the Cover: inputs, statements, schedules, checks, then the DCF.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse tab Cover · The order of the tabs is the order of the calculation."
+   }
+  ],
+  "timeline-flags-counters": [
+   {
+    "lesson_id": "timeline-flags-counters",
+    "goal_index": "0",
+    "text": "On Inputs, type 12/31/2024 in C4, then =EOMONTH(C4,12) in D4 filled right to J4 with Ctrl+R.",
+    "teach": "The model is annual because it values the business, and it projects five years because fewer gives too little to value and more is hard to defend. One date is typed; every other year end counts on from it.",
+    "why": "",
+    "hint_stuck": "pulse range C4:J4 · Twelve months on from a year end is the next year end."
+   },
+   {
+    "lesson_id": "timeline-flags-counters",
+    "goal_index": "1",
+    "text": "The A/E row: A and A in C5:D5, then E across E5:J5 in one entry with Ctrl+Enter.",
+    "teach": "FY26 is the estimate for the year still running (2.1.4): its accounts aren’t closed, so it reads E like the forecast.",
+    "why": "",
+    "hint_stuck": "pulse range C5:J5 · Ctrl+Enter puts one entry in every selected cell."
+   },
+   {
+    "lesson_id": "timeline-flags-counters",
+    "goal_index": "2",
+    "text": "Type 12/31/2026 in C11 and name it LastHistorical with Alt, M, M, D.",
+    "teach": "The last year with figures from the accountants is an input, typed once in blue and named, so the flag reads a stated date and not a column.",
+    "why": "",
+    "hint_stuck": "pulse cell C11 · Define Name takes the selected cell as its reference."
+   },
+   {
+    "lesson_id": "timeline-flags-counters",
+    "goal_index": "3",
+    "text": "The projection flag in C6, =IF(C$4>LastHistorical,1,0), filled to J6: 0 for FY24 to FY26, 1 after.",
+    "teach": "Best practice: a formula that reads the flag, =IF(flag=0, actual, calculation), lets one row carry history and forecast with no seam.",
+    "why": "",
+    "hint_stuck": "pulse range C6:J6 · FY26 ends on LastHistorical, so it isn’t greater and stays 0."
+   },
+   {
+    "lesson_id": "timeline-flags-counters",
+    "goal_index": "4",
+    "text": "Counters: 1 in C7 and =C7+1 across D7:J7, then =IF(C6=1,MAX(B8,0)+1,0) across C8:J8, which starts at 1 in FY27.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C7:J8 · B8 is a label, and MAX of text and 0 is 0."
+   },
+   {
+    "lesson_id": "timeline-flags-counters",
+    "goal_index": "5",
+    "text": "Fill =COLUMNS($C4:C4) across C9:J9, and =C9-C7 across C10:J10, which reads zero.",
+    "teach": "The desk’s other counter, =COLUMNS($C4:C4), reads 1 in the first period and one more with every column it fills across, with no first cell to break and no typed offset. Insert a column in front and it still counts from 1, where =COLUMN()-2 would not.",
+    "why": "",
+    "hint_stuck": "pulse range C9:J10 · The anchored $C keeps the start still while the end moves."
+   },
+   {
+    "lesson_id": "timeline-flags-counters",
+    "goal_index": "6",
+    "text": "Group IS to DCF with Ctrl+Shift+PgDn, and link row 4 once: =Inputs!C4 in C4, filled right to J4.",
+    "teach": "Best practice: the same year sits in the same column on every sheet, FY26 in column E everywhere, so a link across sheets never needs a MATCH and a reviewer never counts columns.",
+    "why": "",
+    "hint_stuck": "pulse range C4:J4 · Ctrl+PgUp walks back through the group without ending it."
+   },
+   {
+    "lesson_id": "timeline-flags-counters",
+    "goal_index": "7",
+    "text": "Does it tie? Watch FY24’s year end on Inputs move back a year, and every header on IS roll with it.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C4:J4 · Every year end reads the one before it."
+   }
+  ],
+  "fill-patterns": [
+   {
+    "lesson_id": "fill-patterns",
+    "goal_index": "0",
+    "text": "On Schedules, fill labor’s formula in C32 right to J32: Shift+→ to the last period, then Ctrl+R.",
+    "teach": "The labor line’s first-period formula is written with its anchors set: the inputs on Inputs fixed with $, the timeline and the row’s own cells relative. Get the first cell right and the fill does the rest.",
+    "why": "",
+    "hint_stuck": "pulse range C32:J32 · Ctrl+R copies the left column across the selection."
+   },
+   {
+    "lesson_id": "fill-patterns",
+    "goal_index": "1",
+    "text": "The other five lines in one motion: select C33:J37 and Ctrl+R.",
+    "teach": "Ctrl+R fills every row of a selection from its own first cell, so five rows with their first periods written take one motion, not five.",
+    "why": "",
+    "hint_stuck": "pulse range C33:J37 · Each row fills from its own C cell."
+   },
+   {
+    "lesson_id": "fill-patterns",
+    "goal_index": "2",
+    "text": "Total the block in row 38 with one Alt+= over C32:J38.",
+    "teach": "Alt+= on a block with an empty row beneath writes a SUM under every column at once (1.6.2).",
+    "why": "",
+    "hint_stuck": "pulse range C38:J38 · Include the empty total row in the selection."
+   },
+   {
+    "lesson_id": "fill-patterns",
+    "goal_index": "3",
+    "text": "Format C32:J32 with the custom code #,##0_);(#,##0);\"-\"_) from Ctrl+1.",
+    "teach": "The desk format (2.2.1): thousands with a comma, negatives in brackets, a zero as a dash, and the spaces that keep the figures lined up with the brackets.",
+    "why": "",
+    "hint_stuck": "pulse range C32:J32 · Number, Custom, then type the code in Type."
+   },
+   {
+    "lesson_id": "fill-patterns",
+    "goal_index": "4",
+    "text": "Select C33:J37 and press F4 to repeat the format.",
+    "teach": "F4 outside a formula repeats the last action whole, so the format code goes onto the next block without the dialog. A one-press route to a custom format exists only as a button you add yourself.",
+    "why": "",
+    "hint_stuck": "pulse range C33:J37 · F4 repeats whatever you did last."
+   },
+   {
+    "lesson_id": "fill-patterns",
+    "goal_index": "5",
+    "text": "Does it tie? Watch FY24’s labor on Data rise by 400: C32 reads it, and the total in C38 answers.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C38 · The historical years read Data through the flag."
+   }
+  ],
+  "checks-sheet-day-one": [
+   {
+    "lesson_id": "checks-sheet-day-one",
+    "goal_index": "0",
+    "text": "On Checks, the balance check in C6, =ROUND(BS!C10-BS!C25,2), filled right to J6.",
+    "teach": "Best practice: wrap every check in ROUND(…,2). Floating-point arithmetic leaves 0.0000000001 where a zero belongs, and the flag would call that a fault.",
+    "why": "",
+    "hint_stuck": "pulse range C6:J6 · Total assets are BS row 10, total liabilities and equity row 25."
+   },
+   {
+    "lesson_id": "checks-sheet-day-one",
+    "goal_index": "1",
+    "text": "The cash tie in C7, =ROUND(BS!C6-CF!C30,2), filled right to J7.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C7:J7 · Cash on the balance sheet less the cash flow’s closing cash."
+   },
+   {
+    "lesson_id": "checks-sheet-day-one",
+    "goal_index": "2",
+    "text": "Type pending in K8:K14 in one entry, beside the six checks still to come.",
+    "teach": "A check whose schedule doesn’t exist yet stays empty with a note beside it, never a typed 0: a typed zero is a dead check that always passes, and the roll-up reads an empty cell as nothing.",
+    "why": "",
+    "hint_stuck": "pulse range K8:K14 · Ctrl+Enter fills the whole selection."
+   },
+   {
+    "lesson_id": "checks-sheet-day-one",
+    "goal_index": "3",
+    "text": "The roll-up in C44: =SUMPRODUCT(ABS(C6:J27)), which reads zero.",
+    "teach": "One number says whether everything ties: the sum of every check’s size, so a +5 and a -5 can’t cancel. The flag under it already reads OK or CHECK (3.6.4).",
+    "why": "",
+    "hint_stuck": "pulse cell C44 · ABS makes every difference count, whichever way it points."
+   },
+   {
+    "lesson_id": "checks-sheet-day-one",
+    "goal_index": "4",
+    "text": "On the Cover, C8 =Checks!C44, so the sum of the differences sits under the flag.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C8 · The Cover reads Checks, never the other way round."
+   },
+   {
+    "lesson_id": "checks-sheet-day-one",
+    "goal_index": "5",
+    "text": "Does it tie? Watch FY25 cash on the BS typed over: the cash tie leaves zero and the Cover flag turns to CHECK.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C7 · One check off zero is enough to turn the flag."
+   }
+  ],
+  "populate-from-data": [
+   {
+    "lesson_id": "populate-from-data",
+    "goal_index": "0",
+    "text": "In IS!A5, =INDEX(Inputs!$N$5:$N$40,MATCH($B5,Inputs!$M$5:$M$40,0)), filled down to A7 with Ctrl+D.",
+    "teach": "Data uses the accountants’ labels, and the mapping on Inputs, the model’s line in M and their name in N, translates one into the other. A helper in column A does the translation once per line.",
+    "why": "",
+    "hint_stuck": "pulse range A5:A7 · MATCH finds the model’s label in M; INDEX returns the name beside it in N."
+   },
+   {
+    "lesson_id": "populate-from-data",
+    "goal_index": "1",
+    "text": "Revenue in C5:E7 in one entry: =INDEX(Data!$C$5:$F$44,MATCH($A5,…),MATCH(YEAR(C$4),Data!$C$4:$F$4,0)), with Ctrl+Enter.",
+    "teach": "One formula for the block: the helper finds the row on Data, YEAR of the header finds the column, because Data holds 2024 where the model holds a date. $A keeps the label column still; the row 4 anchor keeps the header row still.",
+    "why": "",
+    "hint_stuck": "pulse range C5:E7 · The label range is Data!$B$5:$B$44."
+   },
+   {
+    "lesson_id": "populate-from-data",
+    "goal_index": "2",
+    "text": "Cost of sales in C9:E9: the same lookup with a minus in front, =-INDEX(…).",
+    "teach": "Data records costs as positive figures; the IS shows them negative, so the formula carries a minus in front.",
+    "why": "",
+    "hint_stuck": "pulse range C9:E9 · A cost is a negative on this IS."
+   },
+   {
+    "lesson_id": "populate-from-data",
+    "goal_index": "3",
+    "text": "The six site costs in C13:E18, in one entry with the minus lookup.",
+    "teach": "Best practice: never link a model to a data dump by cell position. The next dump will be a row longer or sorted differently, and a lookup by name is what survives it.",
+    "why": "",
+    "hint_stuck": "pulse range C13:E18 · The helpers in A13:A18 are already there."
+   },
+   {
+    "lesson_id": "populate-from-data",
+    "goal_index": "4",
+    "text": "Switch rent in C14:E14 to =-SUMIFS(INDEX(Data!$C$5:$F$44,0,MATCH(YEAR(C$4),…)),Data!$B$5:$B$44,$A14).",
+    "teach": "Data splits rent over two accounts with one label, and MATCH stops at the first. SUMIFS adds every row with the label, and INDEX(block,0,n) hands it the year’s column (4.1.7).",
+    "why": "",
+    "hint_stuck": "pulse range C14:E14 · Both Rent lines on Data belong in the total."
+   },
+   {
+    "lesson_id": "populate-from-data",
+    "goal_index": "5",
+    "text": "Does it tie? Watch FY26 retail sales on Data rise by 1,000, and the IS’s FY26 revenue answer.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell E5 · The IS reads Data by name and year."
+   }
+  ],
+  "drivers-block": [
+   {
+    "lesson_id": "drivers-block",
+    "goal_index": "0",
+    "text": "The Downside’s ticket growth: 0 in F30, then =F30 in G30 filled right to J30.",
+    "teach": "A driver held flat is typed once, in FY27, and each later year points at the one before, in black because it is a formula: one edit rolls through. It is the one accepted link to a link (1.6.4).",
+    "why": "",
+    "hint_stuck": "pulse range F30:J30 · Only FY27 is typed."
+   },
+   {
+    "lesson_id": "drivers-block",
+    "goal_index": "1",
+    "text": "Live new sites in C35: =IF(Inputs!C$6=0,Schedules!C7,CHOOSE(Case,C14,C21,C28)), filled right to J35.",
+    "teach": "CHOOSE(Case, …) picks the Management, Base or Downside figure by the Cover’s case number. Case is a name, so it holds still wherever the formula goes, and the three block references move with the fill. The flag hands the actual years their actuals, so history never moves with the switch.",
+    "why": "",
+    "hint_stuck": "pulse range C35:J35 · Rows 14, 21 and 28 are new sites in the three blocks."
+   },
+   {
+    "lesson_id": "drivers-block",
+    "goal_index": "2",
+    "text": "Live washes a day in C36: =IF(Inputs!C$6=0,Schedules!C16,CHOOSE(Case,C15,C22,C29)), filled right to J36.",
+    "teach": "Best practice: from 5.3 on, every schedule reads a driver from the live block, never from one of the three cases. A typed input beside a live one is the fault an audit finds first.",
+    "why": "",
+    "hint_stuck": "pulse range C36:J36 · The actual reads Schedules row 16."
+   },
+   {
+    "lesson_id": "drivers-block",
+    "goal_index": "3",
+    "text": "The Cover title in A1 takes the case: =Inputs!$C$104&\": operating model, \"&C5&\" case\".",
+    "teach": "Every page says which case it shows (2.6.3), so a printed page can’t be mistaken for another case.",
+    "why": "",
+    "hint_stuck": "pulse cell A1 · The switch’s word is in C5."
+   },
+   {
+    "lesson_id": "drivers-block",
+    "goal_index": "4",
+    "text": "The IS title in A1 the same way: =Inputs!$C$104&\": income statement, \"&Cover!$C$5&\" case\".",
+    "teach": "A scenario moves several drivers together and tells a story; a sensitivity moves one at a time (4.5.2). The drivers block is for scenarios, the data tables for sensitivities, and a model a buyer trusts has both.",
+    "why": "",
+    "hint_stuck": "pulse cell A1 · The case word lives on the Cover."
+   },
+   {
+    "lesson_id": "drivers-block",
+    "goal_index": "5",
+    "text": "Does it tie? Watch the Cover switch to Downside: the live block moves in FY27 to FY31 and holds in FY24 to FY26.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C35:J39 · Only the projected years read the cases."
+   }
+  ],
+  "challenge-model-shell": [
+   {
+    "lesson_id": "challenge-model-shell",
+    "goal_index": "0",
+    "text": "The tabs in order: Cover, Inputs, IS, CF, BS, Schedules, Checks, DCF.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-model-shell",
+    "goal_index": "1",
+    "text": "On Inputs, 12/31/2024 in C4 and =EOMONTH(C4,12) across D4:J4.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-model-shell",
+    "goal_index": "2",
+    "text": "The projection flag across C6:J6, reading LastHistorical.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-model-shell",
+    "goal_index": "3",
+    "text": "Row 4 on IS, CF, BS, Schedules, Checks and DCF linked to Inputs, ending the group.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-model-shell",
+    "goal_index": "4",
+    "text": "IS revenue in C5:E7 from Data by name and year, with INDEX/MATCH.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-model-shell",
+    "goal_index": "5",
+    "text": "The balance check live across Checks C6:J6, reading zero.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "revenue-build": [
+   {
+    "lesson_id": "revenue-build",
+    "goal_index": "0",
+    "text": "Build the rollout in C6:J9 as a corkscrew: opening sites, new sites, closures and closing sites, each through the flag.",
+    "teach": "A corkscrew rolls a balance: opening, plus what comes in, less what goes out, is the closing, and the closing is next year’s opening. The rollout rolls this way, and so will PP&E, the debt and equity. One formula a row carries FY24 to FY31: the flag reads Data in an actual year and the drivers in a projected one.",
+    "why": "",
+    "hint_stuck": "pulse range C6:J9 · Closing sites is opening plus new plus closures; next year’s opening reads it."
+   },
+   {
+    "lesson_id": "revenue-build",
+    "goal_index": "1",
+    "text": "Average sites in the year in C10:J10: the average of the opening and the closing count.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C10:J10 · A site that opens mid-year trades for about half of it."
+   },
+   {
+    "lesson_id": "revenue-build",
+    "goal_index": "2",
+    "text": "Washes a day for a mature and a new site in C13:J14, then a year of washes, in thousands, in C15:J15.",
+    "teach": "A driver-based build multiplies inputs a buyer can question: (mature sites × 250 + new sites × 200) × 365 is a year of washes. The model is in thousands, so the line divides by the labeled 1,000 on Inputs and never by a 1000 typed into the formula.",
+    "why": "",
+    "hint_stuck": "pulse range C13:J15 · Opening sites wash at the mature rate, new sites at the ramp rate."
+   },
+   {
+    "lesson_id": "revenue-build",
+    "goal_index": "3",
+    "text": "Split the washes in C16:J19: washes a day per average site, the member share, retail washes and member washes.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C16:J19 · The share reads the live drivers block, so a case change reaches it."
+   },
+   {
+    "lesson_id": "revenue-build",
+    "goal_index": "4",
+    "text": "The retail ticket, its growth and retail revenue in C20:J22: the ticket grows off the prior year by the live driver.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C20:J22 · Last year’s ticket times one plus the growth driver."
+   },
+   {
+    "lesson_id": "revenue-build",
+    "goal_index": "5",
+    "text": "Average members, membership revenue and other revenue in C23:J25.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C23:J25 · Members are member washes over washes a member a month, times twelve."
+   },
+   {
+    "lesson_id": "revenue-build",
+    "goal_index": "6",
+    "text": "Total revenue and revenue per wash in C26:J27; FY26 reads $13.89, the figure on the Chapter 2 P&L.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C26:J27 · Revenue per wash is total revenue over washes, both in thousands."
+   },
+   {
+    "lesson_id": "revenue-build",
+    "goal_index": "7",
+    "text": "On Checks, tie the income statement’s revenue to the build in C10:J10 with a ROUND around the difference.",
+    "teach": "The actual years read zero now. The projected years show the whole build until the income statement is linked to it in the next module, and then they read zero too.",
+    "why": "",
+    "hint_stuck": "pulse range Checks!C10:J10 · IS revenue less the build’s total revenue, rounded to two places."
+   },
+   {
+    "lesson_id": "revenue-build",
+    "goal_index": "8",
+    "text": "Does it tie? Watch two more sites go into FY28 on the Base case row of Inputs, and revenue answer from FY28 on.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range Schedules!G26:J26 · Every line from the rollout down reads the new count."
+   }
+  ],
+  "cost-build": [
+   {
+    "lesson_id": "cost-build",
+    "goal_index": "0",
+    "text": "Cost of sales in C30:J30: revenue times the live cost-of-wash driver, through the flag.",
+    "teach": "Each cost is built the way it behaves. Chemicals, water and power move with every wash, so cost of sales is a share of revenue off the drivers block; the per-site block below (labor, rent, utilities, maintenance) is a cost per site × average sites, inflated each year; head office is fixed.",
+    "why": "",
+    "hint_stuck": "pulse range C30:J30 · The live cost-of-wash driver sits on Inputs, row 39."
+   },
+   {
+    "lesson_id": "cost-build",
+    "goal_index": "1",
+    "text": "Read it back in C31:J31: cost of sales as a share of revenue, which equals the driver in every projected year.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C31:J31 · Cost of sales over total revenue, inside IFERROR."
+   },
+   {
+    "lesson_id": "cost-build",
+    "goal_index": "2",
+    "text": "Site contribution and the contribution margin in C39:J40: revenue less cost of sales less site costs.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C39:J40 · What each site earns before head office."
+   },
+   {
+    "lesson_id": "cost-build",
+    "goal_index": "3",
+    "text": "Head office in C41:J41: last year’s figure grown 3%, plus $50k for every new site, through the flag.",
+    "teach": "A fixed cost doesn’t scale with sites or washes: it grows with inflation and steps up as the support team grows with the rollout. Last year’s cell times one plus the growth, plus the step times new sites.",
+    "why": "",
+    "hint_stuck": "pulse range C41:J41 · B41 reads the label, so the formula starts from the column before."
+   },
+   {
+    "lesson_id": "cost-build",
+    "goal_index": "4",
+    "text": "EBITDA and its margin in C42:J43; FY26 EBITDA reads $16,600k, the Chapter 2 P&L’s.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C42:J43 · Site contribution less head office."
+   },
+   {
+    "lesson_id": "cost-build",
+    "goal_index": "5",
+    "text": "Does it tie? Watch rent per site go to $190k: site costs and EBITDA answer in every projected year and no actual one.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range Schedules!F42:J42 · The actual years read Data, so the input never reaches them."
+   }
+  ],
+  "working-capital-schedule": [
+   {
+    "lesson_id": "working-capital-schedule",
+    "goal_index": "0",
+    "text": "Receivables in C46:J46: revenue ÷ 365 × the receivable days on Inputs, through the flag.",
+    "teach": "In a model, working capital is a set of days: card takings settle in three days, suppliers are paid in thirty, members prepay about fifteen days of washes. A balance is its driver ÷ 365 × its days. The days here sit on the closing balance; a model that puts them on the average has to solve the closing balance instead, so the schedule’s title says which.",
+    "why": "",
+    "hint_stuck": "pulse range C46:J46 · Total revenue is on row 26; the days are on Inputs, row 68."
+   },
+   {
+    "lesson_id": "working-capital-schedule",
+    "goal_index": "1",
+    "text": "Payables on cost of sales plus site costs, and deferred revenue on membership revenue, in C47:J48.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C47:J48 · Each balance reads its own base and its own day count."
+   },
+   {
+    "lesson_id": "working-capital-schedule",
+    "goal_index": "2",
+    "text": "Net working capital, then the days each actual balance implies, in C49:J52.",
+    "teach": "The implied days are the check on the inputs: the actual years say what the business really collects and pays in, and the projection days should sit close to them. A projected day count with no history behind it is a guess.",
+    "why": "",
+    "hint_stuck": "pulse range C49:J52 · Each implied count is the balance over its base, times 365."
+   },
+   {
+    "lesson_id": "working-capital-schedule",
+    "goal_index": "3",
+    "text": "The cash effect of each balance in C53:J55: the change from last year, receivables with the sign turned.",
+    "teach": "A rise in receivables is cash the company hasn’t collected yet, so it uses cash and carries a minus. A rise in payables or deferred revenue is cash it holds before it pays or delivers, so it brings cash in. FY24 reads its opening balance off Data.",
+    "why": "",
+    "hint_stuck": "pulse range C53:J55 · This year’s balance less last year’s; the period counter finds FY24."
+   },
+   {
+    "lesson_id": "working-capital-schedule",
+    "goal_index": "4",
+    "text": "Add the three cash effects in C56:J56, the line the cash flow statement will read.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C56:J56 · A SUM over the three changes above."
+   },
+   {
+    "lesson_id": "working-capital-schedule",
+    "goal_index": "5",
+    "text": "The cash conversion cycle in C57: receivable days less payable days less deferred-revenue days.",
+    "teach": "Clearcoat’s is −42 days, a rough read since each count sits on its own base, and the sign is the point: suppliers and members fund the business before it pays for anything, so working capital hands cash back as the rollout grows.",
+    "why": "",
+    "hint_stuck": "pulse cell C57 · Three day counts from Inputs, one minus the other two."
+   },
+   {
+    "lesson_id": "working-capital-schedule",
+    "goal_index": "6",
+    "text": "Does it tie? Watch payable days go to 45: the cash effect jumps in FY27 and settles back after.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range Schedules!F56:J56 · A one-off rise in a balance is a one-off cash inflow."
+   }
+  ],
+  "ppe-and-depreciation": [
+   {
+    "lesson_id": "ppe-and-depreciation",
+    "goal_index": "0",
+    "text": "Capex in C61:J63: new sites × capex per site, maintenance capex as 2% of revenue, and the total.",
+    "teach": "Capex per site is the building, the tunnel and the equipment, $2.5m, the part that wears out over twenty years. The land under a new site is rented, and the land Clearcoat owns sits on the balance sheet at cost, outside this schedule: land is never depreciated, and no resale value is assumed at the end.",
+    "why": "",
+    "hint_stuck": "pulse range C61:J63 · New sites are on row 7, revenue on row 26."
+   },
+   {
+    "lesson_id": "ppe-and-depreciation",
+    "goal_index": "1",
+    "text": "The existing base in C70:J70: FY26’s net PP&E from Data over its remaining life, in the projected years only.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C70:J70 · The flag is 1 in a projected year; $E$4 pins the year to FY26."
+   },
+   {
+    "lesson_id": "ppe-and-depreciation",
+    "goal_index": "2",
+    "text": "The waterfall in C71:J75: each projected year’s capex over its 20-year life, from the year after it is spent.",
+    "teach": "One row per year of capex, each anchored to its own year’s capex ($F$63 for FY27) and switched on by the projection counter from the following year. Read down a column and you see what each vintage costs that year; read across a row and you see one year’s capex wear out.",
+    "why": "",
+    "hint_stuck": "pulse range C71:J75 · Each row anchors its own capex cell; the counter starts it the year after."
+   },
+   {
+    "lesson_id": "ppe-and-depreciation",
+    "goal_index": "3",
+    "text": "Total depreciation down the waterfall in C76:J76, and the depreciation line in C64:J64 reading it through the flag.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C76:J76 · A SUM down the base and the five vintages."
+   },
+   {
+    "lesson_id": "ppe-and-depreciation",
+    "goal_index": "4",
+    "text": "Roll PP&E forward in C60:J65: opening is last year’s closing, closing is opening plus capex less depreciation.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C60:J65 · The same corkscrew as the rollout, with capex in and depreciation out."
+   },
+   {
+    "lesson_id": "ppe-and-depreciation",
+    "goal_index": "5",
+    "text": "Two memos: capex over depreciation in C66:J66, and in C67 the life the FY26 base implies.",
+    "teach": "Capex runs at several times depreciation while the rollout lasts and heads toward one after it, which says FY31 isn’t a steady year yet. The implied life, gross depreciable PP&E over FY26 depreciation with the land left out, should land near the 20 years on Inputs; a figure far off means the life or the base is wrong.",
+    "why": "",
+    "hint_stuck": "pulse range C66:J67 · Total capex over depreciation; Inputs’ gross base over FY26 depreciation."
+   },
+   {
+    "lesson_id": "ppe-and-depreciation",
+    "goal_index": "6",
+    "text": "Does it tie? Watch capex per site go to $3.0m: capex moves in every rollout year, depreciation from the year after.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range Schedules!F63:J65 · A vintage starts wearing out the year after it is bought."
+   }
+  ],
+  "debt-and-interest-circle": [
+   {
+    "lesson_id": "debt-and-interest-circle",
+    "goal_index": "0",
+    "text": "Roll the term loan in C79:J82: opening, drawn, repaid and closing, the actual years reading Data through the flag.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C79:J82 · Repaid is the smaller of the opening balance and the $3,000 a year on Inputs."
+   },
+   {
+    "lesson_id": "debt-and-interest-circle",
+    "goal_index": "1",
+    "text": "The average balance in C83:J83, then interest in C84:J84 at the rate on the average while Circ is 1.",
+    "teach": "Interest on the average balance makes a circle once the revolver is in: interest moves net income, net income moves cash, cash moves the revolver, the revolver moves interest. Iterative calculation settles it, and Circ on Inputs is the breaker: at 0 every tranche reads its opening balance and the circle is gone.",
+    "why": "",
+    "hint_stuck": "pulse range C83:J84 · IF(Circ=1, the rate × the average, the rate × the opening)."
+   },
+   {
+    "lesson_id": "debt-and-interest-circle",
+    "goal_index": "2",
+    "text": "Roll the delayed-draw loan in C88:J92: opening, cumulative draws, drawn, repaid at 10% of the draws, closing.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C88:J92 · The draws are on Inputs, row 75; repayment starts the year after the cash comes in."
+   },
+   {
+    "lesson_id": "debt-and-interest-circle",
+    "goal_index": "3",
+    "text": "The delayed-draw loan’s average balance and interest in C93:J94, through the same breaker.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C93:J94 · The same IF on Circ as the term loan, with the delayed-draw rate."
+   },
+   {
+    "lesson_id": "debt-and-interest-circle",
+    "goal_index": "4",
+    "text": "Effective rates in C85:J85 and C95:J95, then the three rate checks on Checks in C21:J23.",
+    "teach": "Interest over the average balance shows what each loan has cost in the actual years. In the projected years it has to equal the rate on Inputs while Circ is 1, so Checks takes the difference and reads zero; a gap means a wrong balance link or a rate in the wrong units.",
+    "why": "",
+    "hint_stuck": "pulse range C85:J85 · Interest over the average, inside IFERROR; Checks rounds the gap to the rate."
+   },
+   {
+    "lesson_id": "debt-and-interest-circle",
+    "goal_index": "5",
+    "text": "Total debt, total interest and net debt in C109:J111, the revolver’s rows included while they are still empty.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C109:J111 · Each tranche’s closing balance, then each one’s interest; net debt takes off BS cash."
+   },
+   {
+    "lesson_id": "debt-and-interest-circle",
+    "goal_index": "6",
+    "text": "Does it tie? Watch Circ go to 0: interest reads the opening balance and the rate checks stand down.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range Schedules!F84:J84 · One breaker, on Inputs, labeled, switches every tranche at once."
+   }
+  ],
+  "tax-schedule": [
+   {
+    "lesson_id": "tax-schedule",
+    "goal_index": "0",
+    "text": "Earnings before tax in C114:J114: a link to the income statement’s EBT line.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C114:J114 · EBT is on row 29 of IS; the projected years fill in when the statement is linked."
+   },
+   {
+    "lesson_id": "tax-schedule",
+    "goal_index": "1",
+    "text": "Tax before losses in C115:J115: the tax rate on Inputs times EBT, and nothing when EBT is a loss.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C115:J115 · MAX(EBT,0) × the rate on Inputs, row 84."
+   },
+   {
+    "lesson_id": "tax-schedule",
+    "goal_index": "2",
+    "text": "Tax losses in C116:J117: the opening balance is last year’s closing, and a loss year adds its loss.",
+    "teach": "A year with a loss pays no tax and leaves a tax loss the company can set against later profits. The schedule carries it as a balance, a corkscrew like the debt: opening, plus a year’s loss, less what profit uses up, closing. The actual years carry none.",
+    "why": "",
+    "hint_stuck": "pulse range C116:J117 · Through the flag: zero in an actual year, MAX(−EBT,0) in a projected one."
+   },
+   {
+    "lesson_id": "tax-schedule",
+    "goal_index": "3",
+    "text": "The losses used against profit in C118:J118, as a negative, then the closing balance in C119:J119.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C118:J119 · The smaller of the opening losses and this year’s profit, with the sign turned."
+   },
+   {
+    "lesson_id": "tax-schedule",
+    "goal_index": "4",
+    "text": "The tax charge in C120:J120, net of the losses used at the rate, then the effective tax rate in C121:J121.",
+    "teach": "The model takes the tax charge as the tax paid. In real accounts a tunnel is written off faster for tax than in the books, which defers part of the bill as deferred tax on the balance sheet; this model carries none, and the schedule says so.",
+    "why": "",
+    "hint_stuck": "pulse range C120:J121 · Tax before losses plus the losses used × the rate; the actual years read Data."
+   },
+   {
+    "lesson_id": "tax-schedule",
+    "goal_index": "5",
+    "text": "Does it tie? Watch a $5.0m loss go into FY28 and a $3.0m profit into FY29: the loss waits, then FY29 pays no tax.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range Schedules!G116:H120 · The loss carried forward shelters the next profit."
+   }
+  ],
+  "challenge-schedules": [
+   {
+    "lesson_id": "challenge-schedules",
+    "goal_index": "0",
+    "text": "Closing sites in F9:J9: opening plus new sites plus closures.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-schedules",
+    "goal_index": "1",
+    "text": "Retail revenue in F22:J22 and membership revenue in F24:J24 from the build above them.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-schedules",
+    "goal_index": "2",
+    "text": "Labor and rent in F32:J33: the cost per site on Inputs, inflated each year, times average sites.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-schedules",
+    "goal_index": "3",
+    "text": "Receivables and payables in F46:J47, each its base ÷ 365 × its days on Inputs.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-schedules",
+    "goal_index": "4",
+    "text": "The FY27 waterfall row in F71:J71 and closing PP&E in F65:J65.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-schedules",
+    "goal_index": "5",
+    "text": "Term-loan interest in F84:J84: the rate on the average while Circ is 1, on the opening while it is 0.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "is-from-schedules": [
+   {
+    "lesson_id": "is-from-schedules",
+    "goal_index": "0",
+    "text": "The three revenue lines in C5:J7, each reading Data or the revenue build through the flag, then total revenue in F8:J8.",
+    "teach": "Each statement line is one formula a row: IF the flag is 0, the INDEX/MATCH on Data, otherwise a link to the schedule’s line, and Ctrl+Enter carries it across all eight years. A tip from the desk: Alt W N opens a second window on the same file and Alt W A arranges the two side by side, so the IS and the schedule it reads sit next to each other while you point.",
+    "why": "",
+    "hint_stuck": "pulse range C5:J7 · The revenue build’s lines are on Schedules, rows 22, 24 and 25."
+   },
+   {
+    "lesson_id": "is-from-schedules",
+    "goal_index": "1",
+    "text": "Cost of sales in C9:J9 from the cost build as a negative, gross profit in F10:J10 and the gross margin in C11:J11.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C9:J9 · Costs carry a minus on the statement; the build holds them as positives."
+   },
+   {
+    "lesson_id": "is-from-schedules",
+    "goal_index": "2",
+    "text": "The six site-cost lines in C13:J18, then site costs and site contribution in F19:J20 and the margin in C21:J21.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C13:J18 · Labor to marketing are Schedules rows 32 to 37; rent sums its Data lines."
+   },
+   {
+    "lesson_id": "is-from-schedules",
+    "goal_index": "3",
+    "text": "Head office in C23:J23, EBITDA in F24:J24 and the EBITDA margin in C25:J25.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C23:J23 · Head office is Schedules row 41, with the sign turned."
+   },
+   {
+    "lesson_id": "is-from-schedules",
+    "goal_index": "4",
+    "text": "Depreciation in C26:J26 from PP&E, EBIT in F27:J27, interest in C28:J28 from the debt schedule and EBT in F29:J29.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C26:J29 · Depreciation is Schedules row 64; total interest is row 110."
+   },
+   {
+    "lesson_id": "is-from-schedules",
+    "goal_index": "5",
+    "text": "Tax in C30:J30 from the tax schedule, net income in F31:J31 and the net margin in C32:J32.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C30:J32 · The tax charge is Schedules row 120; net income is EBT plus tax."
+   },
+   {
+    "lesson_id": "is-from-schedules",
+    "goal_index": "6",
+    "text": "Does it tie? Watch two more sites go into FY28 on the Base case row of Inputs, and FY31 net income answer.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range IS!G31:J31 · The rollout reaches revenue, costs, depreciation and tax on its way down."
+   }
+  ],
+  "cf-indirect": [
+   {
+    "lesson_id": "cf-indirect",
+    "goal_index": "0",
+    "text": "Operations in C6:J11: net income, depreciation added back, the three working-capital changes and the subtotal.",
+    "teach": "The indirect cash flow starts from net income and corrects it back to cash: depreciation cost nothing in cash this year, so it goes back in, and the working-capital changes come straight off the schedule with their signs. Every line is a link to the IS or a schedule.",
+    "why": "",
+    "hint_stuck": "pulse range C6:J11 · Net income is IS row 31; depreciation and the changes are on Schedules."
+   },
+   {
+    "lesson_id": "cf-indirect",
+    "goal_index": "1",
+    "text": "Investing in C14:J15: capex from the PP&E schedule as a negative, and the subtotal.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C14:J15 · Total capex is Schedules row 63; cash going out carries a minus."
+   },
+   {
+    "lesson_id": "cf-indirect",
+    "goal_index": "2",
+    "text": "The debt lines in C18:J21: the term loan drawn and repaid, the delayed-draw loan drawn and repaid.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C18:J21 · The debt schedule carries draws as positives and repayments as negatives already."
+   },
+   {
+    "lesson_id": "cf-indirect",
+    "goal_index": "3",
+    "text": "Distributions in C22:J22, the revolver in C24:J24 from its empty rows on Schedules, and financing in C25:J25.",
+    "teach": "A line with nothing in it yet still gets its link, never a typed zero: the revolver and distributions read nil today, and a typed zero would drop the cash the day either one moves.",
+    "why": "",
+    "hint_stuck": "pulse range C22:J25 · The revolver line is drawn plus repaid, Schedules rows 101 and 102."
+   },
+   {
+    "lesson_id": "cf-indirect",
+    "goal_index": "4",
+    "text": "Cash before the revolver in C23:J23, the net change in C28:J28, then opening and closing cash in C29:J30.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C28:J30 · Opening cash is last year’s closing; FY24 reads Data."
+   },
+   {
+    "lesson_id": "cf-indirect",
+    "goal_index": "5",
+    "text": "Does it tie? Watch a 1,000 revolver draw go into FY27 on the debt schedule, and closing cash rise by 1,000.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range CF!F24:J30 · The link was there before the number was."
+   }
+  ],
+  "bs-cash-not-a-plug": [
+   {
+    "lesson_id": "bs-cash-not-a-plug",
+    "goal_index": "0",
+    "text": "Assets in C6:J10: cash from the cash flow’s closing line, receivables, land at cost, PP&E, then total assets.",
+    "teach": "Cash looks like the plug, the number that makes the sheet balance, but it isn’t: it was built from every other line on the cash flow. So if the sheet balances, every link is right, and if it doesn’t, one of them is wrong.",
+    "why": "",
+    "hint_stuck": "pulse range C6:J10 · Cash is CF row 30; receivables and PP&E are on Schedules; land holds its cost."
+   },
+   {
+    "lesson_id": "bs-cash-not-a-plug",
+    "goal_index": "1",
+    "text": "Liabilities in C13:J18: payables, deferred revenue, the three debt closings, the revolver included, and the total.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C13:J18 · Each closing balance is the last line of its block on Schedules; the revolver is row 103."
+   },
+   {
+    "lesson_id": "bs-cash-not-a-plug",
+    "goal_index": "2",
+    "text": "Equity in C21:J25: opening, net income, distributions, closing, then total liabilities and equity.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C21:J25 · Opening is last year’s closing; distributions read the cash flow’s line."
+   },
+   {
+    "lesson_id": "bs-cash-not-a-plug",
+    "goal_index": "3",
+    "text": "The balance check in C28:J28, then on Checks the debt and PP&E ties in C8:J9; every one reads zero.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C28:J28 · Total assets less total liabilities and equity, rounded to two places."
+   },
+   {
+    "lesson_id": "bs-cash-not-a-plug",
+    "goal_index": "4",
+    "text": "Go to the checks flag in C7 of Cover and read it: OK, every check at zero.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell Cover!C7 · The flag sums every check on Checks; zero is OK."
+   },
+   {
+    "lesson_id": "bs-cash-not-a-plug",
+    "goal_index": "5",
+    "text": "Does it tie? Watch capex per site go to $6.0m: cash goes below zero, and the check still reads zero in every year.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range BS!F6:J6 · Negative cash balances too; the revolver in 5.4.4 is what stops it."
+   }
+  ],
+  "cash-sweep-revolver": [
+   {
+    "lesson_id": "cash-sweep-revolver",
+    "goal_index": "0",
+    "text": "The revolver’s opening balance in C98:J98, cash before the revolver in C99:J99 from the CF, and minimum cash in C100:J100.",
+    "teach": "A model can’t let cash go below what the business needs to trade, and it shouldn’t let cash pile up while it pays interest. The revolver is the last line of financing: it draws when cash before it would fall below the minimum and repays when there is surplus.",
+    "why": "",
+    "hint_stuck": "pulse range C98:J100 · Cash before the revolver is CF row 23; minimum cash is Inputs row 80."
+   },
+   {
+    "lesson_id": "cash-sweep-revolver",
+    "goal_index": "1",
+    "text": "The draw in C101:J101: the minimum less the cash before the revolver, floored at zero with MAX.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C101:J101 · MAX(minimum cash − cash before the revolver, 0), zero in an actual year."
+   },
+   {
+    "lesson_id": "cash-sweep-revolver",
+    "goal_index": "2",
+    "text": "The repayment in C102:J102, as a negative: the surplus over the minimum, capped at the opening balance with MIN.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C102:J102 · −MIN(MAX(cash before − minimum, 0), opening): MIN and MAX, never an IF tower."
+   },
+   {
+    "lesson_id": "cash-sweep-revolver",
+    "goal_index": "3",
+    "text": "The closing balance, the average and interest in C103:J105, interest through the Circ breaker like the other tranches.",
+    "teach": "This closes the circle from 5.3.5: interest moves net income, net income moves cash, cash moves the revolver, and the revolver moves interest. Iterative calculation settles it, and Circ on Inputs switches it off.",
+    "why": "",
+    "hint_stuck": "pulse range C103:J105 · Opening plus drawn plus repaid; the rate is Inputs row 78."
+   },
+   {
+    "lesson_id": "cash-sweep-revolver",
+    "goal_index": "4",
+    "text": "The revolver’s effective rate in C106:J106: interest over the average balance, inside IFERROR.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C106:J106 · The same row as under the other two tranches; Checks already reads it."
+   },
+   {
+    "lesson_id": "cash-sweep-revolver",
+    "goal_index": "5",
+    "text": "Does it tie? Watch capex per site go to $6.0m: the revolver draws in the rollout years, and cash holds at the minimum.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range Schedules!F101:J103 · The draw fills the gap to the minimum; surplus pays it back."
+   }
+  ],
+  "when-it-doesnt-balance": [
+   {
+    "lesson_id": "when-it-doesnt-balance",
+    "goal_index": "0",
+    "text": "Go to the balance check in F28 of BS and read the difference: FY27 is off by exactly FY27’s depreciation.",
+    "teach": "A balance sheet that’s off is off for one of a short list of reasons, and a reviewer checks them in order: the cash tie, the working-capital signs, depreciation, capex, debt, net income to equity, the opening balances. Read the size of the difference before you look anywhere else, because it usually names the line.",
+    "why": "",
+    "hint_stuck": "pulse cell BS!F28 · −5,000 is FY27’s depreciation on Schedules row 64."
+   },
+   {
+    "lesson_id": "when-it-doesnt-balance",
+    "goal_index": "1",
+    "text": "Check 1, the cash tie: FY28 cash in G6 of BS is a typed number, so link it to the CF’s closing cash.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell BS!G6 · Cash is CF row 30, never typed."
+   },
+   {
+    "lesson_id": "when-it-doesnt-balance",
+    "goal_index": "2",
+    "text": "Check 2, the signs: fix the FY29 change in receivables in H8 of the CF, which has its sign turned.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell CF!H8 · The schedule’s change already carries its sign; the CF links it as it is."
+   },
+   {
+    "lesson_id": "when-it-doesnt-balance",
+    "goal_index": "3",
+    "text": "Check 3, depreciation: FY27’s add-back in F7 of the CF is empty, so link it back to the PP&E schedule.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell CF!F7 · Depreciation is Schedules row 64."
+   },
+   {
+    "lesson_id": "when-it-doesnt-balance",
+    "goal_index": "4",
+    "text": "Check 4, capex in both places: FY30 closing PP&E in I65 of Schedules leaves capex out, so put it back.",
+    "teach": "Ctrl+[ selects the cells a formula reads, on any sheet, so you can follow a line back to where it comes from. Closing PP&E reads the opening and depreciation but not capex, which the cash flow still spends.",
+    "why": "",
+    "hint_stuck": "pulse cell Schedules!I65 · Opening plus capex less depreciation, through the flag."
+   },
+   {
+    "lesson_id": "when-it-doesnt-balance",
+    "goal_index": "5",
+    "text": "Check 5, net income to equity: FY31 net income in J22 of BS is empty, so link it to the income statement.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell BS!J22 · Net income is IS row 31."
+   },
+   {
+    "lesson_id": "when-it-doesnt-balance",
+    "goal_index": "6",
+    "text": "When the checks run out, tick it off: FY31 capex in J14 of the CF nets the PP&E change, so link it to capex.",
+    "teach": "Go down the balance sheet, find each line’s change on the cash flow with the right sign, and mark both; the line left unmarked is the break. It’s the one way to find a movement counted twice, like depreciation added back and also netted into the PP&E change.",
+    "why": "",
+    "hint_stuck": "pulse cell CF!J14 · Capex is Schedules row 63, with a minus."
+   },
+   {
+    "lesson_id": "when-it-doesnt-balance",
+    "goal_index": "7",
+    "text": "Does it tie? The check reads zero across eight years, and the Cover flag reads OK.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell Cover!C7 · Every fix moved the check toward zero; the last one landed it."
+   }
+  ],
+  "challenge-linked-statements": [
+   {
+    "lesson_id": "challenge-linked-statements",
+    "goal_index": "0",
+    "text": "On the IS, depreciation in F26:J26, interest in F28:J28 and tax in F30:J30 from their schedules.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-linked-statements",
+    "goal_index": "1",
+    "text": "On the CF, depreciation added back in F7:J7 and capex in F14:J14.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-linked-statements",
+    "goal_index": "2",
+    "text": "On the BS, cash in F6:J6 from the CF’s closing cash and PP&E in F9:J9 from its roll-forward.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-linked-statements",
+    "goal_index": "3",
+    "text": "The revolver’s draw in F101:J101 and repayment in F102:J102 on Schedules.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-linked-statements",
+    "goal_index": "4",
+    "text": "The balance check in F28:J28 of BS, reading zero in every year.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-linked-statements",
+    "goal_index": "5",
+    "text": "Go to the checks flag in C7 of Cover, reading OK.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "tie-outs-cross-foots": [
+   {
+    "lesson_id": "tie-outs-cross-foots",
+    "goal_index": "0",
+    "text": "Tie the equity roll across C12:J12: =ROUND(BS!C21+BS!C22+BS!C23-BS!C24,2), entered with Ctrl+Enter.",
+    "teach": "Equity rolls like every schedule: opening, plus net income, less distributions, is closing. Written as a live difference wrapped in ROUND, it reads zero in every year the roll holds.",
+    "why": "",
+    "hint_stuck": "pulse range C12:J12 · One formula, written for FY24, lands in every year with Ctrl+Enter."
+   },
+   {
+    "lesson_id": "tie-outs-cross-foots",
+    "goal_index": "1",
+    "text": "Tie EBITDA to the Chapter 2 P&L across C13:J13: =IF(Inputs!C$6=0,ROUND(IS!C24-C48,2),0).",
+    "teach": "The historical EBITDA has to agree with the P&L the buyers saw in Chapter 2, typed blue in row 48 with its source. In the projected years there is nothing to tie, so the IF reads 0 there.",
+    "why": "",
+    "hint_stuck": "pulse range C13:J13 · The flag row says whether a year is projected: 0 is an actual."
+   },
+   {
+    "lesson_id": "tie-outs-cross-foots",
+    "goal_index": "2",
+    "text": "Cross-foot the cost build in C11: =ROUND(SUM(Schedules!C32:J37)-SUM(Schedules!C38:J38),2).",
+    "teach": "A cross-foot adds a block twice: every cost line across every year, and the site-cost total row across the years. If one line is left out of a total, the two sums part.",
+    "why": "",
+    "hint_stuck": "pulse cell C11 · Rows 32 to 37 are the cost lines; row 38 is their total."
+   },
+   {
+    "lesson_id": "tie-outs-cross-foots",
+    "goal_index": "3",
+    "text": "Count debt balances below zero across C17:J17, with COUNTIF and \"<0\" on Schedules rows 82, 92 and 103.",
+    "teach": "A tie-out cannot see a balance that has gone through zero: a debt tranche repaid past nothing still ties to itself. A limit check counts what should never happen, with COUNTIF and \"<0\", and reads zero while none does.",
+    "why": "",
+    "hint_stuck": "pulse range C17:J17 · Rows 82, 92 and 103 are the term loan, the delayed draw and the revolver closing."
+   },
+   {
+    "lesson_id": "tie-outs-cross-foots",
+    "goal_index": "4",
+    "text": "Do the same for closing PP&E across C18:J18, with COUNTIF on Schedules row 65.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C18:J18 · Row 65 is closing PP&E, net."
+   },
+   {
+    "lesson_id": "tie-outs-cross-foots",
+    "goal_index": "5",
+    "text": "Clear the pending notes in K11:K13 with Clear All, then Go To Cover!C7: the flag reads OK.",
+    "teach": "The roll-up already adds every row from the balance check down, so the new rows fold into the flag as they land. A pending note says a check is not built yet; once it is, the note goes.",
+    "why": "",
+    "hint_stuck": "pulse range K11:K13 · Clear All takes the note and its italic with it."
+   },
+   {
+    "lesson_id": "tie-outs-cross-foots",
+    "goal_index": "6",
+    "text": "Does it tie? Watch FY29 PP&E on the BS typed over: the PP&E tie in H9 names the line, and the flag turns to CHECK.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell H9 · Each check guards one line."
+   }
+  ],
+  "error-flags-checks-summary": [
+   {
+    "lesson_id": "error-flags-checks-summary",
+    "goal_index": "0",
+    "text": "Count each sheet's errors in C30:C35, starting with C30 =SUMPRODUCT(--ISERROR(IS!C5:J60)) and one sheet a row.",
+    "teach": "ISERROR turns every cell of a block into TRUE or FALSE, the two minus signs turn those into 1 and 0, and SUMPRODUCT adds them. One row a sheet, each over the whole block the sheet uses.",
+    "why": "",
+    "hint_stuck": "pulse range C30:C35 · The labels in column B name each row’s sheet."
+   },
+   {
+    "lesson_id": "error-flags-checks-summary",
+    "goal_index": "1",
+    "text": "Fold the counts into the roll-up: C44 =SUMPRODUCT(ABS(C6:J27))+SUM(C30:C35), and the flag turns to CHECK.",
+    "teach": "An error doesn’t net to zero, so the roll-up adds the counts to the sum of the differences: OK only when both are zero. Schedules reads 1, and the flag says so.",
+    "why": "",
+    "hint_stuck": "pulse cell C44 · Add SUM(C30:C35) to what the cell already holds."
+   },
+   {
+    "lesson_id": "error-flags-checks-summary",
+    "goal_index": "2",
+    "text": "Go to Schedules, the sheet the count names, and press Alt, M, K: Error Checking lands on the #REF! in H66.",
+    "teach": "Error Checking works on one sheet at a time, so go to the sheet the count names first. It selects each error cell in turn and shows its formula.",
+    "why": "",
+    "hint_stuck": "pulse cell H66 · Row 66 is a memo: capex over depreciation."
+   },
+   {
+    "lesson_id": "error-flags-checks-summary",
+    "goal_index": "3",
+    "text": "Close it with Esc and rewrite H66 by pointing: =IFERROR(H63/H64,0), so the count reads 0 and the flag OK.",
+    "teach": "The memo divides capex by depreciation in the same year; the reference to depreciation was deleted. Point at both again rather than typing them, and the count falls to zero.",
+    "why": "",
+    "hint_stuck": "pulse cell H66 · Total capex is row 63 and depreciation row 64."
+   },
+   {
+    "lesson_id": "error-flags-checks-summary",
+    "goal_index": "4",
+    "text": "Open the Watch Window with Alt, M, W, add Cover!C7:C8 with Alt+A, and close it with Esc.",
+    "teach": "The Watch Window keeps a cell in view with its value whatever sheet you are on. Best practice: the flag on the Cover is the first cell a reviewer reads and the last one you read before sending.",
+    "why": "",
+    "hint_stuck": "pulse cell C7 · C7 is the flag and C8 the sum of differences behind it."
+   },
+   {
+    "lesson_id": "error-flags-checks-summary",
+    "goal_index": "5",
+    "text": "Does it tie? Watch a #DIV/0! typed into the IS: the count in C30 catches it and the flag turns to CHECK.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C30 · Every error on the IS adds one."
+   }
+  ],
+  "model-wide-sweep": [
+   {
+    "lesson_id": "model-wide-sweep",
+    "goal_index": "0",
+    "text": "On IS, select the projected block F5:J32 and run Go To Special, Constants: two typed figures light up, G15 and I18.",
+    "teach": "A projected block should hold nothing but formulas, so Go To Special, Constants, Numbers on it selects exactly the cells somebody typed over. Each one is a figure that will not move when the inputs do.",
+    "why": "",
+    "hint_stuck": "pulse range F5:J32 · O picks Constants; Enter selects them."
+   },
+   {
+    "lesson_id": "model-wide-sweep",
+    "goal_index": "1",
+    "text": "Put each back on its row’s formula: select F15:G15 and press Ctrl+R, then H18:I18 and Ctrl+R.",
+    "teach": "Each row is one formula written in FY27 and filled right, so the cure for a typed cell is the fill: Ctrl+R copies the cell to its left across the selection, references shifted.",
+    "why": "",
+    "hint_stuck": "pulse range F15:G15 · The cell to the left holds the row’s formula."
+   },
+   {
+    "lesson_id": "model-wide-sweep",
+    "goal_index": "2",
+    "text": "On Schedules, select the labor row F32:J32 and run Go To Special, Row differences: FY29, H32, lights up.",
+    "teach": "Row differences compares every cell of the selected row with the active cell’s formula, shifted to its column, and selects the ones that do not match. A formula that lost a $ halfway across looks right and gives the wrong figure.",
+    "why": "",
+    "hint_stuck": "pulse range F32:J32 · W picks Row differences."
+   },
+   {
+    "lesson_id": "model-wide-sweep",
+    "goal_index": "3",
+    "text": "Refill the row from FY27: select F32:J32 and press Ctrl+R.",
+    "teach": "H32 reads the FY29 cell of the cost input, which is blank, where every other year reads $C$50. Refill the whole row from FY27 so it is one formula again.",
+    "why": "",
+    "hint_stuck": "pulse range F32:J32 · FY27 holds the row’s formula as written."
+   },
+   {
+    "lesson_id": "model-wide-sweep",
+    "goal_index": "4",
+    "text": "Count typed numbers in C38:C41 on Checks, starting with C38 =SUMPRODUCT(ISNUMBER(IS!F5:J60)*(1-ISFORMULA(IS!F5:J60))) and one sheet a row.",
+    "teach": "ISNUMBER less ISFORMULA is 1 only on a typed number, so the SUMPRODUCT counts typed numbers directly. Counting numbers and formulas separately and subtracting would let a formula showing a dash hide a typed figure.",
+    "why": "",
+    "hint_stuck": "pulse range C38:C41 · Only the projected columns, F to J: history is typed on purpose."
+   },
+   {
+    "lesson_id": "model-wide-sweep",
+    "goal_index": "5",
+    "text": "Fold them into the roll-up: C44 =SUMPRODUCT(ABS(C6:J27))+SUM(C30:C35)+SUM(C38:C41).",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C44 · Add SUM(C38:C41) to what the cell already holds."
+   },
+   {
+    "lesson_id": "model-wide-sweep",
+    "goal_index": "6",
+    "text": "Does it tie? Watch a figure typed into FY29 labor on the IS: the count in C38 catches it and the flag turns to CHECK.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C38 · A typed number in the projection counts one."
+   }
+  ],
+  "stress-tests": [
+   {
+    "lesson_id": "stress-tests",
+    "goal_index": "0",
+    "text": "Take washes to zero: 0 into Inputs!F22:J22 with Ctrl+Enter and 0 into C42; the IS margins read #DIV/0!.",
+    "teach": "Zero is the first stress: every ratio divides by something, and a divisor of zero is #DIV/0!. With no washes, revenue is nothing, so every margin on the IS breaks.",
+    "why": "",
+    "hint_stuck": "pulse range F22:J22 · Row 22 is the Base case washes a day; C42 the washes at a new site."
+   },
+   {
+    "lesson_id": "stress-tests",
+    "goal_index": "1",
+    "text": "Wrap the four margins: C11:J11 =IFERROR(C10/C8,\"-\"), and rows 21, 25 and 32 the same way.",
+    "teach": "A ratio with nothing to divide by has no answer, so IFERROR shows a dash where the error would be. Use it only where the error is expected, never around a whole calculation to hide one.",
+    "why": "",
+    "hint_stuck": "pulse range C11:J11 · Each margin is its line over revenue in row 8."
+   },
+   {
+    "lesson_id": "stress-tests",
+    "goal_index": "2",
+    "text": "Put the base case back: 250 into Inputs!F22:J22 and 200 into C42.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range F22:J22 · The Base case runs 250 washes a day; a new site 200."
+   },
+   {
+    "lesson_id": "stress-tests",
+    "goal_index": "3",
+    "text": "Type 100 into FY27 new sites, Inputs!F21: cash holds at the 5,000 minimum and the flag stays OK; then Ctrl+Z.",
+    "teach": "Ctrl+Z takes back the last change, so a stress is one entry and one undo. A hundred sites is $250m of capex: the revolver draws whatever cash before it falls short of the minimum, and the model still balances.",
+    "why": "",
+    "hint_stuck": "pulse cell F21 · The revolver is the plug that is not a plug: it draws to the minimum cash."
+   },
+   {
+    "lesson_id": "stress-tests",
+    "goal_index": "4",
+    "text": "Type 150% into the FY27 cost of a wash, Inputs!F25: a loss, and Schedules F120 shows no tax; then Ctrl+Z.",
+    "teach": "When the washes cost more than they bring in, earnings before tax go negative, and tax has to stop at zero rather than turn into a refund. The MAX in the tax schedule does that, and the loss is carried to a later year.",
+    "why": "",
+    "hint_stuck": "pulse cell F25 · Row 120 on Schedules is the tax charge."
+   },
+   {
+    "lesson_id": "stress-tests",
+    "goal_index": "5",
+    "text": "Type 100% and then 0% into FY27 member share, Inputs!F24: no errors either way; then Ctrl+Z twice.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell F24 · At 100% every wash is a member’s; at 0% none is."
+   },
+   {
+    "lesson_id": "stress-tests",
+    "goal_index": "6",
+    "text": "Does it tie? Watch C44 on Checks and C7 on the Cover: the base case is back, every check reads zero, and the flag reads OK.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C7 · The last cell you read before sending."
+   }
+  ],
+  "challenge-eight-faults": [
+   {
+    "lesson_id": "challenge-eight-faults",
+    "goal_index": "0",
+    "text": "Put the two typed figures on the IS projection back on their rows’ formulas.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-eight-faults",
+    "goal_index": "1",
+    "text": "Find the labor formula on Schedules that breaks pattern and refill its row from FY27.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-eight-faults",
+    "goal_index": "2",
+    "text": "On CF, add FY28 depreciation back and put the sign of the FY29 receivables change right.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-eight-faults",
+    "goal_index": "3",
+    "text": "Fix the #REF! the error count finds on Schedules.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-eight-faults",
+    "goal_index": "4",
+    "text": "Make the equity roll on Checks a live difference again: =ROUND(BS!C21+BS!C22+BS!C23-BS!C24,2) across C12:J12.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-eight-faults",
+    "goal_index": "5",
+    "text": "Take the plug out of FY31 cash on the BS so it reads the cash flow’s closing cash, and the flag reads OK.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "what-a-dcf-is": [
+   {
+    "lesson_id": "what-a-dcf-is",
+    "goal_index": "0",
+    "text": "Go to Checks with Ctrl+G, then press Ctrl+PgDn to reach the DCF page next door.",
+    "teach": "Ctrl+PgDn moves one sheet to the right, and the DCF page is the tab after Checks. Its blocks are labeled already: free cash flow, discounting, terminal value, enterprise value to equity value, WACC and the sensitivity tables.",
+    "why": "",
+    "hint_stuck": "pulse cell A1 · DCF is the tab to the right of Checks."
+   },
+   {
+    "lesson_id": "what-a-dcf-is",
+    "goal_index": "1",
+    "text": "Link the valuation date in C5 to Inputs: =Inputs!$C$87.",
+    "teach": "Every discount period counts from a stated date: the FY26 year end, the same date the net debt is taken at. It is typed once with the DCF inputs and linked here.",
+    "why": "",
+    "hint_stuck": "pulse cell C5 · Row 87 on Inputs holds 12/31/2026."
+   },
+   {
+    "lesson_id": "what-a-dcf-is",
+    "goal_index": "2",
+    "text": "Link EBITDA across C8:J8: =IS!C24, entered with Ctrl+Enter.",
+    "teach": "The cash flows start from EBITDA, the operating profit before depreciation, interest and tax. The IS already has it, so the DCF reads it and never retypes it.",
+    "why": "",
+    "hint_stuck": "pulse range C8:J8 · EBITDA is row 24 on the IS."
+   },
+   {
+    "lesson_id": "what-a-dcf-is",
+    "goal_index": "3",
+    "text": "Link capex across C14:J14: =-Schedules!C63.",
+    "teach": "Capex is cash out the door, so it comes in with a minus sign: the schedule shows it as a positive spend.",
+    "why": "",
+    "hint_stuck": "pulse range C14:J14 · Total capex is row 63 on Schedules."
+   },
+   {
+    "lesson_id": "what-a-dcf-is",
+    "goal_index": "4",
+    "text": "Link the change in working capital across C15:J15: =Schedules!C56.",
+    "teach": "The working-capital schedule already shows its cash effect with the sign the cash flow needs, so this link takes it as it stands.",
+    "why": "",
+    "hint_stuck": "pulse range C15:J15 · The cash effect of working capital is row 56 on Schedules."
+   },
+   {
+    "lesson_id": "what-a-dcf-is",
+    "goal_index": "5",
+    "text": "Does it tie? Watch three new sites in FY28 instead of six: capex on the DCF falls with them.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell G14 · The DCF reads the schedule, so it moves with the rollout."
+   }
+  ],
+  "unlevered-free-cash-flow": [
+   {
+    "lesson_id": "unlevered-free-cash-flow",
+    "goal_index": "0",
+    "text": "Link depreciation across C9:J9, as a deduction: =-Schedules!C64.",
+    "teach": "Free cash flow is built down the page from EBITDA, one line at a time. Depreciation comes off first to reach EBIT, because tax is charged on profit after depreciation.",
+    "why": "",
+    "hint_stuck": "pulse range C9:J9 · Depreciation is row 64 on Schedules, shown positive there."
+   },
+   {
+    "lesson_id": "unlevered-free-cash-flow",
+    "goal_index": "1",
+    "text": "EBIT across C10:J10: =C8+C9.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C10:J10 · EBITDA plus the line below it, which is negative."
+   },
+   {
+    "lesson_id": "unlevered-free-cash-flow",
+    "goal_index": "2",
+    "text": "Tax on EBIT across C11:J11: =-MAX(C10,0)*Inputs!$C$84.",
+    "teach": "Tax here is on EBIT at the rate, not the tax on the IS, which is lower because interest came off first. MAX keeps a loss year from turning into a refund.",
+    "why": "",
+    "hint_stuck": "pulse range C11:J11 · The tax rate is row 84 on Inputs; anchor it with F4."
+   },
+   {
+    "lesson_id": "unlevered-free-cash-flow",
+    "goal_index": "3",
+    "text": "NOPAT, EBIT after that tax, across C12:J12: =C10+C11.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C12:J12 · EBIT plus the tax line, which is negative."
+   },
+   {
+    "lesson_id": "unlevered-free-cash-flow",
+    "goal_index": "4",
+    "text": "Add depreciation back across C13:J13: =-C9.",
+    "teach": "Depreciation is a charge that never left the bank account, so it comes back now that tax is done.",
+    "why": "",
+    "hint_stuck": "pulse range C13:J13 · The deduction in row 9, turned around."
+   },
+   {
+    "lesson_id": "unlevered-free-cash-flow",
+    "goal_index": "5",
+    "text": "Unlevered free cash flow across C16:J16: =SUM(C12:C15).",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C16:J16 · NOPAT, depreciation back, capex and working capital, rows 12 to 15."
+   },
+   {
+    "lesson_id": "unlevered-free-cash-flow",
+    "goal_index": "6",
+    "text": "The memo, FCF as a share of EBITDA, across C17:J17: =IFERROR(C16/C8,\"-\").",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C17:J17 · Free cash flow over EBITDA; IFERROR shows a dash where EBITDA is nothing."
+   },
+   {
+    "lesson_id": "unlevered-free-cash-flow",
+    "goal_index": "7",
+    "text": "Does it tie? Watch three new sites in FY27 instead of six: capex falls, and free cash flow rises that year.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell F16 · Fewer sites, less capex, more cash."
+   }
+  ],
+  "wacc-block": [
+   {
+    "lesson_id": "wacc-block",
+    "goal_index": "0",
+    "text": "Link the four cost of equity inputs into C50:C53, starting with C50 =Inputs!$C$88.",
+    "teach": "The seven WACC inputs are typed once on Inputs, each with its source in the next cell, and the DCF links them. Clearcoat is private, so its beta of 1.2 stands for the listed operators’ betas, relevered at the 40% target.",
+    "why": "",
+    "hint_stuck": "pulse range C50:C53 · Rows 88 to 91 on Inputs, in the same order."
+   },
+   {
+    "lesson_id": "wacc-block",
+    "goal_index": "1",
+    "text": "Cost of equity in C54: =C50+C52*C51+C53, about 13.2%.",
+    "teach": "The size premium is the extra return investors ask of a company as small as Clearcoat. It is added after beta times the premium, never inside it.",
+    "why": "",
+    "hint_stuck": "pulse cell C54 · Risk-free, plus beta times the premium, plus the size premium."
+   },
+   {
+    "lesson_id": "wacc-block",
+    "goal_index": "2",
+    "text": "Link the cost of debt and the tax rate into C55:C56: =Inputs!$C$92, then =Inputs!$C$84.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C55:C56 · The loan’s 7% is what Clearcoat could borrow at today."
+   },
+   {
+    "lesson_id": "wacc-block",
+    "goal_index": "3",
+    "text": "After-tax cost of debt in C57: =C55*(1-C56).",
+    "teach": "Interest is deducted before tax, so every dollar of it saves a quarter in tax. Debt costs its rate times one less the tax rate.",
+    "why": "",
+    "hint_stuck": "pulse cell C57 · 7% times 75%."
+   },
+   {
+    "lesson_id": "wacc-block",
+    "goal_index": "4",
+    "text": "The weights: C58 =Inputs!$C$93, and C59 =1-C58.",
+    "teach": "The weights come from a target capital structure, the mix a buyer would fund the business with, not whatever today’s balance sheet happens to show.",
+    "why": "",
+    "hint_stuck": "pulse range C58:C59 · Equity funds whatever debt does not."
+   },
+   {
+    "lesson_id": "wacc-block",
+    "goal_index": "5",
+    "text": "WACC in C60: =C59*C54+C58*C57, about 10%.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C60 · Each cost times its weight, added."
+   },
+   {
+    "lesson_id": "wacc-block",
+    "goal_index": "6",
+    "text": "With C60 selected, define the name WACC with Alt, M, M, D.",
+    "teach": "Every discount factor on the page reads this one cell, so it gets a name: WACC reads better in a formula than a cell address, and it cannot drift when rows move.",
+    "why": "",
+    "hint_stuck": "pulse cell C60 · Type the name and press Enter; the cell is already selected."
+   },
+   {
+    "lesson_id": "wacc-block",
+    "goal_index": "7",
+    "text": "Does it tie? Watch beta on Inputs go from 1.2 to 1.5: the cost of equity rises, and WACC in C60 with it.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C60 · Beta drives the cost of equity, and equity is 60% of the blend."
+   }
+  ],
+  "terminal-value": [
+   {
+    "lesson_id": "terminal-value",
+    "goal_index": "0",
+    "text": "Carry FY31 into the normalized column: K8 =J8, and K9 =J9.",
+    "teach": "FY31 is still a rollout year, so its raw cash flow would charge six new sites’ capex forever. Column K is a normalized FY31 beside the forecast; it starts from FY31’s EBITDA and depreciation.",
+    "why": "",
+    "hint_stuck": "pulse range K8:K9 · Each reads the cell to its left."
+   },
+   {
+    "lesson_id": "terminal-value",
+    "goal_index": "1",
+    "text": "Fill J10:K13 and J16:K17 across with Ctrl+R.",
+    "teach": "The rest of the column runs the same formulas as the forecast, so Ctrl+R fills them across from FY31.",
+    "why": "",
+    "hint_stuck": "pulse range J10:K13 · Capex and working capital get their own formulas next, so skip rows 14 and 15."
+   },
+   {
+    "lesson_id": "terminal-value",
+    "goal_index": "2",
+    "text": "Set K14 to =-K13 and K15 to =Inputs!$C$98.",
+    "teach": "In a steady year capex only replaces what wears out, so it is set to depreciation; working capital moves by its steady amount from Inputs.",
+    "why": "",
+    "hint_stuck": "pulse range K14:K15 · Capex is the depreciation added back, turned around."
+   },
+   {
+    "lesson_id": "terminal-value",
+    "goal_index": "3",
+    "text": "The perpetuity value in C27: =K16*(1+Inputs!$C$95)/(WACC-Inputs!$C$95).",
+    "teach": "The perpetuity grows the normalized cash flow a year and divides by WACC less growth. Growth is 3%, no faster than the economy, and it has to sit below WACC or the formula breaks.",
+    "why": "",
+    "hint_stuck": "pulse cell C27 · K16 is the normalized cash flow; growth is row 95 on Inputs."
+   },
+   {
+    "lesson_id": "terminal-value",
+    "goal_index": "4",
+    "text": "The exit value in C28: =J8*Inputs!$C$94.",
+    "teach": "The exit multiple sells the business at the end of FY31 for 11.0 times that year’s EBITDA, sourced to the listed operators and the precedent deals.",
+    "why": "",
+    "hint_stuck": "pulse cell C28 · FY31 EBITDA is J8."
+   },
+   {
+    "lesson_id": "terminal-value",
+    "goal_index": "5",
+    "text": "Implied multiple in C29: =C27/J8, and implied growth in C30: =(C28*WACC-K16)/(C28+K16).",
+    "teach": "Each method implies the other’s input: the perpetuity value over FY31 EBITDA is a multiple, and the perpetuity formula solved for growth turns the exit value into a growth rate.",
+    "why": "",
+    "hint_stuck": "pulse range C29:C30 · Read them against 11.0x and 3%."
+   },
+   {
+    "lesson_id": "terminal-value",
+    "goal_index": "6",
+    "text": "The round trip in C31: =((C29*J8)*WACC-K16)/((C29*J8)+K16), then on Checks C26: =ROUND(DCF!C31-Inputs!$C$95,6).",
+    "teach": "Feed the implied multiple back into the exit method, solve for growth, and the growth input must come back. If it doesn’t, the two values aren’t built on the same cash flow.",
+    "why": "",
+    "hint_stuck": "pulse cell C31 · The check is a live difference that reads zero."
+   },
+   {
+    "lesson_id": "terminal-value",
+    "goal_index": "7",
+    "text": "The switch: C32 =Inputs!$C$96, and C33 =CHOOSE(C32,C27,C28).",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C32:C33 · 1 picks the perpetuity, 2 the exit multiple."
+   },
+   {
+    "lesson_id": "terminal-value",
+    "goal_index": "8",
+    "text": "Does it tie? Watch the exit multiple on Inputs go from 11.0x to 13.0x: the implied growth in C30 climbs.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C30 · A higher multiple says the market expects faster growth."
+   }
+  ],
+  "discounting-mid-year": [
+   {
+    "lesson_id": "discounting-mid-year",
+    "goal_index": "0",
+    "text": "Period t across C20:J20: =IF(Inputs!C$6=1,Inputs!C$8-IF(Inputs!$C$97=1,0.5,0),0), entered with Ctrl+Enter.",
+    "teach": "The period counter is the year count from Inputs, less a half when the mid-year switch is on, and zero in the historical years, so only the forecast is discounted.",
+    "why": "",
+    "hint_stuck": "pulse range C20:J20 · Row 6 on Inputs is the projection flag, row 8 the counter."
+   },
+   {
+    "lesson_id": "discounting-mid-year",
+    "goal_index": "1",
+    "text": "The discount factor across C21:J21: =IF(Inputs!C$6=1,1/(1+WACC)^C20,0).",
+    "teach": "The caret raises to a power: 1/(1+WACC)^t is what a dollar t years out is worth today.",
+    "why": "",
+    "hint_stuck": "pulse range C21:J21 · WACC is the named cell; t is the row above."
+   },
+   {
+    "lesson_id": "discounting-mid-year",
+    "goal_index": "2",
+    "text": "Present values across C22:J22: =C16*C21, then their sum in C23: =SUM(C22:J22).",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C22:J22 · Free cash flow times its factor."
+   },
+   {
+    "lesson_id": "discounting-mid-year",
+    "goal_index": "3",
+    "text": "Discount factors for the terminal values: C36 =J21, and C37 =1/(1+WACC)^Inputs!$J$8.",
+    "teach": "An exit is a sale at the end of FY31, so it takes the end-year factor whatever the switch says; a perpetuity’s cash keeps arriving through the year, so it takes year 5’s own factor.",
+    "why": "",
+    "hint_stuck": "pulse range C36:C37 · Year 5 on the counter is Inputs J8."
+   },
+   {
+    "lesson_id": "discounting-mid-year",
+    "goal_index": "4",
+    "text": "Discount each terminal value: C38 =C27*C36, and C39 =C28*C37.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C38:C39 · Each value times its own factor."
+   },
+   {
+    "lesson_id": "discounting-mid-year",
+    "goal_index": "5",
+    "text": "Enterprise value: C40 =C23+C38, C41 =C23+C39, and C42 =CHOOSE(C32,C40,C41).",
+    "teach": "Enterprise value is the discounted forecast plus the discounted terminal value, built once per method so each sensitivity table can read its own. The switch picks which one goes on.",
+    "why": "",
+    "hint_stuck": "pulse range C40:C42 · The sum of present values plus each discounted terminal value."
+   },
+   {
+    "lesson_id": "discounting-mid-year",
+    "goal_index": "6",
+    "text": "Net debt in C43: =Schedules!$E$111, and equity value in C44: =C42-C43.",
+    "teach": "Picture a house: enterprise value is what the house is worth, net debt the mortgage, and equity the owner’s stake. Net debt is taken at the valuation date, the FY26 year end.",
+    "why": "",
+    "hint_stuck": "pulse range C43:C44 · Net debt is row 111 on Schedules, FY26 in column E."
+   },
+   {
+    "lesson_id": "discounting-mid-year",
+    "goal_index": "7",
+    "text": "The memos: C45 =CHOOSE(C32,C38,C39)/C42, C46 =C23/C42, and E47:F47 =$C$42/E8.",
+    "teach": "How much of the value rests on the terminal value is the first thing a reviewer reads. The multiples get read against the comps: FY27’s is lower while EBITDA grows.",
+    "why": "",
+    "hint_stuck": "pulse range C45:C46 · The two shares add to 100%."
+   },
+   {
+    "lesson_id": "discounting-mid-year",
+    "goal_index": "8",
+    "text": "The cross-check: C24 =SUMPRODUCT($F$16:$J$16,1/(1+WACC)^Inputs!$F$8:$J$8), then on Checks C27: =ROUND(DCF!C24-NPV(WACC,DCF!F16:J16),2).",
+    "teach": "NPV discounts each flow a whole period out, which is the end-year case, so a SUMPRODUCT at end-year periods must match it exactly.",
+    "why": "",
+    "hint_stuck": "pulse cell C24 · The check reads zero when the two agree."
+   },
+   {
+    "lesson_id": "discounting-mid-year",
+    "goal_index": "9",
+    "text": "Does it tie? Watch the mid-year switch on Inputs go off: the present values in C23 fall about 5%, and the exit value stays put.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C23 · Half a year at 10% is worth about 5%; the exit is a sale at the end of FY31 either way."
+   }
+  ],
+  "dcf-sensitivity": [
+   {
+    "lesson_id": "dcf-sensitivity",
+    "goal_index": "0",
+    "text": "The drivers: C63 =WACC, C64 =Inputs!$C$95, and C65 =Inputs!$C$94.",
+    "teach": "The tables read three cells on their own page, never Inputs directly: WACC, growth and the multiple, each passed through. The edges step out from them by the steps on Inputs.",
+    "why": "",
+    "hint_stuck": "pulse range C63:C65 · Growth is row 95 on Inputs and the multiple row 94."
+   },
+   {
+    "lesson_id": "dcf-sensitivity",
+    "goal_index": "1",
+    "text": "Select D69:H73 and enter =SUMPRODUCT($F$16:$J$16,1/(1+$C69)^$F$20:$J$20)+$K$16*(1+D$68)/($C69-D$68)/(1+$C69)^$J$20 with Ctrl+Enter.",
+    "teach": "One formula fills the grid when its anchors are mixed: $C69 keeps the column on the WACC edge and lets the row move, D$68 keeps the row on the growth edge and lets the column move. Each cell values the business at its own pair.",
+    "why": "",
+    "hint_stuck": "pulse range D69:H73 · The forecast discounted at the row’s WACC, plus the perpetuity at the column’s growth."
+   },
+   {
+    "lesson_id": "dcf-sensitivity",
+    "goal_index": "2",
+    "text": "Select D77:H81 and enter =SUMPRODUCT($F$16:$J$16,1/(1+$C77)^$F$20:$J$20)+$J$8*D$76/(1+$C77)^Inputs!$J$8 with Ctrl+Enter.",
+    "teach": "The exit grid is the same forecast plus FY31 EBITDA times the column’s multiple, a sale at the end of FY31.",
+    "why": "",
+    "hint_stuck": "pulse range D77:H81 · The multiples run across row 76."
+   },
+   {
+    "lesson_id": "dcf-sensitivity",
+    "goal_index": "3",
+    "text": "Format D69:H73 with the code #,##0.0,_);(#,##0.0,), then D77:H81 with F4.",
+    "teach": "A comma after the last digit placeholder divides by a thousand, so thousands print as millions with one decimal, the way the book shows a valuation range.",
+    "why": "",
+    "hint_stuck": "pulse range D69:H73 · Ctrl+1, N, then type the code into the Custom box."
+   },
+   {
+    "lesson_id": "dcf-sensitivity",
+    "goal_index": "4",
+    "text": "Bold the base case of each grid: F71, then F79, with Ctrl+B.",
+    "teach": "The middle cell of each grid is the base case, and it equals the enterprise value above for its method. Bold it so the eye starts there.",
+    "why": "",
+    "hint_stuck": "pulse cell F71 · It should read the same as the enterprise value for its method, in millions."
+   },
+   {
+    "lesson_id": "dcf-sensitivity",
+    "goal_index": "5",
+    "text": "Does it tie? Watch three new sites in FY27 instead of six: both tables shift together.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell F71 · Every cell reads the same forecast, so the whole grid moves."
+   }
+  ],
+  "challenge-dcf": [
+   {
+    "lesson_id": "challenge-dcf",
+    "goal_index": "0",
+    "text": "Build the WACC in C60 from the block above it and name the cell WACC.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-dcf",
+    "goal_index": "1",
+    "text": "The perpetuity value in C27, on the normalized cash flow in K16 at the growth on Inputs.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-dcf",
+    "goal_index": "2",
+    "text": "The exit value in C28, FY31 EBITDA at the multiple on Inputs.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-dcf",
+    "goal_index": "3",
+    "text": "Mid-year discount factors across F21:J21, on the periods in row 20.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-dcf",
+    "goal_index": "4",
+    "text": "Enterprise value in C42 on the method the switch names, and equity value in C44 after FY26 net debt.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-dcf",
+    "goal_index": "5",
+    "text": "Fill one sensitivity grid, perpetuity or exit multiple, against its edges.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "revenue-build-in-three": [
+   {
+    "lesson_id": "revenue-build-in-three",
+    "goal_index": "0",
+    "text": "Select the rollout C6:J9 on Schedules and press Ctrl+R, so FY25 to FY31 take each row’s FY24 formula.",
+    "teach": "A benchmark is a build you already know, against the clock. Every row’s formula is written once, in its first column, and filled right in one press: the FY24 cells here already hold it, reading the history through the projection flag, so Ctrl+R carries it across the actuals and the estimates alike.",
+    "why": "",
+    "hint_stuck": "pulse range C6:J9 · The FY24 column holds the formula; one press copies it right."
+   },
+   {
+    "lesson_id": "revenue-build-in-three",
+    "goal_index": "1",
+    "text": "Type =AVERAGE(C6,C9) into C10:J10 with Ctrl+Enter, then fill the washes C15:J15 right with Ctrl+R.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C10:J10 · Average sites sits between the opening and the closing count."
+   },
+   {
+    "lesson_id": "revenue-build-in-three",
+    "goal_index": "2",
+    "text": "Fill the ticket, its growth and retail revenue right in one press: select C20:J22 and press Ctrl+R.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C20:J22 · Three rows, one selection, one Ctrl+R."
+   },
+   {
+    "lesson_id": "revenue-build-in-three",
+    "goal_index": "3",
+    "text": "Type =C19/(Inputs!C45*12) into C23:J23, pressing F4 right after C45, then fill membership revenue C24:J24 right.",
+    "teach": "F4 while the cursor sits just after a reference anchors it as you type, so the fill is right the first time: one press turns Inputs!C45 into Inputs!$C$45. A member washes two and a half times a month, so average members are member washes over thirty a year.",
+    "why": "",
+    "hint_stuck": "pulse range C23:J23 · Without the anchor, D23 would read Inputs!D45, an empty cell."
+   },
+   {
+    "lesson_id": "revenue-build-in-three",
+    "goal_index": "4",
+    "text": "Total revenue in C26:J26: =C22+C24+C25 with Ctrl+Enter, the three revenue lines and not the member count between them.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C26:J26 · Row 23 counts members, not dollars, so AutoSum down the block would add it in."
+   },
+   {
+    "lesson_id": "revenue-build-in-three",
+    "goal_index": "5",
+    "text": "Give the rollout C6:J9 the desk number format in Ctrl+1’s Custom box, then select the washes C15:J15 and press F4.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C6:J9 · The code is #,##0_);(#,##0);\"-\"_), and F4 repeats the last format on the next block."
+   },
+   {
+    "lesson_id": "revenue-build-in-three",
+    "goal_index": "6",
+    "text": "Does it tie? Watch FY31 new sites in Inputs J21 go from 6 to 10: revenue climbs and the revenue check, Checks J10, holds at 0.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell J10 · The check is the IS’s revenue less the build’s, so it reads 0 whatever the case says."
+   }
+  ],
+  "fill-and-format-block": [
+   {
+    "lesson_id": "fill-and-format-block",
+    "goal_index": "0",
+    "text": "Select C30:J56 on Schedules, the cost build and working capital, and fill the block right with Ctrl+R.",
+    "teach": "A block fills in one motion: select from its first formula column to FY31 and press Ctrl+R, and every row takes its own first cell’s formula and format. The memo cells in C57 and C67 live in one column only, so the selections stop short of them.",
+    "why": "",
+    "hint_stuck": "pulse range C30:J56 · Every row’s formula is in C already; one press carries all of them."
+   },
+   {
+    "lesson_id": "fill-and-format-block",
+    "goal_index": "1",
+    "text": "Fill the PP&E block the same way: select C60:J66 and press Ctrl+R.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C60:J66 · Stop at row 66: the implied life in C67 is one cell, not a row."
+   },
+   {
+    "lesson_id": "fill-and-format-block",
+    "goal_index": "2",
+    "text": "Desk number format on the cost lines C32:J37 through Ctrl+1, then F4 on C41:J41, C47:J48, C53:J55, C61:J62 and C64:J64.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C32:J37 · The first line of each block and the totals carry the $ already; the lines between take the plain code."
+   },
+   {
+    "lesson_id": "fill-and-format-block",
+    "goal_index": "3",
+    "text": "Top border on Site costs C38:J38 with Alt H B P, then F4 on the totals in rows 39, 42, 49, 56, 63 and 65.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C38:J38 · A top border marks a total; F4 repeats the border, not the selection."
+   },
+   {
+    "lesson_id": "fill-and-format-block",
+    "goal_index": "4",
+    "text": "Italic on the cost of sales share C31:J31 with Ctrl+I, then F4 on the two margins, C40:J40 and C43:J43.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C31:J31 · Italic sets a ratio apart from the dollars around it."
+   },
+   {
+    "lesson_id": "fill-and-format-block",
+    "goal_index": "5",
+    "text": "Does it tie? Watch labor per site, Inputs C50, go from 257 to 300: every cost line moves and the cross-foot in Checks C11 holds at 0.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C11 · The cross-foot sums the block down, then across, and takes one from the other."
+   }
+  ],
+  "keyboard-only-linking": [
+   {
+    "lesson_id": "keyboard-only-linking",
+    "goal_index": "0",
+    "text": "Link net income, =IS!C31 into CF C6:J6, and depreciation, =Schedules!C64 into C7:J7, each with Ctrl+Enter.",
+    "teach": "A link row is one entry: select the row from FY24 to FY31, type the reference for FY24 and press Ctrl+Enter, and each column reads its own year because the reference is relative. Typing the reference is faster than pointing at it on another sheet, and Ctrl+G gets you to the row.",
+    "why": "",
+    "hint_stuck": "pulse range C6:J6 · Net income is the last line of the IS, row 31."
+   },
+   {
+    "lesson_id": "keyboard-only-linking",
+    "goal_index": "1",
+    "text": "The three working capital changes sit in Schedules rows 53 to 55: select C8:J10 and enter =Schedules!C53 with Ctrl+Enter.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C8:J10 · One entry fills three rows: each row reads the Schedules row in the same order."
+   },
+   {
+    "lesson_id": "keyboard-only-linking",
+    "goal_index": "2",
+    "text": "Capex is cash going out: enter =-Schedules!C63 into C14:J14 with Ctrl+Enter.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C14:J14 · The schedule keeps capex positive; the cash flow shows it as an outflow."
+   },
+   {
+    "lesson_id": "keyboard-only-linking",
+    "goal_index": "3",
+    "text": "Link the term loan, =Schedules!C80 into C18:J19, and the delayed draw, =Schedules!C90 into C20:J21, each with Ctrl+Enter.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C18:J19 · Drawn and repaid sit next to each other on the schedule, so two rows take one entry."
+   },
+   {
+    "lesson_id": "keyboard-only-linking",
+    "goal_index": "4",
+    "text": "The revolver nets its draw and repayment: enter =Schedules!C101+Schedules!C102 into C24:J24 with Ctrl+Enter.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C24:J24 · Row 101 is the draw and row 102 the repayment, already negative."
+   },
+   {
+    "lesson_id": "keyboard-only-linking",
+    "goal_index": "5",
+    "text": "Net change in cash is =C11+C15+C25 in C28:J28, and closing cash =C29+C28 in C30:J30, each with Ctrl+Enter.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C28:J28 · The three section totals, operating, investing and financing, add to the change in cash."
+   },
+   {
+    "lesson_id": "keyboard-only-linking",
+    "goal_index": "6",
+    "text": "Color the links green: C6:J10 through Font Color, then F4 on C14:J14, C18:J21 and C24:J24.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C6:J10 · Green marks a figure that comes from another sheet; the totals stay black."
+   },
+   {
+    "lesson_id": "keyboard-only-linking",
+    "goal_index": "7",
+    "text": "Does it tie? Watch FY31 washes per day in Inputs J22 go from 250 to 300: closing cash climbs and the cash check, Checks J7, holds at 0.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell J7 · The check is the balance sheet’s cash less the cash flow’s closing cash."
+   }
+  ],
+  "challenge-model-speed": [
+   {
+    "lesson_id": "challenge-model-speed",
+    "goal_index": "0",
+    "text": "Fill the rollout C6:J9 on Schedules right, and total revenue in C26:J26 as =C22+C24+C25.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-model-speed",
+    "goal_index": "1",
+    "text": "Fill the cost build C30:J43 right in one press.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-model-speed",
+    "goal_index": "2",
+    "text": "Give the cost lines C32:J37 the desk number format, #,##0_);(#,##0);\"-\"_).",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-model-speed",
+    "goal_index": "3",
+    "text": "Link the debt on the cash flow: =Schedules!C80 into C18:J19, =Schedules!C90 into C20:J21 and the revolver into C24:J24.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-model-speed",
+    "goal_index": "4",
+    "text": "Color the new links green: C18:J21 through Font Color, then F4 on C24:J24.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "ch5-project": [
+   {
+    "lesson_id": "ch5-project",
+    "goal_index": "0",
+    "text": "Build the rollout and revenue on Schedules, rows 6 to 27, each row one formula entered across C:J with Ctrl+Enter.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-project",
+    "goal_index": "1",
+    "text": "Build the cost build down to EBITDA and its margin on Schedules, rows 30 to 43.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-project",
+    "goal_index": "2",
+    "text": "Build working capital on Schedules, rows 46 to 57: the balances by days, the changes in cash and the cycle.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-project",
+    "goal_index": "3",
+    "text": "Build PP&E and the depreciation waterfall on Schedules, rows 60 to 76, each vintage depreciating from the year after it is spent.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-project",
+    "goal_index": "4",
+    "text": "Build the term loan and the delayed draw on Schedules, rows 79 to 95, interest on the average balance behind the breaker.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-project",
+    "goal_index": "5",
+    "text": "Build the revolver and the debt totals on Schedules, rows 98 to 111, drawing to the minimum cash and repaying from any surplus.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-project",
+    "goal_index": "6",
+    "text": "Build tax on Schedules, rows 114 to 121, with the loss carried forward and used against later profit.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-project",
+    "goal_index": "7",
+    "text": "Build the IS from revenue to net income, history from Data and projections from Schedules.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-project",
+    "goal_index": "8",
+    "text": "Build the cash flow statement: the links from the IS and Schedules, the distribution, the section totals and cash.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-project",
+    "goal_index": "9",
+    "text": "Build the BS: cash from the cash flow, the balances from Schedules, equity rolled forward, and the balance check.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-project",
+    "goal_index": "10",
+    "text": "Name DCF C60 WACC with Alt M M D, then build the WACC block in DCF rows 50 to 65.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-project",
+    "goal_index": "11",
+    "text": "Build the DCF in rows 5 to 47: free cash flow, the discount factors, terminal value both ways and the equity bridge.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-project",
+    "goal_index": "12",
+    "text": "Build both sensitivity grids on DCF, rows 68 to 81, each axis stepping from the base case and each cell a live value.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-project",
+    "goal_index": "13",
+    "text": "Build the checks on Checks, rows 6 to 27, each a rounded difference that reads 0 when the model ties.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-project",
+    "goal_index": "14",
+    "text": "Count the errors and hardcodes on Checks, roll everything up to the flag in C45, and link the flag to the Cover.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-project",
+    "goal_index": "15",
+    "text": "Does it tie? Watch FY31 washes a day in Inputs J22 go from 250 to 300: every statement moves and the flag on the Cover holds at OK.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "ch5-assessment": [
+   {
+    "lesson_id": "ch5-assessment",
+    "goal_index": "0",
+    "text": "Build the term loan on Schedules, rows 79 to 82: opening, drawn, repaid at the scheduled amortization or the balance if less, closing.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-assessment",
+    "goal_index": "1",
+    "text": "Add the term loan’s average balance, its interest behind the breaker, and the effective rate in Schedules C83:J85.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-assessment",
+    "goal_index": "2",
+    "text": "Build the delayed draw on Schedules, rows 88 to 92: opening, draws to date, drawn, repaid and closing.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-assessment",
+    "goal_index": "3",
+    "text": "Add the delayed draw’s average balance, its interest behind the breaker, and the effective rate in Schedules C93:J95.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-assessment",
+    "goal_index": "4",
+    "text": "Build the revolver in Schedules C98:J103: cash before it, the minimum, a draw to cover a gap and a repayment from a surplus.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-assessment",
+    "goal_index": "5",
+    "text": "Add the revolver’s average balance, its interest behind the breaker, and the effective rate in Schedules C104:J106.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-assessment",
+    "goal_index": "6",
+    "text": "Total the debt and the interest in rows 109 and 110, and net debt against the BS cash in row 111.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-assessment",
+    "goal_index": "7",
+    "text": "Link interest on the IS, row 28, to the total on Schedules, as a cost, through the projection flag.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-assessment",
+    "goal_index": "8",
+    "text": "Link the draws and repayments on CF: the term loan in C18:J19, the delayed draw in C20:J21, the revolver in C24:J24.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-assessment",
+    "goal_index": "9",
+    "text": "Link the three closing balances to the BS, rows 15 to 17, until the balance check reads 0 in every year.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-assessment",
+    "goal_index": "10",
+    "text": "Does it tie? Watch the minimum cash in Inputs C80 go to 8,000: the revolver draws more and the balance check, Checks row 6, holds at 0.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
   ]
  },
  "modules": {
@@ -11883,6 +15135,62 @@ export const COPY = {
    "objective": "Build the weekly report end to end, then prove it against the clock; or test out of the chapter.",
    "story_beat": "The diligence pack. || A fresh export, a question log with eight questions open, a case sheet with three columns and no switch wired. Answer the log, build the KPI page, wire the case and name what deserves it. Build it, then build it again on another cluster’s export against the clock. The assessment is the test-out.",
    "page_name": "The diligence pack"
+  },
+  "the-three-statements": {
+   "id": "the-three-statements",
+   "name": "The three statements",
+   "objective": "The income statement; accrual and cash; the cash flow statement; the balance sheet; how the three link; one week of one site through all three; reading a set the way a buyer does.",
+   "story_beat": "What the sites did, in three statements. || Before the model, the accounting. Every wash, chemical, paycheck, loan payment and tunnel bought shows up in one of three statements, and a buyer reads all three because each one hides what the others show. This module builds them for one site and one month by hand, so that when the model links them at forty sites and five years, you know what every line means.",
+   "page_name": "One site's month, in three statements"
+  },
+  "model-setup": {
+   "id": "model-setup",
+   "name": "Model setup and efficiencies",
+   "objective": "Inputs, calculations and outputs, sheet order and a Cover; the timeline row with its flags and counters; the fill patterns at model speed; the checks sheet from day one; the statements populated from the data tab; the drivers block.",
+   "story_beat": "Set the model up before you build it. || Forty sites, eight years, six schedules and three statements is too much to hold in your head, so the model holds it for you, if it’s laid out in the order it calculates: inputs feed schedules, schedules feed statements, statements feed the DCF, left to right across the tabs. Set the sheets, the timeline and the checks up empty first, and every formula after has a place to go.",
+   "page_name": "The model shell"
+  },
+  "schedules": {
+   "id": "schedules",
+   "name": "Schedules",
+   "objective": "The revenue build, the cost build, working capital from days to balances, PP&E with its depreciation waterfall, debt and interest with the average-balance circle and a breaker, and tax.",
+   "story_beat": "The schedules behind the statements. || A statement line like revenue or interest is the last row of a schedule that builds it: sites times washes times ticket; a debt balance that rolls forward and charges interest on its average. Six schedules (revenue, costs, working capital, PP&E, debt, tax), and every one rolls a balance from one year to the next. Build them on Schedules, and the statements in module 5.4 read their last lines.",
+   "page_name": "The schedules"
+  },
+  "linking-the-statements": {
+   "id": "linking-the-statements",
+   "name": "Linking the statements",
+   "objective": "The income statement from the schedules, the cash flow statement by the indirect method, the balance sheet with cash as the plug that isn’t a plug, the cash sweep and the revolver, and the order to check when it doesn’t balance.",
+   "story_beat": "Link it. || The schedules are built; the statements read their last lines. Income statement first, from revenue to net income. Cash flow from net income and the schedules’ changes. Balance sheet last, with cash from the cash flow, and if it doesn’t balance, there’s an order to look, and you’ll learn it by breaking it.",
+   "page_name": "The statements, linked"
+  },
+  "auditing-a-model": {
+   "id": "auditing-a-model",
+   "name": "Auditing a model",
+   "objective": "Tie-outs and cross-foots; error flags and the checks summary; the model-wide sweep for hardcodes and pattern breaks; stress tests.",
+   "story_beat": "Audit it before they do. || Three buyers’ analysts are about to open this model looking for the mistake that lets them pay less, so find it first. A model gets audited the way a databook does, and then for the things only a model can get wrong: a row that doesn’t cross-foot, a formula that breaks pattern halfway across, an input that survives a stress test by luck.",
+   "page_name": "The model, audited"
+  },
+  "dcf": {
+   "id": "dcf",
+   "name": "DCF",
+   "objective": "What a DCF is; unlevered free cash flow; the WACC block; terminal value both ways; discounting and the mid-year convention; sensitivity tables.",
+   "story_beat": "What the cash flows are worth. || The model says what the business will earn; the DCF says what that’s worth today. Take the cash the business throws off after tax, capex and working capital, before anyone is paid interest, discount it at the return its investors require, add what it’s worth beyond the forecast, and you have an enterprise value. Take off the debt and what’s left is what the owners are selling.",
+   "page_name": "The DCF page"
+  },
+  "model-speed": {
+   "id": "model-speed",
+   "name": "Model speed",
+   "objective": "The chapter’s three benchmarks with the keys shown once: the revenue build in three minutes, a block filled and formatted in one pass, the cash flow statement linked by keyboard alone.",
+   "story_beat": "Now do it fast. || Everything in this chapter you can now do; the question a desk asks is how fast. Three benchmarks, each a piece of the model against the clock: the revenue build in three minutes, a block filled and formatted in one pass, the cash flow statement linked without touching the mouse. They live in Practice as this chapter’s benchmarks, and here you run each once with the keys shown.",
+   "page_name": "The benchmarks"
+  },
+  "ch5-project-and-assessment": {
+   "id": "ch5-project-and-assessment",
+   "name": "Project and assessment",
+   "objective": "The operating model with its DCF page; the assessment is one schedule and the links from it, timed.",
+   "story_beat": "The operating model, end to end. || An empty shell with the inputs and the history in it. Build the schedules, link the statements, get the flag to OK and value the business. Build it, then build one schedule and its links again on the clock. The assessment is the test-out.",
+   "page_name": "The operating model"
   }
  },
  "site": {

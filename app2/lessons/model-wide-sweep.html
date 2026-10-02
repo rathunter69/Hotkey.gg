@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 185: The model-wide sweep: hardcodes and pattern breaks — Finance and Accounting · hotkey.gg</title>
+<meta name="description" content="Two faults hide in a projected block: a typed number where a formula belongs, and a formula that breaks pattern halfway across a row. Go To Special finds both: Constants lights every typed number in a selection, and Row differences every cell whose formula is not the row’s. Sweep the model with both, then count typed numbers sheet by sheet on Checks so the flag catches the next one. The key is Alt H F D S.">
+<meta name="generator" content="app2/tests/public-pages.js — generated from lesson data; do not edit by hand">
+<script>try{var v=JSON.parse(localStorage.getItem('hk2_theme_vars'));if(v&&v.vars){var r=document.documentElement;for(var k in v.vars)r.style.setProperty('--'+k,v.vars[k]);r.setAttribute('data-dark',v.dark?'1':'0');}}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../ui/public.css">
+</head>
+<body>
+<nav class="top"><a class="brand" href="../index.html#/">hotkey<b>.gg</b></a><a href="../index.html#/learn">Learn</a><a href="../index.html#/practice">Practice</a><a href="../index.html#/leaderboard">Leaderboard</a><a href="../index.html#/reference">Reference</a></nav>
+<main>
+<div class="crumb"><a href="../index.html#/learn">Learn</a> › <a href="index.html">Finance and Accounting</a> › Auditing a model</div>
+<h1>Lesson 185: The model-wide sweep: hardcodes and pattern breaks</h1>
+<div class="meta">Finance and Accounting · Auditing a model · medium · <span class="">Paid</span></div>
+<div class="card">
+<p style="margin:0">Two faults hide in a projected block: a typed number where a formula belongs, and a formula that breaks pattern halfway across a row. Go To Special finds both: Constants lights every typed number in a selection, and Row differences every cell whose formula is not the row’s. Sweep the model with both, then count typed numbers sheet by sheet on Checks so the flag catches the next one. The key is <kbd>Alt H F D S</kbd>.</p>
+</div>
+<h2>What you will do</h2>
+<ol class="goals"><li><span class="muted">A projected block should hold nothing but formulas, so Go To Special, Constants, Numbers on it selects exactly the cells somebody typed over. Each one is a figure that will not move when the inputs do.</span> On IS, select the projected block F5:J32 and run Go To Special, Constants: two typed figures light up, G15 and I18.</li><li><span class="muted">Each row is one formula written in FY27 and filled right, so the cure for a typed cell is the fill: Ctrl+R copies the cell to its left across the selection, references shifted.</span> Put each back on its row’s formula: select F15:G15 and press Ctrl+R, then H18:I18 and Ctrl+R.</li><li><span class="muted">Row differences compares every cell of the selected row with the active cell’s formula, shifted to its column, and selects the ones that do not match. A formula that lost a $ halfway across looks right and gives the wrong figure.</span> On Schedules, select the labor row F32:J32 and run Go To Special, Row differences: FY29, H32, lights up.</li><li><span class="muted">H32 reads the FY29 cell of the cost input, which is blank, where every other year reads $C$50. Refill the whole row from FY27 so it is one formula again.</span> Refill the row from FY27: select F32:J32 and press Ctrl+R.</li><li><span class="muted">ISNUMBER less ISFORMULA is 1 only on a typed number, so the SUMPRODUCT counts typed numbers directly. Counting numbers and formulas separately and subtracting would let a formula showing a dash hide a typed figure.</span> Count typed numbers in C38:C41 on Checks, starting with C38 =SUMPRODUCT(ISNUMBER(IS!F5:J60)*(1-ISFORMULA(IS!F5:J60))) and one sheet a row.</li><li>Fold them into the roll-up: C44 =SUMPRODUCT(ABS(C6:J27))+SUM(C30:C35)+SUM(C38:C41).</li><li>Does it tie? Watch a figure typed into FY29 labor on the IS: the count in C38 catches it and the flag turns to CHECK.</li></ol>
+<div class="cta"><a class="btn" href="../index.html#/lesson/model-wide-sweep">Start this lesson</a><span class="path">Read → Guided → Try solo → Timed</span></div>
+
+<div class="prevnext"><span>← <a href="error-flags-checks-summary.html">Lesson 184: Error flags and the checks summary</a></span><span><a href="stress-tests.html">Lesson 186: Stress tests: zero, huge, a loss</a> →</span></div>
+</main>
+<footer><a href="../index.html#/pricing">Pricing</a><a href="../index.html#/teams">Teams</a><a href="../index.html#/about">About</a><a href="../index.html#/terms">Terms</a><a href="../index.html#/privacy">Privacy</a><a href="../index.html#/contact">Contact</a><span>© hotkey.gg</span></footer>
+</body>
+</html>

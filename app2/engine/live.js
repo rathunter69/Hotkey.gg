@@ -23,6 +23,7 @@
 import { parseRef, refKey, normRef } from './refs.js';
 import { formulaRefs, formulaFunctions } from './formula.js';
 import { Sheet } from './sheet.js';
+import { CalcGraph } from './calc.js';
 
 const clone = o => JSON.parse(JSON.stringify(o));
 const DYNAMIC_FNS = ['OFFSET', 'INDIRECT', 'INDEX'];
@@ -49,14 +50,14 @@ export function perturb(v) { return perturbations(v)[0]; }
 /**
  * @param {Sheet} sheet
  * @param {string} ref  e.g. 'B6'
- * @param {object} [opts]  inputs: array of refs to try (default: the target's precedents, see above)
+ * @param {object} [opts]  inputs: array of refs to try (default: the target's precedents, see above); 'Inputs!C40' names a cell of another sheet of the workbook
  * @returns {boolean}
  */
 export function isLiveFormula(sheet, ref, opts = {}) {
   const key = normRef(ref); if (!key) return false;
   const target = sheet.cells[key];
   if (!target || !target.formula) return false;
-  const inputs = opts.inputs ? opts.inputs.map(normRef).filter(Boolean) : inputsFor(sheet, key);
+  const inputs = opts.inputs ? opts.inputs.map(normInput).filter(Boolean) : inputsFor(sheet, key);
   const verdict = inputs.length > 0 && (inPlaceOk(sheet) ? probeInPlace(sheet, key, inputs) : probeCloneOf(sheet, key, inputs));
   if (liveHooks.onVerdict) liveHooks.onVerdict(sheet, key, opts, verdict);
   return verdict;
@@ -83,11 +84,18 @@ export function liveFormulasByClone(sheet) {
  * each in-place verdict against it.
  */
 export const liveHooks = { onVerdict: null };
+/** An input as the probes name it: 'B3' on the target's sheet, or 'Inputs!C40' on another (the sheet kept as written). */
+function normInput(k) {
+  const s = String(k); const bang = s.lastIndexOf('!');
+  if (bang < 0) return normRef(s);
+  const key = normRef(s.slice(bang + 1)); const name = s.slice(0, bang).replace(/^'(.*)'$/, '$1');
+  return key && name ? name + '!' + key : null;
+}
 export function isLiveFormulaByClone(sheet, ref, opts = {}) {
   const key = normRef(ref); if (!key) return false;
   const target = sheet.cells[key];
   if (!target || !target.formula) return false;
-  const inputs = opts.inputs ? opts.inputs.map(normRef).filter(Boolean) : inputsFor(sheet, key);
+  const inputs = opts.inputs ? opts.inputs.map(normInput).filter(Boolean) : inputsFor(sheet, key);
   return inputs.length > 0 && probeCloneOf(sheet, key, inputs);
 }
 function probeCloneOf(sheet, key, inputs) { const test = cloneSheet(sheet); return probeClone(test, key, test.value(key), inputs); }
@@ -183,7 +191,10 @@ function cloneSheet(sheet) {
   if (typeof sheet.allSheets !== 'function') { const test = one(sheet); test.recalc(); return test; }
   const entries = sheet.allSheets().map(e => ({ name: e.name, sheet: one(e.sheet), src: e.sheet }));
   const lookup = name => { const e = entries.find(x => x.name.toLowerCase() === String(name).toLowerCase()); return e ? e.sheet : null; };
-  for (const e of entries) e.sheet.resolver = lookup;
+  // the clones share one calculation graph, the names and the calculation settings, as the workbook's sheets do,
+  // so a nudge on one sheet reaches a reader two sheets away and a circle iterates as it does in the workbook
+  const book = new CalcGraph(() => entries);
+  for (const e of entries) { e.sheet.resolver = lookup; e.sheet.allSheets = () => entries; e.sheet.book = book; e.sheet.names = clone(e.src.names || {}); e.sheet.calc = e.src.calc ? { ...e.src.calc } : null; e.sheet.iterCalc = e.src.iterCalc ? { ...e.src.iterCalc } : null; }
   for (const e of entries) e.sheet.recalc();
   const mine = entries.find(e => e.src === sheet);
   return mine ? mine.sheet : one(sheet);

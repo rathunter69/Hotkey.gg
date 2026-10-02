@@ -12,6 +12,7 @@
 // revolver's interest on its average balance is the model's one circle, with Circ as its breaker.
 import { buildPage, FMT } from './page.js';
 import { Sheet } from '../../engine/sheet.js';
+import { diffStates as diffCells, sessionToState as sessionCells } from './clearcoat-weekly.js';
 
 export const CHAPTER = 5;
 export const COLS = ['C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
@@ -25,7 +26,7 @@ export const UNITS = 'USD thousands unless stated; fiscal years end December 31'
 const serial = (y, m, d) => Math.round((Date.UTC(y, m - 1, d) - Date.UTC(1899, 11, 30)) / 86400000);
 export const FIRST_YEAR_END = serial(2024, 12, 31), LAST_HISTORICAL = serial(2026, 12, 31), VALUATION_DATE = serial(2026, 12, 31);
 const FY_FMT = { fmtStyle: 'custom', numFmt: '"FY"yy' }, DATE_FMT = { fmtStyle: 'custom', numFmt: 'm/d/yyyy' };
-const MILLIONS = { fmtStyle: 'custom', numFmt: '#,##0.0,_);(#,##0.0,)' };
+const MILLIONS = { fmtStyle: 'custom', numFmt: '#,##0.0,_);(#,##0.0,)', decimals: 1 };
 const NODASH = { fmtStyle: 'comma', decimals: 0 };
 const prev = col => String.fromCharCode(col.charCodeAt(0) - 1);
 const clone = v => (typeof structuredClone === 'function' ? structuredClone(v) : JSON.parse(JSON.stringify(v)));
@@ -123,7 +124,8 @@ const across = fn => (col, r) => COLS.includes(col) ? fn(col, r) : null;
  */
 function page(spec) {
   if (firstPass) { ROWS[spec.name] = dryRows(spec); return null; }   // the layout pass needs only where the rows land
-  const { sheet, at } = buildPage(spec);
+  // the model's figures run to six figures in thousands and seven on the one-site page, bold with a dollar sign on the totals, which 89 shows as ####
+  const { sheet, at } = buildPage({ figureW: 108, ...spec });
   const cells = sheet.cells;
   ROWS[spec.name] = at;
   const figCols = Object.keys(cells).filter(k => /^[C-Z]4$/.test(k)).map(k => k[0]);
@@ -131,12 +133,13 @@ function page(spec) {
   for (const b of spec.blocks) for (const row of b.rows) {
     if (!row.key) continue;
     const r = at[row.key];
+    // a row's format patch reaches every figure, whether or not the timeline is on row 4 yet (a date row reads as a date)
+    if (row.fmt) for (const col of ['C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']) if (cells[col + r]) { Object.assign(cells[col + r], row.fmt); if (row.fmt.numFmt) delete cells[col + r].decimals; }
     if (row.a === true) cells['A' + r] = { formula: `=INDEX(Inputs!$N$5:$N$40,MATCH($B${r},Inputs!$M$5:$M$40,0))` };
     else if (typeof row.a === 'string') cells['A' + r] = { value: row.a };
     for (const col of allCols) {
       const c = cells[col + r]; if (!c) continue;
       if (row.green && c.formula && c.formula.includes('!')) c.fontColor = 'green';
-      if (row.fmt) Object.assign(c, row.fmt);
       if (row.nodash) Object.assign(c, NODASH);
       if (row.boldAt && row.boldAt.includes(col)) c.bold = true;
     }
@@ -179,7 +182,7 @@ function pageCover(extraLinks = []) {
         ['Schedules', 'rollout and revenue, costs, working capital, PP&E, debt, tax'], ['Checks', 'one row per check, the roll-up flag'], ['DCF', 'free cash flow, WACC, terminal value, enterprise value'],
         ['One site', 'Domain for one month, three statements by hand (5.1)'], ['One week', 'Domain for one week, six events (5.1.6)'], ['Data', 'the historical accounts as the accountants sent them'],
         ...extraLinks,
-      ].map(([name, note], i) => ({ key: 'link' + i, label: name, kind: 'text', values: [`=HYPERLINK("#'${name}'!A1","${name}")`, note] })) },
+      ].map(([name, note], i) => ({ key: 'link' + i, label: name, kind: 'text', values: [`=HYPERLINK("#${name.includes(' ') ? `'${name}'` : name}!A1","${name}")`, note] })) },
       { title: 'Cases', rows: CASES.map((c, i) => ({ key: 'c' + (i + 1), label: `Case ${i + 1}`, kind: 'text', values: [c] })) },
       { title: 'Names', rows: [
         { key: 'n1', label: 'Case', kind: 'text', values: ['Cover!$C$6', 'the case number the drivers block reads'] },
@@ -679,7 +682,7 @@ function pageDCF() {
         { key: 'fcfShare', label: 'FCF as a share of EBITDA (memo)', kind: 'pct', indent: 1, fill: col => `=IFERROR(${c('fcf', col)}/${c('ebitda', col)},"-")` },
       ] },
       { title: 'Discounting (projected years; t counts from the valuation date)', rows: [
-        { key: 't', label: 'Period, t (mid-year when the switch is 1)', kind: 'unit', indent: 1, fill: proj(col => `=IF(${flag(col)}=1,${pcnt(col)}-IF(${inp('mid')}=1,0.5,0),0)`) },
+        { key: 't', label: 'Period, t (mid-year when the switch is 1)', kind: 'unit', dollar: false, indent: 1, fill: proj(col => `=IF(${flag(col)}=1,${pcnt(col)}-IF(${inp('mid')}=1,0.5,0),0)`) },
         { key: 'df', label: 'Discount factor, 1 over (1 + WACC) to the t', kind: 'unit', indent: 1, fill: proj(col => `=IF(${flag(col)}=1,1/(1+WACC)^${c('t', col)},0)`) },
         { key: 'pv', label: 'Present value of free cash flow', indent: 1, fill: proj(col => `=${c('fcf', col)}*${c('df', col)}`) },
         one('pvSum', 'Sum of present values', () => `=SUM(C${R(me, 'pv')}:J${R(me, 'pv')})`, { total: true }),
@@ -695,7 +698,7 @@ function pageDCF() {
         one('tv', 'Terminal value used', () => `=CHOOSE(C${R(me, 'method')},C${R(me, 'tvPerp')},C${R(me, 'tvExit')})`, { total: true }),
       ] },
       { title: 'Enterprise value to equity value', rows: [
-        one('dfPerp', 'Discount factor for the perpetuity (year 5, mid-year aware)', () => `=J${R(me, 'df')}`, { kind: 'unit' }),
+        one('dfPerp', 'Discount factor for the perpetuity (year 5, mid-year aware)', () => `=J${R(me, 'df')}`, { kind: 'unit', dollar: false }),
         one('dfExit', 'Discount factor for the exit (a sale at the end of FY31)', () => `=1/(1+WACC)^Inputs!$J$${R('Inputs', 'pcnt')}`, { kind: 'unit' }),
         one('pvTvPerp', 'PV of the terminal value, perpetuity', () => `=C${R(me, 'tvPerp')}*C${R(me, 'dfPerp')}`),
         one('pvTvExit', 'PV of the terminal value, exit multiple', () => `=C${R(me, 'tvExit')}*C${R(me, 'dfExit')}`),
@@ -737,6 +740,8 @@ function pageDCF() {
   timeline(sheet);
   sheet.cells.K4 = { value: 'FY31 normalized', bold: true, align: 'r' };
   for (const prefix of ['sg', 'sm']) for (let i = 0; i < 5; i++) for (const col of ['D', 'E', 'F', 'G', 'H']) Object.assign(sheet.cells[col + R(me, prefix + i)], MILLIONS);
+  // each table's edge across is bold, and its base case (the middle cell) bold (the sheet standard boxes nothing)
+  for (const prefix of ['sg', 'sm']) { for (const col of ['D', 'E', 'F', 'G', 'H']) sheet.cells[col + R(me, prefix + 'H')].bold = true; sheet.cells['F' + R(me, prefix + '2')].bold = true; }
   titled(sheet, caseTitle('DCF'));
   return sheet;
 }
@@ -918,11 +923,14 @@ export function coverWith(extraLinks) {
   return { sheet, at };
 }
 export const NAMES = { Case: 'Cover!$C$6', LastHistorical: `Inputs!$C$${ROW.Inputs.lasthist}`, Circ: `Inputs!$C$${ROW.Inputs.circ}`, WACC: `DCF!$C$${ROW.DCF.wacc}` };
+/** The Watch Window's two rows (5.5.2 adds them): the Cover's flag and its sum of differences, in view on every sheet. */
+export const WATCHES = [{ sheet: 'Cover', key: 'C' + ROW.Cover.flag }, { sheet: 'Cover', key: 'C' + ROW.Cover.diff }];
 
 const DONE = {
   sheets: [...SHEET_ORDER.slice(0, 10).map(n => PAGES[n]), pageData()],
   settings: { calcMode: 'automatic', iterative: true, maxIterations: 100, maxChange: 0.001, qat: ['save', 'undo', 'redo', 'fontColor', 'fillColor', 'borders', 'decDecimal'], enterMoves: false },
   names: { ...NAMES },
+  watches: WATCHES.map(w => ({ ...w })),
 };
 
 /* ---------------- state helpers ---------------- */
@@ -965,8 +973,8 @@ function pend(state, keys) {
   for (const key of keys) { for (const col of COLS) delete cells[col + rowOf('Checks', key)]; cells['K' + rowOf('Checks', key)] = { value: 'pending', it: true }; }
 }
 const unpend = (state, keys) => { const cells = cellsOf(state, 'Checks'); for (const key of keys) delete cells['K' + rowOf('Checks', key)]; };
-/** A planted cell on a sheet. */
-const plant = (state, name, ref, cell) => { const cells = cellsOf(state, name); cells[ref] = cell === null ? undefined : { ...(cells[ref] || {}), ...cell }; if (cell === null) delete cells[ref]; };
+/** A planted cell on a sheet: merged into the cell it replaces; a typed value takes a formula's place (and a formula a value's). */
+const plant = (state, name, ref, cell) => { const cells = cellsOf(state, name); if (cell === null) { delete cells[ref]; return; } const c = { ...(cells[ref] || {}), ...cell }; if ('value' in cell && !('formula' in cell)) delete c.formula; if ('formula' in cell) delete c.value; cells[ref] = c; };
 const setFormula = (state, name, ref, formula) => { const cells = cellsOf(state, name); cells[ref] = { ...(cells[ref] || {}), formula }; delete cells[ref].value; };
 
 /** The historical values of the CF and BS lines (what the shell carries typed before the statements are linked). */
@@ -985,14 +993,17 @@ function typeStatementHist(state, name, table) {
 
 const SITE_BLOCKS = { is: ['rev', 'ni'], accrual: ['cashIn1', 'cfoHand'], cf: ['cfNi', 'close'], bs: ['bsCash', 'check'], ratios: ['rMargin', 'rReturn'] };
 const stripSite = (state, name, blocks) => { for (const b of blocks) strip(state, name, span(name, ...SITE_BLOCKS[b])); };
-const onlyPages = (state, names) => { state.sheets = state.sheets.filter(s => names.includes(s.name)); delete state.names; };
+const onlyPages = (state, names) => { state.sheets = state.sheets.filter(s => names.includes(s.name)); delete state.names; delete state.watches; };
 
+// B518: after 5.1.7, the two pages by hand complete (5.2.1 opens the model itself)
+const B518 = derive(DONE, s => { onlyPages(s, ['One site', 'One week']); });
 // B517: before 5.1.7, One site has everything but the ratios; One week is done
 const B517 = derive(DONE, s => { onlyPages(s, ['One site', 'One week']); stripSite(s, 'One site', ['ratios']); });
 // B516: before 5.1.6, One week holds the events and the opening balance sheet only
 const B516 = derive(B517, s => { strip(s, 'One week', span('One week', 'rev', 'dCheck')); });
-// B515: before 5.1.5 (the links tour), the One week page is not there yet
-const B515 = derive(B516, s => { onlyPages(s, ['One site']); });
+// B515: before 5.1.5 (the links tour, which follows links and builds nothing): the One week page
+// rides along from 5.1.1 with its events and opening balance sheet, since no lesson could type it
+const B515 = derive(B516, () => {});
 // B514: before 5.1.4, the balance sheet block is empty
 const B514 = derive(B515, s => { stripSite(s, 'One site', ['bs']); });
 // B513: before 5.1.3, the cash flow block too
@@ -1029,6 +1040,7 @@ function isHistOnly(state) {
 
 // B531 (= after 5.2.6): the shell complete, every schedule and statement still to build
 const B531 = derive(DONE, s => {
+  delete s.watches;   // the Watch Window's rows arrive with 5.5.2
   isHistOnly(s);
   typeStatementHist(s, 'CF', CF_HIST); typeStatementHist(s, 'BS', BS_HIST);
   stripFigures(s, 'Schedules');
@@ -1096,6 +1108,8 @@ const SCH = {
   debt: [...span('Schedules', 'termOpen', 'termEff'), ...span('Schedules', 'ddOpen', 'ddEff'), 'totalDebt', 'totalInt', 'netDebt'],
   revolver: span('Schedules', 'revOpen', 'revEff'), tax: span('Schedules', 'ebt', 'effTax'),
 };
+/** A schedule's rows go with their helper labels in column A. */
+const SCH_COLS = ['A', ...COLS, 'K'];
 // B541 (= after 5.3.6): every schedule but the revolver built; the statements not yet linked
 const B541 = derive(B531, s => {
   const done = cellsOf(DONE, 'Schedules'), cells = cellsOf(s, 'Schedules');
@@ -1103,18 +1117,39 @@ const B541 = derive(B531, s => {
   unpend(s, ['rev']); for (const col of COLS) cellsOf(s, 'Checks')[col + rowOf('Checks', 'rev')] = clone(cellsOf(DONE, 'Checks')[col + rowOf('Checks', 'rev')]);
   for (const key of ['termEff', 'ddEff', 'revEff']) for (const col of COLS) cellsOf(s, 'Checks')[col + rowOf('Checks', key)] = clone(cellsOf(DONE, 'Checks')[col + rowOf('Checks', key)]);
 });
-const B536 = derive(B541, s => { strip(s, 'Schedules', SCH.tax); });
-const B535 = derive(B536, s => { strip(s, 'Schedules', SCH.debt); strip(s, 'Checks', ['termEff', 'ddEff', 'revEff']); });
-const B534 = derive(B535, s => { strip(s, 'Schedules', SCH.ppe); });
-const B533 = derive(B534, s => { strip(s, 'Schedules', SCH.wc); });
-const B532 = derive(B533, s => { strip(s, 'Schedules', SCH.costs); });
-// B531 is before 5.3.1 (defined above); B53C: inputs and a timeline and no schedules at all
-const B53C = derive(B531, s => { stripFigures(s, 'Schedules'); });
+// each lesson's schedule goes with its helper labels in column A (B531 has none), so a lesson builds only its own rows
+const B536 = derive(B541, s => { strip(s, 'Schedules', SCH.tax, SCH_COLS); });
+const B535 = derive(B536, s => { strip(s, 'Schedules', SCH.debt, SCH_COLS); strip(s, 'Checks', ['termEff', 'ddEff', 'revEff']); });
+const B534 = derive(B535, s => { strip(s, 'Schedules', SCH.ppe, SCH_COLS); });
+const B533 = derive(B534, s => { strip(s, 'Schedules', SCH.wc, SCH_COLS); });
+const B532 = derive(B533, s => { strip(s, 'Schedules', SCH.costs, SCH_COLS); });
+/** Empty keyed rows' figures but keep their look (the shelling rule): formula and value go, the formats stay; `drop` names format fields to take as well. */
+function blank(state, name, keys, cols = COLS, drop = []) {
+  const cells = cellsOf(state, name);
+  for (const key of keys) for (const col of cols) {
+    const k = col + rowOf(name, key); const c = cells[k]; if (!c) continue;
+    delete c.formula; delete c.value; for (const f of drop) delete c[f];
+    if (!Object.keys(c).length) delete cells[k];
+  }
+}
+/**
+ * The module challenges' blanks: the projected years (FY27 to FY31) of the lines each one rebuilds,
+ * the actuals and every other line left in place. Ten schedule lines for 5.3.C; for 5.4.C the links
+ * from the schedules into the three statements, the revolver's draw and repayment, and the balance check.
+ */
+export const CHALLENGE_BLANKS = {
+  'challenge-schedules': { Schedules: ['closeSites', 'retailRev', 'clubRev', 'labor', 'rent', 'rec', 'pay', 'wf1', 'ppeClose', 'termInt'] },
+  'challenge-linked-statements': { IS: ['dep', 'int', 'tax'], CF: ['dep', 'capex'], BS: ['cash', 'ppe', 'check'], Schedules: ['revDrawn', 'revRepaid'] },
+};
+const blankAll = (s, id) => { for (const [name, keys] of Object.entries(CHALLENGE_BLANKS[id])) blank(s, name, keys, PROJ_COLS); };
+// B531 is before 5.3.1 (defined above); B53C: every schedule built (the revolver waits for 5.4.4), ten projected lines blank
+const B53C = derive(B541, s => blankAll(s, 'challenge-schedules'));
 
 /* ---------------- module 5.4: linking the statements ---------------- */
 
 // B545 (= after 5.4.4): the model complete and balanced; Checks still waits on 5.5
 const B545 = derive(DONE, s => {
+  delete s.watches;
   pend(s, ['xfoot', 'eq', 'ebitda']);
   strip(s, 'Checks', ['debtNeg', 'ppeNeg', 'roundTrip', 'npv', 'errIS', 'errCF', 'errBS', 'errSch', 'errDCF', 'errInp', 'hcIS', 'hcCF', 'hcBS', 'hcSch']);
   setFormula(s, 'Checks', 'C' + rowOf('Checks', 'rollup'), `=SUMPRODUCT(ABS(C${rowOf('Checks', 'bs')}:J${rowOf('Checks', 'npv')}))`);
@@ -1122,7 +1157,7 @@ const B545 = derive(DONE, s => {
   delete s.names.WACC;
 });
 // B544: before 5.4.4, the revolver block is empty (its links on the CF and BS read zero)
-const B544 = derive(B545, s => { strip(s, 'Schedules', SCH.revolver); });
+const B544 = derive(B545, s => { strip(s, 'Schedules', SCH.revolver, SCH_COLS); });
 // B543: before 5.4.3, the balance sheet is typed history and empty projection; debt and PP&E ties pending
 const B543 = derive(B544, s => { typeStatementHist(s, 'BS', BS_HIST); pend(s, ['debt', 'ppe']); });
 // B542: before 5.4.2, the cash flow statement too
@@ -1140,36 +1175,42 @@ export const BREAKS = [
 const plantAll = (s, list) => { for (const [name, ref, cell] of list) plant(s, name, ref, cell); };
 // B545 is before 5.4.5 only once the breaks are planted
 const B545broken = derive(B545, s => plantAll(s, BREAKS));
-// B54C: schedules done, statements empty
-const B54C = derive(B544, s => { for (const name of ['IS', 'CF', 'BS']) stripFigures(s, name); });
+// B54C: the linked model (the breaks of 5.4.5 fixed) with its links into the statements, the revolver's draw and repayment and the balance check blank
+const B54C = derive(B545, s => blankAll(s, 'challenge-linked-statements'));
 
 /* ---------------- module 5.5: auditing ---------------- */
+// Each state is what the lesson before it leaves, clean. What a lesson plants for the learner to
+// find (the #REF!, the sweep's typed figures and pattern break, the bare margins) rides on the
+// lesson as its planting (plantPatch), so a lesson's solution leaves exactly the next one's start.
 
 // B551: before 5.5.1 (= after 5.4.5, the breaks fixed)
 const B551 = derive(B545, () => {});
-// B552: before 5.5.2, the errors block is empty and a #REF! sits in a memo cell on Schedules
-export const PLANT_REF = ['Schedules', 'H' + rowOf('Schedules', 'capexToDep'), { formula: `=H${rowOf('Schedules', 'capexTotal')}/#REF!` }];
+const ERR_KEYS = ['errIS', 'errCF', 'errBS', 'errSch', 'errDCF', 'errInp'], HC_KEYS = ['hcIS', 'hcCF', 'hcBS', 'hcSch'];
+/** Put a keyed row's finished cells back from DONE (over `cols`). */
+const fromDone = (s, name, keys, cols = COLS) => { const done = cellsOf(DONE, name), cells = cellsOf(s, name); for (const key of keys) for (const col of cols) { const k = col + rowOf(name, key); if (done[k]) cells[k] = clone(done[k]); } };
+/** The roll-up once 5.5.2 folds the error counts in (5.5.3 adds the hardcode counts: DONE's formula). */
+export const ROLLUP_ERRORS = `=SUMPRODUCT(ABS(C${rowOf('Checks', 'bs')}:J${rowOf('Checks', 'npv')}))+SUM(C${rowOf('Checks', 'errIS')}:C${rowOf('Checks', 'errInp')})`;
+// B552: before 5.5.2 (= after 5.5.1): every tie and both limit checks live; no error or hardcode counts yet; the DCF page is labels
 const B552 = derive(DONE, s => {
-  strip(s, 'Checks', ['errIS', 'errCF', 'errBS', 'errSch', 'errDCF', 'errInp', 'hcIS', 'hcCF', 'hcBS', 'hcSch', 'roundTrip', 'npv']);
+  strip(s, 'Checks', [...ERR_KEYS, ...HC_KEYS, 'roundTrip', 'npv']);
   setFormula(s, 'Checks', 'C' + rowOf('Checks', 'rollup'), `=SUMPRODUCT(ABS(C${rowOf('Checks', 'bs')}:J${rowOf('Checks', 'npv')}))`);
   stripFigures(s, 'DCF');
-  delete s.names.WACC;
-  plant(s, ...PLANT_REF);
+  delete s.names.WACC; delete s.watches;
 });
+/** What 5.5.2 plants: one #REF! in a memo cell on Schedules (the ties still read zero; the count reads 1). */
+export const PLANT_REF = ['Schedules', 'H' + rowOf('Schedules', 'capexToDep'), { formula: `=H${rowOf('Schedules', 'capexTotal')}/#REF!` }];
+// B553: before 5.5.3: the errors block, folded into the roll-up, and the Watch Window's two rows
+const B553 = derive(B552, s => { fromDone(s, 'Checks', ERR_KEYS, ['C']); setFormula(s, 'Checks', 'C' + rowOf('Checks', 'rollup'), ROLLUP_ERRORS); s.watches = WATCHES.map(w => ({ ...w })); });
 /** What 5.5.3 plants: two typed numbers in the IS projection and a labor formula that lost its anchor in FY29. */
 export const PLANT_SWEEP = [
   ['IS', 'G' + rowOf('IS', 'util'), { value: -3100, fontColor: 'blue' }],
   ['IS', 'I' + rowOf('IS', 'mkt'), { value: -1400, fontColor: 'blue' }],
   ['Schedules', 'H' + rowOf('Schedules', 'labor'), { formula: `=IF(Inputs!H$${ROW.Inputs.flag}=0,${dat(rowOf('Schedules', 'labor'), 'H')},Inputs!H$${ROW.Inputs.labor}*(1+Inputs!$C$${ROW.Inputs.infl})^Inputs!H$${ROW.Inputs.pcnt}*H${rowOf('Schedules', 'avgSites')})` }],
 ];
-const B553 = derive(B552, s => { plant(s, PLANT_REF[0], PLANT_REF[1], null); cellsOf(s, 'Schedules')[PLANT_REF[1]] = clone(cellsOf(DONE, 'Schedules')[PLANT_REF[1]]); for (const key of ['errIS', 'errCF', 'errBS', 'errSch', 'errDCF', 'errInp']) cellsOf(s, 'Checks')['C' + rowOf('Checks', key)] = clone(cellsOf(DONE, 'Checks')['C' + rowOf('Checks', key)]); });
-const B553planted = derive(B553, s => plantAll(s, PLANT_SWEEP));
-// B554: before 5.5.4, the IS margins divide bare (the ticket at zero makes them #DIV/0!)
-const B554 = derive(B553, s => {
-  for (const key of ['hcIS', 'hcCF', 'hcBS', 'hcSch']) cellsOf(s, 'Checks')['C' + rowOf('Checks', key)] = clone(cellsOf(DONE, 'Checks')['C' + rowOf('Checks', key)]);
-  const cells = cellsOf(s, 'IS');
-  for (const [key, num] of [['gm', 'gp'], ['cm', 'contrib'], ['em', 'ebitda'], ['nm', 'ni']]) for (const col of COLS) cells[col + rowOf('IS', key)].formula = `=${col}${rowOf('IS', num)}/${col}${rowOf('IS', 'rev')}`;
-});
+// B554: before 5.5.4: the hardcode counts and the full roll-up
+const B554 = derive(B553, s => { fromDone(s, 'Checks', [...HC_KEYS, 'rollup'], ['C']); });
+/** What 5.5.4 plants: the IS margins dividing bare, so a zero revenue shows #DIV/0!. */
+export const PLANT_MARGINS = [['gm', 'gp'], ['cm', 'contrib'], ['em', 'ebitda'], ['nm', 'ni']].flatMap(([key, num]) => COLS.map(col => ['IS', col + rowOf('IS', key), { formula: `=${col}${rowOf('IS', num)}/${col}${rowOf('IS', 'rev')}` }]));
 // B55C: the eight faults on the linked model
 export const FAULTS = [
   PLANT_SWEEP[0], PLANT_SWEEP[1], PLANT_SWEEP[2],
@@ -1180,6 +1221,22 @@ export const FAULTS = [
   ['BS', 'J' + rowOf('BS', 'cash'), { formula: `=J${rowOf('BS', 'tle')}-J${rowOf('BS', 'rec')}-J${rowOf('BS', 'land')}-J${rowOf('BS', 'ppe')}` }],
 ];
 const B55C = derive(B554, s => { plantAll(s, FAULTS); });
+/**
+ * A planting as a lesson's state patch ({ 'Sheet!A1': cell | null }), laid over the named state:
+ * each planted record merges into the cell it replaces, and a typed value takes the formula's place.
+ */
+export function plantPatch(stateId, list) {
+  const st = STATES[stateId]; const out = {};
+  for (const [name, ref, cell] of list) {
+    if (cell === null) { out[name + '!' + ref] = null; continue; }
+    const base = clone((cellsOf(st, name) || {})[ref] || {});
+    const merged = { ...base, ...cell };
+    if ('value' in cell && !('formula' in cell)) delete merged.formula;
+    if ('formula' in cell) delete merged.value;
+    out[name + '!' + ref] = merged;
+  }
+  return out;
+}
 
 /* ---------------- module 5.6: DCF ---------------- */
 
@@ -1187,65 +1244,97 @@ const DCFB = {
   fcf: span('DCF', 'ebitda', 'fcfShare'), disc: span('DCF', 't', 'pvEnd'), tv: span('DCF', 'tvPerp', 'tv'), ev: span('DCF', 'dfPerp', 'evMult'),
   wacc: span('DCF', 'rf', 'wacc'), sens: span('DCF', 'ptW', 'sm4'),
 };
-// B566: before 5.6.6, the sensitivity tables are labels
+// B566: before 5.6.6, the pass-through drivers and the sensitivity tables are labels
 const B566 = derive(DONE, s => { strip(s, 'DCF', DCFB.sens); });
 // B565: before 5.6.5, the discounting and enterprise value blocks too; the NPV cross-check waits
 const B565 = derive(B566, s => { strip(s, 'DCF', [...DCFB.disc, ...DCFB.ev]); strip(s, 'Checks', ['npv']); });
-// B564: before 5.6.4, the terminal value block too; the round trip waits
-const B564 = derive(B565, s => { strip(s, 'DCF', DCFB.tv); strip(s, 'Checks', ['roundTrip']); });
+// B564: before 5.6.4, the terminal value block and the normalized FY31 column too; the round trip waits
+const B564 = derive(B565, s => { strip(s, 'DCF', DCFB.tv); strip(s, 'DCF', DCFB.fcf, ['K']); strip(s, 'Checks', ['roundTrip']); });
 // B563: before 5.6.3, the WACC block too, and no WACC name
 const B563 = derive(B564, s => { strip(s, 'DCF', DCFB.wacc); delete s.names.WACC; });
-// B562: before 5.6.2, the free-cash-flow block holds the three links 5.6.1 made
+// B562: before 5.6.2, the free-cash-flow block holds the valuation date and the three links 5.6.1 made
 const B562 = derive(B563, s => { strip(s, 'DCF', DCFB.fcf.filter(k => !['ebitda', 'capex', 'nwc'].includes(k))); });
-// B561: before 5.6.1, the DCF page is a title and a units line
-const B561 = derive(B562, s => { stripFigures(s, 'DCF', { keepTimeline: false }); const cells = cellsOf(s, 'DCF'); for (const k of Object.keys(cells)) if (k !== 'A1' && k !== 'A2') delete cells[k]; });
+// B561: before 5.6.1 (= after 5.5.4): the DCF page is its title, the timeline and the labels
+const B561 = derive(B562, s => { stripFigures(s, 'DCF'); });
 // B56C: a DCF from a given free-cash-flow line (typed), the rest to build
 export const FCF_GIVEN = [-900, 2100, 4500, 7000, 9400];
 const B56C = derive(B561, s => {
   const done = sheetOf(DONE, 'DCF'); const sh = sheetOf(s, 'DCF');
-  sh.cells = clone(done.cells);
-  stripFigures(s, 'DCF');
   PROJ_COLS.forEach((col, i) => { sh.cells[col + rowOf('DCF', 'fcf')] = { ...clone(done.cells[col + rowOf('DCF', 'fcf')]), value: FCF_GIVEN[i], fontColor: 'blue' }; delete sh.cells[col + rowOf('DCF', 'fcf')].formula; });
   sh.cells['K' + rowOf('DCF', 'fcf')] = { ...clone(done.cells['K' + rowOf('DCF', 'fcf')]), value: FCF_GIVEN[4], fontColor: 'blue' }; delete sh.cells['K' + rowOf('DCF', 'fcf')].formula;
+  // given with it, so the clock goes on the valuation: EBITDA, the periods, the WACC block but its last line, the drivers and the tables' edges
+  const keep = (key, cols) => { for (const col of cols) { const ref = col + rowOf('DCF', key); if (done.cells[ref]) sh.cells[ref] = clone(done.cells[ref]); } };
+  keep('ebitda', COLS); keep('t', COLS);
+  for (const key of span('DCF', 'rf', 'eqW')) keep(key, ['C']);
+  for (const key of ['ptW', 'ptG', 'ptM']) keep(key, ['C']);
+  for (const p of ['sg', 'sm']) { keep(p + 'H', ['D', 'E', 'F', 'G', 'H']); for (let i = 0; i < 5; i++) keep(p + i, ['C']); }
 });
 
 /* ---------------- module 5.7: model speed (each starts from the finished model) ---------------- */
 
-const B571 = derive(DONE, s => { strip(s, 'Schedules', [...SCH.rollout, ...SCH.revenue]); });
-const FILL_BLOCK = [...span('Schedules', 'cos', 'em'), ...SCH.wc, ...span('Schedules', 'ppeOpen', 'impliedLife')];
-const B572 = derive(DONE, s => {
-  strip(s, 'Schedules', FILL_BLOCK, ['D', 'E', 'F', 'G', 'H', 'I', 'J']);
-  const cells = cellsOf(s, 'Schedules');
-  for (const key of FILL_BLOCK) { const c = cells['C' + rowOf('Schedules', key)]; if (!c) continue; delete c.fmtStyle; delete c.numFmt; delete c.decimals; delete c.bold; delete c.bt; delete c.bdbl; delete c.it; }
+const NUM_FMT = ['fmtStyle', 'numFmt', 'decimals'];
+/** 5.7.1: the rows whose first column keeps its formula (the history read through the flag) and waits to be filled right; the rows typed whole; the rows that lose the desk number format. */
+export const SPEED_REVENUE = {
+  fill: ['openSites', 'newSites', 'closures', 'closeSites', 'washes', 'ticket', 'tickGrowth', 'retailRev', 'clubRev'],
+  type: ['avgSites', 'members', 'rev'],
+  desk: ['openSites', 'newSites', 'closures', 'closeSites', 'washes'],
+};
+// B571: before 5.7.1, the revenue build cut back to each row's first column, three rows empty, the rollout and the washes without the desk number format
+const B571 = derive(DONE, s => {
+  strip(s, 'Schedules', SPEED_REVENUE.fill, COLS.slice(1));
+  blank(s, 'Schedules', SPEED_REVENUE.type);
+  for (const key of SPEED_REVENUE.desk) { const c = cellsOf(s, 'Schedules')['C' + rowOf('Schedules', key)]; NUM_FMT.forEach(f => delete c[f]); }
 });
-const B573 = derive(DONE, s => { strip(s, 'CF', allKeys('CF')); });
+/** 5.7.2: the forty-row block (cost build, working capital, PP&E; the two memo cells that live in C alone stay out), its plain lines, its totals and its ratio lines. */
+export const SPEED_BLOCK = {
+  fill: [...span('Schedules', 'cos', 'em'), ...span('Schedules', 'rec', 'wcCash'), ...span('Schedules', 'ppeOpen', 'capexToDep')],
+  plain: ['labor', 'rent', 'util', 'maint', 'card', 'mkt', 'ho', 'pay', 'def', 'chgRec', 'chgPay', 'chgDef', 'capexNew', 'capexMaint', 'dep'],
+  totals: ['siteCosts', 'contrib', 'ebitda', 'nwc', 'wcCash', 'capexTotal', 'ppeClose'],
+  ratios: ['cosShare', 'cm', 'em'],
+};
+// B572: before 5.7.2, the block holds its first column only: the plain lines without the desk number format, the totals without their top border, the ratios upright
+const B572 = derive(DONE, s => {
+  strip(s, 'Schedules', SPEED_BLOCK.fill, COLS.slice(1));
+  const cells = cellsOf(s, 'Schedules'), c = key => cells['C' + rowOf('Schedules', key)];
+  for (const key of SPEED_BLOCK.plain) NUM_FMT.forEach(f => delete c(key)[f]);
+  for (const key of SPEED_BLOCK.totals) delete c(key).bt;
+  for (const key of SPEED_BLOCK.ratios) delete c(key).it;
+});
+/** 5.7.3: the cash flow lines that are links (green), and the two cash lines that are arithmetic. */
+export const SPEED_LINKS = { links: ['ni', 'dep', 'chgRec', 'chgPay', 'chgDef', 'capex', 'termDrawn', 'termRepaid', 'ddDrawn', 'ddRepaid', 'rev'], calc: ['net', 'close'] };
+// B573: before 5.7.3, the cash flow statement's links, net change and closing cash empty (formats kept, the links not yet green); the totals and opening cash stand
+const B573 = derive(DONE, s => { blank(s, 'CF', SPEED_LINKS.links, COLS, ['fontColor']); blank(s, 'CF', SPEED_LINKS.calc); });
 
 /* ---------------- module 5.8: project and assessment ---------------- */
 
-// B5P: the project's shell: inputs, Data, the timeline, every other page empty labels
+// B5P: the project's shell. Inputs, Data and the Cover's switch and map stand; every formula on the
+// six model sheets is emptied (labels, the helper column, typed figures, titles and formats stay, as
+// the shelling rule has it); the Cover's flag is not linked yet and WACC is not named yet.
 const B5P = derive(DONE, s => {
-  for (const name of ['IS', 'CF', 'BS', 'Schedules', 'Checks', 'DCF']) stripFigures(s, name);
-  for (const name of ['IS', 'CF', 'BS', 'DCF']) setFormula(s, name, 'A1', `=Inputs!$C$${ROW.Inputs.company}&": ${{ IS: 'income statement', CF: 'cash flow statement', BS: 'balance sheet', DCF: 'DCF' }[name]}"`);
-  // the Cover keeps its title, the case switch and the case names (the live drivers block reads Case); the flag and the map are the project's to build
-  const cover = sheetOf(s, 'Cover'); const done = cellsOf(DONE, 'Cover');
-  const keep = ['A1', 'A2', 'B4', 'C4', 'D4', ...['case', 'casen', 'c1', 'c2', 'c3'].flatMap(k => ['B', 'C'].map(col => col + rowOf('Cover', k))), 'B' + (rowOf('Cover', 'c1') - 1)];
-  cover.cells = Object.fromEntries(keep.filter(k => done[k]).map(k => [k, clone(done[k])]));
-  setFormula(s, 'Cover', 'A1', `=Inputs!$C$${ROW.Inputs.company}&": operating model"`);
-  s.names = { Case: NAMES.Case, LastHistorical: NAMES.LastHistorical, Circ: NAMES.Circ };
-  pend(s, ['su']);
+  // the Watch Window keeps its two rows on the Cover (they read blank until the project links the flag)
+  for (const name of ['IS', 'CF', 'BS', 'Schedules', 'Checks', 'DCF']) {
+    const cells = cellsOf(s, name);
+    for (const k of Object.keys(cells)) {
+      const m = /^([C-Z])(\d+)$/.exec(k); const c = cells[k];
+      if (!m || +m[2] < 5 || !c.formula) continue;
+      delete c.formula; delete c.value;
+    }
+  }
+  blank(s, 'Cover', ['flag', 'diff'], ['C']);
+  delete s.names.WACC;
 });
-// B5A: the assessment: everything built except the debt schedule and its links
+// B5A: the assessment: everything built except the debt schedule and its links (their formats stay)
 const B5A = derive(DONE, s => {
-  strip(s, 'Schedules', [...SCH.debt, ...SCH.revolver]);
-  strip(s, 'IS', ['int']); strip(s, 'CF', ['termDrawn', 'termRepaid', 'ddDrawn', 'ddRepaid', 'rev']); strip(s, 'BS', ['term', 'dd', 'rev']);
+  blank(s, 'Schedules', [...SCH.debt, ...SCH.revolver]);
+  blank(s, 'IS', ['int']); blank(s, 'CF', ['termDrawn', 'termRepaid', 'ddDrawn', 'ddRepaid', 'rev']); blank(s, 'BS', ['term', 'dd', 'rev']);
 });
 
 const BUILDERS = {
-  B511, B512, B513, B514, B515, B516, B517, B51C,
+  B511, B512, B513, B514, B515, B516, B517, B518, B51C,
   B521, B522, B523, B524, B525, B526, B52C,
   B531, B532, B533, B534, B535, B536, B53C,
   B541, B542, B543, B544, B545: B545broken, B54C,
-  B551, B552, B553: B553planted, B554, B55C,
+  B551, B552, B553, B554, B55C,
   B561, B562, B563, B564, B565, B566, B56C,
   B571, B572, B573, B5P, B5A, DONE: () => DONE,
 };
@@ -1255,7 +1344,7 @@ for (const id in BUILDERS) Object.defineProperty(STATES, id, { get: BUILDERS[id]
 export const STATE_ORDER = Object.keys(BUILDERS);
 /** Which lesson each state starts (the state after a lesson is the next lesson's start; DONE closes every module). */
 export const STATE_LESSONS = {
-  B511: '5.1.1', B512: '5.1.2', B513: '5.1.3', B514: '5.1.4', B515: '5.1.5', B516: '5.1.6', B517: '5.1.7', B51C: '5.1.C',
+  B511: '5.1.1', B512: '5.1.2', B513: '5.1.3', B514: '5.1.4', B515: '5.1.5', B516: '5.1.6', B517: '5.1.7', B518: 'after 5.1.7', B51C: '5.1.C',
   B521: '5.2.1', B522: '5.2.2', B523: '5.2.3', B524: '5.2.4', B525: '5.2.5', B526: '5.2.6', B52C: '5.2.C',
   B531: '5.3.1', B532: '5.3.2', B533: '5.3.3', B534: '5.3.4', B535: '5.3.5', B536: '5.3.6', B53C: '5.3.C',
   B541: '5.4.1', B542: '5.4.2', B543: '5.4.3', B544: '5.4.4', B545: '5.4.5', B54C: '5.4.C',
@@ -1278,4 +1367,82 @@ export function stateOf(id) {
   const s = STATES[id];
   if (!s) throw new Error('unknown workbook state ' + id);
   return clone(s);
+}
+
+/* ---------------- the replay's state shape (one pair every caller shares) ---------------- */
+
+const byName = o => (o ? Object.fromEntries(Object.entries(o).sort(([a], [b]) => a.toUpperCase().localeCompare(b.toUpperCase()))) : o);
+/** The settings a state compares on, in one key order: the iteration limits are the engine's own and never differ by lesson, so they ride along unread. */
+const normState = st => {
+  const { maxIterations, maxChange, ...settings } = st.settings || {}; void maxIterations; void maxChange;
+  return { ...st, settings: byName(settings), ...(st.names ? { names: byName(st.names) } : {}) };
+};
+/** What differs between two states (clearcoat-weekly's diff), with the names and settings compared whatever their key order. */
+export function diffStates(a, b) { return diffCells(normState(a), normState(b)); }
+/** A live session in the authored-state shape: clearcoat-weekly's extraction, with the iteration limits the model carries. */
+export function sessionToState(ses) {
+  const st = sessionCells(ses);
+  st.settings = { ...st.settings, maxIterations: ses.settings.maxIterations, maxChange: ses.settings.maxChange };
+  return st;
+}
+
+/* ---------------- the module challenges and their seeds (one table, one dispatcher) ---------------- */
+
+/** The module challenges and the states they start from (the seed dresses them; the workload never moves). */
+export const CHALLENGES = {
+  'challenge-one-site-month': { before: 'B51C' },
+  'challenge-model-shell': { before: 'B52C' },
+  'challenge-schedules': { before: 'B53C' },
+  'challenge-linked-statements': { before: 'B54C' },
+  'challenge-eight-faults': { before: 'B55C' },
+  'challenge-dcf': { before: 'B56C' },
+};
+/** A draw on a grid: lo to hi in steps of `by`, rounded clear of float dust. */
+const drawStep = (rng, lo, hi, by) => Math.round((lo + Math.floor(rng() * (Math.round((hi - lo) / by) + 1)) * by) * 1e6) / 1e6;
+/** Fresh typed figures on Inputs, in the cells' own look. */
+function inputDraws(stateId, draws) {
+  const inp = cellsOf(STATES[stateId], 'Inputs');
+  return Object.fromEntries(draws.map(([key, value]) => { const ref = 'C' + rowOf('Inputs', key); return ['Inputs!' + ref, { ...inp[ref], value }]; }));
+}
+const SEEDS = {
+  // 5.1.C: Mueller's month (washes, ticket, the four site costs and the members) around SITE_CHALLENGE
+  'challenge-one-site-month': rng => {
+    const p = {}, cells = cellsOf(STATES.B51C, 'One site'), S = SITE_CHALLENGE, step = (lo, hi, by) => drawStep(rng, lo, hi, by);
+    const draw = { washes: step(S.washes - 600, S.washes + 600, 50), ticket: step(130, 145, 1) / 10, rentIn: step(S.rent - 1000, S.rent + 1000, 250), laborIn: step(S.labor - 1500, S.labor + 1500, 500),
+      utilIn: step(S.utilities - 400, S.utilities + 400, 100), maintIn: step(S.maintenance - 300, S.maintenance + 300, 100), members: step(S.members - 200, S.members + 200, 50) };
+    for (const key in draw) { const ref = 'C' + rowOf('One site', key); p['One site!' + ref] = { ...cells[ref], value: draw[key] }; }
+    return p;
+  },
+  // 5.2.C: the accountants' FY26 retail and membership figures on Data, so the historicals the shell pulls differ run to run
+  'challenge-model-shell': rng => {
+    const p = {}, cells = sheetOf(STATES.B52C, 'Data').cells;
+    for (const key of ['retail', 'club']) {
+      const r = 5 + DATA_LINES.findIndex(([, k]) => k === key);
+      p['Data!F' + r] = { ...cells['F' + r], value: HIST[key][3] + drawStep(rng, -1000, 1000, 250) };
+    }
+    return p;
+  },
+  // 5.3.C and 5.4.C: fresh inputs on Inputs, each in a band around the case's own, so every figure the
+  // challenge builds is new and the model still balances by construction
+  'challenge-schedules': rng => inputDraws('B53C', [['capexSite', drawStep(rng, 2300, 2800, 100)], ['newWash', drawStep(rng, 180, 220, 10)], ['labor', drawStep(rng, 240, 270, 5)], ['rent', drawStep(rng, 150, 175, 5)], ['payDays', drawStep(rng, 25, 35, 5)]]),
+  'challenge-linked-statements': rng => inputDraws('B54C', [['capexSite', drawStep(rng, 2300, 2800, 100)], ['minCash', drawStep(rng, 4000, 6000, 500)], ['termRate', drawStep(rng, 0.065, 0.075, 0.0025)]]),
+  // 5.5.C: the two planted hardcodes retyped at fresh figures
+  'challenge-eight-faults': rng => {
+    const p = {}, st = STATES.B55C;
+    for (const [name, ref, lo, hi] of [['IS', PLANT_SWEEP[0][1], 2600, 3600], ['IS', PLANT_SWEEP[1][1], 1100, 1700]]) p[name + '!' + ref] = { ...clone(cellsOf(st, name)[ref]), value: -drawStep(rng, lo, hi, 50) };
+    return p;
+  },
+  // 5.6.C: the given free-cash-flow line scaled (the normalized year follows FY31)
+  'challenge-dcf': rng => {
+    const p = {}, k = drawStep(rng, 85, 115, 5) / 100, cells = cellsOf(STATES.B56C, 'DCF'), r = rowOf('DCF', 'fcf');
+    const flows = FCF_GIVEN.map(v => Math.round(v * k / 100) * 100);
+    PROJ_COLS.forEach((col, i) => { p['DCF!' + col + r] = { ...clone(cells[col + r]), value: flows[i] }; });
+    p['DCF!K' + r] = { ...clone(cells['K' + r]), value: flows[4] };
+    return p;
+  },
+};
+/** A module challenge's seed patch: content only, never workload. */
+export function challengeSeed(id, rng) {
+  if (!CHALLENGES[id]) throw new Error('clearcoat-model: no challenge ' + id);
+  return SEEDS[id](rng);
 }

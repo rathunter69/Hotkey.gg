@@ -329,6 +329,57 @@ export const CONCEPTS = {
   'name-manager': 'the Name Manager (Ctrl+F3) lists every name with its value, its reference and its scope; Edit renames or re-points one and the formulas follow, Delete removes a stray',
   'paste-list': 'Paste Name (F3) › Paste List writes every name and what it refers to from the active cell down, so the reviewer can read them on a sheet',
   'name-driven-list': 'a drop-down whose Source is a name (=Cases) reads the named list wherever it sits, so the list can move and the picker keeps working',
+  // Chapter 5 · 5.1 The three statements (the One site and One week pages)
+  'income-statement': 'the income statement runs from revenue through cost of sales, site costs, EBITDA, depreciation, interest and tax to net income, what a period earned',
+  'accrual-gaps': 'profit and cash part by timing: cash paid ahead is deferred revenue, a cost not yet paid is a payable, revenue not yet collected is a receivable',
+  'cash-flow-statement': 'the cash flow statement walks from net income to the change in cash in three parts: operations, investing, financing',
+  'balance-sheet': 'the balance sheet is what the business owns, owes and leaves for its owners on one date; assets equal liabilities plus equity',
+  'statement-links': 'five links join the statements: net income, depreciation, capex, debt and closing cash',
+  'three-statement-events': 'every event lands in at least two statements, and the balance check says whether each one was placed right',
+  'buyer-ratios': 'the ratios a buyer reads first: EBITDA margin, cash conversion, leverage and interest cover',
+  // Chapter 5 · 5.2 Model setup
+  'model-architecture': 'a model reads in the order it calculates: Cover, Inputs, statements, schedules, Checks, DCF; typed numbers live on Inputs only',
+  'timeline-flags': 'a model timeline: year ends by EOMONTH from one typed date, an A/E row, a projection flag that reads the last historical year, and period counters',
+  'columns-counter': '=COLUMNS($C4:C4) counts the columns from the anchor to here, so it reads 1, 2, 3 across with no typed offset',
+  'block-fill': 'a block filled in one motion: the first column written with its anchors, the whole block selected, Ctrl+R',
+  'checks-sheet': 'a Checks sheet built before the model: one row per check, each a ROUND of a live difference, empty and marked pending until its schedule exists',
+  'populate-by-name': 'historicals read from a data tab by name: INDEX on the data, MATCH on the label down and on the year across, SUMIFS where a label repeats',
+  'drivers-block': 'a drivers block: each case typed by year in its own block, and one live block that reads the case the switch names with CHOOSE',
+  // Chapter 5 · 5.3 Schedules and 5.4 Linking the statements (the operating model)
+  'corkscrew': 'a corkscrew rolls a balance: opening, plus what comes in, less what goes out, is the closing, and the closing is next year’s opening',
+  'driver-build': 'a driver-based build multiplies inputs a buyer can question (sites × washes a day × days × ticket) instead of growing last year by a typed rate',
+  'cost-behaviour': 'each cost is built the way it behaves: per wash as a share of revenue, per site as a cost per site × average sites, fixed as a base that grows plus a step',
+  'working-capital-days': 'a working-capital balance is its driver ÷ 365 × its days, and the change in it is cash: a rise in an asset uses cash, a rise in a liability brings it in',
+  'depreciation-waterfall': 'a depreciation waterfall puts each year’s capex on its own row and depreciates it across from the year after, so total depreciation is a SUM down a column',
+  'circularity-breaker': 'interest on the average balance makes a circle that iterative calculation settles; a breaker cell (Circ: 1 on the average, 0 on the opening) switches it off when it breaks',
+  'tax-losses': 'tax is MAX(EBT,0) × the rate, and a loss is carried forward as a balance that later profit uses up before tax is paid',
+  'schedule-links': 'each projected statement line links to the last line of its schedule, and one formula a row carries the actuals through the projection flag',
+  'indirect-cash-flow': 'the indirect cash flow starts from net income, adds back depreciation, takes the working-capital changes with their signs, then capex and the financing lines',
+  'cash-not-a-plug': 'balance sheet cash is the cash flow’s closing cash, built from every other line, so a sheet that balances proves the links and nothing is forced',
+  'cash-sweep': 'the revolver draws MAX(minimum cash − cash before the revolver, 0) and repays MIN(MAX(surplus, 0), its balance): MIN and MAX, never an IF tower',
+  'balance-order': 'when the balance sheet is off, read the size of the difference first, then check in order: cash, working-capital signs, depreciation, capex, debt, net income to equity, openings',
+  'select-precedents': 'Ctrl+[ jumps to the cells a formula reads, on another sheet too, so a link can be followed back to its source',
+  // Chapter 5 · 5.5 Auditing a model and 5.6 DCF (the operating model)
+  'tie-out': 'a tie-out is a live difference between one figure in two places, wrapped in ROUND so it reads exactly 0 while they agree',
+  'cross-foot': 'a cross-foot adds a block both ways, every line across every year and the total row across the years, and checks the two sums agree',
+  'limit-check': 'a limit check counts what should never happen, COUNTIF(range,"<0") on the closing balances, and reads 0 while none does',
+  'error-count': 'SUMPRODUCT(--ISERROR(block)) counts the error cells on a sheet, so one check knows about a #REF! three sheets away',
+  'error-checking': 'Error Checking (Alt, M, K) walks the error cells of the active sheet one by one; it works on one sheet at a time',
+  'watch-window': 'the Watch Window (Alt, M, W) keeps chosen cells in view with their values and formulas whatever sheet you are on; Add Watch is Alt+A',
+  'row-differences': 'Go To Special, Row differences (Alt, H, F, D, S, W) selects every cell of the selected row whose formula is not the active cell\'s, filled across',
+  'hardcode-count': 'SUMPRODUCT(ISNUMBER(block)*(1-ISFORMULA(block))) counts the typed numbers in a projected block, which should hold none',
+  'stress-test': 'a stress test types an input to an extreme (zero, a hundred, a loss), reads what breaks, fixes the formula that should have held, and puts the input back',
+  'dcf': 'a discounted cash flow values a business as the cash it will generate, discounted to today, plus what it is worth after the forecast ends',
+  'unlevered-fcf': 'unlevered free cash flow is EBIT less tax on EBIT, plus depreciation, less capex and the cash tied up in working capital: the cash before anyone is paid',
+  'wacc': 'WACC blends the cost of equity (risk-free plus beta times the premium, plus a size premium) with the after-tax cost of debt, by the target weights',
+  'terminal-value': 'a terminal value stands for the years after the forecast: the normalized last cash flow grown forever over WACC less growth, or the last EBITDA times an exit multiple',
+  'mid-year-discounting': 'a discount factor is 1/(1+WACC)^t; the mid-year convention counts t from the middle of each year (0.5, 1.5 and on) because cash arrives through the year',
+  'enterprise-to-equity': 'enterprise value is the discounted cash flows plus the discounted terminal value; take off net debt and what is left is equity value',
+  'sensitivity-grid': 'a sensitivity grid is one formula with mixed anchors ($C69 and D$68) written over a block, so each cell values the business at its own row and column inputs',
+  // Chapter 5 · 5.7 Model speed (the operating model's benchmarks)
+  'speed-build': 'a build on the clock: each row’s formula written once in its first column and filled right, anchors set with F4 as the formula is typed, the check read at the end',
+  'one-pass-format': 'a block filled with one Ctrl+R and formatted by whole-block actions, F4 repeating each one on the next range, so no cell is touched twice',
+  'keyboard-linking': 'statement links made without the mouse: the reference typed, or pointed with Ctrl+PgDn and the arrows, then Ctrl+Enter across the row and F4 repeating the green',
 };
 
 /**
@@ -568,7 +619,10 @@ export function validateDrill(d) {
   need(ACCESS.includes(d.access), 'access must be free | paid');
   need(d.benchmark === undefined || typeof d.benchmark === 'boolean', 'benchmark must be true or false');
   need(d.seed === undefined || typeof d.seed === 'function', 'seed must be a function (rng) => cells patch');
-  need(isObject(d.sheet), 'sheet (starting sheet) missing');
+  // a drill starts from its own sheet, or (Chapter 5 on) from a named workbook state with a planting over it
+  const onWorkbook = typeof d.workbook === 'string' && isObject(d.state) && typeof d.state.before === 'string';
+  need(isObject(d.sheet) || onWorkbook, 'sheet (starting sheet) or workbook and state.before missing');
+  need(!onWorkbook || d.seed === undefined, 'a workbook drill plants its fault with plant, not a seed');
   need(d.sheets === undefined || (Array.isArray(d.sheets) && d.sheets.every(isObject)), 'sheets must be an array of { name, cells } records');
   need(Number.isInteger(d.optimalKeys) && d.optimalKeys > 0, 'optimalKeys must be a positive integer');
   const p = d.pars;
@@ -589,6 +643,7 @@ export function validateDrill(d) {
   const ends = Array.isArray(d.endState) ? d.endState.filter(isObject) : [];
   for (const e of ends) { need(typeof e.text === 'string', 'endState entries need text'); need(typeof e.check === 'function', 'endState entries need a check'); }
   need(typeof d.solution === 'string' && d.solution.trim(), 'solution keystrokes missing');
-  if (isObject(d.sheet)) validateStartingSheet(d, goals, ends, need);
+  if (onWorkbook) validateStartingSheet(d, goals, ends, need, { moduleLesson: true, kind: 'drill' });
+  else if (isObject(d.sheet)) validateStartingSheet(d, goals, ends, need);
   return errs;
 }

@@ -152,3 +152,20 @@ test('a workbook with SUBTOTAL is probed in place (it repeats itself), with the 
   assert.equal(isLiveFormulaByClone(s, 'B4', { inputs: ['B3'] }), false, 'the clone sees the hidden row too');
   assert.deepEqual(cellsOf(s), before, 'every nudge put back');
 });
+
+test('a named input on another sheet, and a clone that reaches two sheets away: a three-sheet chain under iterative calculation, through a defined name', async () => {
+  const { Session } = await import('../engine/keyboard.js');
+  const ses = new Session(new Sheet({ cells: { A1: { value: 2 }, A2: { value: 1 } } }));
+  ses.renameSheet(0, 'Inputs');
+  ses.addSheet('Sched', new Sheet({ cells: { B1: { formula: '=Inputs!A1*3' } } }));
+  ses.addSheet('Stmt', new Sheet({ cells: { C1: { formula: '=IF(Circ=1,Sched!B1+1,0)' }, C2: { formula: '=C3+1' }, C3: { formula: '=C2*0.5' } } }));   // C2:C3 a circle: the clone path
+  Object.assign(ses.settings, { iterative: true });
+  ses.names = { Circ: 'Inputs!$A$2' };
+  const stmt = ses.sheets[2].sheet;
+  assert.equal(stmt.value('C1'), 7);
+  const before = JSON.stringify(ses.sheets.map(e => e.sheet.cells));
+  assert.equal(isLiveFormula(stmt, 'C1', { inputs: ['Inputs!A1'] }), true, 'Inputs → Sched → Stmt moves on the clone, the name resolving there');
+  assert.equal(isLiveFormula(stmt, 'C1', { inputs: ['Inputs!$A$1'] }), true, 'an anchored input reads the same');
+  assert.equal(isLiveFormula(stmt, 'C1', { inputs: ['Inputs!B9'] }), false, 'a cell nothing reads moves nothing');
+  assert.equal(JSON.stringify(ses.sheets.map(e => e.sheet.cells)), before, 'the workbook is untouched');
+});

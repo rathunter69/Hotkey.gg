@@ -889,3 +889,58 @@ Iterative calculation honoring the breaker and settling a real circle; a named C
   - Source pass (2026-09-30): the fold-back plan in claude/source-checklist.md (section H) is applied to this chapter as DRAFT: 73 edits, plus fifteen held items pulled back on Wolf's depth call (G090, G102, G106, G100, G107, G060, G062, G080, G083, G085, G164, G132, G120, G124, and G134 as its own goal in 5.6.4). Wolf's calls of that day are in the decision log (screenplay 11); what was held back stays listed in the checklist's section B.
   - Case numbers (Wolf, 2026-09-30): Clearcoat's own capex is $2,500k a site (building, tunnel, equipment) on rented land, and the $5m stays as the all-in cost of a site. Written into the brief, Inputs, 5.1.1, 5.1.4, 5.1.6, 5.1.7 and 5.3.4 as DRAFT. A build session confirms it on a real rebuild (Base-case free cash flow about zero in FY27 rising to about $9m in FY31) before 5.4.4, 5.6.4, 6.3.2 and 6.3.5 go to goal level.
   - Two arithmetic slips fixed in passing: the site's share of loan amortization is $75k a year (5.1.3), and the week's loan payment is $3,460, $2,020 of it interest (5.1.6).
+
+## Built differently
+
+### 5.1 and 5.2 (r5-lessons-a)
+- The One week page is in the file from 5.1.1, so 5.1.5 builds nothing.
+- 5.1.1: the washes are a typed input and the formats arrive planted. The learner adds only the double borders under EBITDA and net income.
+- 5.1.2: the closing clears August's payable instead of setting payable days to zero, because the model has no payable-days input.
+- Opening equity is the workbook's formula, not a typed blue figure.
+- The best-practice goals became teach lines throughout.
+- 5.1.C: most lines arrive planted and the learner writes 14 key cells, so it fits in 180 seconds.
+- 5.2.1: there are no tab colors, because states do not keep them. The learner types the title, the case number, the flag and two links; the rest of the Cover arrives planted.
+- 5.2.2: there is no divider goal, and the insert-a-column proof is a teach line.
+- 5.2.3: F4 repeats the labor row's format onto the other five rows. The closing changes a Data figure, because the forecast years read zero until 5.3.
+- 5.2.4: the red rule and the flag arrive planted. The learner writes two checks, marks six as pending and writes the roll-up.
+- 5.2.5: the learner writes the helpers, three lookups and a SUMIFS for rent; the rest arrives planted. There is no re-sort goal.
+- 5.2.6: the case blocks sit at rows 14, 21 and 28. The learner writes the flat Downside driver, the live rows and the titles.
+- 5.2.C: there are no tab colors, divider or drivers block.
+
+### 5.3 and 5.4 (r5-lessons-b)
+- Each lesson's key is =, not the script's Alt F T, Ctrl+PgDn, MAX or Ctrl+[.
+- 5.3.1: the units tip sits in the washes goal's teach line. The revenue check compares the income statement with the build.
+- 5.3.2: the per-site cost block came with 5.2.3, so it is not built again.
+- 5.3.3: the actual balances read Data through the flag.
+- 5.3.5: there is no Alt F T confirm and no blow-it-up goal. The closing shows the breaker.
+- 5.3.6: the projected rows are graded on what they reference. The closing types a loss over EBT, because the income statement is not linked yet.
+- 5.4.1: colors, italics and the A/E divider are planted. The Alt W N tip is in a teach line.
+- 5.4.2: the closing tests the revolver wiring. The capex closing is dropped.
+- 5.4.4: the cash flow and balance sheet links were already made in 5.4.2 and 5.4.3.
+- 5.4.5: the six breaks are planted, each in its cell's own format.
+- 5.3.C and 5.4.C blank only the projected years, so each fits in 3 minutes.
+
+### 5.5 and 5.6 (r5-lessons-c)
+- 5.5.1 fills three check rows and two limit checks, and finds the flag with Go To.
+- 5.5.2 watches the Cover's flag and its sum of differences.
+- 5.5.3 has no Column differences, no border tip and no circle hunt.
+- 5.5.4 stresses washes to zero rather than the ticket, plus four undo stresses.
+- 5.5.C has 6 goals in 180 seconds, not five minutes.
+- 5.6.2: EBIT is EBITDA less depreciation from Schedules.
+- 5.6.5: the closing turns mid-year off and says the forecast present values fall about 5%. With the exit method on, enterprise value hardly moves, so the script's "rises a few percent" does not hold here.
+- 5.6.6: the base case is bold, not boxed, and the edges are planted.
+- 5.6.C opens with EBITDA, the periods, the WACC inputs, the drivers and the table edges given, so it fits 180 seconds.
+
+### 5.7, project and assessment (r5-lessons-d)
+- 5.7.1: total revenue is typed as =C22+C24+C25 rather than AutoSum, because the member count row sits inside the block.
+- 5.7.2 uses two fills and three formats, each repeated with F4.
+- 5.7.3: the references are typed into each row with Ctrl+Enter, not pointed at with Ctrl+PgDn.
+- 5.7.C is one seeded run that cuts a piece of each benchmark, not three separate runs.
+- 5.P has 15 goals, not about 18. Inputs, Data, the timeline and the Cover map arrive built, and there is no stress-test goal.
+- 5.A has 10 goals, not about 14.
+- Drills: ch5-balance-it has one planted break, not five seeds. ch5-checks covers the balance, cash and debt checks, since the model has no sources and uses table. ch5-sweep stresses 18 new sites in FY28.
+- The 10 Wave 1 Chapter 5 drill sketches are not built.
+
+### Integration (r5-int)
+- 5.6.6 builds each sensitivity grid as one formula with mixed anchors over the block, not as a Data Table, and has no calculation-mode goal. A Data Table only moves an input on its own sheet, and the model reads WACC through its name and growth and the multiple from Inputs, so real tables need the pass-through drivers wired into the discounting and terminal values from 5.6.3 on.
+- 5.P's shell keeps the Watch Window's two rows on the Cover; they read blank until the project links the flag.

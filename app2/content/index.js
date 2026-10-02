@@ -166,6 +166,56 @@ import validation_list_by_name from './lessons/validation-list-by-name.js';
 import challenge_toggles_named from './lessons/challenge-toggles-named.js';
 import ch4_project from './lessons/ch4-project.js';
 import ch4_assessment from './lessons/ch4-assessment.js';
+// Chapter 5 · Finance and Accounting (Run R5): 5.1 The three statements, 5.2 Model setup
+import the_income_statement from './lessons/the-income-statement.js';
+import accrual_and_cash from './lessons/accrual-and-cash.js';
+import the_cash_flow_statement from './lessons/the-cash-flow-statement.js';
+import the_balance_sheet from './lessons/the-balance-sheet.js';
+import how_the_statements_link from './lessons/how-the-statements-link.js';
+import one_week_three_statements from './lessons/one-week-three-statements.js';
+import read_like_a_buyer from './lessons/read-like-a-buyer.js';
+import challenge_one_site_month from './lessons/challenge-one-site-month.js';
+import model_architecture from './lessons/model-architecture.js';
+import timeline_flags_counters from './lessons/timeline-flags-counters.js';
+import fill_patterns from './lessons/fill-patterns.js';
+import checks_sheet_day_one from './lessons/checks-sheet-day-one.js';
+import populate_from_data from './lessons/populate-from-data.js';
+import drivers_block from './lessons/drivers-block.js';
+import challenge_model_shell from './lessons/challenge-model-shell.js';
+// Chapter 5 · Finance and Accounting (Run R5): 5.3 Schedules, 5.4 Linking the statements
+import revenue_build from './lessons/revenue-build.js';
+import cost_build from './lessons/cost-build.js';
+import working_capital_schedule from './lessons/working-capital-schedule.js';
+import ppe_and_depreciation from './lessons/ppe-and-depreciation.js';
+import debt_and_interest_circle from './lessons/debt-and-interest-circle.js';
+import tax_schedule from './lessons/tax-schedule.js';
+import challenge_schedules from './lessons/challenge-schedules.js';
+import is_from_schedules from './lessons/is-from-schedules.js';
+import cf_indirect from './lessons/cf-indirect.js';
+import bs_cash_not_a_plug from './lessons/bs-cash-not-a-plug.js';
+import cash_sweep_revolver from './lessons/cash-sweep-revolver.js';
+import when_it_doesnt_balance from './lessons/when-it-doesnt-balance.js';
+import challenge_linked_statements from './lessons/challenge-linked-statements.js';
+// Chapter 5 · Finance and Accounting (Run R5): 5.5 Auditing a model, 5.6 DCF
+import tie_outs_cross_foots from './lessons/tie-outs-cross-foots.js';
+import error_flags_checks_summary from './lessons/error-flags-checks-summary.js';
+import model_wide_sweep from './lessons/model-wide-sweep.js';
+import stress_tests from './lessons/stress-tests.js';
+import challenge_eight_faults from './lessons/challenge-eight-faults.js';
+import what_a_dcf_is from './lessons/what-a-dcf-is.js';
+import unlevered_free_cash_flow from './lessons/unlevered-free-cash-flow.js';
+import wacc_block from './lessons/wacc-block.js';
+import terminal_value from './lessons/terminal-value.js';
+import discounting_mid_year from './lessons/discounting-mid-year.js';
+import dcf_sensitivity from './lessons/dcf-sensitivity.js';
+import challenge_dcf from './lessons/challenge-dcf.js';
+// Chapter 5 · Finance and Accounting (Run R5): 5.7 Model speed, 5.8 Project and assessment
+import revenue_build_in_three from './lessons/revenue-build-in-three.js';
+import fill_and_format_block from './lessons/fill-and-format-block.js';
+import keyboard_only_linking from './lessons/keyboard-only-linking.js';
+import challenge_model_speed from './lessons/challenge-model-speed.js';
+import ch5_project from './lessons/ch5-project.js';
+import ch5_assessment from './lessons/ch5-assessment.js';
 
 export const CHAPTERS = [
   {
@@ -280,6 +330,32 @@ export const CHAPTERS = [
       challenge_three_case_model,
       naming_sparingly, name_manager, validation_list_by_name, challenge_toggles_named,
       ch4_project, ch4_assessment,
+    ],
+  },
+  {
+    id: 'finance-and-accounting',
+    title: 'Finance and Accounting',
+    access: 'paid',
+    blurb: 'The three statements by hand, then the operating model: setup, schedules, the statements linked and balanced, the audit, the DCF and model speed, on Clearcoat’s forty sites growing to seventy.',
+    // Chapter 5's sections in order (script-ch5.md): the seven modules and the closing project block.
+    sections: [
+      { name: 'The three statements', blurb: 'The income statement; accrual and cash; the cash flow statement; the balance sheet; how the three link; one week of one site through all three; reading a set the way a buyer does.' },
+      { name: 'Model setup and efficiencies', blurb: 'Inputs, calculations and outputs, sheet order and a Cover; the timeline row with its flags and counters; the fill patterns at model speed; the checks sheet from day one; the statements populated from the data tab; the drivers block.' },
+      { name: 'Schedules', blurb: 'The revenue build, the cost build, working capital from days to balances, PP&E with its depreciation waterfall, debt and interest with the average-balance circle and a breaker, and tax.' },
+      { name: 'Linking the statements', blurb: 'The income statement from the schedules, the cash flow statement by the indirect method, the balance sheet with cash as the plug that isn’t a plug, the cash sweep and the revolver, and the order to check when it doesn’t balance.' },
+      { name: 'Auditing a model', blurb: 'Tie-outs and cross-foots; error flags and the checks summary; the model-wide sweep for hardcodes and pattern breaks; stress tests.' },
+      { name: 'DCF', blurb: 'What a DCF is; unlevered free cash flow; the WACC block; terminal value both ways; discounting and the mid-year convention; sensitivity tables.' },
+      { name: 'Model speed', blurb: 'The chapter’s three benchmarks with the keys shown once: the revenue build in three minutes, a block filled and formatted in one pass, the cash flow statement linked by keyboard alone.' },
+      { name: 'Project and assessment', blurb: 'Build the operating model with its DCF page from an empty shell, then one schedule and its links again on the clock; the assessment is the test-out.' },
+    ],
+    lessons: [
+      the_income_statement, accrual_and_cash, the_cash_flow_statement, the_balance_sheet, how_the_statements_link, one_week_three_statements, read_like_a_buyer, challenge_one_site_month, model_architecture, timeline_flags_counters, fill_patterns, checks_sheet_day_one, populate_from_data, drivers_block, challenge_model_shell,
+      revenue_build, cost_build, working_capital_schedule, ppe_and_depreciation, debt_and_interest_circle, tax_schedule, challenge_schedules,
+      is_from_schedules, cf_indirect, bs_cash_not_a_plug, cash_sweep_revolver, when_it_doesnt_balance, challenge_linked_statements,
+      tie_outs_cross_foots, error_flags_checks_summary, model_wide_sweep, stress_tests, challenge_eight_faults,
+      what_a_dcf_is, unlevered_free_cash_flow, wacc_block, terminal_value, discounting_mid_year, dcf_sensitivity, challenge_dcf,
+      revenue_build_in_three, fill_and_format_block, keyboard_only_linking, challenge_model_speed,
+      ch5_project, ch5_assessment,
     ],
   },
 ];
