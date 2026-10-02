@@ -282,3 +282,13 @@ test('Ctrl+Home under frozen panes lands on the first unfrozen cell, as Excel do
   s.moveHome(false, false); assert.equal(s.selectionText(), 'A5', 'plain Home still goes to column A');
   s.freeze = { r: 1, c: 0 }; s.goTo(9, 9); s.moveHome(true, false); assert.equal(s.selectionText(), 'A2');
 });
+
+test('a bracket inside a string literal is text: the entry commits, and only real brackets auto-close', () => {
+  assert.deepEqual(Sheet.classifyInput('=LEN("(")'), { kind: 'formula', formula: '=LEN("(")' });
+  const channel = '=MID(A1,FIND("(",A1)+1,FIND(")",A1)-FIND("(",A1)-1)';
+  assert.deepEqual(Sheet.classifyInput(channel), { kind: 'formula', formula: channel });
+  assert.deepEqual(Sheet.classifyInput('=FIND("(",A1'), { kind: 'formula', formula: '=FIND("(",A1)' });
+  const s = new Sheet({ ...SMALL, cells: { A1: { value: 'Wash D @ AUS-DOM (kiosk)' } } });
+  s.commitInput(channel, 1, 2);
+  assert.equal(s.value('B1'), 'kiosk');
+});

@@ -688,7 +688,9 @@ export class Sheet {
     // a leading apostrophe makes the rest text, whatever it looks like ('=A1, '00123), and is kept as the cell's prefix, not its value (M71)
     if (buf[0] === "'") return { kind: 'value', value: String(text).replace(/^\s*'/, '').replace(/\s+$/, ''), txt: true, apos: true };
     if (buf[0] === '=') {
-      const opens = (buf.match(/\(/g) || []).length, closes = (buf.match(/\)/g) || []).length;
+      // brackets inside a string literal ("(" in =FIND("(",F5)) are text, not grouping, so they never count
+      const bare = buf.replace(/"(?:[^"]|"")*"?/g, '');
+      const opens = (bare.match(/\(/g) || []).length, closes = (bare.match(/\)/g) || []).length;
       if (opens > closes) buf += ')'.repeat(opens - closes);   // Excel auto-closes
       const ac = autocorrectFormula(buf);
       if (ac.kind === 'fix') return { kind: 'fix', buf: ac.buf, fixed: ac.fixed };
