@@ -166,6 +166,9 @@ import validation_list_by_name from './lessons/validation-list-by-name.js';
 import challenge_toggles_named from './lessons/challenge-toggles-named.js';
 import ch4_project from './lessons/ch4-project.js';
 import ch4_assessment from './lessons/ch4-assessment.js';
+// Chapter 5 · Finance and Accounting (Run R5): 5.1 The three statements, 5.2 Model setup
+import the_income_statement from './lessons/the-income-statement.js';
+import accrual_and_cash from './lessons/accrual-and-cash.js';
 
 export const CHAPTERS = [
   {
@@ -280,6 +283,26 @@ export const CHAPTERS = [
       challenge_three_case_model,
       naming_sparingly, name_manager, validation_list_by_name, challenge_toggles_named,
       ch4_project, ch4_assessment,
+    ],
+  },
+  {
+    id: 'finance-and-accounting',
+    title: 'Finance and Accounting',
+    access: 'paid',
+    blurb: 'The three statements by hand, then the operating model: setup, schedules, the statements linked and balanced, the audit, the DCF and model speed, on Clearcoat’s forty sites growing to seventy.',
+    // Chapter 5's sections in order (script-ch5.md): the seven modules and the closing project block.
+    sections: [
+      { name: 'The three statements', blurb: 'The income statement; accrual and cash; the cash flow statement; the balance sheet; how the three link; one week of one site through all three; reading a set the way a buyer does.' },
+      { name: 'Model setup and efficiencies', blurb: 'Inputs, calculations and outputs, sheet order and a Cover; the timeline row with its flags and counters; the fill patterns at model speed; the checks sheet from day one; the statements populated from the data tab; the drivers block.' },
+      { name: 'Schedules', blurb: 'The revenue build, the cost build, working capital, PP&E, debt and interest with a breaker, and tax.' },
+      { name: 'Linking the statements', blurb: 'The income statement, the cash flow statement and the balance sheet from the schedules; the cash sweep and the revolver; the order to check when it doesn’t balance.' },
+      { name: 'Auditing a model', blurb: 'Tie-outs and cross-foots; error flags and the checks summary; the model-wide sweep; stress tests.' },
+      { name: 'DCF', blurb: 'Unlevered free cash flow, the WACC block, terminal value both ways, discounting with the mid-year convention, and the sensitivity tables.' },
+      { name: 'Model speed', blurb: 'The revenue build in three minutes, a block filled and formatted in one pass, the statements linked by keyboard.' },
+      { name: 'Project and assessment', blurb: 'The operating model with its DCF page, then one schedule and the links from it against the clock.' },
+    ],
+    lessons: [
+      the_income_statement, accrual_and_cash,
     ],
   },
 ];

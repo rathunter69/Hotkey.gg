@@ -181,7 +181,7 @@ test('the plantings: breaks, faults, the #REF!, the sweep, the shell and the pro
   assert.deepEqual(errors(p), [], 'the project shell is clean');
   assert.equal(sh(p, 'Inputs').value('F' + WB.ROW.Inputs.lNew), 6, 'the live block reads the case switch the shell keeps');
   // 5.1: the one-site pages grow block by block
-  assert.deepEqual(WB.stateOf('B511').sheets.map(x => x.name), ['One site']);
+  assert.deepEqual(WB.stateOf('B511').sheets.map(x => x.name), ['One site', 'One week'], 'the One week page rides along from 5.1.1 (5.1.5 builds nothing a solution could add it with)');
   assert.equal(cell(WB.stateOf('B511'), 'One site', 'C' + WB.ROW['One site'].rev), undefined);
   assert.ok(cell(WB.stateOf('B512'), 'One site', 'C' + WB.ROW['One site'].ni));
   assert.deepEqual(WB.stateOf('B516').sheets.map(x => x.name), ['One site', 'One week']);

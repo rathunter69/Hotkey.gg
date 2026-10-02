@@ -12,6 +12,7 @@
 // revolver's interest on its average balance is the model's one circle, with Circ as its breaker.
 import { buildPage, FMT } from './page.js';
 import { Sheet } from '../../engine/sheet.js';
+import { diffStates as diffCells, sessionToState as sessionCells } from './clearcoat-weekly.js';
 
 export const CHAPTER = 5;
 export const COLS = ['C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
@@ -991,8 +992,9 @@ const onlyPages = (state, names) => { state.sheets = state.sheets.filter(s => na
 const B517 = derive(DONE, s => { onlyPages(s, ['One site', 'One week']); stripSite(s, 'One site', ['ratios']); });
 // B516: before 5.1.6, One week holds the events and the opening balance sheet only
 const B516 = derive(B517, s => { strip(s, 'One week', span('One week', 'rev', 'dCheck')); });
-// B515: before 5.1.5 (the links tour), the One week page is not there yet
-const B515 = derive(B516, s => { onlyPages(s, ['One site']); });
+// B515: before 5.1.5 (the links tour, which follows links and builds nothing): the One week page
+// rides along from 5.1.1 with its events and opening balance sheet, since no lesson could type it
+const B515 = derive(B516, () => {});
 // B514: before 5.1.4, the balance sheet block is empty
 const B514 = derive(B515, s => { stripSite(s, 'One site', ['bs']); });
 // B513: before 5.1.3, the cash flow block too
@@ -1278,4 +1280,47 @@ export function stateOf(id) {
   const s = STATES[id];
   if (!s) throw new Error('unknown workbook state ' + id);
   return clone(s);
+}
+
+/* ---------------- the replay's state shape, and the module challenges' seeds ---------------- */
+
+const byName = o => (o ? Object.fromEntries(Object.entries(o).sort(([a], [b]) => a.toUpperCase().localeCompare(b.toUpperCase()))) : o);
+/** The settings a state compares on: the runner sets calculation, iteration, the QAT and Enter; the iteration limits ride along unread. */
+const normState = st => {
+  const { maxIterations, maxChange, ...settings } = st.settings || {}; void maxIterations; void maxChange;
+  return { ...st, settings: byName(settings), ...(st.names ? { names: byName(st.names) } : {}) };
+};
+/** What differs between two states (clearcoat-weekly's diff), with the names and settings compared whatever their key order. */
+export function diffStates(a, b) { return diffCells(normState(a), normState(b)); }
+/** A live session in the authored-state shape (clearcoat-weekly's extraction). */
+export function sessionToState(ses) { return sessionCells(ses); }
+
+/** The module challenges and the states they start from (the seed dresses them; the workload never moves). */
+export const CHALLENGES = {
+  'challenge-one-site-month': { before: 'B51C' },
+  'challenge-model-shell': { before: 'B52C' },
+};
+/**
+ * A module challenge's seed patch: content only, never workload. 5.1.C draws Mueller's month (washes,
+ * ticket, the four site costs and the members) around SITE_CHALLENGE; 5.2.C draws the accountants'
+ * FY26 retail and membership figures on Data, so the historicals the shell pulls differ run to run.
+ */
+export function challengeSeed(id, rng) {
+  if (!CHALLENGES[id]) throw new Error('clearcoat-model: no challenge ' + id);
+  const p = {};
+  const step = (lo, hi, by) => lo + Math.floor(rng() * (Math.round((hi - lo) / by) + 1)) * by;
+  if (id === 'challenge-one-site-month') {
+    const cells = cellsOf(STATES.B51C, 'One site'), S = SITE_CHALLENGE;
+    const draw = { washes: step(S.washes - 600, S.washes + 600, 50), ticket: step(130, 145, 1) / 10, rentIn: step(S.rent - 1000, S.rent + 1000, 250), laborIn: step(S.labor - 1500, S.labor + 1500, 500),
+      utilIn: step(S.utilities - 400, S.utilities + 400, 100), maintIn: step(S.maintenance - 300, S.maintenance + 300, 100), members: step(S.members - 200, S.members + 200, 50) };
+    for (const key in draw) { const ref = 'C' + rowOf('One site', key); p['One site!' + ref] = { ...cells[ref], value: draw[key] }; }
+  }
+  if (id === 'challenge-model-shell') {
+    const cells = sheetOf(STATES.B52C, 'Data').cells;
+    for (const key of ['retail', 'club']) {
+      const r = 5 + DATA_LINES.findIndex(([, k]) => k === key);
+      p['Data!F' + r] = { ...cells['F' + r], value: HIST[key][3] + step(-1000, 1000, 250) };
+    }
+  }
+  return p;
 }

@@ -1839,6 +1839,30 @@ export const COPY = {
    "mac_note": "",
    "story_beat": ""
   },
+  "the-income-statement": {
+   "id": "the-income-statement",
+   "module": "the-three-statements",
+   "order": "5.1.1",
+   "title": "The income statement",
+   "brief": "The income statement says what a business earned and spent over a period, and every line has a car-wash meaning: a wash sold is revenue, chemicals are cost of sales, the crew and the rent are site costs, the tunnel wearing out is depreciation, the loan costs interest and the government takes tax. What is left is net income. You built a P&L to EBITDA in Chapter 2; this one goes to the bottom line, for Domain, for September, every line a formula on the inputs above it. The key is `=`.",
+   "closing": "Domain earned $15,561 in September out of $104,250 of washes, and every line between means something the site did. || Best practice: costs go in as negatives and every subtotal is a plain sum, so a reader never has to guess which way a line points. EBITDA is the line a buyer prices; net income is what is left for the owners after the lenders and the government. The next lesson asks why that profit isn’t the cash in the bank.",
+   "wow": "Twenty lines from the first wash to the bottom line, and every one of them means something the site did.",
+   "convention_line": "Income positive, costs negative; One input, one cell; formulas reference it",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "accrual-and-cash": {
+   "id": "accrual-and-cash",
+   "module": "the-three-statements",
+   "order": "5.1.2",
+   "title": "Accrual and cash: why profit isn’t cash",
+   "brief": "A member pays $30 on the 1st for washes they’ll take all month, so on the 1st the cash is in the bank and none of the revenue is earned; the unearned part is deferred revenue, a liability, because the company owes the member washes. The chemical supplier is paid in thirty days, so September’s chemicals are a cost in September and cash in October: a payable. Card revenue settles in three days: a receivable. Profit and cash differ by timing gaps like these, so build them for Domain’s month. The key is `=`.",
+   "closing": "On this page profit and cash differ by three timing gaps, and now you can name each one. || Domain made $15,561 and kept $26,003 of cash from operations: depreciation added back, a payable that grew by $450, a receivable that grew by $425. Best practice: read a working-capital line as a change, and a rise in what the business owes is cash in, a rise in what it’s owed is cash out.",
+   "wow": "Three timing gaps, and now you can say where every dollar between profit and cash went.",
+   "convention_line": "The check is a live difference → 0; One input, one cell; formulas reference it",
+   "mac_note": "",
+   "story_beat": ""
+  },
   "remix-format-on-the-pnl": {
    "id": "remix-format-on-the-pnl",
    "module": "remixes",
@@ -11664,6 +11688,130 @@ export const COPY = {
     "why": "",
     "hint_stuck": ""
    }
+  ],
+  "the-income-statement": [
+   {
+    "lesson_id": "the-income-statement",
+    "goal_index": "0",
+    "text": "Revenue in C33: washes times the blended ticket, =C6*C7, which reads $104,250.",
+    "teach": "Revenue is what the washes earned: washes times the blended ticket. Money that comes in another way, interest on the bank balance or an insurance payout for a damaged arch, is other income, and it sits below operating profit, outside EBITDA.",
+    "why": "",
+    "hint_stuck": "pulse cell C33 · Washes sit in C6 and the ticket in C7."
+   },
+   {
+    "lesson_id": "the-income-statement",
+    "goal_index": "1",
+    "text": "Below it: cost of sales =-C6*C8, gross profit =C33+C34, and gross margin in C36 with IFERROR.",
+    "teach": "Cost of sales is what each wash used up, the chemicals, water and power at $1.50 a wash, and it goes in as a negative (2.1.2). Revenue less cost of sales is gross profit; over revenue it is the gross margin.",
+    "why": "",
+    "hint_stuck": "pulse range C34:C36 · The minus makes the cost a negative, so gross profit is a plain sum."
+   },
+   {
+    "lesson_id": "the-income-statement",
+    "goal_index": "2",
+    "text": "Site costs in C37:C41 as negatives (card fees =-C33*C13), their SUM in C42, and site contribution =C35+C42 in C43.",
+    "teach": "Site costs are what it takes to open the doors: the crew, the rent, the power and the upkeep, each a negative link to its input, plus card fees at 2% of revenue. Gross profit less site costs is site contribution, what one site adds before head office.",
+    "why": "",
+    "hint_stuck": "pulse range C37:C43 · Rent, labor, utilities and maintenance are C9 to C12, each with a minus in front."
+   },
+   {
+    "lesson_id": "the-income-statement",
+    "goal_index": "3",
+    "text": "Head office share in C44 =-C14/C15, EBITDA =C43+C44 in C45 with a double bottom border (Alt H B B), its margin in C46.",
+    "teach": "Head office runs all forty sites, so each carries a fortieth of it. Site contribution less that share is EBITDA, earnings before interest, tax, depreciation and amortization, the profit a buyer prices, and a double bottom border marks it as an answer.",
+    "why": "",
+    "hint_stuck": "pulse range C44:C46 · Alt H B B draws the double bottom border on the active cell."
+   },
+   {
+    "lesson_id": "the-income-statement",
+    "goal_index": "4",
+    "text": "Depreciation in C47, the build over its life for one month, =-C16/C17/12, then EBIT =C45+C47 in C48.",
+    "teach": "Depreciation is the tunnel wearing out: the $2,500,000 build spread over its twenty-year life, one month of it here, and no cash leaves for it. Amortization is the same charge for something bought that you can’t touch, a brand or a customer list; Clearcoat has none, and it isn’t the loan amortization of 5.1.3, which repays principal.",
+    "why": "",
+    "hint_stuck": "pulse range C47:C48 · Twenty years of life, twelve months a year."
+   },
+   {
+    "lesson_id": "the-income-statement",
+    "goal_index": "5",
+    "text": "Interest on the site’s share of the loan in C49, =-C18*C19/12, then earnings before tax =C48+C49 in C50.",
+    "teach": "Interest is what the loan costs for the month: the site’s share of the balance times the rate, over twelve. It sits below EBIT because it pays the lenders, not the running of the site.",
+    "why": "",
+    "hint_stuck": "pulse range C49:C50 · The loan is C18 and its rate C19."
+   },
+   {
+    "lesson_id": "the-income-statement",
+    "goal_index": "6",
+    "text": "Tax in C51 =-MAX(C50,0)*C21, then net income =C50+C51 in C52 with a double bottom border.",
+    "teach": "Tax is 25% of a profit and nothing on a loss, so MAX holds the base at zero when earnings before tax go negative. What is left is net income, the bottom line.",
+    "why": "",
+    "hint_stuck": "pulse range C51:C52 · The tax is a negative, so net income is a plain sum."
+   },
+   {
+    "lesson_id": "the-income-statement",
+    "goal_index": "7",
+    "text": "Does it tie? Watch the ticket in C7 go to $15 and every line from revenue to net income answer.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C52 · Every line reads the inputs, so one change runs to the bottom."
+   }
+  ],
+  "accrual-and-cash": [
+   {
+    "lesson_id": "accrual-and-cash",
+    "goal_index": "0",
+    "text": "Membership cash in C55: members times the fee paid on the 1st, =C22*C23, which reads $45,000.",
+    "teach": "Accrual accounting books revenue when it is earned and a cost when it is incurred, whenever the cash moves. A member’s fee arrives on the 1st, so the cash is in and the revenue is still owed to the member as washes.",
+    "why": "",
+    "hint_stuck": "pulse cell C55 · Members are C22, the fee C23."
+   },
+   {
+    "lesson_id": "accrual-and-cash",
+    "goal_index": "1",
+    "text": "Deferred revenue at September 15 in C56, =C55*(C25-15)/C25, and at September 30 in C57, =C55*(C25-C25)/C25.",
+    "teach": "The fee is earned a thirtieth a day, so the unearned part shrinks as the month runs: half at the 15th, none at the 30th. That unearned balance is deferred revenue, a liability on the balance sheet.",
+    "why": "",
+    "hint_stuck": "pulse range C56:C57 · The days left in the month over the days in it."
+   },
+   {
+    "lesson_id": "accrual-and-cash",
+    "goal_index": "2",
+    "text": "One member who paid on the 20th: in C58, =C23*(C25-10)/C25, two thirds of the fee still unearned on the 30th.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C58 · From the 20th to the 30th is ten days earned, twenty still owed."
+   },
+   {
+    "lesson_id": "accrual-and-cash",
+    "goal_index": "3",
+    "text": "Payables at September 30 in C59: the month’s chemicals, unpaid until October, =-C34.",
+    "teach": "September’s chemicals are a cost in September and cash in October, so at the month end the whole bill is a payable. Chemicals count as used on delivery, so there is no inventory line. A year of insurance paid ahead is a prepaid asset, the mirror of deferred revenue, and wages worked but not yet paid are an accrued liability, the payable’s twin; neither has a row here.",
+    "why": "",
+    "hint_stuck": "pulse cell C59 · Cost of sales is a negative in C34; the payable is the same bill as a positive balance."
+   },
+   {
+    "lesson_id": "accrual-and-cash",
+    "goal_index": "4",
+    "text": "Receivables at September 30 in C60: three days of card revenue, =C33/C25*C24.",
+    "teach": "Card sales land in the bank three days later, so the last three days of the month are revenue booked and cash not yet in: a receivable, an asset.",
+    "why": "",
+    "hint_stuck": "pulse cell C60 · A day of revenue is C33 over the days in C25."
+   },
+   {
+    "lesson_id": "accrual-and-cash",
+    "goal_index": "5",
+    "text": "Cash from operations by hand in C61: =C52-C47+(C59-C27)-(C60-C28)+C57, net income adjusted for every gap.",
+    "teach": "Cash from operations starts at net income, adds back depreciation because no cash left for it, then adjusts for the gaps: a rise in a liability is cash kept, a rise in an asset is cash not yet in. Best practice: it is the change in a balance that moves cash, never the balance itself.",
+    "why": "",
+    "hint_stuck": "pulse cell C61 · Opening payables are C27 and opening receivables C28; deferred revenue opened at nil."
+   },
+   {
+    "lesson_id": "accrual-and-cash",
+    "goal_index": "6",
+    "text": "Does it tie? Watch August’s unpaid bill in C27 go to nil: September pays nothing for it, and cash from operations rises by $10,800.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C61 · A payable that is paid is cash out; one that never existed is not."
+   }
   ]
  },
  "modules": {
@@ -11883,6 +12031,13 @@ export const COPY = {
    "objective": "Build the weekly report end to end, then prove it against the clock; or test out of the chapter.",
    "story_beat": "The diligence pack. || A fresh export, a question log with eight questions open, a case sheet with three columns and no switch wired. Answer the log, build the KPI page, wire the case and name what deserves it. Build it, then build it again on another cluster’s export against the clock. The assessment is the test-out.",
    "page_name": "The diligence pack"
+  },
+  "the-three-statements": {
+   "id": "the-three-statements",
+   "name": "The three statements",
+   "objective": "The income statement; accrual and cash; the cash flow statement; the balance sheet; how the three link; one week of one site through all three; reading a set the way a buyer does.",
+   "story_beat": "What the sites did, in three statements. || Before the model, the accounting. Every wash, chemical, paycheck, loan payment and tunnel bought shows up in one of three statements, and a buyer reads all three because each one hides what the others show. This module builds them for one site and one month by hand, so that when the model links them at forty sites and five years, you know what every line means.",
+   "page_name": ""
   }
  },
  "site": {

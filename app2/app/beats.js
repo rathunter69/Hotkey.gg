@@ -89,6 +89,11 @@ const BEATS_DEFAULT = {
     body: 'The pack is thirteen sheets now, and the case switch is read from all over it. A name turns Scenarios!$C$11 into Case, so a formula reads like English and a reviewer finds the switch by name. But a model with a hundred names is worse than one with none. Name the toggles and the key inputs, manage them, and let the picker read its list by name.' },
   'ch4-project-and-assessment': { eyebrow: 'Module 4.7 · project and assessment', title: 'The diligence pack.',
     body: 'A fresh export, a question log with eight questions open, a case sheet with three columns and no switch wired. Answer the log, build the KPI page, wire the case and name what deserves it. Build it, then build it again on another cluster’s export against the clock. The assessment is the test-out.' },
+  // Chapter 5 · Finance and Accounting (script-ch5.md story cards)
+  'the-three-statements': { eyebrow: 'Module 5.1 · the three statements', title: 'What the sites did, in three statements.',
+    body: 'Before the model, the accounting. Every wash, chemical, paycheck, loan payment and tunnel bought shows up in one of three statements, and a buyer reads all three because each one hides what the others show. This module builds them for one site and one month by hand, so that when the model links them at forty sites and five years, you know what every line means.' },
+  'model-setup': { eyebrow: 'Module 5.2 · model setup', title: 'Set the model up before you build it.',
+    body: 'Forty sites, eight years, six schedules and three statements is too much to hold in your head, so the model holds it for you, if it’s laid out in the order it calculates: inputs feed schedules, schedules feed statements, statements feed the DCF, left to right across the tabs. Set the sheets, the timeline and the checks up empty first, and every formula after has a place to go.' },
   'project-and-assessment': { eyebrow: 'Module 1.8 · project, assessment, test-out', title: 'Management’s next feed is in.',
     body: 'A fresh week, a blank Report, and everything the chapter taught. Build the page start to finish, then prove it against the clock on Monday morning; or test out of the chapter in five minutes.' },
 };
