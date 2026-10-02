@@ -80,9 +80,9 @@ export const COPY = {
    "module": "move-and-select",
    "order": "1.2.1",
    "title": "Jump, don’t scroll",
-   "brief": "The CFO has five questions about the feed, and every answer is a cell. Ctrl and an arrow key jumps to the edge of the data, and it stops at a gap, which is how you find a missing figure in a sixty-row feed without reading it. Ctrl+End goes to the last used cell on the sheet, Home snaps to column A, and Page Down moves a screen at a time when you want to read rather than reach. Nobody who does this for a living scrolls. The key is `Ctrl+↓`.",
-   "closing": "Ctrl and an arrow goes to the edge of the data and stops at a gap; Ctrl+End finds the bottom of everything; Home and Ctrl+Home bring you back. Those keys answer most questions about a feed before anyone opens it properly. || The missing wash costs in column F are the first thing you’ll fix in module 1.3.",
-   "wow": "Five questions answered, and you never scrolled once.",
+   "brief": "The CFO has six questions about the feed, and every answer is a cell. Ctrl and an arrow key jumps to the edge of the data, and it stops at a gap, which is how you find a missing figure in a sixty-row feed without reading it. Ctrl+End goes to the last used cell on the sheet, Home snaps to column A, and Page Down moves a screen at a time when you want to read rather than reach. Nobody who does this for a living scrolls. The key is `Ctrl+↓`.",
+   "closing": "Ctrl and an arrow goes to the edge of the data and stops at a gap; Ctrl+End finds the bottom of everything; Home and Ctrl+Home bring you back. Those keys answer most questions about a feed before anyone opens it properly. || The feed runs sixty rows over twelve days and six columns, the wash costs stop at F11, Airport never sent its Saturday, a note sits under the feed, and South Lamar pays $1,650 a week in rent. The missing figures are the first thing you’ll fix in module 1.3.",
+   "wow": "Six questions answered, and you never scrolled once.",
    "convention_line": "Jump, never scroll: the mouse is for reviewing, not building.",
    "mac_note": "",
    "story_beat": ""
@@ -128,8 +128,8 @@ export const COPY = {
    "module": "move-and-select",
    "order": "1.2.C",
    "title": "Challenge: find and mark",
-   "brief": "A fresh feed from another cluster, and Revenue is now a formula, with stray typed numbers hiding in it. Jump the feed, select it, then find every typed number in the Revenue column and mark it blue.",
-   "closing": "You jumped the feed, selected it, and found and marked every typed number in it. The whole audit in five moves. || Every feed that lands from here on gets the same five, and the typed numbers hiding in a formula column are the ones a reviewer would have found first.",
+   "brief": "A fresh feed from another cluster came through untidy, and Revenue is now a formula with stray typed numbers hiding in it. Select each part of the feed and fix it as you go, then mark every typed number in the Revenue column blue.",
+   "closing": "You tidied the feed one selection at a time and marked every typed number in it. The whole audit in four moves. || Every feed that lands from here on gets the same four, and the typed numbers hiding in a formula column are the ones a reviewer would have found first.",
    "wow": "",
    "convention_line": "",
    "mac_note": "",
@@ -993,23 +993,15 @@ export const COPY = {
    {
     "lesson_id": "jump-dont-scroll",
     "goal_index": "5",
-    "text": "Skim the feed a screen at a time: one PgUp, one PgDn.",
-    "teach": "PgDn and PgUp move a screen at a time, for reading through, not for reaching a cell. On a Mac that’s fn+↓ and fn+↑.",
+    "text": "\"Is Airport’s week all in?\" takes PgUp to read the screen above the notes, where row 61 has a date and no figures, then PgDn back.",
+    "teach": "PgDn and PgUp move a screen at a time, for reading through, not for reaching a cell. Row 61 is Airport’s Saturday, and the empty cells beside its date are a day the site never sent. On a Mac the keys are fn+↓ and fn+↑.",
     "why": "",
-    "hint_stuck": "pulse the PgDn keycap · One press each; the goal counts once both have been pressed."
+    "hint_stuck": "pulse the PgUp keycap · One press each; the goal counts once both have been pressed."
    },
    {
     "lesson_id": "jump-dont-scroll",
     "goal_index": "6",
-    "text": "Back to the top for the next job: Ctrl+Home.",
-    "teach": "Ctrl+Home from anywhere. The answer sheet: sixty days, six columns, missing wash costs starting at F12, a note at A64.",
-    "why": "",
-    "hint_stuck": "pulse cell A1 · Ctrl+Home lands on A1 from anywhere on the sheet."
-   },
-   {
-    "lesson_id": "jump-dont-scroll",
-    "goal_index": "7",
-    "text": "For a cell you can name, press Ctrl+G, type Costs!B7 and Enter, and you land on South Lamar’s rent figure two sheets away.",
+    "text": "\"What does South Lamar pay in rent?\" is two sheets away: press Ctrl+G, type Costs!B7 and Enter, and read 1650.",
     "teach": "Ctrl+G opens Go To: a cell address, or Sheet!Cell for another sheet, and Enter lands you on it. You won’t use it often (the arrows are faster for anything nearby), but for a far cell you can name, it’s one press. The Name Box does the same with the mouse.",
     "why": "",
     "hint_stuck": "pulse the Go To box · Sheet name, exclamation mark, cell: Costs!B7."
@@ -1161,7 +1153,7 @@ export const COPY = {
    {
     "lesson_id": "challenge-find-and-mark",
     "goal_index": "0",
-    "text": "Land on the feed’s last date in one jump from the top of Raw.",
+    "text": "On Raw, select the figure headers C1:F1 and right-align them over their numbers.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -1169,7 +1161,7 @@ export const COPY = {
    {
     "lesson_id": "challenge-find-and-mark",
     "goal_index": "1",
-    "text": "Back to the top, then along the headers to the last column, F1.",
+    "text": "Select the whole header row and give it some air: row 1 at height 20.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -1177,7 +1169,7 @@ export const COPY = {
    {
     "lesson_id": "challenge-find-and-mark",
     "goal_index": "2",
-    "text": "Select everything used on the sheet from A1 in one stroke.",
+    "text": "This cluster’s site names are cut off in column B: select the column and AutoFit it.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -1185,15 +1177,7 @@ export const COPY = {
    {
     "lesson_id": "challenge-find-and-mark",
     "goal_index": "3",
-    "text": "Select the Revenue figures E2:E60, edge to edge.",
-    "teach": "",
-    "why": "",
-    "hint_stuck": ""
-   },
-   {
-    "lesson_id": "challenge-find-and-mark",
-    "goal_index": "4",
-    "text": "Open Go To Special, pick Constants, then color every typed number in the block blue.",
+    "text": "Select the Revenue figures E2:E60 edge to edge, pick out the constants with Go To Special and color them blue.",
     "teach": "",
     "why": "",
     "hint_stuck": ""

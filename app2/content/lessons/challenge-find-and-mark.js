@@ -1,16 +1,22 @@
 // Chapter 1 · 1.2.C — Challenge: find and mark (seeded over S2a)
-// A fresh feed from another cluster where Revenue is a formula column carrying stray typed numbers:
-// reach the named cells by keyboard, make the selections, and mark every constant in the block blue
-// through Go To Special. Seeds vary the site names, figures and stray positions, never the workload.
-// The learner-facing words live in content/copy/*.csv.
+// A fresh feed from another cluster where Revenue is a formula column carrying stray typed numbers,
+// and the feed's layout came through untidy. Every selection does a job (payoff pass, 2026-10-02):
+// the figure headers right-aligned, the header row given air, the site column fitted to this
+// cluster's names, and every constant in the Revenue block marked blue through Go To Special. Seeds
+// vary the site names, figures and stray positions, never the workload. The learner-facing words
+// live in content/copy/*.csv.
 import { pickCluster, siteNames } from '../workbooks/clusters.js';
-import { SITES, rawRow } from '../workbooks/clearcoat-weekly.js';
+import { SITES, rawRow, stateOf } from '../workbooks/clearcoat-weekly.js';
 import { roleColour } from '../../app/graders.js';
 
-const at = (sheet, ref) => !sheet.sel && sheet.selectionText() === ref;
 const windowKeys = ses => ses.keyLog.slice(ses.goalMark || 0).map(e => e.k);
 const onSheet = (ses, name) => ses.sheets[ses.sheetIndex] && ses.sheets[ses.sheetIndex].name === name;
 const raw = ses => { const e = ses.sheets.find(x => x.name === 'Raw'); return e ? e.sheet : null; };
+const S2A_RAW = stateOf('S2a').sheets.find(s => s.name === 'Raw');
+const HEADERS = { C1: 'Washes', D1: 'Avg ticket ($)', E1: 'Revenue ($)', F1: 'Wash cost ($)' };
+const ROW1 = S2A_RAW.rowH[1];
+const headersRight = sh => Object.keys(HEADERS).every(r => sh.cellAt(r).align === 'r');
+const siteColFits = sh => !!sh.colSet[2] && sh.colW[2] >= sh.neededWidth(2);
 
 export default {
   id: 'challenge-find-and-mark',
@@ -26,7 +32,7 @@ export default {
   access: 'free',
   minutes: 3,
   prerequisites: ['typed-vs-calculated'],
-  brief: 'A fresh feed from another cluster, and Revenue is now a formula, with stray typed numbers hiding in it. Jump the feed, select it, then find every typed number in the Revenue column and mark it blue.',
+  brief: 'A fresh feed from another cluster came through untidy, and Revenue is now a formula with stray typed numbers hiding in it. Select each part of the feed and fix it as you go, then mark every typed number in the Revenue column blue.',
   timeLimit: 160,
   pars: { pass: 90, pro: 55, legendary: 35 },
   seed: rng => {
@@ -43,22 +49,27 @@ export default {
         : { formula: `=C${r}*D${r}` };
     }
     patch['Raw!C33'] = { value: 240 };   // the washes typed as text would poison =C33*D33; the seed feeds them clean
+    // the export's layout, the same on every seed: headers left over their numbers, row 1 at the
+    // default height, the site column too narrow for any cluster's names
+    for (const [ref, value] of Object.entries(HEADERS)) patch['Raw!' + ref] = { value, bold: true };
+    const rowH = { ...S2A_RAW.rowH }; delete rowH[1];
+    patch['Raw!#rowH'] = rowH;
+    patch['Raw!#colW'] = { ...S2A_RAW.colW, 2: 40 };
     return patch;
   },
   goals: [
-    { id: 'last-row', text: 'Land on the feed’s last date in one jump from the top of Raw.', keys: 'Ctrl+PgDn then Ctrl+↓',
-      check: (s, ses) => onSheet(ses, 'Raw') && at(s, 'A61') && windowKeys(ses).includes('Ctrl+↓') },
-    { id: 'headers', text: 'Back to the top, then along the headers to the last column, F1.', keys: 'Ctrl+Home Ctrl+→',
-      check: (s, ses) => at(s, 'F1') && windowKeys(ses).includes('Ctrl+→') },
-    { id: 'all-used', text: 'Select everything used on the sheet from A1 in one stroke.', keys: 'Ctrl+Home Ctrl+Shift+End',
-      check: (s, ses) => s.selectionText() === 'A1:N68' && windowKeys(ses).includes('Ctrl+Shift+End') },
-    { id: 'revenue-block', text: 'Select the Revenue figures E2:E60, edge to edge.', keys: 'Ctrl+Home Ctrl+→ ← ↓ then Ctrl+Shift+↓',
-      check: (s, ses) => s.selectionText() === 'E2:E60' && windowKeys(ses).includes('Ctrl+Shift+↓') },
-    { id: 'mark-strays', text: 'Open Go To Special, pick Constants, then color every typed number in the block blue.', keys: 'Alt H F D S O ↵ then Alt H F C → ×4 ↵',
-      check: (s, ses) => { const sh = raw(ses); return !!sh && roleColour(sh, 'E2:E60').ok; } },
+    { id: 'headers', text: 'On Raw, select the figure headers C1:F1 and right-align them over their numbers.', keys: 'Ctrl+PgDn → → Shift+→ ×3 then Alt H A R',
+      check: (s, ses) => { const sh = raw(ses); return !!sh && onSheet(ses, 'Raw') && headersRight(sh); } },
+    { id: 'header-row', text: 'Select the whole header row and give it some air: row 1 at height 20.', keys: 'Ctrl+Home Shift+Space then Alt H O H "20" ↵',
+      check: (s, ses) => { const sh = raw(ses); return !!sh && sh.rowH[1] === ROW1; } },
+    { id: 'site-col', text: 'This cluster’s site names are cut off in column B: select the column and AutoFit it.', keys: '→ Ctrl+Space then Alt H O I',
+      check: (s, ses) => { const sh = raw(ses); return !!sh && siteColFits(sh); } },
+    { id: 'mark-strays', text: 'Select the Revenue figures E2:E60 edge to edge, pick out the constants with Go To Special and color them blue.', keys: 'Ctrl+Home Ctrl+→ ← ↓ Ctrl+Shift+↓ then Alt H F D S O ↵ then Alt H F C → ×4 ↵',
+      check: (s, ses) => { const sh = raw(ses); return !!sh && windowKeys(ses).length > 0 && roleColour(sh, 'E2:E60').ok; } },
   ],
   graders: [
     ses => { const sh = raw(ses); return sh ? roleColour(sh, 'E2:E60') : { ok: false, why: 'There is no Raw sheet.' }; },
+    ses => { const sh = raw(ses); return sh && headersRight(sh) ? { ok: true } : { ok: false, why: 'The figure headers in C1:F1 sit left over numbers that sit right.' }; },
   ],
-  solution: 'Ctrl+PgDn Ctrl+Down Ctrl+Home Ctrl+Right Ctrl+Home Ctrl+Shift+End Ctrl+Home Ctrl+Right Left Down Ctrl+Shift+Down Alt H F D S O Enter Alt H F C Right Right Right Right Enter',
+  solution: 'Ctrl+PgDn Right Right Shift+Right Shift+Right Shift+Right Alt H A R Ctrl+Home Shift+Space Alt H O H "20" Enter Right Ctrl+Space Alt H O I Ctrl+Home Ctrl+Right Left Down Ctrl+Shift+Down Alt H F D S O Enter Alt H F C Right Right Right Right Enter',
 };
