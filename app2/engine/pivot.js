@@ -1,11 +1,13 @@
 // app2/engine/pivot.js — a minimal PivotTable (Insert › PivotTable, Alt N V T): one row field, an
 // optional column field and one value field summarised by Sum, Count or Average, laid out as
-// Excel's compact form with grand totals. Pure: the Session (tools.js) builds and refreshes a
+// Excel's compact form with grand totals, and Show Values As % of Column Total. Pure: the Session (tools.js) builds and refreshes a
 // pivot on a sheet; GETPIVOTDATA (formula.js, through the sheet's evalCtx) finds the cell a
 // data field and its item pairs name.
 import { refKey } from './refs.js';
 
 export const PIVOT_FNS = [['sum', 'Sum'], ['count', 'Count'], ['average', 'Average']];
+/** Show Values As: No Calculation, or each figure as a share of its column's grand total (Excel's % of Column Total). */
+export const PIVOT_SHOW = [['none', 'No Calculation'], ['pctCol', '% of Column Total']];
 const itemText = v => v === null || v === undefined || v === '' ? '(blank)' : typeof v === 'boolean' ? (v ? 'TRUE' : 'FALSE') : String(v);
 const sortItems = vals => [...new Set(vals)].sort((a, b) => {
   const na = typeof a === 'number', nb = typeof b === 'number';
@@ -32,26 +34,30 @@ export function pivotCache(table, spec) {
     if (spec.fn === 'average') return nums.length ? nums.reduce((a, b) => a + b, 0) / nums.length : '#DIV/0!';
     return nums.reduce((a, b) => a + b, 0);
   };
-  const cell = (r, c) => agg(x => (r < 0 || key(x[ri]) === rowItems[r]) && (c < 0 || ci < 0 || key(x[ci]) === colItems[c]));
+  const raw = (r, c) => agg(x => (r < 0 || key(x[ri]) === rowItems[r]) && (c < 0 || ci < 0 || key(x[ci]) === colItems[c]));
+  // % of Column Total: every figure over its column's grand total (the grand total column over the grand total)
+  const pct = spec.show === 'pctCol';
+  const cell = pct ? (r, c) => { const v = raw(r, c), t = raw(-1, c); return typeof v !== 'number' || typeof t !== 'number' ? v : t === 0 ? '#DIV/0!' : v / t; } : raw;
   const anyRow = (r, c) => body.some(x => (r < 0 || key(x[ri]) === rowItems[r]) && (c < 0 || ci < 0 || key(x[ci]) === colItems[c]));
-  return { rowItems, colItems, cell, anyRow, valueHead: (PIVOT_FNS.find(f => f[0] === spec.fn) || PIVOT_FNS[0])[1] + ' of ' + heads[vi] };
+  return { rowItems, colItems, cell, anyRow, pct, valueHead: (PIVOT_FNS.find(f => f[0] === spec.fn) || PIVOT_FNS[0])[1] + ' of ' + heads[vi] };
 }
 
-/** The pivot's cells in compact form at (r0, c0): { 'A3': value, … } and its extent. */
+/** The pivot's cells in compact form at (r0, c0): { 'A3': value, … }, its extent, and which cells hold figures (`data`) and which items (`rowKeys`, `colKeys`). */
 export function pivotLayout(cache, at) {
-  const out = {}; const put = (r, c, v) => { out[refKey(r, c)] = v; };
+  const out = {}; const data = [], rowKeys = [], colKeys = [];
+  const put = (r, c, v, role) => { const k = refKey(r, c); out[k] = v; if (role === 'd') data.push(k); else if (role === 'r') rowKeys.push(k); else if (role === 'c') colKeys.push(k); };
   const { r: r0, c: c0 } = at; const R = cache.rowItems, C = cache.colItems;
   if (!C) {
     put(r0, c0, 'Row Labels'); put(r0, c0 + 1, cache.valueHead);
-    R.forEach((it, i) => { put(r0 + 1 + i, c0, it); put(r0 + 1 + i, c0 + 1, cache.cell(i, -1)); });
-    put(r0 + 1 + R.length, c0, 'Grand Total'); put(r0 + 1 + R.length, c0 + 1, cache.cell(-1, -1));
-    return { cells: out, r1: r0, c1: c0, r2: r0 + 1 + R.length, c2: c0 + 1 };
+    R.forEach((it, i) => { put(r0 + 1 + i, c0, it, 'r'); put(r0 + 1 + i, c0 + 1, cache.cell(i, -1), 'd'); });
+    put(r0 + 1 + R.length, c0, 'Grand Total'); put(r0 + 1 + R.length, c0 + 1, cache.cell(-1, -1), 'd');
+    return { cells: out, data, rowKeys, colKeys, r1: r0, c1: c0, r2: r0 + 1 + R.length, c2: c0 + 1 };
   }
   put(r0, c0, cache.valueHead); put(r0, c0 + 1, 'Column Labels'); put(r0 + 1, c0, 'Row Labels');
-  C.forEach((it, j) => put(r0 + 1, c0 + 1 + j, it)); put(r0 + 1, c0 + 1 + C.length, 'Grand Total');
-  R.forEach((it, i) => { put(r0 + 2 + i, c0, it); C.forEach((cj, j) => put(r0 + 2 + i, c0 + 1 + j, cache.anyRow(i, j) ? cache.cell(i, j) : null)); put(r0 + 2 + i, c0 + 1 + C.length, cache.cell(i, -1)); });
-  put(r0 + 2 + R.length, c0, 'Grand Total'); C.forEach((cj, j) => put(r0 + 2 + R.length, c0 + 1 + j, cache.cell(-1, j))); put(r0 + 2 + R.length, c0 + 1 + C.length, cache.cell(-1, -1));
-  return { cells: out, r1: r0, c1: c0, r2: r0 + 2 + R.length, c2: c0 + 1 + C.length };
+  C.forEach((it, j) => put(r0 + 1, c0 + 1 + j, it, 'c')); put(r0 + 1, c0 + 1 + C.length, 'Grand Total');
+  R.forEach((it, i) => { put(r0 + 2 + i, c0, it, 'r'); C.forEach((cj, j) => put(r0 + 2 + i, c0 + 1 + j, cache.anyRow(i, j) ? cache.cell(i, j) : null, 'd')); put(r0 + 2 + i, c0 + 1 + C.length, cache.cell(i, -1), 'd'); });
+  put(r0 + 2 + R.length, c0, 'Grand Total'); C.forEach((cj, j) => put(r0 + 2 + R.length, c0 + 1 + j, cache.cell(-1, j), 'd')); put(r0 + 2 + R.length, c0 + 1 + C.length, cache.cell(-1, -1), 'd');
+  return { cells: out, data, rowKeys, colKeys, r1: r0, c1: c0, r2: r0 + 2 + R.length, c2: c0 + 1 + C.length };
 }
 
 /**

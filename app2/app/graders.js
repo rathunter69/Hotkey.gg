@@ -25,7 +25,8 @@ function* eachRef(range) {
 }
 const cellName = ref => ref;   // the voice names cells by their address
 
-const isNumCell = cell => cell && cell.formula == null && typeof cell.value === 'number';
+// a Data Table's result cell ({=TABLE()}) is the table's calculation, not a typed input
+const isNumCell = cell => cell && cell.formula == null && !cell.table && typeof cell.value === 'number';
 const isFormulaCell = cell => cell && typeof cell.formula === 'string' && cell.formula.length > 0;
 const isBlank = cell => !cell || (cell.value == null && cell.formula == null);
 

@@ -22,7 +22,10 @@
 //   Data Table            Alt A W T: Row input cell, Column input cell; {=TABLE()} cells; the
 //                         calculation option Automatic except for data tables (Alt M X E) and F9
 //   PivotTable            Alt N V T: a minimal pivot (one row field, one column field, one value
-//                         field with Sum / Count / Average), Refresh (Alt+F5) and GETPIVOTDATA
+//                         field with Sum / Count / Average), Refresh (Alt+F5) and GETPIVOTDATA;
+//                         on a pivot cell the shortcut menu (Shift+F10) has Refresh (R), Show
+//                         Values As (A, then C for % of Column Total, N for No Calculation) and
+//                         Show Field List (D)
 
 import { Sheet, CELL_STYLES } from './sheet.js';
 import { tokenize, evalFormula, formulaRefs, evaluateStepper, valueText, translateFormula, isErrVal, textToNumber, dateTextValue, parses } from './formula.js';
@@ -701,9 +704,22 @@ const methods = {
     return this.goToRef((/^[A-Za-z_][A-Za-z0-9_.]*$/.test(link.sheet) ? link.sheet : "'" + link.sheet.replace(/'/g, "''") + "'") + '!' + link.ref);
   },
   /** Shift+F10 (or the Menu key): the cell's shortcut menu. Its Hyperlink items are what the engine acts on: Open Hyperlink (O), Edit Hyperlink (H), Remove Hyperlink (R); Esc closes. */
-  openContextMenu() { this.startClock(); this.openDialog('ctxmenu', []); this.dlg = { kind: 'ctxmenu' }; },
+  openContextMenu() { this.startClock(); this.openDialog('ctxmenu', []); this.dlg = { kind: 'ctxmenu', sub: null }; },
   contextMenuKey(key) {
     const K = key.toUpperCase(); const S = this.sheet; const a = S.dispActive(); const has = !!this.linkOf(a.r, a.c);
+    // on a PivotTable: Refresh, Show Values As (a submenu: % of Column Total, No Calculation), Show Field List
+    const pv = this.pivotAtActive();
+    if (pv) {
+      const d = this.dlg;
+      if (d.sub === 'show') {
+        const show = K === 'C' ? 'pctCol' : K === 'N' ? null : undefined;
+        if (show === undefined) { if (key === 'Enter') this.exitRibbon(false); return; }
+        this.exitRibbon(false); if (show) pv.pivot.spec.show = show; else delete pv.pivot.spec.show; this.refreshPivot(pv.sheet, pv.pivot); return;
+      }
+      if (K === 'R') { this.exitRibbon(false); this.refreshPivot(pv.sheet, pv.pivot); return; }
+      if (K === 'A' && pv.pivot.spec.value) { d.sub = 'show'; return; }
+      if (K === 'D') { this.exitRibbon(false); this.openPivotFields(pv); return; }
+    }
     if (K === 'O' && has) { this.exitRibbon(false); this.followLink(a.r, a.c); return; }
     if (K === 'H') { this.exitRibbon(false); this.openHyperlink(); return; }
     if (K === 'R' && S.get(a.r, a.c).link) { this.exitRibbon(false); S.pushUndo(); const c = S.ensure(a.r, a.c); delete c.link; c.uline = false; c.fontColor = null; S.commit('format'); return; }
@@ -963,10 +979,11 @@ const methods = {
     const pv = this.findPivot(d.pivot); if (!pv) { this.exitRibbon(false); return; }
     if (key === 'Enter') { this.exitRibbon(false); return; }
     if (key === 'ArrowDown') { d.idx = Math.min(d.fields.length - 1, d.idx + 1); return; } if (key === 'ArrowUp') { d.idx = Math.max(0, d.idx - 1); return; }
+    if (key === 'Home') { d.idx = 0; return; } if (key === 'End') { d.idx = d.fields.length - 1; return; }   // the list's first and last field
     const f = d.fields[d.idx]; const K = key.length === 1 ? key.toUpperCase() : key; const sp = pv.pivot.spec;
     const take = () => { for (const k of ['row', 'col', 'value']) if (sp[k] === f) sp[k] = null; };
     if (K === 'R') { take(); sp.row = f; } else if (K === 'C') { take(); sp.col = f; }
-    else if (K === 'V') { take(); sp.value = f; sp.fn = this.pivotColumnNumeric(pv.pivot, f) ? 'sum' : 'count'; }
+    else if (K === 'V') { take(); sp.value = f; sp.fn = this.pivotColumnNumeric(pv.pivot, f) ? 'sum' : 'count'; delete sp.show; }   // a new value field starts at No Calculation
     else if (K === 'S') { const i = PIVOT_FNS.findIndex(x => x[0] === sp.fn); sp.fn = PIVOT_FNS[(i + 1) % PIVOT_FNS.length][0]; }
     else if (key === 'Delete' || key === 'Backspace') take();
     else return;
@@ -977,6 +994,14 @@ const methods = {
     let t = String(text || '').trim().replace(/^=/, ''); let sheet = this.sheet; const bang = t.lastIndexOf('!');
     if (bang > 0) { const sn = t.slice(0, bang).replace(/^'|'$/g, '').replace(/''/g, "'"); const e = this.sheets.find(x => x.name.toLowerCase() === sn.toLowerCase()); if (!e) return null; sheet = e.sheet; t = t.slice(bang + 1); }
     const rg = parseRange(t.replace(/\$/g, '').toUpperCase()); return rg ? { sheet, ...rg } : null;
+  },
+  /** The pivot whose block holds the active cell: { sheet, pivot } or null. */
+  pivotAtActive() { const S = this.sheet; const a = S.dispActive(); const p = (S.pivots || []).find(x => a.r >= x.r1 && a.r <= x.r2 && a.c >= x.c1 && a.c <= x.c2); return p ? { sheet: S, pivot: p } : null; },
+  /** Show Field List: the field list of an existing pivot, open again on its first field. */
+  openPivotFields(found) {
+    const p = found.pivot; const src = this.toolRange("'" + p.source.sheet.replace(/'/g, "''") + "'!" + p.source.range); if (!src) return false;
+    const heads = []; for (let c = src.c1; c <= src.c2; c++) heads.push(dispText(src.sheet.get(src.r1, c)));
+    this.openDialog('pivot', []); this.dlg = { kind: 'pivot', step: 'fields', pivot: p.id, fields: heads, idx: 0 }; return true;
   },
   findPivot(id) { for (const e of this.sheets) for (const p of (e.sheet.pivots || [])) if (p.id === id) return { sheet: e.sheet, pivot: p }; return null; },
   pivotColumnNumeric(p, field) { const src = this.toolRange("'" + p.source.sheet.replace(/'/g, "''") + "'!" + p.source.range); if (!src) return false; for (let c = src.c1; c <= src.c2; c++) if (dispText(src.sheet.get(src.r1, c)).toLowerCase() === String(field).toLowerCase()) { for (let r = src.r1 + 1; r <= src.r2; r++) { const v = src.sheet.get(r, c).value; if (v !== null && v !== '') return typeof v === 'number'; } } return false; },
@@ -990,6 +1015,10 @@ const methods = {
     if (!cache) { Object.assign(p, { r1: p.at.r, c1: p.at.c, r2: p.at.r, c2: p.at.c, rowItems: null, colItems: null, valueHead: null }); T.commit('edit'); return true; }
     const lay = pivotLayout(cache, p.at);
     for (const k in lay.cells) { const pp = parseRef(k); const cell = T.ensure(pp.r, pp.c); cell.formula = null; cell.value = lay.cells[k]; cell.txt = false; cell.pivot = p.id; }
+    // an item that is a number (a date) wears its source column's number format, as Excel's items do; a share wears a percentage
+    const srcFmt = field => { for (let c = src.c1; c <= src.c2; c++) if (dispText(src.sheet.get(src.r1, c)).toLowerCase() === String(field || '').toLowerCase()) { const x = src.sheet.get(src.r1 + 1, c); return x.fmtStyle && x.fmtStyle !== 'general' ? { fmtStyle: x.fmtStyle, numFmt: x.numFmt || null, decimals: x.decimals || 0 } : null; } return null; };
+    for (const [keys, field] of [[lay.rowKeys, p.spec.row], [lay.colKeys, p.spec.col]]) { const f = srcFmt(field); if (f) for (const k of keys) if (typeof lay.cells[k] === 'number') { const pp = parseRef(k); Object.assign(T.ensure(pp.r, pp.c), f); } }
+    if (cache.pct) for (const k of lay.data) { const pp = parseRef(k); Object.assign(T.ensure(pp.r, pp.c), { fmtStyle: 'percent', decimals: 2 }); }
     Object.assign(p, { r1: lay.r1, c1: lay.c1, r2: lay.r2, c2: lay.c2, rowItems: cache.rowItems, colItems: cache.colItems, valueHead: cache.valueHead });
     T.commit('edit'); return true;
   },

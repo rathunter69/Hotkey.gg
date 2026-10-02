@@ -15,7 +15,11 @@
 // clothing on the same shape.
 import { mulberry32 } from '../../engine/rng.js';
 import { dateToSerial } from '../../engine/format.js';
-import { buildPage, FMT } from './page.js';
+import { buildPage, FMT, formatOf } from './page.js';
+import { Sheet } from '../../engine/sheet.js';
+import { pivotCache, pivotLayout } from '../../engine/pivot.js';
+import { refKey, parseRef } from '../../engine/refs.js';
+import { diffStates as diffCells, sessionToState as sessionCells } from './clearcoat-weekly.js';
 
 export const CHAPTER = 4;
 export const UNITS = 'USD unless stated; costs shown as negatives';
@@ -365,13 +369,15 @@ function scenariosPage(ex) {
         { key: 'ebitda', label: 'EBITDA', total: true, final: true, fill: C_((r, at) => `=C${at('contrib')}+C${at('ho')}`) },
         { key: 'margin', label: 'EBITDA margin', kind: 'pct', fill: C_((r, at) => `=C${at('ebitda')}/C${at('revenue')}`) },
       ] },
+      // the sensitivities are real Data Tables (Alt A W T): the edge typed, the output linked in the
+      // corner column C, the results {=TABLE()} in D:H (tablesOn below writes them)
       { title: 'EBITDA by ticket', rows: [
-        { key: 'tkVals', label: 'Ticket ($)', kind: 'unit', dollar: true, values: [12, 13, 14, 15, 16] },
-        { key: 'tkEbitda', label: 'EBITDA', dollar: true, fill: (c, r, at) => `=$C$${at('washesYr')}*(${c}${at('tkVals')}-Inputs!$C$5-(1-$G$${at('share')})*Inputs!$C$7)+$C$${at('siteCosts')}+$C$${at('ho')}` },
+        { key: 'tkVals', label: 'Ticket ($)', kind: 'unit', dollar: true, values: [null, ...TICKETS] },
+        { key: 'tkEbitda', label: 'EBITDA', dollar: true, fill: (c, r, at) => c === 'C' ? `=C${at('ebitda')}` : null },
       ] },
       { title: 'EBITDA by ticket and member share', rows: [
-        { key: 'twVals', label: 'Ticket ($)', kind: 'unit', dollar: true, values: [12, 13, 14, 15, 16] },
-        ...[0.4, 0.45, 0.5, 0.55, 0.6].map((sh, i) => ({ key: 'tw' + i, label: sh, dollar: i === 0, fill: (c, r, at) => `=$C$${at('washesYr')}*(${c}$${at('twVals')}-Inputs!$C$5-(1-$B${r})*Inputs!$C$7)+$C$${at('siteCosts')}+$C$${at('ho')}` })),
+        { key: 'twVals', label: 'Member share down, ticket across ($)', kind: 'unit', dollar: true, fill: (c, r, at) => c === 'C' ? `=C${at('ebitda')}` : 'DEFGH'.includes(c) ? TICKETS['DEFGH'.indexOf(c)] : null },
+        ...SHARES.map((sh, i) => ({ key: 'tw' + i, label: null, kind: 'pct', values: [sh] })),
       ] },
       { title: 'Break-even washes a day', rows: [
         { key: 'beSite', label: 'Site code', kind: 'text', values: ['AUS-DOM'] },
@@ -383,17 +389,17 @@ function scenariosPage(ex) {
         { key: 'beGoalSeek', label: 'Break-even washes a day, per Goal Seek', kind: 'count', values: [BREAK_EVEN.goalSeek] },
       ] },
       { title: 'Cases side by side', rows: [
-        { key: 'coNum', label: 'Case number', kind: 'count', values: [1, 2, 3] },
-        { key: 'coName', label: 'Case', kind: 'text', fill: (c, r, at) => 'CDE'.includes(c) ? `=INDEX(Lists!$L$5:$L$7,${c}${at('coNum')})` : null },
-        { key: 'coWashes', label: 'Washes a year', kind: 'count', fill: (c, r, at) => 'CDE'.includes(c) ? `=INDEX($C$${at('sites')}:$E$${at('sites')},${c}$${at('coNum')})*INDEX($C$${at('washes')}:$E$${at('washes')},${c}$${at('coNum')})*Inputs!$C$10` : null },
-        { key: 'coRevenue', label: 'Revenue', dollar: true, fill: (c, r, at) => 'CDE'.includes(c) ? `=${c}${at('coWashes')}*$C$${at('ticketModel')}` : null },
-        { key: 'coContrib', label: 'Site contribution', fill: (c, r, at) => 'CDE'.includes(c) ? `=${c}${at('coWashes')}*($C$${at('ticketModel')}-Inputs!$C$5-(1-INDEX($C$${at('share')}:$E$${at('share')},${c}$${at('coNum')}))*Inputs!$C$7)-INDEX($C$${at('sites')}:$E$${at('sites')},${c}$${at('coNum')})*Inputs!$C$10*Inputs!$C$8` : null },
-        { key: 'coEbitda', label: 'EBITDA', total: true, final: true, fill: (c, r, at) => 'CDE'.includes(c) ? `=${c}${at('coContrib')}+$C$${at('ho')}` : null },
+        { key: 'coName', label: 'Case', kind: 'text', fill: (c, r, at) => 'DEF'.includes(c) ? `=INDEX(Lists!$L$5:$L$7,${c}${at('coNum')})` : null },
+        { key: 'coNum', label: 'Case number', kind: 'count', values: [null, 1, 2, 3] },
+        { key: 'coWashes', label: 'Washes a year', kind: 'count', dollar: false, fill: (c, r, at) => c === 'C' ? `=C${at('washesYr')}` : null },
+        { key: 'coRevenue', label: 'Revenue', dollar: true, fill: (c, r, at) => c === 'C' ? `=C${at('revenue')}` : null },
+        { key: 'coContrib', label: 'Site contribution', fill: (c, r, at) => c === 'C' ? `=C${at('contrib')}` : null },
+        { key: 'coEbitda', label: 'EBITDA', total: true, final: true, fill: (c, r, at) => c === 'C' ? `=C${at('ebitda')}` : null },
       ] },
     ],
     source: 'Source: the management case (Scenarios), Inputs, and the site list on Lists',
     checks: [
-      { label: 'Live case in the side-by-side table ties to EBITDA', formula: (c, r, at) => `=INDEX($C$${at('coEbitda')}:$E$${at('coEbitda')},Case)-C${at('ebitda')}` },
+      { label: 'Live case in the side-by-side table ties to EBITDA', formula: (c, r, at) => `=ROUND(INDEX($D$${at('coEbitda')}:$F$${at('coEbitda')},Case)-C${at('ebitda')},0)` },
       { label: 'Break-even by hand ties to Goal Seek', formula: (c, r, at) => `=ROUND(C${at('beHand')},0)-C${at('beGoalSeek')}` },
       { label: 'EBITDA margin within 0 to 100%', formula: (c, r, at) => `=IF(AND(C${at('margin')}>=0,C${at('margin')}<=1),0,1)` },
     ],
@@ -401,13 +407,51 @@ function scenariosPage(ex) {
   const c = page.sheet.cells, at = page.at;
   c.A1 = { formula: `=$C$${at.case}&" case: Clearcoat Express forecast, ${ex.year}"`, bold: true, fsz: c.A1.fsz };
   each(c, ['C' + at.case, 'C' + at.beSite], blue);
-  each(c, [0, 1, 2, 3, 4].map(i => 'B' + at['tw' + i]), x => { x.fontColor = 'blue'; x.fmtStyle = 'percent'; x.decimals = 1; x.it = true; });
+  // the one-way table's title says which case it ran on; the corner of the two-way table reads EBITDA like the one-way's
+  c['B' + (at.tkVals - 1)] = { formula: `="EBITDA by ticket, "&$C$${at.case}&" case"`, bold: true };
+  c['C' + at.twVals] = { formula: `=C${at.ebitda}`, ...formatOf('money', { dollar: true, dash: true }) };
+  // the base case in the two-way grid ($14, 50%) is marked bold
   page.sheet.colW[2] = 190;
   page.sheet.condFmt = [
     { id: 'cfCase', range: `C4:E${at.sites}`, kind: 'formula', formula: `=C$4=$C$${at.case}`, style: 'green' },
-    { id: 'cfDown', range: `C${at.tw0}:G${at.tw4}`, kind: 'formula', formula: `=C${at.tw0}<$E$${at.coEbitda}`, style: 'lightred' },
+    { id: 'cfDown', range: `D${at.tw0}:H${at.tw4}`, kind: 'formula', formula: `=D${at.tw0}<$C$${at.ebitda}`, style: 'lightred' },
   ];
+  tablesOn(page.sheet, scenariosMap(at), { ticket: 'C' + at.driver, share: 'G' + at.share, sw: 'C' + at.switch });
   return page;
+}
+/** The sensitivity edges: the tickets across and the member shares down (4.5.2, 4.5.3). */
+export const TICKETS = [12, 13, 14, 15, 16];
+export const SHARES = [0.4, 0.45, 0.5, 0.55, 0.6];
+/** The Data Tables on Scenarios as the engine keeps them (sheet.dataTables): the result block is everything right of and below the edges. */
+export function tableRecords(C, { ticket, share, sw }) {
+  const out = {};
+  if (ticket) out.oneWay = { r1: C.oneWay.vals, c1: 3, r2: C.oneWay.ebitda, c2: 8, row: ticket, col: null };
+  if (ticket && share) out.twoWay = { r1: C.twoWay.vals, c1: 3, r2: C.twoWay.rows[4], c2: 8, row: ticket, col: share };
+  if (sw) out.cases = { r1: C.cases.num, c1: 3, r2: C.cases.ebitda, c2: 6, row: sw, col: null };
+  return out;
+}
+/**
+ * Write Data Tables onto a Scenarios sheet record: the record in sheet.dataTables and every result
+ * cell as the engine leaves it ({=TABLE(row,col)}, its format, its value). The values come from the
+ * one-line model on the live case (Base); the engine recomputes them on the first change, and the
+ * chain test compares the tables by their records, not by these figures.
+ * `on`: which tables and their input cells, e.g. { ticket: 'C13', share: 'G7', sw: 'C11' }.
+ */
+export function tablesOn(sheet, C, on, live = caseOf(1)) {
+  const cells = sheet.cells; const recs = tableRecords(C, on);
+  const put = (r, c, v, fmt, t) => { const k = refKey(r, c); cells[k] = { ...fmt, value: v, table: '{=TABLE(' + (t.row || '') + ',' + (t.col || '') + ')}' }; };
+  const money = (dollar, extra) => ({ ...formatOf('money', { dollar, dash: true }), ...(extra || {}) });
+  if (recs.oneWay) TICKETS.forEach((t, j) => put(C.oneWay.ebitda, 4 + j, model({ ...live, ticket: t }).ebitda, money(true), recs.oneWay));
+  if (recs.twoWay) SHARES.forEach((sh, i) => TICKETS.forEach((t, j) => put(C.twoWay.rows[i], 4 + j, model({ ...live, ticket: t, share: sh }).ebitda, { ...money(i === 0), ...(i === 2 && j === 2 ? { bold: true } : {}) }, recs.twoWay)));
+  if (recs.cases) [0, 1, 2].forEach(k => { const m = model(caseOf(k)); [['washes', m.washesYr, formatOf('count', { dash: true })], ['revenue', m.revenue, money(true)], ['contrib', m.contrib, money(false)], ['ebitda', m.ebitda, money(true, { bold: true, bt: true, bdbl: true })]].forEach(([key, v, fmt]) => put(C.cases[key], 4 + k, v, fmt, recs.cases)); });
+  sheet.dataTables = Object.values(recs).map(t => ({ ...t }));
+  return sheet;
+}
+/** Take every Data Table and its result cells off a Scenarios sheet record (a start state before the lesson builds them). */
+export function tablesOff(sheet) {
+  for (const t of sheet.dataTables || []) for (let r = t.r1 + 1; r <= t.r2; r++) for (let c = t.c1 + 1; c <= t.c2; c++) delete sheet.cells[refKey(r, c)];
+  delete sheet.dataTables;
+  return sheet;
 }
 /** Where things sit on Scenarios, read from the built page. */
 function scenariosMap(at) {
@@ -415,7 +459,7 @@ function scenariosMap(at) {
     outputs: { title: at.washesYr - 1, washesYr: at.washesYr, revenue: at.revenue, cow: at.cow, retail: at.retail, siteCosts: at.siteCosts, contrib: at.contrib, ho: at.ho, ebitda: at.ebitda, margin: at.margin },
     oneWay: { title: at.tkVals - 1, vals: at.tkVals, ebitda: at.tkEbitda }, twoWay: { title: at.twVals - 1, vals: at.twVals, rows: [0, 1, 2, 3, 4].map(i => at['tw' + i]) },
     breakEven: { title: at.beSite - 1, site: at.beSite, costs: at.beCosts, cpw: at.beCpw, washes: at.beWashes, daily: at.beDaily, hand: at.beHand, goalSeek: at.beGoalSeek },
-    cases: { title: at.coNum - 1, num: at.coNum, name: at.coName, washes: at.coWashes, revenue: at.coRevenue, contrib: at.coContrib, ebitda: at.coEbitda },
+    cases: { title: at.coName - 1, num: at.coNum, name: at.coName, washes: at.coWashes, revenue: at.coRevenue, contrib: at.coContrib, ebitda: at.coEbitda },
     source: at.coEbitda + 1, checks: at.coEbitda + 3, checkRows: [1, 2, 3].map(i => at.coEbitda + 3 + i) };
 }
 /**
@@ -473,7 +517,7 @@ export const questions = (S, C) => [
   ['Sponsor B', 'What was the busiest single site-day, in washes?', 'Finance', 'Answered', `=Summary!J${S.totalRow}`, 'count'],
   ['Sponsor C', 'What was revenue per site per open hour in the last week, and which site led?', 'Finance', 'Answered', `=Summary!C${S.perHour.leader}&" at "&TEXT(Summary!D${S.perHour.leader},"$#,##0.00")&" an hour"`, 'text'],
   ['Sponsor C', 'What was retail revenue in the last seven days?', 'Finance', 'Answered', `=Summary!C${S.window.revenue}`, 'money'],
-  ['Sponsor A', 'What is EBITDA in the downside case?', 'Finance', 'Answered', `=Scenarios!E${C.cases.ebitda}`, 'money'],
+  ['Sponsor A', 'What is EBITDA in the downside case?', 'Finance', 'Answered', `=Scenarios!F${C.cases.ebitda}`, 'money'],
   ['Sponsor C', 'How many washes a day does a site need to break even?', 'Finance', 'Answered', `=Scenarios!C${C.breakEven.goalSeek}`, 'count'],
   ['Sponsor B', 'What is member churn by site?', 'Ops', 'Open', null, 'text'],
   ['Sponsor C', 'What is the rent per site under the current leases?', 'Ops', 'Open', null, 'text'],
@@ -815,14 +859,76 @@ const S436 = derive(S435, s => {
 const S43C = S436;
 
 /* ---------------- module 4.4: pivot tables ---------------- */
-// The states carry no pivot yet: the three lessons' states are the module's start. The engine builds one over the export (Alt N V T) that ties to the cube; the lessons decide where it lands.
-const S44 = S436, S441 = S436, S442 = S436, S443 = S436, S44C = S436;
+
+/** The sheet module 4.4 builds its pivot on: Alt N V T's new worksheet (in front of Export), renamed. */
+export const CUTS = 'Cuts';
+/** Export's values as the engine reads them (formulas worked out): rows 4 to 94, A to J, the table a pivot caches. */
+function exportTable(state) {
+  const X = new Sheet({ cells: clone(sheetOf(state, 'Export').cells) }); X.recalc();
+  const table = []; for (let r = 4; r <= EXPORT_LAST; r++) { const row = []; for (let c = 1; c <= 10; c++) row.push(X.get(r, c).value); table.push(row); }
+  return { table, X };
+}
+/**
+ * A pivot over Export!A4:J94 as the engine leaves it on a sheet record: the record in sheet.pivots
+ * and its cells (the values, an item's source format, a share as a percentage). `spec` is
+ * { row, col, value, fn, show } by header name; the pivot sits at A3, as Alt N V T puts it.
+ */
+export function pivotOn(rec, state, spec, id = 'PivotTable1') {
+  const { table, X } = exportTable(state); const at = { r: 3, c: 1 };
+  const cache = pivotCache(table, spec); if (!cache) throw new Error("pivotOn: " + JSON.stringify(table[0]) + JSON.stringify(spec)); const lay = pivotLayout(cache, at);
+  rec.cells = rec.cells || {};
+  for (const k in rec.cells) if (rec.cells[k].pivot === id) delete rec.cells[k];
+  for (const k in lay.cells) if (lay.cells[k] !== null) rec.cells[k] = { value: lay.cells[k], pivot: id };
+  const srcFmt = field => { const c = table[0].findIndex(h => String(h).toLowerCase() === String(field || '').toLowerCase()); if (c < 0) return null; const x = X.get(5, c + 1); return x.fmtStyle && x.fmtStyle !== 'general' ? { fmtStyle: x.fmtStyle, ...(x.numFmt ? { numFmt: x.numFmt } : {}), decimals: x.decimals || 0 } : null; };
+  for (const [keys, field] of [[lay.rowKeys, spec.row], [lay.colKeys, spec.col]]) { const f = srcFmt(field); if (f) for (const k of keys) if (typeof lay.cells[k] === 'number') Object.assign(rec.cells[k], f); }
+  if (cache.pct) for (const k of lay.data) if (rec.cells[k]) Object.assign(rec.cells[k], { fmtStyle: 'percent', decimals: 2 });
+  rec.pivots = [{ id, source: { sheet: 'Export', range: 'A4:J94' }, spec: { row: spec.row || null, col: spec.col || null, value: spec.value, fn: spec.fn || 'sum', ...(spec.show ? { show: spec.show } : {}) }, at,
+    r1: lay.r1, c1: lay.c1, r2: lay.r2, c2: lay.c2, rowItems: cache.rowItems, colItems: cache.colItems, valueHead: cache.valueHead }];
+  return rec;
+}
+/** The three arrangements module 4.4 leaves its pivot in. */
+export const PIVOTS = {
+  S441: { row: 'Week', col: 'Site', value: 'Retail revenue ($)', fn: 'sum' },
+  S442: { row: 'Site', col: null, value: 'Date', fn: 'count' },
+  S443: { row: 'Week', col: 'Site', value: 'Total washes', fn: 'sum' },
+};
+/** 4.4.3's late correction: the controller resent Domain's first day, ten more retail washes. */
+export const PIVOT_FIX = { ref: 'C5', value: ROWS[0].retail + 10 };
+/** 4.4.3's reader on Summary: Domain's washes from the pivot by GETPIVOTDATA, and its difference from the cube. */
+export const PIVOT_READ = {
+  labels: { H14: { value: 'Domain washes, from the pivot' }, H15: { value: 'Less the cube (reads 0)' } },
+  formats: { I14: { fontColor: 'green', fmtStyle: 'custom', numFmt: FMT.countDash, decimals: 0 }, I15: { fmtStyle: 'custom', numFmt: FMT.countDash, decimals: 0 } },
+  formulas: { I14: `=GETPIVOTDATA("Total washes",${CUTS}!$A$3,"Site","AUS-DOM")`, I15: `=I14-F${SUMMARY.cubeRows[0]}` },
+};
+const withCuts = (s, spec) => { let rec = sheetOf(s, CUTS); if (!rec) { rec = { name: CUTS, cells: {} }; s.sheets.splice(s.sheets.findIndex(x => x.name === 'Export'), 0, rec); } pivotOn(rec, s, spec); };
+const S44 = S436;
+// 4.4.1 Build and rearrange: the pivot on its own sheet (Cuts), rearranged, left as retail revenue by week down and site across
+const S441 = derive(S44, s => { withCuts(s, PIVOTS.S441); });
+// 4.4.2 Value settings: the dates, the week key, a share of the column, an average, and last the count of days by site
+const S442 = derive(S441, s => { withCuts(s, PIVOTS.S442); });
+// 4.4.3 Refresh and GETPIVOTDATA: the correction on Export, the pivot refreshed and turned back to washes by week and site, Summary reading it by name
+const S443 = derive(S442, s => {
+  sheetOf(s, 'Export').cells[PIVOT_FIX.ref] = { ...sheetOf(s, 'Export').cells[PIVOT_FIX.ref], value: PIVOT_FIX.value };
+  withCuts(s, PIVOTS.S443);
+  plant(s, 'Summary', PIVOT_READ.labels);
+  for (const k in PIVOT_READ.formulas) plant(s, 'Summary', { [k]: { formula: PIVOT_READ.formulas[k], ...PIVOT_READ.formats[k] } });
+});
+// 4.4.C starts from the module's start (no Cuts sheet); its seed lays a fresh fortnight over Export
+const S44C = S436;
 
 /* ---------------- module 4.5: scenarios and sensitivity ---------------- */
 
 const C = SCENARIOS;
 /** The outputs as 4.5.1 to 4.5.4 build them: the ticket read from the live column, before 4.5.5 routes it through the driver. */
 const beforeDriver = cells => { for (const ref of ['C' + C.outputs.revenue, 'C' + C.breakEven.cpw]) if (cells[ref]) cells[ref] = { ...cells[ref], formula: cells[ref].formula.replace('C' + C.ticketModel, 'G' + C.inputs.ticket) }; };
+/** The Data Tables each 4.5 state holds, by the input cells they move: before 4.5.5 the ticket is the live column's G6; from 4.5.5 the pass-through driver C13. */
+export const TABLE_INPUTS = {
+  S452: { ticket: 'G' + C.inputs.ticket },
+  S453: { ticket: 'G' + C.inputs.ticket, share: 'G' + C.inputs.share }, S454: { ticket: 'G' + C.inputs.ticket, share: 'G' + C.inputs.share },
+  S455: { ticket: 'C' + C.driver, share: 'G' + C.inputs.share },
+  S456: { ticket: 'C' + C.driver, share: 'G' + C.inputs.share, sw: 'C' + C.switch },
+};
+const tables = (s, id) => tablesOn(sheetOf(s, 'Scenarios'), C, TABLE_INPUTS[id]);
 const S45 = S436;
 // 4.5.1 A case toggle: the switch, the live column (CHOOSE on the first line, INDEX below), the outputs, the live case lit by a rule, the case in the title
 const S451 = derive(S45, s => {
@@ -832,26 +938,88 @@ const S451 = derive(S45, s => {
   beforeDriver(c);
   sheetOf(s, 'Scenarios').condFmt = [clone(sheetOf(SOLVED, 'Scenarios').condFmt[0])];
 });
-// 4.5.2 One-way data table: EBITDA at five tickets (an explicit grid; a Data Table on the 4.5.5 driver gives the same figures)
-const S452 = derive(S451, s => { take(s, SOLVED, 'Scenarios', ['B' + C.oneWay.title, ...blockRefs([C.oneWay.vals, C.oneWay.ebitda], COLS('BCDEFG'))]); });
-// 4.5.3 Two-way data table: ticket across, member share down, the cells below the downside EBITDA red (the downside's EBITDA arrives with 4.5.6's table; until then the rule reads an empty cell)
-const S453 = derive(S452, s => { take(s, SOLVED, 'Scenarios', ['B' + C.twoWay.title, ...blockRefs([C.twoWay.vals, ...C.twoWay.rows], COLS('BCDEFG'))]); sheetOf(s, 'Scenarios').condFmt.push(clone(sheetOf(SOLVED, 'Scenarios').condFmt[1])); });
+// 4.5.2 One-way data table: EBITDA at five tickets, a Data Table on the live ticket G6, titled with the case it ran on
+const ONE = C.oneWay, TWO = C.twoWay, CO = C.cases;
+const S452 = derive(S451, s => { take(s, SOLVED, 'Scenarios', ['B' + ONE.title, 'B' + ONE.vals, 'B' + ONE.ebitda, 'C' + ONE.ebitda, ...rowRefs(ONE.vals, COLS('DEFGH'))]); tables(s, 'S452'); });
+// 4.5.3 Two-way data table: ticket across, member share down, on G6 and G7; the base case bold; cells below the live case's EBITDA red
+const S453 = derive(S452, s => {
+  take(s, SOLVED, 'Scenarios', ['B' + TWO.title, 'B' + TWO.vals, 'C' + TWO.vals, ...rowRefs(TWO.vals, COLS('DEFGH')), ...TWO.rows.map(r => 'C' + r)]);
+  tables(s, 'S453');
+  sheetOf(s, 'Scenarios').condFmt.push(clone(sheetOf(SOLVED, 'Scenarios').condFmt[1]));
+});
 // 4.5.4 Goal Seek: Domain's break-even by hand and per Goal Seek, noted
 const BE = C.breakEven;
 const S454 = derive(S453, s => { take(s, SOLVED, 'Scenarios', ['B' + BE.title, ...blockRefs(Object.values(BE).slice(1), COLS('BC'))]); beforeDriver(sheetOf(s, 'Scenarios').cells); });
-// 4.5.5 The pass-through driver: the ticket moved to Inputs (the case columns read it), the driver and the ticket the model reads, the outputs pointed at it
+// 4.5.5 The pass-through driver: the ticket moved to Inputs (the case columns read it), the driver and the ticket the model reads, the outputs pointed at it, both tables re-run on the driver
 const S455 = derive(S454, s => {
   take(s, SOLVED, 'Inputs', ['B15', 'C15', 'D15']);
   take(s, SOLVED, 'Scenarios', [...rowRefs(C.inputs.ticket, COLS('CDE')), ...blockRefs([C.driver, C.ticketModel], COLS('BC')), 'C' + C.outputs.revenue, 'C' + BE.cpw]);
+  tables(s, 'S455');
 });
-// 4.5.6 Case outputs side by side: the table on the switch (an explicit grid), the source line and the checks; questions 9 and 10 answered. The sticky IF (it needs iterative calculation, which the engine has) is not in the state.
+// 4.5.6 Case outputs side by side: a Data Table on the switch, the source line and the checks; questions 9 and 10 answered. The sticky IF is built, watched and taken out again: the table is what stays.
 const S456 = derive(S455, s => {
-  take(s, SOLVED, 'Scenarios', ['B' + C.cases.title, ...blockRefs(Object.values(C.cases).slice(1), COLS('BCDE')), 'B' + C.source, 'B' + C.checks, ...blockRefs(C.checkRows, COLS('BC'))]);
+  take(s, SOLVED, 'Scenarios', ['B' + CO.title, ...blockRefs([CO.name, CO.num, CO.washes, CO.revenue, CO.contrib, CO.ebitda], COLS('BCDEF')), 'B' + C.source, 'B' + C.checks, ...blockRefs(C.checkRows, COLS('BC'))]);
   const c = sheetOf(s, 'Scenarios').cells;
   c['C' + C.checkRows[0]] = { ...c['C' + C.checkRows[0]], formula: c['C' + C.checkRows[0]].formula.replace('Case', '$C$11') };
+  tables(s, 'S456');
   take(s, SOLVED, 'Q&A', ['E13', 'F13', 'E14', 'F14']);
 });
-const S45C = S456;
+/** A cell with its value or formula taken out and its format kept (a start state the learner fills). */
+export const formatOnly = cell => { if (!cell) return null; const { value, formula, table, ...fmt } = cell; return Object.keys(fmt).length ? fmt : null; };
+/** 4.5.C's start: the module's model with its switch, live column, tables and Goal Seek note taken out (the edges, corners and labels stay). */
+const S45C = derive(S456, s => {
+  const sc = sheetOf(s, 'Scenarios');
+  tablesOff(sc);
+  for (const ref of ['C' + C.switch, ...Object.values(C.inputs).map(r => 'G' + r), 'C' + BE.goalSeek]) { const f = formatOnly(sc.cells[ref]); if (f) sc.cells[ref] = f; else delete sc.cells[ref]; }
+});
+
+/* ---------------- the module challenges' seeds (4.4.C, 4.5.C) ---------------- */
+
+export const CHALLENGES = {
+  'challenge-an-export-summarized-three-ways': { before: 'S44C' },
+  'challenge-a-three-case-model-with-a-sensitivity-table': { before: 'S45C' },
+};
+/** 4.4.C's late site-day: the row the controller never reported (Riverside, Sep 22), and where the seed leaves its figures. */
+export const LATE = { row: exportRow(PLANT.missing.day, PLANT.missing.site), retail: 'L', member: 'M', label: 'K' };
+/**
+ * A module challenge's seed patch: content only, never workload. 4.4.C lays a fresh fortnight's
+ * washes and revenue over Export (every row, the late one's figures parked beside it); 4.5.C draws
+ * fresh case inputs (washes, member share and sites for the three cases, in order).
+ */
+export function challengeSeed(id, rng) {
+  if (!CHALLENGES[id]) throw new Error('clearcoat-pack: no challenge ' + id);
+  const p = {};
+  if (id === 'challenge-an-export-summarized-three-ways') {
+    const ex = sheetOf(STATES[CHALLENGES[id].before], 'Export').cells;
+    ROWS.forEach((x, i) => {
+      const r = 5 + i; const site = SITES[x.site];
+      const wd = ymd(x.date).wd; const dayFactor = wd === 5 ? 1.5 : wd === 6 ? 1.2 : wd === 0 ? 0.85 : 1;
+      const total = Math.round((site.target * dayFactor * (0.8 + rng() * 0.4)) / 5) * 5;
+      const retail = Math.round((total * (0.4 + rng() * 0.2)) / 5) * 5;
+      if (r === LATE.row) {
+        p[`Export!${LATE.label}${r}`] = { value: 'Late figures (retail, member)' };
+        p[`Export!${LATE.retail}${r}`] = { value: retail, fontColor: 'blue' }; p[`Export!${LATE.member}${r}`] = { value: total - retail, fontColor: 'blue' };
+        return;
+      }
+      p[`Export!C${r}`] = { ...ex['C' + r], value: retail }; p[`Export!D${r}`] = { ...ex['D' + r], value: total - retail };
+      p[`Export!F${r}`] = { ...ex['F' + r], value: r2(retail * site.ticket) };
+    });
+  }
+  if (id === 'challenge-a-three-case-model-with-a-sensitivity-table') {
+    const sc = sheetOf(STATES[CHALLENGES[id].before], 'Scenarios').cells;
+    const step = (lo, hi, by) => lo + Math.floor(rng() * (Math.round((hi - lo) / by) + 1)) * by;
+    const base = { washes: step(230, 270, 5), share: Math.round(step(0.45, 0.55, 0.01) * 100) / 100, sites: step(40, 48, 1) };
+    const cases = [
+      { washes: base.washes + step(15, 35, 5), share: Math.round((base.share + 0.05) * 100) / 100, sites: base.sites + 2 },
+      base,
+      { washes: base.washes - step(20, 40, 5), share: Math.round((base.share - 0.05) * 100) / 100, sites: base.sites - 4 },
+    ];
+    COLS('CDE').forEach((col, i) => {
+      for (const [key, row] of [['washes', C.inputs.washes], ['share', C.inputs.share], ['sites', C.inputs.sites]]) p[`Scenarios!${col}${row}`] = { ...sc[col + row], value: cases[i][key] };
+    });
+  }
+  return p;
+}
 
 /* ---------------- module 4.6: names and structure ---------------- */
 
@@ -909,4 +1077,33 @@ export function stateOf(id) {
   const s = STATES[id];
   if (!s) throw new Error('unknown workbook state ' + id);
   return clone(s);
+}
+
+/* ---------------- diffing (the chain test reads these) ---------------- */
+
+/** The Data Tables of a sheet record, normalised: their blocks and input cells. */
+const normTables = sh => (sh.dataTables || []).map(({ r1, c1, r2, c2, row, col }) => ({ r1, c1, r2, c2, row: row || null, col: col || null })).sort((a, b) => a.r1 - b.r1 || a.c1 - b.c1);
+/** The pivots of a sheet record, normalised: source, place and layout (the id is the engine's count, not the learner's choice). */
+const normPivots = sh => (sh.pivots || []).map(x => ({ source: x.source, at: x.at, spec: { row: x.spec.row || null, col: x.spec.col || null, value: x.spec.value || null, fn: x.spec.fn || 'sum', show: x.spec.show || null } }));
+/** A table's results are worked out by the engine, so a state compares the table (its record) and not its figures. */
+function withoutTableValues(state) {
+  const out = clone({ ...state, sheets: state.sheets.map(sh => ({ ...sh, cells: sh.cells })) });
+  for (const sh of out.sheets) for (const t of sh.dataTables || []) for (let r = t.r1 + 1; r <= t.r2; r++) for (let c = t.c1 + 1; c <= t.c2; c++) { const cell = sh.cells && sh.cells[refKey(r, c)]; if (cell) delete cell.value; }
+  return out;
+}
+/** What differs between two states: the cells, structure and settings (clearcoat-weekly's diff), plus each sheet's Data Tables and pivots. */
+export function diffStates(a, b) {
+  const out = diffCells(withoutTableValues(a), withoutTableValues(b));
+  for (const sa of a.sheets) {
+    const sb = b.sheets.find(x => x.name === sa.name); if (!sb) continue;
+    if (JSON.stringify(normTables(sa)) !== JSON.stringify(normTables(sb))) out.push({ sheet: sa.name, kind: 'dataTables', key: 'dataTables', a: normTables(sa), b: normTables(sb) });
+    if (JSON.stringify(normPivots(sa)) !== JSON.stringify(normPivots(sb))) out.push({ sheet: sa.name, kind: 'pivots', key: 'pivots', a: normPivots(sa), b: normPivots(sb) });
+  }
+  return out;
+}
+/** A live session in the authored-state shape: clearcoat-weekly's extraction, plus each sheet's Data Tables and pivots. */
+export function sessionToState(ses) {
+  const st = sessionCells(ses);
+  ses.sheets.forEach((e, i) => { const sh = st.sheets[i]; if (e.sheet.dataTables && e.sheet.dataTables.length) sh.dataTables = clone(e.sheet.dataTables); if (e.sheet.pivots && e.sheet.pivots.length) sh.pivots = clone(e.sheet.pivots); });
+  return st;
 }
