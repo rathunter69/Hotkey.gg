@@ -892,13 +892,13 @@ const S46C = derive(S463, s => {
   const sc = sheetOf(s, 'Scenarios');
   for (const ref of [...blockRefs(Object.values(C.inputs), COLS('G')), 'C' + C.checkRows[0]]) sc.cells[ref] = { ...sc.cells[ref], formula: sc.cells[ref].formula.replace('Case', '$C$11') };
   applyValidation(s, SUMMARY, SCENARIOS, false);
-  drop(s, 'Inputs', [...NAMES_HEAD, ...blockRefs([19, 20, 21, 22, 23], COLS('BC'))]);
+  drop(s, 'Inputs', blockRefs([19, 20, 21, 22, 23], COLS('BC')));
 });
 const S46Cdone = derive(S46C, s => {
   s.names = sortNames({ Case: NAMES.Case, Cases: NAMES.Cases, Cost_Per_Wash: NAMES.Cost_Per_Wash, Ticket: NAMES.Ticket });
   take(s, SOLVED, 'Scenarios', [...blockRefs(Object.values(C.inputs), COLS('G')), 'C' + C.checkRows[0]]);
   sheetOf(s, 'Scenarios').validation['C' + C.picker].source = '=Cases';
-  take(s, SOLVED, 'Inputs', NAMES_HEAD); plant(s, 'Inputs', pasteListCells(s.names));
+  plant(s, 'Inputs', pasteListCells(s.names));
 });
 
 /* ---------------- 4.P and 4.A: the diligence pack on a fresh export ---------------- */

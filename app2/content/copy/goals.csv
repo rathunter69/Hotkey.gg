@@ -920,3 +920,8 @@ validation-list-by-name,2,Name the unique site list on Lists N5:N10 Sites.,,,"pu
 validation-list-by-name,3,Point the site picker on Summary C34 at =Sites the same way.,,,pulse cell C34 on Summary · The site code the two-way lookup reads.
 validation-list-by-name,4,Paste the names list again from Inputs B19 so it shows all five names.,"Paste List writes what the names are now, not what they were, so a list on the page goes stale the moment a name is added. Paste it over the old one.",,"pulse cell B19 on Inputs · F3, then Alt+L for Paste List."
 validation-list-by-name,5,"Does it tie? Watch the case picker drop down the three cases it reads through Cases, and the live column follow the pick.",,,pulse cell C10 on Scenarios · The drop-down lists whatever the name Cases covers.
+challenge-toggles-named,0,"Name the switch on Scenarios C11 Case, Inputs C5 Cost_Per_Wash and the case list on Lists L5:L7 Cases.",,,
+challenge-toggles-named,1,"In the Name Manager point Ticket at Inputs C15, delete the stray Ticket_old and close it.",,,
+challenge-toggles-named,2,Make the live column G5:G8 and the check in C58 on Scenarios read the switch as Case.,,,
+challenge-toggles-named,3,"Point the case picker in Scenarios C10 at the name: Data Validation, List, Source =Cases.",,,
+challenge-toggles-named,4,Paste the names list on Inputs from B19 with F3 and Paste List.,,,

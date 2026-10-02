@@ -1395,6 +1395,18 @@ export const COPY = {
    "mac_note": "",
    "story_beat": ""
   },
+  "challenge-toggles-named": {
+   "id": "challenge-toggles-named",
+   "module": "names-and-structure",
+   "order": "4.6.C",
+   "title": "Challenge: a model’s toggles named and wired",
+   "brief": "A model with its switch read by address, a broken Ticket and a stray in the Name Manager. Name the switch and the key inputs, fix the names, drive the picker by name and paste the list on Inputs.",
+   "closing": "",
+   "wow": "",
+   "convention_line": "Name toggles and key inputs only; A case toggle, never copies of the file",
+   "mac_note": "",
+   "story_beat": ""
+  },
   "remix-format-on-the-pnl": {
    "id": "remix-format-on-the-pnl",
    "module": "remixes",
@@ -9009,6 +9021,48 @@ export const COPY = {
     "teach": "",
     "why": "",
     "hint_stuck": "pulse cell C10 on Scenarios · The drop-down lists whatever the name Cases covers."
+   }
+  ],
+  "challenge-toggles-named": [
+   {
+    "lesson_id": "challenge-toggles-named",
+    "goal_index": "0",
+    "text": "Name the switch on Scenarios C11 Case, Inputs C5 Cost_Per_Wash and the case list on Lists L5:L7 Cases.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-toggles-named",
+    "goal_index": "1",
+    "text": "In the Name Manager point Ticket at Inputs C15, delete the stray Ticket_old and close it.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-toggles-named",
+    "goal_index": "2",
+    "text": "Make the live column G5:G8 and the check in C58 on Scenarios read the switch as Case.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-toggles-named",
+    "goal_index": "3",
+    "text": "Point the case picker in Scenarios C10 at the name: Data Validation, List, Source =Cases.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-toggles-named",
+    "goal_index": "4",
+    "text": "Paste the names list on Inputs from B19 with F3 and Paste List.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
    }
   ]
  },

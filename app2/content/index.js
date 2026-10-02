@@ -125,6 +125,7 @@ import challenge_text_dump from './lessons/challenge-text-dump.js';
 import naming_sparingly from './lessons/naming-sparingly.js';
 import name_manager from './lessons/name-manager.js';
 import validation_list_by_name from './lessons/validation-list-by-name.js';
+import challenge_toggles_named from './lessons/challenge-toggles-named.js';
 
 export const CHAPTERS = [
   {
@@ -223,7 +224,7 @@ export const CHAPTERS = [
       { name: 'Project and assessment', blurb: 'The diligence pack from a fresh export, then another cluster’s on the clock; the assessment is the test-out.' },
     ],
     lessons: [
-      naming_sparingly, name_manager, validation_list_by_name,
+      naming_sparingly, name_manager, validation_list_by_name, challenge_toggles_named,
     ],
   },
 ];
