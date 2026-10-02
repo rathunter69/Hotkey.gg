@@ -7,7 +7,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  STATES, STATE_ORDER, CHAIN, stateOf, diffStates, sessionToState, finish, readExport, sisterExport, sisterPatch, SISTERS,
+  STATES, STATE_ORDER, CHAIN, stateOf, CHALLENGES, challengeSeed, STRAY_RULES, PLANT_ROW_FLAG, FLAG_ROW, CF_ROW_FLAG, diffStates, sessionToState, finish, readExport, sisterExport, sisterPatch, SISTERS,
   PLANT_GRID, PLANT_MONTHLY, PLANT_STRAY, PLANT_CLUSTER_LINES, PLANT_DUP_LABEL,
   CODES, LABELS, LABEL_NOTE, FOOTNOTE, SOURCE_LINE, TITLE, TITLE_FORMULAS, UNITS_FORMULA, TIMELINE_FORMULAS, CH2_PAGE_SETUP, DETAIL, DETAIL_NAMES, NAV, PRINT,
   MONTHLY_ROW, MARGIN_W, TITLE_ROW_H, DIVIDER_FILL, CF_CHECKS, EXPORT, EXPORT_NEXT, FIGURES_NEXT, cleanLabel, YEAR_COLS, MONTH_COLS, LINE_ROWS, COST_ROWS,
@@ -167,4 +167,32 @@ test('the project is the same export a year on; a sister operator seeds the asse
   assert.equal(pl.value('A1'), sisterExport(mulberry32(11)).company + ' - Historical Financials');
   for (const ref of ['C39', 'C40']) assert.equal(pl.value(ref), 0, ref + ' ties on the sister\'s figures');
   assert.ok(close(sheetIn(ses, 'Print').value('E7'), pl.value('E24')));
+});
+
+test('the module challenges seed over their start states: the cluster\'s figures, the module\'s faults, the same workload every seed', () => {
+  assert.deepEqual(diffStates(stateOf('S7C'), (() => { const s = stateOf('S7b'); delete s.settings.pageSetup; return s; })()), [], 'S7C is the finished pack with no print set-up');
+  for (const id in CHALLENGES) {
+    const { before, after } = CHALLENGES[id];
+    assert.ok(STATES[before] && STATES[after], id);
+    const a = challengeSeed(id, mulberry32(5)), b = challengeSeed(id, mulberry32(5));
+    assert.deepEqual(a, b, `${id} is deterministic`);
+    assert.equal(Object.keys(challengeSeed(id, mulberry32(1))).length, Object.keys(challengeSeed(id, mulberry32(2))).length, `${id}: the workload never moves`);
+    const seeded = applyStatePatch(stateOf(before), a);
+    const ses = live(seeded);
+    assert.equal(sheetIn(ses, 'P&L').value('C39'), 0, `${id}: the cluster's revenue check ties`);
+    assert.ok(Math.abs(sheetIn(ses, 'P&L').value('C10')) < 0.4 * 33000, `${id}: a cluster's figures, not the company's`);
+  }
+  const g = applyStatePatch(stateOf('S2d'), challengeSeed('challenge-pnl-presentation-quality', mulberry32(3))).sheets[0];
+  assert.equal(g.cells.C7.ball, true); assert.equal(g.cells.C7.numFmt, CODES.dollar, 'formatted for numbers already'); assert.equal(g.cells.A7.value, '4010', 'the codes still in A');
+  const n = applyStatePatch(stateOf('S3f'), challengeSeed('challenge-grouped-navigable', mulberry32(3))).sheets[0];
+  assert.deepEqual(n.hiddenRows, [26, 27, 28, 29, 30]); assert.equal(n.cells.B45.value, 'AUSTIN'); assert.equal(n.groups, undefined, 'flat');
+  const f = applyStatePatch(stateOf('S4d'), challengeSeed('challenge-checks-flags', mulberry32(3)));
+  assert.deepEqual(f.sheets[0].condFmt, STRAY_RULES); assert.deepEqual(f.sheets[2].condFmt, []); assert.equal([7, 8, 9].filter(r => f.sheets[0].cells['A' + r] && f.sheets[0].cells['A' + r].value === 'x').length, 1);
+  const h = applyStatePatch(stateOf('S5d'), challengeSeed('challenge-dynamic-header-block', mulberry32(3)));
+  assert.equal(h.sheets[2].cells.C4.value, '2026-01'); assert.equal(h.sheets[2].cells.N4.value, '2026-12'); assert.equal(h.sheets[0].cells.A1.value, TITLE, 'the typed title stays');
+  assert.equal(cells('S5d', 'Monthly detail').B6.value, 'RETAIL_WASH  REVENUE', 'the dirty labels arrive with the start state');
+  const fl = applyStatePatch(stateOf('S5a'), PLANT_ROW_FLAG); fl.sheets[0].condFmt = [CF_ROW_FLAG];
+  const fs = sheetIn(live(fl), 'P&L');
+  assert.equal(fl.sheets[0].cells['A' + FLAG_ROW].value, 'x'); assert.equal(fl.sheets[0].cells.C8.value, cells('S5a', 'P&L').C8.value);
+  const map = fs.condFmtMap(); assert.ok(map['C' + FLAG_ROW] && map['C' + FLAG_ROW].fill, 'the row rule lights the flagged row'); assert.equal(map.C7, undefined, 'and no other');
 });

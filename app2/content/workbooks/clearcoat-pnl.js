@@ -1031,6 +1031,51 @@ export const PLANT_MONTHLY = overlayPatch(S3e, PLANT_MONTHLY_RAW);              
 export const PLANT_STRAY = overlayPatch(S4b, { 'P&L!#hiddenRows': [26, 27, 28, 29, 30], ...strayBlock(EXPORT) });      // 2.4.3: the margins hidden, a block pasted under the P&L
 export const PLANT_CLUSTER_LINES = overlayPatch(S4c, PLANT_CLUSTER_RAW);                                            // 2.4.4: the site-level lines in
 export const PLANT_DUP_LABEL = overlayPatch(S4d, { 'P&L!B18': { value: LABELS[19] } });                             // 2.5.1: a duplicate label (Card fees reads Marketing)
+/** 2.5.2: the flag the row rule reads, an x in the margin beside membership revenue (the lesson's Does it tie clears it, so the page keeps no flag). */
+export const FLAG_ROW = 8;
+export const PLANT_ROW_FLAG = overlayPatch(S5a, { [`P&L!A${FLAG_ROW}`]: { value: 'x' } });
+
+/* the module challenges 2.3.C to 2.7.C: each starts from the chain state before its module's first lesson, a cluster's figures laid over it plus the faults the module fixes */
+
+/** 2.7.C's start: the three pages built, Print linked, and no print set-up anywhere. */
+const S7C = derive(S6e, s => summaryPage(s, EXPORT));
+/** The decoration and stray rules 2.5.C strips: bars on the totals, a scale on the site costs, a rule nobody remembers on the revenue lines. */
+export const STRAY_RULES = [
+  { kind: 'dataBar', range: 'C10:E10', color: 'blue' },
+  { kind: 'colorScale', range: 'C13:E19', scale: 'green-yellow-red' },
+  { kind: 'cellValue', op: '>', v1: 1000, range: 'C7:E9', style: 'yellow' },
+];
+/** Monthly's month heads as the export writes them in a fresh file: text, 2026-01 to 2026-12 (2.6.C turns them back into a date chain). */
+export const textMonthsOf = year => MONTH_COLS.map((col, m) => `${year}-${String(m + 1).padStart(2, '0')}`);
+/** The challenges' start states (lesson.state.before) and the chain state each one's end matches on the ground it covers. */
+export const CHALLENGES = {
+  'challenge-pnl-presentation-quality': { before: 'S2d', after: 'S3e' },
+  'challenge-grouped-navigable': { before: 'S3f', after: 'S4d' },
+  'challenge-checks-flags': { before: 'S4d', after: 'S5d' },
+  'challenge-dynamic-header-block': { before: 'S5d', after: 'S6e' },
+  'challenge-print-pack': { before: 'S7C', after: 'S7b' },
+};
+/**
+ * A challenge's seed patch (lesson.seed): the cluster's signed figures over its start state, plus
+ * what that module's challenge finds. The key count never moves with the seed (the workload invariant).
+ */
+export function challengeSeed(id, rng) {
+  const ch = CHALLENGES[id]; if (!ch) throw new Error('clearcoat-pnl: no challenge ' + id);
+  const before = STATES[ch.before];
+  const p = clusterPatch(rng, { signed: true });
+  if (id === 'challenge-pnl-presentation-quality') for (const r of [7, 8, 9, 10, 13, 14, 15, 16, 17, 18, 19, 20, 22, 23, 24]) for (const col of YEAR_COLS) p[`P&L!${col}${r}`] = { ...(p[`P&L!${col}${r}`] || {}), ball: true };
+  if (id === 'challenge-grouped-navigable') Object.assign(p, { 'P&L!#hiddenRows': [26, 27, 28, 29, 30] }, strayBlock(EXPORT));
+  if (id === 'challenge-checks-flags') {
+    const flagRow = REVENUE_ROWS[Math.floor(rng() * REVENUE_ROWS.length)];
+    Object.assign(p, { 'P&L!#condFmt': clone(STRAY_RULES), 'Monthly!#condFmt': [], [`P&L!A${flagRow}`]: { value: 'x' } });
+  }
+  if (id === 'challenge-dynamic-header-block') {
+    delete p['P&L!A1'];   // the title is the company's, typed; the challenge builds it from Inputs
+    textMonthsOf(EXPORT.years[2]).forEach((t, m) => { p[`Monthly!${MONTH_COLS[m]}4`] = { value: t }; });
+  }
+  if (id === 'challenge-print-pack') delete p['P&L!A1'];
+  return overlayPatch(before, p);
+}
 
 /* the project (2.P): the same export a year on, FY25A, FY26A and FY27E, the same faults; the assessment (2.A): a sister operator's three years on the project's export */
 
@@ -1073,8 +1118,8 @@ export function sisterPatch(rng) {
   return patch;
 }
 
-export const STATES = { S1raw, S1a, S1b, S1c, S1d, S2a, S2b, S2c, S2d, S3a, S3b, S3c, S3d, S3e, S3f, S4a, S4b, S4c, S4d, S5a, S5b, S5c, S5d, S6a, S6b, S6c, S6d, S6e, S7a, S7b, Pdone, S8raw, S8done };
-/** The chain the lessons walk (S1raw to S7b); Pdone is the solved chapter the chain reaches; S8raw and S8done are the project's fresh export and its end. */
+export const STATES = { S1raw, S1a, S1b, S1c, S1d, S2a, S2b, S2c, S2d, S3a, S3b, S3c, S3d, S3e, S3f, S4a, S4b, S4c, S4d, S5a, S5b, S5c, S5d, S6a, S6b, S6c, S6d, S6e, S7a, S7b, S7C, Pdone, S8raw, S8done };
+/** The chain the lessons walk (S1raw to S7b); S7C is 2.7.C's start (the pack with no print set-up); Pdone is the solved chapter the chain reaches; S8raw and S8done are the project's fresh export and its end. */
 export const STATE_ORDER = Object.keys(STATES);
 export const CHAIN = STATE_ORDER.slice(0, STATE_ORDER.indexOf('S7b') + 1);
 
