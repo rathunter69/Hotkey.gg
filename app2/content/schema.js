@@ -205,6 +205,7 @@ export const CONCEPTS = {
   'data-bars': 'Data Bars and Color Scales (Alt, H, L, D and S) draw a chart inside the cells; Clear Rules (Alt, H, L, C) takes rules off the selection or the sheet',
   'eomonth-edate': 'EOMONTH(date, n) is the last day of the month n months on; EDATE(date, n) the same day n months on',
   'clean-text': 'TRIM strips stray spaces, PROPER capitalizes each word, SUBSTITUTE swaps one piece of text for another: together they clean an imported label',
+  'dynamic-title': 'a title built with & from the inputs: the company name lives in one cell and every page reads it',
   'single-source-line': 'a line every page shows is built once from the inputs and read everywhere, so one edit changes every page',
 };
 

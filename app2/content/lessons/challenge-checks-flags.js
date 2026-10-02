@@ -60,7 +60,7 @@ export default {
     { id: 'no-stray', text: 'Delete the stray Greater Than 1,000 rule on C7:E9, so only the flagged row lights.',
       keys: 'Alt H L R ↓ ×2 Delete ↵',
       check: (s, ses) => { const sh = pnl(ses); return !!sh && !sh.condFmt.some(stray) && flagLights(sh) && settled(ses); } },
-    { id: 'order', text: 'In Manage Rules, put the checks rule on top with U and tick Stop If True with S.', convention: 'F1',
+    { id: 'order', text: 'In Manage Rules (Alt, H, L, R), put the checks rule on top with U and tick Stop If True with S.', convention: 'F1',
       keys: 'Alt H L R ↓ U S ↵',
       check: (s, ses) => checksFirst(pnl(ses)) && settled(ses) },
   ],

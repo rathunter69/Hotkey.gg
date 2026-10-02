@@ -58,6 +58,12 @@ import formula_driven_rules from './lessons/formula-driven-rules.js';
 import data_bars_and_scales from './lessons/data-bars-and-scales.js';
 import managing_rules from './lessons/managing-rules.js';
 import challenge_checks_flags from './lessons/challenge-checks-flags.js';
+import text_for_labels from './lessons/text-for-labels.js';
+import eomonth_edate from './lessons/eomonth-edate.js';
+import dynamic_titles from './lessons/dynamic-titles.js';
+import cleaning_imported_labels from './lessons/cleaning-imported-labels.js';
+import units_and_period_line from './lessons/units-and-period-line.js';
+import challenge_dynamic_header_block from './lessons/challenge-dynamic-header-block.js';
 import remix_format_on_the_pnl from './remixes/formatting-on-the-pnl.js';   // Chapter 1's format challenge, re-clothed (content/remix.js)
 
 export const CHAPTERS = [
@@ -104,6 +110,7 @@ export const CHAPTERS = [
       built_in_formats_on_a_pnl, sign_convention_costs_negative, currency_and_percent_lines, dates_on_the_timeline, challenge_format_the_numbers,
       the_four_section_format, units_in_the_format, dynamic_headers_with_text, conditional_codes_and_hidden_zeros, challenge_house_format_set,
       highlight_rules, formula_driven_rules, data_bars_and_scales, managing_rules, challenge_checks_flags,
+      text_for_labels, eomonth_edate, dynamic_titles, cleaning_imported_labels, units_and_period_line, challenge_dynamic_header_block,
       remix_format_on_the_pnl,
     ],
   },
