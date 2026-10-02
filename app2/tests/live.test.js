@@ -101,7 +101,7 @@ test('a link to a formula on another sheet is live through that formula’s own 
 const cellsOf = s => JSON.parse(JSON.stringify(s.cells));
 
 test('in place: a dynamic array that grows under a nudge, and a nudge over a spilled cell, both put back exactly', () => {
-  const s = new Sheet({ cells: { A1: { value: 3 }, B1: { formula: '=SEQUENCE(A1)' }, C1: { formula: '=SUM(B1:B5)' }, D1: { formula: '=B3*2' }, E1: { formula: '=SUM(B1#)' }, F1: { formula: '=A1*0' } } });
+  const s = new Sheet({ cells: { A1: { value: 3 }, B1: { formula: '=SEQUENCE(A1)' }, C1: { formula: '=SUM(B1:B5)' }, D1: { formula: '=B3*2' }, E1: { formula: '=SUM(B1#)' }, F1: { formula: '=G1*0' }, G1: { value: 5 } } });
   const before = cellsOf(s);
   for (const [k, opts] of [['C1', {}], ['D1', {}], ['E1', {}], ['F1', {}], ['C1', { inputs: ['A1'] }], ['C1', { inputs: ['B2'] }], ['D1', { inputs: ['B4'] }]]) {
     assert.equal(isLiveFormula(s, k, opts), isLiveFormulaByClone(s, k, opts), k + ' ' + JSON.stringify(opts));
