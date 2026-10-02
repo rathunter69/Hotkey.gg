@@ -46,6 +46,8 @@ await context.addInitScript(() => {
   const start = () => new MutationObserver(skip).observe(document.documentElement, { subtree: true, childList: true });
   if (document.documentElement) start(); else document.addEventListener('DOMContentLoaded', start);
 });
+// every Content-Security-Policy violation is reported as a console error (and so fails the run)
+await context.addInitScript(() => document.addEventListener('securitypolicyviolation', e => console.error(`CSP violation: ${e.effectiveDirective} blocked ${e.blockedURI || 'inline'} in ${e.sourceFile || location.pathname}`)));
 const page = await context.newPage();
 const errors = [];
 page.on('pageerror', e => errors.push('pageerror: ' + e.message));
@@ -345,8 +347,24 @@ try {
     if (!(await p4.waitForSelector('.dp-poster img', { timeout: 5000 }).catch(() => null))) fail('failure: the landing without its demo player shows no still');
     await p4.waitForFunction(() => /didn.t load/i.test((document.querySelector('#ldDemoNote') || {}).textContent || ''), null, { timeout: 5000 }).catch(() => fail('failure: the landing does not say its live demo did not load'));
     block = null;
+    // the boot watchdog (no inline onerror under the CSP): a failed app module shows the reload card at once
+    const p5 = await ctx2.newPage();
+    block = /\/app\/main\.js$/;
+    await p5.goto(base + '#/');
+    if (!(await p5.waitForSelector('#bootReload', { timeout: 5000 }).catch(() => null))) fail('failure: a failed app module does not show the boot reload card');
+    block = null;
     await ctx2.close();
     t('failure paths');
+  }
+  {
+    // the CSP (serve.js sends app2/_headers' site-wide policy): the static page types load under it too,
+    // and any violation anywhere in the run is a console error the errors list catches
+    for (const path of ['lessons/accrual-and-cash.html', 'shortcuts/', 'shortcuts/alt-a-h.html', '404.html']) {
+      const res = await page.goto(`http://127.0.0.1:${PORT}/app2/${path}`);
+      if (!res || !/script-src 'self'/.test(res.headers()['content-security-policy'] || '')) fail(`csp: ${path} was served without the policy`);
+      await page.waitForLoadState('load');
+    }
+    t('csp');
   }
 } finally {
   if (errors.length) { failures += errors.length; console.log('ERRORS\n' + errors.join('\n')); }

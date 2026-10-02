@@ -36,10 +36,11 @@ try{var p=JSON.parse(localStorage.getItem('hk2_prefs')||'{}');document.documentE
 <div class="app"><main id="root"><div class="sk sk-boot" role="status" aria-label="Loading"><span class="sk-sr">Loading…</span><div class="sk-bar sk-title"></div><div class="sk-bar sk-sub"></div><div class="sk-col"><div class="sk-card"></div><div class="sk-card"></div></div></div></main></div>
 <div id="footMount"></div>
 <!-- boot watchdog: if the app never replaces the boot shape (a module failed, or the network stalled), say so and offer a reload -->
-<script>(function(){function stuck(){var r=document.getElementById('root');if(!r||!r.querySelector('.sk-boot'))return;r.innerHTML='<div class="err-card" role="alert"><div class="err-cap">Couldn’t load</div><div class="err-body"><h1>Part of hotkey.gg didn’t load.</h1><p>Check your connection and reload.</p><div class="err-actions"><button class="btn btn-primary" type="button" onclick="location.reload()">Reload</button></div></div></div>';}window.__hkBootFail=stuck;setTimeout(stuck,12000);})();</script>
+<script>(function(){function stuck(){var r=document.getElementById('root');if(!r||!r.querySelector('.sk-boot'))return;r.innerHTML='<div class="err-card" role="alert"><div class="err-cap">Couldn’t load</div><div class="err-body"><h1>Part of hotkey.gg didn’t load.</h1><p>Check your connection and reload.</p><div class="err-actions"><button class="btn btn-primary" type="button" id="bootReload">Reload</button></div></div></div>';var b=document.getElementById('bootReload');if(b)b.addEventListener('click',function(){location.reload();});}window.__hkBootFail=stuck;window.addEventListener('error',function(e){var s=e.target;if(s&&s.tagName==='SCRIPT'&&s.type==='module')stuck();},true);setTimeout(stuck,12000);})();</script>
 <!-- pinned supabase-js UMD (classic script, never imported): exposes window.supabase for app/auth.js -->
 <script defer src="./vendor/supabase.js"></script>
-<script type="module" onerror="window.__hkBootFail&&window.__hkBootFail()">
+<!-- no inline handlers anywhere (the CSP allows only hashed inline scripts): the watchdog's capture-phase error listener stands in for onerror -->
+<script type="module">
   import { startApp } from './app/main.js';
   startApp({ navEl: document.getElementById('navMount'), rootEl: document.getElementById('root'), footEl: document.getElementById('footMount') });
 </script>

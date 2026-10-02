@@ -19,3 +19,27 @@
 /admin.html / 302
 /checkout /#/checkout 302
 /checkout/ /#/checkout 302
+# Dev-only files are not served (liability checklist, Security; pinned by app2/tests/security.test.js).
+# app2/ is the published folder, so the database, function source, tests and copy sheets would
+# otherwise be public. Pages has no exclude setting and no 404 status here, so they send people home.
+# One file under supabase/ stays public on purpose: functions/_shared/student-domains.js, which the
+# pricing page imports. A new file under supabase/ or tests/ fails the test until it is listed here.
+/tests/* / 302
+/supabase/migrations/* / 302
+/supabase/tests/* / 302
+/supabase/scripts/* / 302
+/supabase/templates/* / 302
+/supabase/README.md / 302
+/supabase/config.toml / 302
+/supabase/functions/create-checkout/* / 302
+/supabase/functions/billing-portal/* / 302
+/supabase/functions/stripe-webhook/* / 302
+/supabase/functions/_shared/adapters.ts / 302
+/supabase/functions/_shared/billing.js / 302
+/supabase/functions/_shared/http.js / 302
+/content/copy/site.csv / 302
+/content/copy/goals.csv / 302
+/content/copy/modules.csv / 302
+/content/copy/lessons.csv / 302
+/content/copy/micro.csv / 302
+/package.json / 302
