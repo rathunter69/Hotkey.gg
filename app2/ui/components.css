@@ -4,7 +4,9 @@
    Loaded after the older stylesheets, so it wins where they disagree. */
 
 /* ---------- the site frame: the rail at the left (232px), the content to its right ---------- */
-body{padding-top:0}
+body{padding-top:0; display:flex; flex-direction:column; min-height:100vh}
+body > .app{flex:1 0 auto; margin-right:0; align-self:stretch}
+body > #footMount{flex:none; margin-right:0; align-self:stretch}
 #navMount{position:fixed; left:0; top:0; bottom:0; width:var(--rail-w); z-index:50}
 body > .app{margin-left:var(--rail-w); max-width:none; padding:var(--content-top) var(--content-side) 0; width:auto}
 body > #footMount{margin-left:var(--rail-w)}
@@ -48,8 +50,9 @@ body.keytips-on .kt{display:inline-block}
 .rail-level .rail-sub-word{font-variant-numeric:tabular-nums; color:var(--rail-text)}
 .rail-bar{height:var(--bar-h); background:var(--rail-hi); margin-top:var(--s2); overflow:hidden; border-radius:var(--bar-h)}
 .rail-bar i{display:block; height:100%; width:0; background:var(--rail-accent); transition:width var(--d-goal)}
-.rail-pro{display:inline-block; margin-top:var(--s2); font-size:var(--fs-label); font-weight:var(--fw-semi); color:var(--rail-sub); text-decoration:underline !important; text-underline-offset:var(--s1)}
-.rail-pro:hover{color:var(--rail-on)}
+.rail .rail-pro{display:flex; align-items:center; justify-content:center; gap:var(--s2); margin-top:var(--s3); min-height:var(--rail-sub-h); font-size:var(--fs-label); font-weight:var(--fw-bold); color:var(--rail); background:var(--rail-accent); border-radius:var(--r-btn)}
+.rail .rail-pro:hover{background:var(--rail-on)}
+.rail .rail-pro[hidden]{display:none}
 .rail-streak .rail-row{align-items:flex-start}
 .rail-streak .rail-sub-word{color:var(--rail-text); max-width:var(--rail-streak-w)}
 .rail-week{display:inline-flex; gap:var(--s1); flex:none; padding-top:var(--s1)}

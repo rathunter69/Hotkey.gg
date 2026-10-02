@@ -4682,7 +4682,12 @@ export const COPY = {
   "account_cancel_note": "Cancelling keeps your access to the end of the month you paid for.",
   "account_billing_err": "Billing didn’t open. Try again in a minute.",
   "account_billing_none": "There is no subscription on this account yet.",
-  "home_xp_to_go": "{n} XP to go"
+  "home_xp_to_go": "{n} XP to go",
+  "learn_free": "Free",
+  "learn_being_written": "Being written",
+  "learn_up_next": "Up next",
+  "learn_reward": "Finish {module} to earn it",
+  "learn_reward_earned": "Earned"
  },
  "micro": {
   "enter-tab-direction": {

@@ -199,6 +199,91 @@
 .tbl-board tr.mine td[data-col="n"], .tbl-board tr.mine td[data-col="gap"], .tbl-board tr.mine td[data-col="keys"]{color:var(--mode-ink)}
 .board-host{display:flex; flex-direction:column; gap:var(--s4)}
 
+/* ---------- the path: Learn and the drill catalog (ui/components/path.js) ---------- */
+.keys-row{display:inline-flex; flex-wrap:wrap; gap:var(--s1); align-items:center}
+.keys-row .key{font-size:var(--fs-min)}
+.keys-more{font-size:var(--fs-min); color:var(--ink-2); font-weight:var(--fw-semi)}
+
+/* the one obvious next step, at the top of Learn */
+.learn-continue{flex-direction:row; align-items:center; gap:var(--s5); padding:var(--s5) var(--s6)}
+.learn-continue.cursor-on{outline-color:transparent}
+.learn-continue.cursor-on::after{content:none}
+.lc-n{min-width:var(--lc-n-w); font-size:var(--fs-panel); padding:var(--s2) var(--s3)}
+.lc-main{flex:1 1 auto; min-width:0; display:flex; flex-direction:column; gap:var(--s2)}
+.lc-title{margin:0; font-size:var(--fs-head); font-weight:var(--fw-heavy); line-height:1.15}
+.lc-sub{display:flex; flex-wrap:wrap; align-items:center; gap:var(--s3); font-size:var(--fs-label); font-weight:var(--fw-semi); color:var(--ink-2)}
+.learn-continue .btn2{padding:var(--s4) var(--s6); font-size:var(--fs-panel); flex:none}
+
+/* the chapter strip: six cards, each a tab */
+.ch-cards{display:grid; grid-template-columns:repeat(6, minmax(0,1fr)); gap:var(--s3); border-bottom:0}
+.ch-cards .ch-card{display:flex; flex-direction:column; align-items:stretch; gap:var(--s2); text-align:left; background:var(--sheet); border:0; border-top:var(--mode-rule) solid transparent; margin:0; padding:var(--s3) var(--s4) var(--s4); border-radius:0; color:var(--ink); font-weight:var(--fw-body)}
+.ch-cards .ch-card:hover{background:var(--chrome)}
+.ch-cards .ch-card.on{border-top-color:var(--mode); background:var(--mode-tint)}
+.ch-cards .ch-card:focus-visible{outline:var(--cursor-w) solid var(--mode); outline-offset:0; border-radius:0}
+.ch-top{display:flex; justify-content:space-between; align-items:center; gap:var(--s2)}
+.ch-n{font-family:var(--mono); font-weight:var(--fw-bold); font-size:var(--fs-panel); line-height:1; color:var(--ink); background:var(--sheet); border:1px solid var(--edge); border-bottom-width:var(--key-edge); border-radius:var(--r-btn); min-width:var(--s8); text-align:center; padding:var(--s1) var(--s2)}
+.ch-card.full .ch-n{background:var(--learn); color:var(--on-fill); border-color:var(--learn-ink)}
+.ch-note{font-size:var(--fs-min); font-weight:var(--fw-bold); color:var(--learn-ink)}
+.ch-card.locked .ch-note{display:inline-flex; align-items:center; gap:var(--s1); color:var(--challenges-ink)}
+.ch-card.locked .ch-note::before{content:''; width:var(--s2); height:var(--s2); border:var(--bw-2) solid currentColor; border-bottom:0; border-radius:var(--s1) var(--s1) 0 0; box-shadow:0 var(--s2) 0 calc(-1 * var(--bw-2)) currentColor; margin-bottom:var(--s1)}   /* a small drawn lock */
+.ch-title{font-size:var(--fs-name); font-weight:var(--fw-bold); line-height:1.25}
+.ch-bar{display:block; height:var(--bar-h); background:var(--line); margin-top:auto}
+.ch-bar i{display:block; height:100%; background:var(--learn)}
+.ch-count{font-size:var(--fs-min); font-weight:var(--fw-semi); color:var(--ink-2)}
+
+/* a module: its number on a key, its name, its path of lessons ending on the challenge */
+.mod-list{display:flex; flex-direction:column; border-top:var(--bw-2) solid var(--ink)}
+.mod-row{display:grid; grid-template-columns:var(--mod-n-w) minmax(0,1fr) auto; align-items:center; gap:var(--s4); padding:var(--s3); border-bottom:1px solid var(--line); cursor:pointer}
+.mod-row:hover{background:var(--chrome)}
+.mod-row.current{background:var(--mode-tint)}
+.mod-row.locked{cursor:default; color:var(--ink-2)}
+.mod-row.locked:hover{background:transparent}
+.mod-n{font-family:var(--mono); font-size:var(--fs-key); font-weight:var(--fw-bold); line-height:1; color:var(--ink); background:var(--sheet); border:1px solid var(--edge); border-bottom-width:var(--key-edge); border-radius:var(--r-btn); padding:var(--s1) var(--s2); text-align:center}
+.mod-complete .mod-n{background:var(--learn); color:var(--on-fill); border-color:var(--learn-ink)}
+.mod-main{display:flex; flex-direction:column; gap:var(--s2); min-width:0}
+.mod-head{display:flex; align-items:baseline; gap:var(--s3)}
+.mod-title{font-weight:var(--fw-bold); font-size:var(--fs-name)}
+.mod-min{font-size:var(--fs-min); color:var(--ink-2); font-variant-numeric:tabular-nums}
+.mod-end{display:flex; align-items:center; gap:var(--s3)}
+.mod-status{font-size:var(--fs-label); font-weight:var(--fw-semi); color:var(--ink-2)}
+.mod-complete .mod-status{color:var(--learn-ink)}
+.mod-row.current .mod-status{color:var(--ink); font-weight:var(--fw-bold)}
+
+/* the nodes: one per lesson, the line between them filling as the path is walked; the challenge is a diamond */
+.path{display:flex; align-items:center; min-height:var(--pn-now)}
+.pn{position:relative; display:inline-block; width:var(--pn); height:var(--pn); border:var(--bw-2) solid var(--edge); border-radius:50%; background:var(--sheet); flex:none; box-sizing:border-box}
+.pn + .pn{margin-left:var(--pn-gap)}
+.pn + .pn::before{content:''; position:absolute; top:50%; left:calc(-1 * var(--pn-gap) - var(--bw-2)); width:var(--pn-gap); height:var(--bw-2); background:var(--line); transform:translateY(-50%)}
+.pn-done{background:var(--learn); border-color:var(--learn)}
+.pn-done + .pn::before{background:var(--learn)}
+.pn-started{border-color:var(--learn)}
+.pn-next{width:var(--pn-now); height:var(--pn-now); border-color:var(--learn); box-shadow:0 0 0 var(--bw-3) var(--learn-tint)}
+.pn-next::after{content:''; position:absolute; inset:var(--bw-3); border-radius:50%; background:var(--learn)}
+.pn-ch{border:0; background:transparent; border-radius:0; display:inline-grid; place-items:center}
+.pn-ch i{display:block; width:calc(var(--pn) - var(--bw-2)); height:calc(var(--pn) - var(--bw-2)); transform:rotate(45deg); border:var(--bw-2) solid var(--challenges); background:var(--sheet); box-sizing:border-box}
+.pn-ch.pn-done i{background:var(--challenges)}
+.pn-ch.pn-next{box-shadow:none}
+.pn-ch.pn-next::after{content:none}
+.pn-ch.pn-next i{background:var(--challenges-tint); box-shadow:0 0 0 var(--bw-3) var(--challenges-tint)}
+a.pn:hover{border-color:var(--ink)}
+a.pn-ch:hover i{border-color:var(--challenges-ink)}
+a.pn:focus-visible{outline:var(--cursor-w) solid var(--mode); outline-offset:var(--bw-2)}
+
+/* the open module's lessons, under its row */
+.mod-lessons{display:flex; flex-direction:column; padding:var(--s1) 0 var(--s2); border-bottom:1px solid var(--line)}
+.ls-row{display:grid; grid-template-columns:var(--s12) minmax(0,1fr) auto var(--ls-st-w); align-items:center; gap:var(--s3); min-height:var(--row-h); padding:0 var(--s3) 0 calc(var(--mod-n-w) + var(--s4)); color:var(--ink); text-decoration:none; font-size:var(--fs-name)}
+.ls-row:hover{background:var(--chrome)}
+.ls-row.next{background:var(--mode-tint); font-weight:var(--fw-semi)}
+.ls-n{font-family:var(--mono); font-size:var(--fs-min); color:var(--ink-2)}
+.ls-ch .ls-title{color:var(--challenges-ink); font-weight:var(--fw-semi)}
+.ls-st{font-size:var(--fs-label); font-weight:var(--fw-semi); color:var(--ink-2); text-align:right}
+.ls-done .ls-st, .ls-row.next .ls-st{color:var(--learn-ink)}
+
+/* the badge a module pays out, under its page */
+.learn-reward{display:flex; align-items:center; gap:var(--s3); padding-top:var(--s3); border-top:1px solid var(--line)}
+.learn-reward .px{flex:none}
+@media (max-width:900px){ .ch-cards{grid-template-columns:repeat(2, minmax(0,1fr))} .learn-continue{flex-wrap:wrap} }
+
 /* below 900px the columns stack */
 @media (max-width:900px){
   .pg-two, .pg-cols{grid-template-columns:minmax(0,1fr)}

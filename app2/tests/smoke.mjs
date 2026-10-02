@@ -165,7 +165,7 @@ try {
     else { for (let i = 0; i < 8 && (await page.$('.coach')); i++) { await page.keyboard.press('Enter'); await page.waitForTimeout(60); } if (await page.$('.coach')) fail('journey: Enter did not dismiss the coach marks'); }
     // Learn (3.0): the chapter table with module 1.1 open and current, and its page built beside it
     await page.goto(base + '#/learn'); await page.waitForSelector('.learn-table', { timeout: 5000 }).catch(() => fail('journey: Learn did not render'));
-    if (!(await page.$('.learn-table tr.row-module.open'))) fail('journey: Learn has no open module');
+    if (!(await page.$('.learn-table .row-module.open'))) fail('journey: Learn has no open module');
     if (!/built/.test(await page.evaluate(() => (document.querySelector('.learn-side') || {}).textContent || ''))) fail('journey: Learn does not show page 1.1 as built');
     // Practice renders its catalog, with the first drills unlocked by 1.1
     await page.goto(base + '#/practice'); await page.waitForTimeout(300);
