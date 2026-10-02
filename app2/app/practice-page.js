@@ -51,7 +51,7 @@ export const DRILL_MODULE = {
   // Chapter 5 (script-ch5.md's module ids)
   'ch5-statement-link': 'linking-the-statements', 'ch5-schedule-fill': 'schedules', 'ch5-balance-it': 'linking-the-statements',
   'ch5-discount-it': 'dcf', 'ch5-sweep': 'linking-the-statements', 'ch5-checks': 'auditing-a-model',
-  'ch5-revenue-build': 'model-speed', 'puzzle-ch5': 'linking-the-statements',
+  'ch5-revenue-build': 'model-speed', 'puzzle-ch5': 'linking-the-statements', 'ch5-is-it-revenue': 'the-three-statements',
   // Chapter 6 (script-ch6.md's module ids)
   'ch6-spread-a-comp': 'trading-comps', 'ch6-median-and-range': 'trading-comps', 'ch6-sources-and-uses': 'lbo', 'ch6-irr-sprint': 'lbo',
   'ch6-waterfall': 'bids-and-waterfall', 'ch6-football-field': 'bids-and-waterfall', 'ch6-paper-lbo': 'lbo', 'puzzle-ch6': 'bids-and-waterfall',
@@ -199,7 +199,7 @@ function drillsPage(el, ctx) {
     const g = groups.find(x => x.id === chapterKey) || { id: tab.key, n: tab.n, title: tab.title, rows: [], passed: 0, of: 0 };
     const chLocked = tab.access === 'paid' && !pro;
     const nextId = (g.rows.find(r => r.open && !r.pro && r.best == null) || {}).id;
-    const tiles = drillSheetHtml(g.rows.map(r => ({ id: r.id, title: r.title, keys: keysOf(r.id), length: fmtLength(r.length), best: r.best != null ? fmtClock(r.best) : '', tier: r.tier, open: r.open, after: r.after, pro: r.pro, href: '#/drill/' + r.id, next: r.id === nextId })), g.title);
+    const tiles = drillSheetHtml(g.rows.map(r => ({ id: r.id, title: r.title, sub: (DRILLS_BY_ID[r.id] && DRILLS_BY_ID[r.id].ruleLine) || undefined, keys: keysOf(r.id), length: fmtLength(r.length), best: r.best != null ? fmtClock(r.best) : '', tier: r.tier, open: r.open, after: r.after, pro: r.pro, href: '#/drill/' + r.id, next: r.id === nextId })), g.title);
     const main = panelHtml({ heading: esc(t('chapter_heading', { n: g.n, name: g.title })), facts: g.of ? esc(t('practice_chapter_fact', { done: g.passed, of: g.of })) : '', body: g.rows.length ? tiles : `<p class="panel-line">${esc(t('practice_chapter_coming', { n: g.n }))}</p>`, cls: 'catalog', stretch: true });
     // the set, inline: what Start drilling plays, in order, and why each is in it
     const setRows = set.ids.map((id, i) => { const e = CATALOG.find(x => x.id === id); return `<a class="set-row" href="#/drill/${esc(id)}"><kbd class="key set-n">${i + 1}</kbd><span class="set-main"><span class="row-name">${esc(e.title)}</span><span class="row-sub">${esc(t('reason_' + String(set.reasons[id]).replace('-', '_')))}</span></span><span class="set-len">${esc(fmtLength(e.length))}</span></a>`; }).join('');

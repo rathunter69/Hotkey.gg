@@ -60,7 +60,8 @@ export function recordRun(run) {
     const r = settle(L, attempts, ctx, Date.now(), roller(attempts));
     saveLedger(L);
     // the rows this run moved: a step forward, or the tick
-    const moved = ['daily', 'weekly'].flatMap(p => r.board[p].rows.filter(row => had[p + row.id] !== Infinity && row.have > (had[p + row.id] || 0)));
+    const tickedNow = new Set(r.ticked.map(row => row.id));
+    const moved = ['daily', 'weekly'].flatMap(p => r.board[p].rows.filter(row => tickedNow.has(row.id) || (had[p + row.id] !== Infinity && row.have > (had[p + row.id] || 0))));
     return {
       quests: moved.map(row => ({ title: questTitle(row), have: row.have, target: row.target, done: row.done, xp: row.xp })),
       bonus: r.bonus.map(b => ({ period: b.period, xp: b.xp, reward: b.roll && FLAIR_BY_ID[b.roll] ? siteCopy('flair_' + b.roll, FLAIR_BY_ID[b.roll].fallback) : '' })),

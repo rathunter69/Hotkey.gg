@@ -29,6 +29,7 @@ import { fitZoomFor } from './zoom.js';
 import { itemNumber } from './numbering.js';
 import { titleAt, rewardAt } from '../content/levels.js';
 import { recordRun } from './quest-loop.js';
+import { hasPickers, PICKER_LESSON } from '../content/catalog.js';
 import { equipReward } from './cosmetics.js';
 import { shortcutsUsed } from './runner.js';
 import { siteCopy } from '../content/copy/apply.js';
@@ -179,11 +180,18 @@ export function mountDrillPage(root, ctx = {}) {
   document.addEventListener('fullscreenchange', onFullChange);
 
   /* ---------------- Ready, Run ---------------- */
+  /** The lines the Ready beat carries above the tasks (M85): a stretch drill's one rule, and the drop-downs when the lesson that teaches them isn't done. */
+  function readyNotes(d, all) {
+    const notes = [];
+    if (d.ruleLine) notes.push(d.ruleLine);
+    if (hasPickers(d) && !(all[PICKER_LESSON] && all[PICKER_LESSON].completed)) notes.push(siteCopy('panel_pickers', 'The class cells are drop-downs: Alt+↓ opens one, ↑ and ↓ move, Enter picks.'));
+    return notes;
+  }
   function showReady() {
     phase = 'ready';
     const pb = store.pb(drill.id);
     panel.ready({
-      title: drill.title, tasks: drill.goals.map(g => g.text), length: aboutLength(drill.pars && drill.pars.pass),
+      title: drill.title, tasks: drill.goals.map(g => g.text), length: aboutLength(drill.pars && drill.pars.pass), notes: readyNotes(drill, store.all()),
       best: pb ? { secs: pb.secs, tier: tierFor(pb.secs, drill.pars) } : null, pars: drill.pars,
     });
     if (tickH) { clearInterval(tickH); tickH = null; }

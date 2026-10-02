@@ -172,6 +172,7 @@ export function createRunPanel(host, opts = {}) {
     const best = d.best && Number.isFinite(d.best.secs) ? t('panel_best', 'Best {t}, {tier}', { t: fmtPar(d.best.secs), tier: tierLabel(d.best.tier) }) : '';
     const html = `<div class="rp-title">${esc(d.title)}</div>` +
       factsHtml([t('panel_tasks', '{n} tasks', { n: d.tasks.length }), d.length ? t('panel_about', 'About {m}', { m: d.length }) : '', best]) +
+      (d.notes || []).filter(Boolean).map(n => `<div class="rp-note">${esc(n)}</div>`).join('') +
       `<ol class="rp-tasks">${d.tasks.map((x, i) => `<li><i>${i + 1}</i><span>${esc(x)}</span></li>`).join('')}</ol>` +
       (d.pars ? `<div class="rp-pars">${TIER_ORDER.map(tier => `<span><b>${esc(tierLabel(tier))}</b> ${esc(fmtPar(d.pars[tier]))}</span>`).join('')}</div>` : '') +
       `<div class="rp-start">${esc(siteCopy('panel_press_any', 'Press any key to start'))}</div>` +

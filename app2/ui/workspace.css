@@ -379,6 +379,7 @@ html[data-panel="ticker"] .rp-head{border-left:var(--s2) solid var(--clock-ink)}
 
 /* the quest rows in the result (6.10, the quest loop): the name, a bar that fills to where the run left it, the count or the XP */
 .rp-quest .rp-quest-name{flex:1 1 auto; min-width:0; color:var(--ink)}
+.rp-quest b{white-space:nowrap}
 .rp-quest .rp-tickbox:not(.on){background:transparent; box-shadow:inset 0 0 0 var(--bw-1-5) var(--edge)}
 .rp-quest .rp-tickbox:not(.on)::after{display:none}
 .rp-quest-bar{flex:0 0 calc(3 * var(--seg-w)); height:var(--bar-h); background:var(--line); border-radius:1px; overflow:hidden}

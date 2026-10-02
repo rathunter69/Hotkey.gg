@@ -19,6 +19,7 @@ import ch5_discount_it from './drills/ch5-discount-it.js';
 import ch5_sweep from './drills/ch5-sweep.js';
 import ch5_checks from './drills/ch5-checks.js';
 import ch5_revenue_build from './drills/ch5-revenue-build.js';
+import ch5_is_it_revenue from './drills/ch5-is-it-revenue.js';
 import puzzle_ch5 from './drills/puzzle-ch5.js';
 import ch6_spread_a_comp from './drills/ch6-spread-a-comp.js';
 import ch6_median_and_range from './drills/ch6-median-and-range.js';
@@ -54,6 +55,7 @@ export const DRILLS = [
   ch5_sweep,
   ch5_checks,
   ch5_revenue_build,
+  ch5_is_it_revenue,   // R7: the proof of pickers and what-if grading (M84, M85; script-drills D01)
   puzzle_ch5,
   // Chapter 6 (screenplay 6.2): the planned set on the valuation pack, the benchmark and the puzzle
   ch6_spread_a_comp,

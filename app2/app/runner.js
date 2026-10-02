@@ -1,6 +1,7 @@
 // app2/app/runner.js — runs one lesson: builds the sheet and session, feeds keys, tracks goals.
 // Headless (the replay test uses it); the lesson view paints from it.
 
+import { whatIf } from './what-if.js';
 import { Sheet } from '../engine/sheet.js';
 import { Session, parseKeyScript, parseKeySpec } from '../engine/keyboard.js';
 import { stepPath } from '../engine/ribbon.js';
@@ -26,6 +27,7 @@ export class LessonRun {
   /** Fresh sheet + session at the lesson's starting state. */
   reset(mode) {
     if (mode) this.mode = mode;
+    this.whatIfRef = null;   // the reference route's workbook, built on first need (M84)
     this.ghostSnap = null; this.ghosting = false;   // a restart mid-ghost: the freeze belongs to the session being thrown away
     // the case's "today": a module workbook names it (CASE_TODAY, the Monday of its reporting week) so Ctrl+; and TODAY() date the sheet the way its states do
     const wb = this.lesson.workbook ? WORKBOOKS[this.lesson.workbook] : null;
@@ -261,11 +263,28 @@ export class LessonRun {
    * with a broken convention is not a pass; the first failing `why` is the one line shown.
    */
   graderStates() {
-    if (!Array.isArray(this.lesson.graders)) return [];
-    return this.lesson.graders.map(fn => {
+    const fns = Array.isArray(this.lesson.graders) ? this.lesson.graders.slice() : [];
+    // M84: a what-if over the answer block, judged against the reference route under the same change
+    if (this.lesson.whatIf && !this.opts.noWhatIf) fns.push(ses => whatIf(ses, this.referenceSession(), this.lesson.whatIf));
+    return fns.map(fn => {
       try { const r = fn(this.session); return { ok: !!(r && r.ok), why: (r && r.why) || 'a convention check failed' }; }
       catch (e) { return { ok: false, why: 'a convention check failed' }; }
     });
+  }
+  /**
+   * The reference route's finished workbook, on the same seed and patch as this run: the solution
+   * replayed headless once and kept for the run (M84's judge). null when the route doesn't finish.
+   */
+  referenceSession() {
+    if (this.whatIfRef !== null) return this.whatIfRef || null;
+    let ref = false;
+    try {
+      const r = new LessonRun(this.lesson, { mode: this.mode, seedNo: this.seedNo, statePatch: this.opts.statePatch, today: this.opts.today, now: () => 0, noWhatIf: true });
+      r.run(this.lesson.solution);
+      ref = r.finished ? r.session : false;
+    } catch (e) { ref = false; }
+    this.whatIfRef = ref;
+    return ref || null;
   }
 }
 
