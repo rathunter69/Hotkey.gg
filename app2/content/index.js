@@ -61,6 +61,7 @@ import challenge_new_site_case from './lessons/challenge-new-site-case.js';
 import trace_arrows_evaluate from './lessons/trace-arrows-evaluate.js';
 import f9_show_formulas_at_scale from './lessons/f9-show-formulas-at-scale.js';
 import hardcode_external_link_hunt from './lessons/hardcode-external-link-hunt.js';
+import checks_block_rollup from './lessons/checks-block-rollup.js';
 import remix_format_on_the_pnl from './remixes/formatting-on-the-pnl.js';   // Chapter 1's format challenge, re-clothed (content/remix.js)
 
 export const CHAPTERS = [
@@ -123,7 +124,7 @@ export const CHAPTERS = [
     ],
     lessons: [
       pv_fv_pmt, npv_xnpv, irr_xirr, payment_schedule, challenge_new_site_case,
-      trace_arrows_evaluate, f9_show_formulas_at_scale, hardcode_external_link_hunt,
+      trace_arrows_evaluate, f9_show_formulas_at_scale, hardcode_external_link_hunt, checks_block_rollup,
     ],
   },
 ];
