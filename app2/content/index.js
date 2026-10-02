@@ -216,6 +216,8 @@ import keyboard_only_linking from './lessons/keyboard-only-linking.js';
 import challenge_model_speed from './lessons/challenge-model-speed.js';
 import ch5_project from './lessons/ch5-project.js';
 import ch5_assessment from './lessons/ch5-assessment.js';
+// Chapter 6 · Valuation (Run R6): 6.1 Trading comps
+import spreading_a_comp from './lessons/spreading-a-comp.js';
 
 export const CHAPTERS = [
   {
@@ -356,6 +358,23 @@ export const CHAPTERS = [
       what_a_dcf_is, unlevered_free_cash_flow, wacc_block, terminal_value, discounting_mid_year, dcf_sensitivity, challenge_dcf,
       revenue_build_in_three, fill_and_format_block, keyboard_only_linking, challenge_model_speed,
       ch5_project, ch5_assessment,
+    ],
+  },
+  {
+    id: 'valuation',
+    title: 'Valuation',
+    access: 'paid',
+    blurb: 'What Clearcoat is worth by every method and what each bid leaves the owners: trading comps, precedent deals, the sponsor’s LBO, the bids and the waterfall, on one page for the board.',
+    // Chapter 6's sections in order (script-ch6.md): the four modules and the closing project block.
+    sections: [
+      { name: 'Trading comps', blurb: 'Spreading a comp, the enterprise value build; calendarization and LTM; sorting the set, filtering the outliers, taking the median; EV per site and per wash; the range applied to Clearcoat.' },
+      { name: 'Precedent transactions', blurb: 'Deal multiples and premiums; sorting by date and size and deciding what is comparable; the precedents range applied.' },
+      { name: 'LBO', blurb: 'Sources and uses; the debt and the cash sweep; sale-leasebacks; IRR and MOIC; the returns bridge; what the sponsor can pay.' },
+      { name: 'The bids and the waterfall', blurb: 'Three bids side by side; from enterprise value to the owners’ proceeds; your stake under each bid; the football field and the page for the board.' },
+      { name: 'Project and assessment', blurb: 'The valuation summary for the board from a fresh set, then again against the clock.' },
+    ],
+    lessons: [
+      spreading_a_comp,
     ],
   },
 ];

@@ -107,6 +107,9 @@ const BEATS_DEFAULT = {
     body: 'Everything in this chapter you can now do; the question a desk asks is how fast. Three benchmarks, each a piece of the model against the clock: the revenue build in three minutes, a block filled and formatted in one pass, the cash flow statement linked without touching the mouse. They live in Practice as this chapter’s benchmarks, and here you run each once with the keys shown.' },
   'ch5-project-and-assessment': { eyebrow: 'Module 5.8 · project and assessment', title: 'The operating model, end to end.',
     body: 'An empty shell with the inputs and the history in it. Build the schedules, link the statements, get the flag to OK and value the business. Build it, then build one schedule and its links again on the clock. The assessment is the test-out.' },
+  // Chapter 6 · Valuation (script-ch6.md story cards)
+  'trading-comps': { eyebrow: 'Module 6.1 · trading comps', title: 'What the market pays for a car wash.',
+    body: 'Six listed operators do what Clearcoat does, and the market prices each of them every day. Turn those prices into multiples (what a dollar of car-wash EBITDA is worth), measure every company to the same date, take the middle of the set, and apply it to Clearcoat. That’s the first range on the board’s page, and the one the buyers will quote back.' },
   'project-and-assessment': { eyebrow: 'Module 1.8 · project, assessment, test-out', title: 'Management’s next feed is in.',
     body: 'A fresh week, a blank Report, and everything the chapter taught. Build the page start to finish, then prove it against the clock on Monday morning; or test out of the chapter in five minutes.' },
 };

@@ -163,6 +163,9 @@ function page(spec) {
   }
   if (spec.condFmt) sheet.condFmt = clone(spec.condFmt);
   if (spec.colWExtra) Object.assign(sheet.colW, spec.colWExtra);
+  // a page wider than Z (Comps runs to AB) widens its grid, or the last columns sit off the sheet
+  const widest = Math.max(...Object.keys(cells).filter(k => /^[A-Z]+\d+$/.test(k)).map(k => colNum(k.replace(/\d+$/, ''))));
+  if (widest > 26) sheet.cols = widest + 2;
   return sheet;
 }
 function dryRows(spec) {
@@ -792,10 +795,10 @@ const Rw = ROW;
 function lboRaw(s, rows) { strip(s, 'LBO', rows, allKeys(rows, 'LBO')); stripHeader(s, 'LBO', rows, 'hurdles'); delete sheetOf(s, 'LBO').condFmt; }
 function bidsRaw(s, rows) { const b = BB(rows); strip(s, 'Bids', rows, [...b.bids, ...b.priced, ...b.rank, ...b.wf, ...b.stake, ...b.inputs641]); }
 function after62(s, rows) { lboRaw(s, rows); bidsRaw(s, rows); summaryLabels(s); pendSu(s); }
-function after61(s, rows, deals) { dealsRaw(s, rows, deals); after62(s, rows); }
 
 // module 6.1: trading comps (Comps grows column group by column group; every later page waits)
-const B615 = derive(DONE, s => { strip(s, 'Comps', Rw, span(Rw, 'Comps', 'rgMult', 'rgEqWash')); after61(s, Rw, DEALS); });
+// 6.1.5 ends where 6.2.1 starts: B615 is B621 with the Comps range not yet applied (so the chain is exact)
+const B615 = derive(() => B621(), s => { strip(s, 'Comps', Rw, span(Rw, 'Comps', 'rgMult', 'rgEqWash')); });
 const B614 = derive(B615, s => { keepCols(s, 'Comps', Rw, [...compKeys(Rw, 6), 'cc'], [...COMP_INPUT_COLS, ...COMP_EV_COLS, ...COMP_STAT_COLS]); strip(s, 'Comps', Rw, STATS, COMP_OP_COLS); });
 const B613 = derive(B614, s => { keepCols(s, 'Comps', Rw, compKeys(Rw, 6), [...COMP_INPUT_COLS, ...COMP_EV_COLS]); strip(s, 'Comps', Rw, [...STATS, 'cc', 'sort0', 'sort1', 'sort2', 'sort3', 'sort4', 'sort5']); stripHeader(s, 'Comps', Rw, 'sort0'); delete cellsOf(s, 'Comps')[CC.note + Rw.Comps.c4]; });
 const B612 = derive(B613, s => {
@@ -803,7 +806,8 @@ const B612 = derive(B613, s => {
   keepCols(s, 'Comps', Rw, qKeys(Rw, 6), Q_INPUT_COLS); stripHeader(s, 'Comps', Rw, 'q0', ['C']);
   strip(s, 'Comps', Rw, ['ltmDate', 'ltmStart', 'priorStart']);
 });
-const B611 = derive(B615, s => compsRaw(s, Rw, COMPS));
+// 6.1.1 ends on B612: B611 is B612 without the EV build (market cap, EV, the two multiples, the margin)
+const B611 = derive(B612, s => { strip(s, 'Comps', Rw, compKeys(Rw, 6), COMP_EV_COLS); });
 const ALT_PACK = lazy(() => buildPack(ALT));
 const ALT2_PACK = lazy(() => buildPack(ALT2));
 /** A state on a fresh set: the model sheets, the pack's pages, everything raw. `fn` shapes it. */
@@ -887,4 +891,28 @@ export function stateOf(id) {
   const s = STATES[id];
   if (!s) throw new Error('unknown workbook state ' + id);
   return clone(s);
+}
+
+/* ---------------- the replay's state shape and the module challenges' seeds ---------------- */
+
+/** The pack is the Chapter 5 model plus five pages: its sessions and states compare as the model's do. */
+export { diffStates, sessionToState } from './clearcoat-model.js';
+
+/** The module challenges and the states they start from (the seed dresses them; the workload never moves). */
+export const CHALLENGES = {
+  'challenge-comps': { before: 'B61C' },
+};
+const drawStep = (rng, lo, hi, by) => Math.round((lo + Math.floor(rng() * (Math.round((hi - lo) / by) + 1)) * by) * 1e6) / 1e6;
+const SEEDS = {
+  // 6.1.C: the three fresh comps' share prices, each within a tenth of its own, so every EV and multiple is new
+  'challenge-comps': rng => {
+    const rows = ALT_ROWS().Comps, cells = cellsOf(STATES.B61C, 'Comps'), p = {};
+    ALT.comps.forEach((cp, i) => { const ref = CC.price + rows['c' + i]; p['Comps!' + ref] = { ...clone(cells[ref]), value: drawStep(rng, Math.round(cp.price * 90) / 100, Math.round(cp.price * 110) / 100, 0.05) }; });
+    return p;
+  },
+};
+/** A module challenge's seed patch: content only, never workload. */
+export function challengeSeed(id, rng) {
+  if (!CHALLENGES[id] || !SEEDS[id]) throw new Error('clearcoat-valuation: no challenge ' + id);
+  return SEEDS[id](rng);
 }

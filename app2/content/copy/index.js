@@ -2391,6 +2391,18 @@ export const COPY = {
    "mac_note": "",
    "story_beat": ""
   },
+  "spreading-a-comp": {
+   "id": "spreading-a-comp",
+   "module": "trading-comps",
+   "order": "6.1.1",
+   "title": "Spreading a comp: the EV build",
+   "brief": "Enterprise value is what the operating business is worth, however it’s funded: equity value (share price times shares) plus debt, less the cash that comes with it. A trading multiple is that over a year of EBITDA, the market’s price for a dollar of profit. Spreading a comp means building those lines for one company from its filings, so every company in the set is built the same way. Spread Pinnacle, then fill the pattern down the set. The key is `=`.",
+   "closing": "Six companies are built the same way, and each one carries a price for a dollar of profit. || Best practice: every input on a comp carries its source and date in the next cell. When a reviewer asks where 24.50 came from, the answer is on the row.",
+   "wow": "",
+   "convention_line": "Inputs blue, formulas black; Write once, fill right; $ on the first and total rows; Label the source (\"per utility contract\")",
+   "mac_note": "",
+   "story_beat": ""
+  },
   "remix-format-on-the-pnl": {
    "id": "remix-format-on-the-pnl",
    "module": "remixes",
@@ -14916,6 +14928,64 @@ export const COPY = {
     "why": "",
     "hint_stuck": ""
    }
+  ],
+  "spreading-a-comp": [
+   {
+    "lesson_id": "spreading-a-comp",
+    "goal_index": "0",
+    "text": "On Comps, Pinnacle’s market cap in E5: =C5*D5.",
+    "teach": "On Comps, each operator’s inputs are typed in blue from its filings: price, shares, debt, cash, LTM revenue and EBITDA. The LTM figures are given for now; the next lesson builds them. Equity value starts with the market’s price: share price times shares is the market cap.",
+    "why": "",
+    "hint_stuck": "pulse cell E5 · Price in C5 times shares in D5, both in thousands of dollars once multiplied."
+   },
+   {
+    "lesson_id": "spreading-a-comp",
+    "goal_index": "1",
+    "text": "Enterprise value in H5: =E5+F5-G5.",
+    "teach": "A buyer of the business takes on its debt and gets its cash, so enterprise value is the market cap plus debt less cash. It is the same whether the company is funded by shares or loans.",
+    "why": "",
+    "hint_stuck": "pulse cell H5 · Market cap in E5, debt in F5 added, cash in G5 taken off."
+   },
+   {
+    "lesson_id": "spreading-a-comp",
+    "goal_index": "2",
+    "text": "The multiples: K5 =H5/I5, and L5 =IF(J5>0,H5/J5,\"NM\").",
+    "teach": "Enterprise value goes over a line struck before interest (revenue, EBITDA), because a sponsor sets its own debt and a peer’s multiple should price its washes, not its loans. Where EBITDA is zero or negative the multiple means nothing, so the IF shows NM and the statistics later skip it like any text.",
+    "why": "",
+    "hint_stuck": "pulse range K5:L5 · Both over the EV in H5; the IF tests J5 first."
+   },
+   {
+    "lesson_id": "spreading-a-comp",
+    "goal_index": "3",
+    "text": "The EBITDA margin in M5: =J5/I5, in italic with Ctrl+I.",
+    "teach": "The margin is a ratio beside the figures, not a figure, so the page sets it in italic.",
+    "why": "",
+    "hint_stuck": "pulse cell M5 · EBITDA in J5 over revenue in I5, then Ctrl+I."
+   },
+   {
+    "lesson_id": "spreading-a-comp",
+    "goal_index": "4",
+    "text": "Fill the set: K5:M10 down with Ctrl+D, then E6:E10 and H6:H10 with Ctrl+Enter so the $ stays on the first row.",
+    "teach": "Ctrl+D copies a cell’s format with its formula, which is right for the multiples and the margin. The $ sign belongs on the first row only, so E and H take Ctrl+Enter, which writes the formula and leaves each cell’s format alone.",
+    "why": "",
+    "hint_stuck": "pulse range K5:M10 · Summit holds more cash than debt, so its EV lands below its market cap: net cash, as the note in AB7 says."
+   },
+   {
+    "lesson_id": "spreading-a-comp",
+    "goal_index": "5",
+    "text": "Read where Pinnacle’s figures come from: from C5, Ctrl+→ twice lands on its source and date in AA5.",
+    "teach": "A comp set is only as good as the day it was pulled, so every comp carries its filing and its price date beside it. Ctrl+→ jumps across the empty columns to the next thing in the row.",
+    "why": "",
+    "hint_stuck": "pulse cell AA5 · The first Ctrl+→ stops at M5, the end of the filled run."
+   },
+   {
+    "lesson_id": "spreading-a-comp",
+    "goal_index": "6",
+    "text": "Does it tie? Watch Pinnacle’s price go from $24.50 to $30.00: its market cap, EV and multiple in row 5 move, and no other row does.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell L5 · Each row reads only its own inputs."
+   }
   ]
  },
  "modules": {
@@ -15191,6 +15261,13 @@ export const COPY = {
    "objective": "The operating model with its DCF page; the assessment is one schedule and the links from it, timed.",
    "story_beat": "The operating model, end to end. || An empty shell with the inputs and the history in it. Build the schedules, link the statements, get the flag to OK and value the business. Build it, then build one schedule and its links again on the clock. The assessment is the test-out.",
    "page_name": "The operating model"
+  },
+  "trading-comps": {
+   "id": "trading-comps",
+   "name": "Trading comps",
+   "objective": "Trading comps: spreading a comp (the enterprise value build); calendarization and LTM; sorting the set, filtering the outliers, taking the median; operating multiples (EV per site and per wash); applying the range to Clearcoat.",
+   "story_beat": "What the market pays for a car wash. || Six listed operators do what Clearcoat does, and the market prices each of them every day. Turn those prices into multiples (what a dollar of car-wash EBITDA is worth), measure every company to the same date, take the middle of the set, and apply it to Clearcoat. That’s the first range on the board’s page, and the one the buyers will quote back.",
+   "page_name": "Trading comps, spread"
   }
  },
  "site": {

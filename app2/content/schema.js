@@ -380,6 +380,15 @@ export const CONCEPTS = {
   'speed-build': 'a build on the clock: each row’s formula written once in its first column and filled right, anchors set with F4 as the formula is typed, the check read at the end',
   'one-pass-format': 'a block filled with one Ctrl+R and formatted by whole-block actions, F4 repeating each one on the next range, so no cell is touched twice',
   'keyboard-linking': 'statement links made without the mouse: the reference typed, or pointed with Ctrl+PgDn and the arrows, then Ctrl+Enter across the row and F4 repeating the green',
+  // Chapter 6 · 6.1 Trading comps (the valuation pack)
+  'enterprise-value': 'enterprise value is what the operating business is worth however it is funded: market cap (price times shares) plus debt, less cash',
+  'trading-multiple': 'a trading multiple is enterprise value over a year of revenue or EBITDA, with NM where EBITDA is zero or negative: the market’s price for a dollar of profit',
+  'ltm': 'LTM is the last twelve months: the last four quarters to one date, a SUMIFS on the period-end dates, so every company is measured to the same day',
+  'calendarization': 'calendarization restates a fiscal year onto a calendar year by weighting two fiscal years by the months each contributes, the weight from MONTH(year end)/12',
+  'flagged-set-stats': 'statistics on a flagged set run through a helper column, =IF(include=1, multiple, ""), so an excluded comp drops out instead of counting as zero',
+  'quartile-range': 'QUARTILE.INC(helper,1) and (helper,3) give the low and high of a range around the median, which an outlier cannot pull',
+  'operating-multiples': 'operating multiples price a unit anyone can count: enterprise value per site and per wash, beside EV / EBITDA',
+  'applied-range': 'a range applied: the low, median and high multiples times the target’s own figure, giving a range of enterprise values and, less net debt, of equity values',
 };
 
 /**

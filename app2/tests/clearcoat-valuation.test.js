@@ -170,7 +170,8 @@ test('the start states: each lesson finds its inputs, the empty cells it fills a
   assert.equal(cell(b611, 'Comps', C6.ebitda + R.Comps.c0).value, 170500); assert.equal(cell(b611, 'Comps', C6.ebitda + R.Comps.c0).fontColor, 'blue');
   for (const col of [C6.mcap, C6.ev, C6.evEbitda, C6.include, C6.sites]) assert.equal(cell(b611, 'Comps', col + R.Comps.c0), undefined, 'B611 ' + col);
   assert.ok(cell(b611, 'Comps', C6.note + R.Comps.c2)); assert.equal(cell(b611, 'Comps', C6.note + R.Comps.c4), undefined);
-  assert.equal(cell(b611, 'Comps', 'C' + R.Comps.q0), undefined, 'no quarters yet'); assert.equal(cell(b611, 'Comps', 'C' + R.Comps.cc), undefined);
+  assert.equal(cell(b611, 'Comps', 'C' + R.Comps.q0).fontColor, 'blue', 'the quarters typed (6.1.2 reads them), nothing built on them'); assert.equal(cell(b611, 'Comps', 'P' + R.Comps.q0), undefined); assert.equal(cell(b611, 'Comps', 'C' + R.Comps.cc), undefined);
+  assert.deepEqual(WB.diffStates(WB.stateOf('B615'), (() => { const s = WB.stateOf('B621'); for (const k of Object.keys(s.sheets.find(x => x.name === 'Comps').cells)) { const r = +k.replace(/^[A-Z]+/, ''); if (r >= R.Comps.rgMult && r <= R.Comps.rgEqWash && !k.startsWith('B')) delete s.sheets.find(x => x.name === 'Comps').cells[k]; } return s; })()), [], '6.1.5 ends where 6.2.1 starts');
   assert.equal(cell(b611, 'Precedents', D6.mult + R.Precedents.d0), undefined); assert.ok(cell(b611, 'Precedents', D6.ev + R.Precedents.d0));
   assert.equal(cell(b611, 'LBO', 'C' + R.LBO.entryEV), undefined); assert.equal(cell(b611, 'Bids', 'C' + R.Bids.headline), undefined); assert.ok(cell(b611, 'Bids', 'C' + R.Bids.feePct));
   assert.equal(cell(b611, 'Summary', 'A1'), undefined); assert.ok(cell(b611, 'Summary', 'B' + R.Summary.ffComps));

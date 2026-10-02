@@ -46,7 +46,7 @@ test('the course: six chapters toward one certificate', () => {
   assert.equal(COURSE.chapters.length, 6); assert.equal(COURSE.chapters[0].id, 'foundations'); assert.equal(COURSE.chapters[5].n, 6);
   const none = courseProgress(CHAPTERS, {}, {});
   assert.deepEqual([none.verifiedCount, none.of, none.issued, none.chapters.length], [0, 6, false, 6]);
-  assert.equal(none.chapters[0].built, true); assert.equal(none.chapters[5].built, false);
+  assert.equal(none.chapters[0].built, true); assert.equal(none.chapters[5].built, true, 'Chapter 6 is in the catalogue (R6)');
   const recs = Object.fromEntries(COURSE.chapters.map(c => [c.id, { assessment: true }]));
   const all = courseProgress(CHAPTERS, doneAll(ch1, { gate: 400 }), recs);
   assert.deepEqual([all.verifiedCount, all.issued, all.chapters[0].status, all.chapters[5].status], [6, true, 'verified', 'verified']);
