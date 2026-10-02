@@ -78,3 +78,21 @@ test('probing stays within budget: precedents only, no recalc for a hardcode, fu
   const t = new Sheet({ cells: { A1: { value: 1 }, B1: { formula: '=A1+1' }, C1: { formula: '=B1*2' } } });
   assert.equal(isLiveFormula(t, 'C1', { inputs: ['a1'] }), true);   // explicit inputs are normalised
 });
+
+test('a link to a formula on another sheet is live through that formula’s own inputs (=Sites!K5 where K5 =J5/365.25)', async () => {
+  const { Session } = await import('../engine/keyboard.js');
+  const s = new Session(new Sheet({ cells: { C5: { value: 1 } } }));
+  s.renameSheet(0, 'Summary');
+  s.addSheet('Sites', new Sheet({ cells: { I5: { value: 46280 }, E5: { value: 43539 }, J5: { formula: '=$I$5-E5' }, K5: { formula: '=J5/365.25' }, K6: { formula: '=Summary!C5*2' } } }));
+  s.switchSheet(0);
+  const sum = s.sheet;
+  sum.commitInput('=Sites!K5', 5, 12);      // L5
+  sum.commitInput('=Sites!K5*0', 5, 13);    // M5
+  sum.commitInput('=Sites!K6', 5, 14);      // N5
+  assert.ok(Math.abs(sum.value('L5') - 2741 / 365.25) < 1e-9);
+  assert.equal(isLiveFormula(sum, 'L5'), true, 'the chain reaches Sites!I5 and E5');
+  assert.equal(isLiveFormula(sum, 'M5'), false, 'times zero is still dead across sheets');
+  assert.equal(isLiveFormula(sum, 'N5'), true, 'a hop out and back to this sheet lands on its own input C5');
+  assert.equal(isLiveFormula(sum, 'N5', { inputs: ['C5'] }), true);
+  assert.ok(liveFormulas(sum).includes('L5') && !liveFormulas(sum).includes('M5'));
+});
