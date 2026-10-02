@@ -170,6 +170,7 @@ import ch4_assessment from './lessons/ch4-assessment.js';
 import tie_outs_cross_foots from './lessons/tie-outs-cross-foots.js';
 import error_flags_checks_summary from './lessons/error-flags-checks-summary.js';
 import model_wide_sweep from './lessons/model-wide-sweep.js';
+import stress_tests from './lessons/stress-tests.js';
 
 export const CHAPTERS = [
   {
@@ -303,7 +304,7 @@ export const CHAPTERS = [
       { name: 'Project and assessment', blurb: 'The operating model with its DCF page, then one schedule and its links against the clock.' },
     ],
     lessons: [
-      tie_outs_cross_foots, error_flags_checks_summary, model_wide_sweep,
+      tie_outs_cross_foots, error_flags_checks_summary, model_wide_sweep, stress_tests,
     ],
   },
 ];
