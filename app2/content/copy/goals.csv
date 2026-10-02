@@ -1281,3 +1281,9 @@ drivers-block,2,"Live washes a day in C36: =IF(Inputs!C$6=0,Schedules!C16,CHOOSE
 drivers-block,3,"The Cover title in A1 takes the case: =Inputs!$C$104&"": operating model, ""&C5&"" case"".","Every page says which case it shows (2.6.3), so a printed page can’t be mistaken for another case.",,pulse cell A1 · The switch’s word is in C5.
 drivers-block,4,"The IS title in A1 the same way: =Inputs!$C$104&"": income statement, ""&Cover!$C$5&"" case"".","A scenario moves several drivers together and tells a story; a sensitivity moves one at a time (4.5.2). The drivers block is for scenarios, the data tables for sensitivities, and a model a buyer trusts has both.",,pulse cell A1 · The case word lives on the Cover.
 drivers-block,5,Does it tie? Watch the Cover switch to Downside: the live block moves in FY27 to FY31 and holds in FY24 to FY26.,,,pulse range C35:J39 · Only the projected years read the cases.
+challenge-model-shell,0,"The tabs in order: Cover, Inputs, IS, CF, BS, Schedules, Checks, DCF.",,,
+challenge-model-shell,1,"On Inputs, 12/31/2024 in C4 and =EOMONTH(C4,12) across D4:J4.",,,
+challenge-model-shell,2,"The projection flag across C6:J6, reading LastHistorical.",,,
+challenge-model-shell,3,"Row 4 on IS, CF, BS, Schedules, Checks and DCF linked to Inputs, ending the group.",,,
+challenge-model-shell,4,"IS revenue in C5:E7 from Data by name and year, with INDEX/MATCH.",,,
+challenge-model-shell,5,"The balance check live across Checks C6:J6, reading zero.",,,

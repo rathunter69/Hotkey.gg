@@ -2007,6 +2007,18 @@ export const COPY = {
    "mac_note": "",
    "story_beat": ""
   },
+  "challenge-model-shell": {
+   "id": "challenge-model-shell",
+   "module": "model-setup",
+   "order": "5.2.C",
+   "title": "Challenge: a blank model shell to standard in three minutes",
+   "brief": "Eight sheets in the wrong order, no timeline and no live checks. Order the tabs, build the timeline and its flag, link it everywhere, pull the revenue history from Data and make the balance check live.",
+   "closing": "",
+   "wow": "",
+   "convention_line": "Name the tabs; outputs left, data right; The check is a live difference → 0",
+   "mac_note": "",
+   "story_beat": ""
+  },
   "remix-format-on-the-pnl": {
    "id": "remix-format-on-the-pnl",
    "module": "remixes",
@@ -12611,6 +12623,56 @@ export const COPY = {
     "teach": "",
     "why": "",
     "hint_stuck": "pulse range C35:J39 · Only the projected years read the cases."
+   }
+  ],
+  "challenge-model-shell": [
+   {
+    "lesson_id": "challenge-model-shell",
+    "goal_index": "0",
+    "text": "The tabs in order: Cover, Inputs, IS, CF, BS, Schedules, Checks, DCF.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-model-shell",
+    "goal_index": "1",
+    "text": "On Inputs, 12/31/2024 in C4 and =EOMONTH(C4,12) across D4:J4.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-model-shell",
+    "goal_index": "2",
+    "text": "The projection flag across C6:J6, reading LastHistorical.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-model-shell",
+    "goal_index": "3",
+    "text": "Row 4 on IS, CF, BS, Schedules, Checks and DCF linked to Inputs, ending the group.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-model-shell",
+    "goal_index": "4",
+    "text": "IS revenue in C5:E7 from Data by name and year, with INDEX/MATCH.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-model-shell",
+    "goal_index": "5",
+    "text": "The balance check live across Checks C6:J6, reading zero.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
    }
   ]
  },
