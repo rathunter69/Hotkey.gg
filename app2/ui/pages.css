@@ -308,11 +308,11 @@ a.pn:focus-visible{outline:var(--cursor-w) solid var(--mode); outline-offset:var
 
 /* the set, inline at the side of the catalog */
 .set-list{display:flex; flex-direction:column; border-top:var(--bw-2) solid var(--ink)}
-.set-row{display:grid; grid-template-columns:auto minmax(0,1fr) var(--set-len-w); align-items:center; gap:var(--s3); padding:var(--s2) 0; border-bottom:1px solid var(--line); color:var(--ink); text-decoration:none}
+.set-row{display:grid; grid-template-columns:auto minmax(0,1fr) auto; align-items:center; gap:var(--s3); padding:var(--s2) 0; border-bottom:1px solid var(--line); color:var(--ink); text-decoration:none}
 .set-row:hover{background:var(--chrome)}
 .set-n{min-width:var(--s6); text-align:center}
 .set-main{display:flex; flex-direction:column; min-width:0}
-.set-len{font-size:var(--fs-min); color:var(--ink-2); text-align:right; font-variant-numeric:tabular-nums}
+.set-keys{display:flex; justify-content:flex-end; min-width:0}
 
 /* Rapid-fire: the lengths as a toolbar in the header (Monkeytype's row of numbers), the deck as a sheet */
 .rf-lens{display:flex; align-items:center; gap:var(--s1); padding:var(--s1); background:var(--chrome); border-radius:var(--r-btn)}

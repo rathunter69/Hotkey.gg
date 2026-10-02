@@ -169,14 +169,14 @@ const bestsOf = () => { const out = {}; for (const d of DRILLS) { const pb = sto
 
 /**
  * The catalog as a worksheet (the drills, the challenges): A the name (and the module under it), B the
- * keys it drills as keycaps, C the length, D your time or why it is closed, E the tier. rows: [{ id,
+ * keys it drills as keycaps (Wolf, 02:08: the keys, not the minutes), C your time or why it is closed, D the tier. rows: [{ id,
  * title, sub, keys, length, best, tier, open, after, pro, href, next, done }].
  */
 function drillSheetHtml(rows, label) {
   const lock = (word, cls = '') => `<span class="dt-lock${cls}">${esc(word)}</span>`;
-  const columns = [{ key: 'name', label: t('col_drill') }, { key: 'keys', label: t('col_keys') }, { key: 'len', label: t('col_length'), align: 'right', cls: 'min' }, { key: 'best', label: t('col_best'), align: 'right', cls: 'best' }, { key: 'tier', label: '', align: 'right', cls: 'tier' }];
+  const columns = [{ key: 'name', label: t('col_drill') }, { key: 'keys', label: t('col_keys') }, { key: 'best', label: t('col_best'), align: 'right', cls: 'best' }, { key: 'tier', label: '', align: 'right', cls: 'tier' }];
   return tableHtml({ sheet: true, columns, label, cls: 'tbl-drills', rows: rows.map(r => ({
-    cells: { name: `<span class="row-name">${esc(r.title)}</span>${r.sub ? `<span class="row-sub">${esc(r.sub)}</span>` : ''}`, keys: keysRowHtml(r.keys || [], { max: 3 }), len: esc(r.length || ''),
+    cells: { name: `<span class="row-name">${esc(r.title)}</span>${r.sub ? `<span class="row-sub">${esc(r.sub)}</span>` : ''}`, keys: keysRowHtml(r.keys || [], { max: 4 }),
       best: r.pro ? lock(t('paywall_pro')) : !r.open ? lock(t('practice_after', { n: r.after }), ' dt-after') : r.best ? `<span class="dt-time">${esc(r.best)}</span>` : `<span class="dt-new">${esc(r.done ? t('status_done') : t('practice_not_played'))}</span>`,
       tier: r.pro || !r.open ? '' : tierMarksHtml(r.tier || 'none') },
     cls: `row-drill${r.pro ? ' pro' : ''}${!r.open && !r.pro ? ' later' : ''}${r.next ? ' next' : ''}`, href: r.pro || !r.open ? '' : r.href, attrs: r.pro ? { 'data-pro': r.id } : null, cursor: r.pro || r.open })) });
@@ -218,7 +218,7 @@ function drillsPage(el, ctx) {
     const tiles = drillSheetHtml(g.rows.map(r => ({ id: r.id, title: r.title, sub: (DRILLS_BY_ID[r.id] && DRILLS_BY_ID[r.id].ruleLine) || undefined, keys: keysOf(r.id), length: fmtLength(r.length), best: r.best != null ? fmtClock(r.best) : '', tier: r.tier, open: r.open, after: r.after, pro: r.pro, href: '#/drill/' + r.id, next: r.id === nextId })), g.title);
     const main = panelHtml({ heading: esc(t('chapter_heading', { n: g.n, name: g.title })), facts: g.of ? esc(t('practice_chapter_fact', { done: g.passed, of: g.of })) : '', body: g.rows.length ? tiles : `<p class="panel-line">${esc(t('practice_chapter_coming', { n: g.n }))}</p>`, cls: 'catalog', stretch: true });
     // the set, inline: what Start drilling plays, in order, and why each is in it
-    const setRows = set.ids.map((id, i) => { const e = CATALOG.find(x => x.id === id); return `<a class="set-row" href="#/drill/${esc(id)}"><kbd class="key set-n">${i + 1}</kbd><span class="set-main"><span class="row-name">${esc(e.title)}</span><span class="row-sub">${esc(t('reason_' + String(set.reasons[id]).replace('-', '_')))}</span></span><span class="set-len">${esc(fmtLength(e.length))}</span></a>`; }).join('');
+    const setRows = set.ids.map((id, i) => { const e = CATALOG.find(x => x.id === id); return `<a class="set-row" href="#/drill/${esc(id)}"><kbd class="key set-n">${i + 1}</kbd><span class="set-main"><span class="row-name">${esc(e.title)}</span><span class="row-sub">${esc(t('reason_' + String(set.reasons[id]).replace('-', '_')))}</span></span><span class="set-keys">${keysRowHtml(keysOf(id), { max: 3 })}</span></a>`; }).join('');
     const setPanel = panelHtml({ heading: esc(t('practice_set_heading')), facts: set.ids.length ? esc(fmtLength(set.secs)) : '', body: set.ids.length ? `<div class="set-list">${setRows}</div>` : `<p class="panel-line">${esc(t('practice_set_none'))}</p>`, cls: 'set-panel' });
     // rapid-fire, one click from here (Wolf): the last length played, straight to the stage, where Enter starts it
     const rlen = lastRapidLen();

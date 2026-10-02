@@ -258,8 +258,9 @@ export function mountDrillPage(root, ctx = {}) {
     effects.finish(chrome.stage);
     if (newPb) effects.newPB(); else if (attempt.tier !== 'none') effects.parTier(attempt.tier);
     // the quest loop (6.10): the run ticks its quests before the XP is read, so their XP lands in this result
-    keyStates.notePressed(shortcutsUsed(run.session.keyLog));   // the keys this run pressed are practiced (M57)
-    const qr = recordRun({ kind: daily ? 'daily' : 'drill', ref: drill.id, clean: attempt.clean, tier: attempt.tier, pb: newPb, ghost: newPb && !!pbBefore, noWaste: attempt.clean && drill.optimalKeys > 0 && attempt.keys <= drill.optimalKeys, noMouse: !attempt.mouse, used: shortcutsUsed(run.session.keyLog) });
+    const used = shortcutsUsed(run.session.keyLog);
+    keyStates.notePressed(used);   // the keys this run pressed are practiced (M57)
+    const qr = recordRun({ kind: daily ? 'daily' : 'drill', ref: drill.id, clean: attempt.clean, tier: attempt.tier, pb: newPb, ghost: newPb && !!pbBefore, noWaste: attempt.clean && drill.optimalKeys > 0 && attempt.keys <= drill.optimalKeys, noMouse: !attempt.mouse, used });
     busyOn = false; if (effects.setBusy) effects.setBusy(false);
     const earned = celebrate(effects, ctxBefore);
     const ctxAfter = gameCtx();
@@ -280,6 +281,7 @@ export function mountDrillPage(root, ctx = {}) {
       newBest: newPb ? { by: pbBefore ? pbBefore.secs - attempt.secs : null } : null,
       pars: drill.pars, oldBest: pbBefore ? pbBefore.secs : null,
       tasks: { total: run.goals.length, done: run.doneCount },
+      shortcuts: used.map(u => ({ keys: u.keys, count: u.count })),
       note: attempt.clean ? (daily ? t('panel_daily_attempts', 'Attempts today: {n}', { n: attemptsToday() }) : '') : (attempt.helped ? siteCopy('panel_no_time_help', 'Help was used, so no time is posted. It still counts as practice.') : siteCopy('panel_no_time_mouse', 'The mouse touched the sheet, so no time is posted. It still counts as practice.')),
       xp: gained ? { gained, pct: ctxAfter.levelInfo.pct } : null,
       board: ix >= 0 ? { title: daily ? siteCopy('panel_board_today', 'Today’s board') : siteCopy('panel_board', 'Your board'), place: ix + 1, of: board.length, move: null } : null,

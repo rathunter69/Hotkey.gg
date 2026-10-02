@@ -54,6 +54,14 @@ test('M19 and M50: every rapid-fire prompt is a key on the sheet, so the deck an
   for (const p of RAPID_DECK) assert.ok(keyIdsPressed([p.keys]).length >= 1, `${p.id} (${p.keys}) is a row of keys.csv`);
 });
 
+test('M19: every taught key has a prompt, apart from the plain moves and commits, the sheet tabs (a fragment is one sheet), F9 and the Ribbon route to Format Cells', () => {
+  const NO_PROMPT = ['arrow-keys', 'tab-move', 'enter-move', 'enter-commit', 'tab-commit', 'esc-cancel', 'esc-ribbon', 'ctrl-page-up-down',
+    'alt-h-o-r', 'alt-h-i-s', 'alt-h-d-s', 'alt-h-o-m', 'f9', 'alt-h-o-e'];
+  const covered = new Set(keyIdsPressed(RAPID_DECK.map(p => p.keys)));
+  const missing = KEYS.filter(k => k.lesson && !covered.has(k.id)).map(k => k.id);
+  assert.deepEqual(missing.sort(), NO_PROMPT.slice().sort());
+});
+
 test('normRoute and pressedForms: modifier order, Enter and Esc, the arrows spread, a sequence opened by a chord', () => {
   assert.equal(normRoute('Shift+Alt+→'), normRoute('Alt+Shift+→'));
   assert.equal(normRoute('Ctrl+Alt+V V Enter'), normRoute('Ctrl+Alt+V V ↵'));

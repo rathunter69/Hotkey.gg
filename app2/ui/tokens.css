@@ -83,7 +83,7 @@
   /* the site pages' parts (M89, M104): goal segments, the level and field bars, tier marks, badge tiles, the sheet preview, a table row */
   --seg-w:24px; --seg-h:5px; --bar-h:6px; --field-bar-w:200px; --tier-mark:9px; --badge-tile:48px; --preview-h:300px; --sp-row:17px; --row-h:36px; --level-tile:40px;
   /* the path (Learn, the drill catalog): a lesson's node, the node where the learner is, the line between them, a module's key, a lesson row's status column */
-  --set-len-w:56px; --kb-u:34px; --kb-gap:3px; --kb-pad:2px; --fs-kb:10px; --kr-focus-w:300px; --kr-demo-w:560px; --kr-demo-h:360px; --kr-what-min:150px; --theme-card-w:140px; --theme-card-h:96px; --prof-lvl:72px; --ach-art:48px; --cert-bar-w:120px; --cert-n:28px;
+  --kb-u:34px; --kb-gap:3px; --kb-pad:2px; --fs-kb:10px; --kr-focus-w:300px; --kr-demo-w:560px; --kr-demo-h:360px; --kr-what-min:150px; --theme-card-w:140px; --theme-card-h:96px; --prof-lvl:72px; --ach-art:48px; --cert-bar-w:120px; --cert-n:28px;
   --pn:14px; --pn-now:20px; --pn-gap:14px; --mod-n-w:48px; --ls-st-w:96px; --lc-n-w:64px;
   /* rapid-fire's stage (M100): the stage's width, the fragment's window (columns A to G, rows 1 to 8 at the zoom below), a keycap, a meter segment */
   --rf-max:1080px; --rf-top-h:56px; --rf-frag-w:776px; --rf-frag-h:290px; --rf-zoom:160; --rf-cap:56px; --rf-cap-fs:22px; --rf-seg-w:30px; --rf-seg-h:10px; --rf-target-w:3px; --rf-deck-h:560px;

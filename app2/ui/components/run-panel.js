@@ -225,6 +225,7 @@ export function createRunPanel(host, opts = {}) {
       (d.pars ? `<div class="rp-m rp-m4">${trackHtml(model, { animate: anim })}</div>` : '') +
       (d.tasks ? `<div class="rp-row rp-m rp-m5"><span>${esc(t('panel_tasks', '{n} tasks', { n: d.tasks.total }))}</span><b class="rp-tasks-done">${d.tasks.done >= d.tasks.total ? `<span class="rp-tickbox on" aria-hidden="true"></span>${esc(siteCopy('panel_all_done', 'All done'))}` : esc(t('panel_tasks_done', '{d} of {n} done', { d: d.tasks.done, n: d.tasks.total }))}</b></div>` : '') +
       (d.note ? `<div class="rp-note rp-m rp-m5">${esc(d.note)}</div>` : '') +
+      (d.shortcuts && d.shortcuts.length ? `<div class="rp-m rp-m5">${usedHtml(d.shortcuts)}</div>` : '') +
       `<div class="rp-m rp-m6">${xpHtml(d.xp, anim)}</div>` +
       (d.board ? `<div class="rp-row rp-m rp-m5"><span>${esc(d.board.title || siteCopy('panel_board', 'Your board'))}</span><b>${esc(boardLine(d.board.place, d.board.of, d.board.move))}</b></div>` : '') +
       `<div class="rp-m rp-m7">${levelUpHtml(d.levelUp, platform())}</div>` +
@@ -246,14 +247,18 @@ export function createRunPanel(host, opts = {}) {
   /** Any key skips the result's moments. */
   function skip() { if (beat !== 'result') return; el.classList.remove('rp-animate'); cancelAnimationFrame(countH); const n = body.querySelector('.rp-time-n'); if (n) n.textContent = fmtClock(+n.dataset.secs); }
 
+  /** The shortcuts a run used, each with its count (a lesson's complete beat and a drill's result). */
+  function usedHtml(shortcuts) {
+    const rows = (shortcuts || []).map(s => `<div class="rp-used"><span>${s.keys.split(' ').map(k => kbd(k, platform())).join(' ')}</span><b>${esc(s.count === 1 ? siteCopy('panel_once', 'once') : t('panel_times', '{n} times', { n: s.count }))}</b></div>`).join('');
+    return rows ? `<div class="rp-h"><span>${esc(siteCopy('panel_shortcuts', 'Shortcuts used'))}</span><span class="rp-h-fact">${esc(t('panel_shortcuts_n', '{n}', { n: shortcuts.length }))}</span></div><div class="rp-used-list">${rows}</div>` : '';
+  }
   /** Lesson complete: the done line, the payoff paragraphs, the shortcuts used, the XP row, a level-up row, Next lesson on Enter. */
   function complete(d) {
-    const rows = (d.shortcuts || []).map(s => `<div class="rp-used"><span>${s.keys.split(' ').map(k => kbd(k, platform())).join(' ')}</span><b>${esc(s.count === 1 ? siteCopy('panel_once', 'once') : t('panel_times', '{n} times', { n: s.count }))}</b></div>`).join('');
     const html = `<div class="rp-title">${esc(d.title)}</div>` +
       (d.line ? `<div class="rp-wow">${esc(d.line)}</div>` : '') +
       (d.paras || []).map(p => `<p class="rp-para">${esc(p)}</p>`).join('') +
       (d.marks || []).map(m => `<div class="rp-note">${esc(m)}</div>`).join('') +
-      (rows ? `<div class="rp-h"><span>${esc(siteCopy('panel_shortcuts', 'Shortcuts used'))}</span><span class="rp-h-fact">${esc(t('panel_shortcuts_n', '{n}', { n: d.shortcuts.length }))}</span></div><div class="rp-used-list">${rows}</div>` : '') +
+      usedHtml(d.shortcuts) +
       (d.mouse ? `<div class="rp-note">${esc(d.mouse)}</div>` : '') +
       xpHtml(d.xp, true) + levelUpHtml(d.levelUp, platform()) +
       ((d.quests && d.quests.length) || (d.bonus && d.bonus.length) ? `<div class="rp-quests">${questRowsHtml(d.quests, d.bonus)}</div>` : '') +
