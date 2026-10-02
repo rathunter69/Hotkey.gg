@@ -93,7 +93,7 @@ export default {
     { id: 'payback', text: 'Work out the payback in C40: the cumulative cash in row 38, the crossing fraction in row 39, then the years.',
       keys: '↓ "=C29" Tab "=C38+D29" Tab ← Shift+→ ×4 Ctrl+R ↓ ← \'=IF(AND(C38<0,D38>=0),-C38/D29,0)\' ↵ ↑ Shift+→ ×4 Ctrl+R ↓ \'=COUNTIF(C38:H38,"<0")+SUM(C39:G39)\' ↵',
       check: (s, ses) => { const sh = loans(ses); return !!sh && payback(sh) && settled(ses); } },
-    { id: 'schedule', text: 'Build the first twelve months of the schedule in rows 44 to 55: months 1 to 12, opening, interest, principal and closing.', convention: 'E2',
+    { id: 'schedule', text: 'Build the first twelve months of the schedule in C44:G55: months 1 to 12, opening, interest, principal and closing.', convention: 'E2',
       keys: 'Ctrl+↓ ↓ "1" ↵ ↑ Shift+↓ ×11 Alt H F I S ↵ → "=C6" Tab "=D44*$C$12" Tab "=$C$16-E44" Tab "=D44-F44" ↵ "=G44" ↵ ↑ Shift+↓ ×10 Ctrl+D ↑ → Shift+→ ×2 Shift+↓ ×11 Ctrl+D',
       check: (s, ses) => { const sh = loans(ses); return !!sh && schedule(sh) && settled(ses); } },
   ],
