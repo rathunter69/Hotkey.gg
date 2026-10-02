@@ -353,7 +353,8 @@ const num15 = n => parseFloat(Number(n).toPrecision(15));
 
 function numeq(a, b) { return num15(a) === num15(b); }
 
-const cmpText = (a, b) => a.localeCompare(b, 'en', { sensitivity: 'accent' });
+// one collator, built once: localeCompare with options builds a new one on every call (the lookups in a big model call this millions of times)
+const cmpText = new Intl.Collator('en', { sensitivity: 'accent' }).compare;
 /**
  * Excel's comparison of two plain values (number | string | boolean | null) under = <> < <= > >=:
  * numbers < text < booleans, text case-insensitive, a blank reads as the other side's zero ("" / 0 /
