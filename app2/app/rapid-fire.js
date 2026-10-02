@@ -13,10 +13,10 @@
 //   #/rapid               Ready on the last length (Enter starts)
 //   #/rapid?len=60        Ready on that length
 //   #/rapid?focus=a,b,c   Ready for a thirty-second round of those commands
-import { RAPID_DECK, RAPID_BY_ID, RAPID_DURATIONS, deckFor, buildFrag, fragSession, atRest, stateSig, fragRect } from '../content/rapid-deck.js';
+import { RAPID_DECK, RAPID_BY_ID, RAPID_DURATIONS, deckFor, buildFrag, fragSession, atRest, stateSig, fragRect, FRAG_COLS } from '../content/rapid-deck.js';
 import { splitSequence, splitHold } from '../content/reference.js';
 import { LESSONS_BY_ID, CHAPTERS } from '../content/index.js';
-import { SheetView } from '../ui/sheet-view.js';
+import { SheetView, ROWHDR_W } from '../ui/sheet-view.js';
 import { RibbonView } from '../ui/ribbon-view.js';
 import { mountEffects, parseMs } from '../ui/effects.js';
 import { prefs, keyLabel } from './prefs.js';
@@ -155,10 +155,13 @@ export function mountRapidPage(root, ctx = {}) {
   const $ = sel => el.querySelector(sel);
   $('#rfBack').onclick = () => leave();
 
+  /** Put the meter back under the top bar before the main area is rewritten. */
+  function parkMeter() { const m = $('#rfMeter'); if (m && m.parentNode !== el) el.insertBefore(m, $('#rfMain')); }
+
   function paintTop() {
     $('#rfLen').textContent = lenLabel(dur);
     $('#rfHits').textContent = hitsLabel(hits);
-    const left = phase === 'run' ? Math.max(0, (endAt - Date.now()) / 1000) : dur;
+    const left = phase === 'run' ? Math.max(0, (endAt - Date.now()) / 1000) : phase === 'done' ? 0 : dur;
     const c = $('#rfClock'); c.textContent = fmtClock(left, true); c.classList.toggle('low', phase === 'run' && left < 10);
   }
   function paintMeter() {
@@ -171,13 +174,16 @@ export function mountRapidPage(root, ctx = {}) {
   function renderReady() {
     phase = 'ready'; el.dataset.phase = 'ready';
     const lens = focus ? '' : `<div class="rf-lens" role="radiogroup">${RAPID_DURATIONS.map((n, i) => `<button type="button" role="radio" aria-checked="${n === dur}" class="rf-lenbtn${n === dur ? ' on' : ''}" data-len="${n}"><kbd class="key">${i + 1}</kbd><span>${esc(t('rapid_len_short_' + n))}</span></button>`).join('')}</div>`;
+    parkMeter();
     $('#rfMain').innerHTML = `<section class="rf-ready">
-      <p class="rf-start">${esc(focus ? t('rapid_ready_focus') : t('rapid_ready'))}</p>
-      ${lens}
       <p class="rf-deckline">${esc(deckLine(ids.length, chapter, focus))}</p>
-      ${focus ? `<ol class="rf-focus">${focusIds.map(id => `<li>${esc(cmdName(id))}</li>`).join('')}</ol>` : ''}
+      <h1 class="rf-title">${esc(t('rapid_title'))}</h1>
+      ${focus ? `<ol class="rf-focus">${focusIds.map(id => `<li>${esc(cmdName(id))}</li>`).join('')}</ol>` : `<ol class="rf-how">${[1, 2, 3].map(n => `<li>${esc(t('rapid_how_' + n))}</li>`).join('')}</ol>`}
+      ${lens}
+      <button type="button" class="btn2 btn2-primary rf-go" id="rfGo"><kbd class="key">${esc(keyLabel('Enter', platform))}</kbd><span>${esc(focus ? t('rapid_ready_focus') : t('rapid_ready'))}</span></button>
       <p class="rf-fine">${esc(siteCopy('rapid_fine', ''))} ${esc(t('rapid_esc_note'))}</p>
     </section>`;
+    $('#rfGo').onclick = () => startRound();
     el.querySelectorAll('.rf-lenbtn').forEach(b => { b.onclick = () => { dur = Number(b.dataset.len); keepLen(dur); renderReady(); }; });
     paintTop(); paintMeter();
   }
@@ -196,6 +202,7 @@ export function mountRapidPage(root, ctx = {}) {
       <div class="rf-keys" id="rfKeys"></div>
       <p class="rf-note" id="rfNote"></p>
     </section>`;
+    $('.rf-play').prepend($('#rfMeter'));   // the meter rides just above the command while a round runs
     startAt = Date.now(); endAt = startAt + dur * 1000;
     tickH = setInterval(tick, 100);
     fx.setBusy(true); fx.clockStart();
@@ -209,12 +216,18 @@ export function mountRapidPage(root, ctx = {}) {
     if (view) { view.destroy(); view = null; }
     if (ribbon) { ribbon.destroy(); ribbon = null; }
     s = fragSession(frag, { onKey: () => {} });
-    s.sheet.zoom = cssNum('rf-zoom', 160);
     const host = $('#rfSheet'); host.innerHTML = '';
+    s.sheet.zoom = fitZoom(s.sheet, host.clientWidth, cssNum('rf-zoom', 160));
     ribbon = new RibbonView($('#rfFrag .rf-ribbon'), s, { mode: 'slim' });
     view = new SheetView(host, s);
     unsub = s.onChange(() => requestAnimationFrame(placeTarget));
     requestAnimationFrame(placeTarget);
+  }
+
+  /** The largest zoom, up to the stage's own, at which the fragment's seven columns fit the stage's width. */
+  function fitZoom(sheet, width, max) {
+    let w = ROWHDR_W; for (let c = 1; c <= FRAG_COLS; c++) if (!sheet.hiddenCols.has(c)) w += sheet.colW[c];
+    return width > 0 ? Math.max(100, Math.min(max, Math.floor(100 * (width - 4) / w))) : max;
   }
 
   /** The dashed outline over the target cells, from the painted grid's own cells. */
@@ -243,7 +256,7 @@ export function mountRapidPage(root, ctx = {}) {
     mountFragment();
     sig = stateSig(s); logAt = 0; pressed = [];
     promptAt = Date.now();
-    $('#rfPrompt').textContent = cmdName(id);
+    $('#rfPrompt').textContent = cmdName(id); $('#rfPrompt').dataset.id = id;
     $('#rfFrag').classList.remove('hit', 'miss');
     paintCaps('hidden');
     if (stallH) clearTimeout(stallH);
@@ -253,11 +266,12 @@ export function mountRapidPage(root, ctx = {}) {
   /** The caps: one per key of the reference chord, "?" until pressed; pressed keys fill them in order. */
   function paintCaps(how) {
     const ref = capsOf(prompt.keys).map(k => keyLabel(k, platform));
-    const n = Math.max(ref.length, pressed.length);
+    const shown = pressed.slice(-(ref.length + 2));   // a run of typed letters shows its tail, never a wall of caps
+    const n = how === 'answer' || how === 'reveal' ? ref.length : Math.max(ref.length, shown.length);
     let html = '';
     for (let i = 0; i < n; i++) {
       if (how === 'answer' || how === 'reveal') html += capHtml(ref[i] || '', how === 'reveal' ? ' shown' : ' answer');
-      else if (i < pressed.length) html += capHtml(keyLabel(pressed[i], platform), ' on');
+      else if (i < shown.length) html += capHtml(keyLabel(shown[i], platform), ' on');
       else html += capHtml('?', ' q');
     }
     $('#rfKeys').innerHTML = html;
@@ -305,6 +319,7 @@ export function mountRapidPage(root, ctx = {}) {
     const log = s.keyLog;
     if (log.length > logAt) { for (const e of log.slice(logAt)) pressed.push(...keysOfLabel(e.k)); keys += log.length - logAt; logAt = log.length; }
     if (prompt.check(s, frag)) { onHit(); return; }
+    if (atRest(s) && stateSig(s) === sig) pressed = [];   // back where the prompt began (Esc out of a cell or a menu): the caps start over
     paintCaps('pressed');
     if (atRest(s) && stateSig(s) !== sig) onMiss();
   }
@@ -331,15 +346,16 @@ export function mountRapidPage(root, ctx = {}) {
   function renderResult(xp) {
     tearDownSheet();
     slow = slowest(times, 3);
-    const rows = slow.map(r => `<tr><td class="rf-cmd">${esc(cmdName(r.id))}</td><td class="rf-ks">${capsOf(RAPID_BY_ID[r.id].keys).map(k => capHtml(keyLabel(k, platform))).join('')}</td><td class="num rf-time">${esc(t('rapid_secs', { s: r.secs.toFixed(1) }))}</td></tr>`).join('');
+    const rows = slow.map(r => `<tr><td class="rf-cmd">${esc(cmdName(r.id))}</td><td><span class="rf-ks">${capsOf(RAPID_BY_ID[r.id].keys).map(k => `<kbd class="key">${esc(keyLabel(k, platform))}</kbd>`).join('')}</span></td><td class="num rf-time">${esc(t('rapid_secs', { s: r.secs.toFixed(1) }))}</td></tr>`).join('');
     const facts = [t('rapid_best_combo', { c: bestCombo }), t('rapid_accuracy', { a: accuracy(hits, misses) }), xp ? t('rapid_xp', { n: xp }) : t('rapid_xp_none')];
+    parkMeter();
     $('#rfMain').innerHTML = `<section class="rf-result">
       <h1 class="rf-prompt rf-total">${esc(hitsLabel(hits))}</h1>
       <ul class="rf-facts">${facts.map(f => `<li>${esc(f)}</li>`).join('')}</ul>
       ${synthwave ? `<p class="rf-unlock">${esc(t('rapid_synthwave'))}</p>` : ''}
       <div class="rf-slow">
         <h2 class="rf-slow-h">${esc(slow.length >= 3 ? t('rapid_slowest') : t('rapid_slowest_few'))}</h2>
-        ${slow.length ? `<table class="rf-slow-t"><thead><tr><th>${esc(t('col_command'))}</th><th>${esc(t('col_keys_press'))}</th><th class="num">${esc(t('col_average'))}</th></tr></thead><tbody>${rows}</tbody></table>` : `<p class="rf-fine">${esc(t('rapid_slow_none'))}</p>`}
+        ${slow.length ? `<table class="tbl rf-slow-t"><thead><tr><th>${esc(t('col_command'))}</th><th>${esc(t('col_keys_press'))}</th><th class="num">${esc(t('col_average'))}</th></tr></thead><tbody>${rows}</tbody></table>` : `<p class="rf-fine">${esc(t('rapid_slow_none'))}</p>`}
       </div>
       <div class="rf-acts">
         ${slow.length ? `<button type="button" class="btn2 btn2-primary" id="rfDrill"><span>${esc(t('rapid_drill_these'))}</span><kbd class="key">Enter</kbd></button>` : ''}
@@ -380,7 +396,8 @@ export function mountRapidPage(root, ctx = {}) {
   /* ---- the keyboard ---- */
   const onKeyDown = e => {
     if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
-    if (MODIFIER_KEYS.has(e.key)) { if (phase === 'run' && e.key === 'Alt') e.preventDefault(); return; }
+    // a bare Alt is a key of its own while a round runs: it opens the Ribbon's KeyTips; the other modifiers wait for their chord
+    if (MODIFIER_KEYS.has(e.key) && !(phase === 'run' && e.key === 'Alt')) return;
     fx.armSounds();
     if (phase === 'ready') {
       if (e.key === 'Escape') { e.preventDefault(); leave(); return; }

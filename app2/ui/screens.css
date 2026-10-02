@@ -453,41 +453,46 @@ body[data-route="rapid"] > .app{padding:0; margin:0; max-width:none}
 .rf-hits{font-size:var(--fs-body); font-weight:var(--fw-bold); color:var(--ink)}
 .rf-clock{margin-left:auto; font-family:var(--mono); font-size:var(--fs-clock); font-weight:var(--fw-bold); font-variant-numeric:tabular-nums; color:var(--ink)}
 .rf-clock.low{color:var(--red)}
-.rf-meter{display:flex; align-items:center; gap:var(--s4); padding:var(--s4) 0 0; border-radius:var(--r-btn)}
+.rf-meter{display:flex; align-items:center; justify-content:center; gap:var(--s4); padding:var(--s4) 0 0}
 .rf-segs{display:flex; gap:var(--s1)}
 .rf-segs i{display:block; width:var(--rf-seg-w); height:var(--rf-seg-h); border-radius:var(--s1); background:var(--sheet); border:1px solid var(--rapid)}
 .rf-segs i.on{background:var(--rapid)}
 .rf-combo{font-size:var(--fs-label); font-weight:var(--fw-semi); color:var(--rapid-ink); font-variant-numeric:tabular-nums}
-.rf[data-phase="ready"] .rf-meter, .rf[data-phase="done"] .rf-meter{visibility:hidden}
+.rf[data-phase="ready"] .rf-meter, .rf[data-phase="done"] .rf-meter{display:none}
 .rf-main{flex:1 1 auto; display:flex; flex-direction:column; align-items:center; padding-top:var(--s6)}
+.rf[data-phase="run"] .rf-main{justify-content:center; padding-bottom:var(--s12)}
 
 /* the round: the command, the fragment, the caps */
 .rf-play{display:flex; flex-direction:column; align-items:center; gap:var(--s5); width:100%}
 .rf-prompt{margin:0; font-size:var(--fs-prompt); font-weight:var(--fw-heavy); line-height:var(--lh-tight); text-align:center; color:var(--ink); min-height:var(--fs-prompt)}
 .rf-frag{position:relative; background:var(--sheet); border:1px solid var(--line); border-radius:var(--r-card); overflow:hidden}
 .rf-frag .ribbon{border-bottom:1px solid var(--line)}
-.rf-sheet{width:var(--rf-frag-w); height:var(--rf-frag-h); overflow:hidden}
+.rf-sheet{width:min(var(--rf-frag-w), calc(100vw - var(--content-side) * 2 - var(--s1))); height:var(--rf-frag-h); overflow:hidden}
 .rf-sheet .fbar, .rf-sheet .sbar{display:none}
 .rf-sheet .gridwrap{overflow:hidden}
 .rf-target{position:absolute; pointer-events:none; border:var(--rf-target-w) dashed var(--rapid); border-radius:var(--s1); z-index:5}
 .rf-frag.hit .rf-target{border-style:solid; border-color:var(--learn)}
 .rf-frag.miss .rf-target{border-style:solid; border-color:var(--red)}
 .rf-keys{display:flex; gap:var(--s2); justify-content:center; min-height:var(--rf-cap)}
-.rf-cap{display:inline-flex; align-items:center; justify-content:center; min-width:var(--rf-cap); height:var(--rf-cap); padding:0 var(--s3); font-size:var(--rf-cap-fs); font-weight:var(--fw-bold)}
-.rf-cap.q{color:var(--ink-2); background:var(--chrome)}
-.rf-cap.on{color:var(--rapid-ink); background:var(--rapid-tint); border-color:var(--rapid)}
-.rf-cap.shown{color:var(--ink-2); border-style:dashed}
-.rf-cap.answer{color:var(--red); border-color:var(--red)}
+.rf-keys .rf-cap{display:inline-flex; align-items:center; justify-content:center; min-width:var(--rf-cap); height:var(--rf-cap); padding:0 var(--s3); font-size:var(--rf-cap-fs); font-weight:var(--fw-bold)}
+.rf-keys .rf-cap.q{color:var(--ink-2); background:var(--chrome)}
+.rf-keys .rf-cap.on{color:var(--rapid-ink); background:var(--rapid-tint); border-color:var(--rapid)}
+.rf-keys .rf-cap.shown{color:var(--ink-2); border-style:dashed}
+.rf-keys .rf-cap.answer{color:var(--red); border-color:var(--red)}
 .rf-frag.hit ~ .rf-keys .rf-cap{color:var(--on-fill); background:var(--rapid); border-color:var(--rapid-ink)}
 .rf-note{margin:0; min-height:var(--s6); font-size:var(--fs-body); font-weight:var(--fw-bold); color:var(--rapid-ink)}
 
 /* Ready: what Enter starts */
 .rf-ready{display:flex; flex-direction:column; align-items:center; gap:var(--s5); padding-top:var(--s12); max-width:calc(var(--side-col) * 2); text-align:center}
-.rf-start{margin:0; padding:var(--s4) var(--s8); border-radius:var(--r-btn); background:var(--clock-tint); color:var(--clock-ink); font-size:var(--fs-head); font-weight:var(--fw-heavy)}
+.rf-title{margin:0; font-size:var(--fs-prompt); font-weight:var(--fw-heavy); line-height:var(--lh-tight); color:var(--ink)}
+.rf-how{margin:0; padding:0; list-style:none; counter-reset:rf; display:flex; flex-direction:column; gap:var(--s2); text-align:left; font-size:var(--fs-body); line-height:var(--lh-body); color:var(--ink)}
+.rf-how li{counter-increment:rf; display:flex; gap:var(--s3); align-items:baseline}
+.rf-how li::before{content:counter(rf); flex:none; width:var(--s6); height:var(--s6); display:inline-flex; align-items:center; justify-content:center; border-radius:50%; background:var(--rapid-tint); color:var(--rapid-ink); font-size:var(--fs-label); font-weight:var(--fw-bold)}
+.rf-go{--mode:var(--rapid); display:inline-flex; align-items:center; gap:var(--s3); padding:var(--s3) var(--s6); font-size:var(--fs-item); font-weight:var(--fw-bold)}
 .rf-lens{display:flex; gap:var(--s2)}
 .rf-lenbtn{display:inline-flex; align-items:center; gap:var(--s2); font:inherit; font-size:var(--fs-body); font-weight:var(--fw-bold); color:var(--ink); background:var(--sheet); border:1px solid var(--edge); border-radius:var(--r-btn); padding:var(--s2) var(--s4); cursor:pointer}
 .rf-lenbtn.on{color:var(--rapid-ink); background:var(--rapid-tint); border-color:var(--rapid)}
-.rf-deckline{margin:0; font-size:var(--fs-body); font-weight:var(--fw-semi); color:var(--ink)}
+.rf-deckline{margin:0; font-size:var(--fs-label); font-weight:var(--fw-bold); color:var(--rapid-ink)}
 .rf-focus{margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:var(--s1); font-size:var(--fs-panel); font-weight:var(--fw-bold)}
 .rf-fine{margin:0; font-size:var(--fs-label); line-height:var(--lh-body); color:var(--ink-2)}
 
@@ -497,12 +502,8 @@ body[data-route="rapid"] > .app{padding:0; margin:0; max-width:none}
 .rf-unlock{margin:0; padding:var(--s2) var(--s4); border-radius:var(--r-btn); background:var(--rapid-tint); color:var(--rapid-ink); font-weight:var(--fw-bold)}
 .rf-slow{width:100%; background:var(--sheet); border-top:var(--mode-rule) solid var(--rapid); padding:var(--s4) var(--s5)}
 .rf-slow-h{margin:0 0 var(--s3); font-size:var(--fs-panel); font-weight:var(--fw-heavy)}
-.rf-slow-t{width:100%; border-collapse:collapse}
-.rf-slow-t th{text-align:left; font-size:var(--fs-label); font-weight:var(--fw-semi); color:var(--ink-2); padding:var(--s2) var(--s2) var(--s2) 0; border-top:1px solid var(--ink); border-bottom:1px solid var(--line)}
-.rf-slow-t td{padding:var(--s2) var(--s2) var(--s2) 0; border-bottom:1px solid var(--line); font-size:var(--fs-name)}
-.rf-slow-t .num{text-align:right; font-variant-numeric:tabular-nums}
+.rf-slow-t td{font-size:var(--fs-name)}
 .rf-cmd{font-weight:var(--fw-semi)}
-.rf-ks{display:flex; gap:var(--s1)}
-.rf-ks .rf-cap{min-width:0; height:auto; padding:var(--s1) var(--s2); font-size:var(--fs-key); font-weight:var(--fw-key)}
-.rf-time{font-family:var(--mono)}
+.rf-ks{display:inline-flex; gap:var(--s1)}
+.rf-slow-t .rf-time{font-family:var(--mono)}
 .rf-acts{display:flex; gap:var(--s3); flex-wrap:wrap; justify-content:center}

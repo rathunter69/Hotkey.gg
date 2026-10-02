@@ -88,6 +88,8 @@ export function table(rng, o = {}) {
 /** Build the Session for a fragment: the sheet, the selection, then any setup keys (a copy, a bold to undo). */
 export function fragSession(frag, opts = {}) {
   const sheet = new Sheet({ rows: SHEET_ROWS, cols: SHEET_COLS, cells: frag.cells, colW: frag.colW, hiddenRows: frag.hiddenRows, hiddenCols: frag.hiddenCols, groups: frag.groups, condFmt: frag.condFmt, view: frag.view });
+  // seeded labels fit their column as typed ones do, unless the fragment sets the width (autofit needs a narrow one)
+  for (let c = 1; c <= FRAG_COLS; c++) if (!(frag.colW && c in frag.colW)) { const need = sheet.neededWidth(c); if (need > sheet.colW[c]) sheet.colW[c] = need; }
   const s = new Session(sheet, opts);
   const steps = [frag.select ? { select: frag.select } : { select: frag.active || 'A1' }, ...(frag.setup || [])];
   for (const st of steps) {
