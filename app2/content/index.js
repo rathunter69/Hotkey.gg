@@ -122,6 +122,9 @@ import text_to_numbers from './lessons/text-to-numbers.js';
 import text_to_columns_flash_fill from './lessons/text-to-columns-flash-fill.js';
 import challenge_text_dump from './lessons/challenge-text-dump.js';
 
+// Chapter 4 · Data and lookups (Run R4): 4.4 Pivot tables, 4.5 Scenarios and sensitivity
+import build_and_rearrange from './lessons/build-and-rearrange.js';
+
 export const CHAPTERS = [
   {
     id: 'foundations',
@@ -201,6 +204,25 @@ export const CHAPTERS = [
       pv_fv_pmt, npv_xnpv, irr_xirr, payment_schedule, challenge_new_site_case,
       trace_arrows_evaluate, f9_show_formulas_at_scale, hardcode_external_link_hunt, checks_block_rollup, challenge_six_faults,
       ch3_project, ch3_assessment,
+    ],
+  },
+  {
+    id: 'data-and-lookups',
+    title: 'Data and lookups',
+    access: 'paid',
+    blurb: 'Lookups, lists, summaries from raw rows, pivots, scenarios and names: the diligence pack a buyer reads, where every answer points at a cell and every what-if lives in one model.',
+    // Chapter 4's sections in order (script-ch4.md): the six modules and the closing project block.
+    sections: [
+      { name: 'Lookups', blurb: 'VLOOKUP and HLOOKUP and how they fail, MATCH and INDEX/MATCH, two-way lookups, XLOOKUP, approximate match and IFERROR, multi-criteria lookups, and why the standard avoids OFFSET and INDIRECT.' },
+      { name: 'Lists and tables', blurb: 'Sort, AutoFilter and SUBTOTAL, Remove Duplicates, Data Validation drop-downs, filter tricks, and the modern list functions.' },
+      { name: 'Summaries from raw rows', blurb: 'The SUMIFS cube, the KPI block, date-range criteria, the KPI page, a buyer’s question answered end to end, and 3D references.' },
+      { name: 'Pivot tables', blurb: 'Build and rearrange a PivotTable, group and set its values, refresh it, and read it from a page with GETPIVOTDATA.' },
+      { name: 'Scenarios and sensitivity', blurb: 'A case toggle with CHOOSE and INDEX, one-way and two-way data tables, Goal Seek for break-even, the pass-through driver, and the cases side by side.' },
+      { name: 'Names and structure', blurb: 'Naming toggles and key inputs sparingly, the Name Manager, and a validation list driven by a name.' },
+      { name: 'Project and assessment', blurb: 'The diligence pack end to end, then a fresh export against the clock.' },
+    ],
+    lessons: [
+      build_and_rearrange,
     ],
   },
 ];

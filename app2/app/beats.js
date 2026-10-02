@@ -72,6 +72,10 @@ const BEATS_DEFAULT = {
     body: 'Before you built yours, someone started a Summary sheet and left. It has a SUMIF pointing at a range a row short, a typed number in a formula column, a text "12", and a total that agrees with nothing. Chapter 1 taught the three looks; this module adds the tools a reviewer uses on a sheet they didn’t build, and the checks block that says, in one cell, whether the databook ties.' },
   'ch3-project-and-assessment': { eyebrow: 'Module 3.7 · project and assessment', title: 'The databook, tied out.',
     body: 'A fresh export, a fresh site list, a Summary someone else abandoned. Rebuild it so every number reads the export and the flag reads OK, then value the next site on the list. Build it, then build it again on the clock. The assessment is the test-out.' },
+  'pivot-tables': { eyebrow: 'Module 4.4 · pivot tables', title: 'The fast cut, and where it stops.',
+    body: 'Sponsor B’s analyst wants three cuts of the export by tomorrow, and a PivotTable gives each in a minute: a field down, a field across, a field into values. It’s the fastest way to see a dataset and the wrong thing to build a model on, because it holds a copy of the data and doesn’t refresh on its own. Use it for the cut, and GETPIVOTDATA to read it when a page must.' },
+  'scenarios-and-sensitivity': { eyebrow: 'Module 4.5 · scenarios and sensitivity', title: 'What if the ticket falls?',
+    body: 'The management case is the company’s own forecast; a buyer builds a base case from what they think will happen and a downside they can live with, and they want all three in one model with a switch, never three files. Then the questions: what if the blended ticket drops a dollar, what if member share slips, how many washes break even. A case toggle and a data table answer them on one sheet.' },
   'project-and-assessment': { eyebrow: 'Module 1.8 · project, assessment, test-out', title: 'Management’s next feed is in.',
     body: 'A fresh week, a blank Report, and everything the chapter taught. Build the page start to finish, then prove it against the clock on Monday morning; or test out of the chapter in five minutes.' },
 };
