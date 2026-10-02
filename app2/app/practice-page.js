@@ -62,7 +62,10 @@ export const DRILL_MODULE = {
   // Chapter 5 (script-ch5.md's module ids)
   'ch5-statement-link': 'linking-the-statements', 'ch5-schedule-fill': 'schedules', 'ch5-balance-it': 'linking-the-statements',
   'ch5-discount-it': 'dcf', 'ch5-sweep': 'linking-the-statements', 'ch5-checks': 'auditing-a-model',
-  'ch5-revenue-build': 'model-speed', 'puzzle-ch5': 'linking-the-statements', 'ch5-is-it-revenue': 'the-three-statements',
+  'ch5-revenue-build': 'model-speed', 'puzzle-ch5': 'linking-the-statements',
+  'ch5-is-it-revenue': 'the-three-statements', 'ch5-four-rungs': 'the-three-statements', 'ch5-two-balance-sheets': 'the-three-statements',
+  'ch5-two-landings': 'the-three-statements', 'ch5-name-the-driver': 'schedules', 'ch5-dep-waterfall': 'schedules', 'ch5-breaker': 'schedules',
+  'ch5-circle-hunt': 'auditing-a-model', 'ch5-normalize-the-year': 'dcf', 'ch5-dcf-read-back': 'dcf',
   // Chapter 6 (script-ch6.md's module ids)
   'ch6-spread-a-comp': 'trading-comps', 'ch6-median-and-range': 'trading-comps', 'ch6-sources-and-uses': 'lbo', 'ch6-irr-sprint': 'lbo',
   'ch6-waterfall': 'bids-and-waterfall', 'ch6-football-field': 'bids-and-waterfall', 'ch6-paper-lbo': 'lbo', 'puzzle-ch6': 'bids-and-waterfall',
