@@ -2,7 +2,8 @@
 // Cedar Park was funded with a $3.5m loan at 7% over ten years, paid monthly, and the buyers want
 // its payment. The Loans sheet carries the four blue inputs in C6:C9; the learner turns the annual
 // terms into per-period ones (C12, C13), builds the payment with PMT (C16) and reads the sign, then
-// the total paid and the interest (C17, C18), and PV and FV beside them (C21, C22). Every check
+// the total paid and the interest (C17, C18). PV first proves the payment (back to the $3.5m), then
+// answers its own question in C21; FV first proves the loan clears (zero), then compounds $1m in C22. Every check
 // reads the figure the current inputs give and the shared liveness rule, so any legitimate route
 // passes. The closer moves the rate to 6% and the payment and the interest fall.
 import { liveness } from '../../app/graders.js';
@@ -27,7 +28,9 @@ function terms(sh) {
 const perPeriod = sh => { const t = terms(sh); return liveAt(sh, 'C12', t.r) && liveAt(sh, 'C13', t.n); };
 const payment = sh => liveAt(sh, 'C16', terms(sh).pmt);
 const totals = sh => { const t = terms(sh); return liveAt(sh, 'C17', t.paid) && liveAt(sh, 'C18', t.interest); };
+const pvProof = sh => liveAt(sh, 'C21', terms(sh).P);
 const pvDone = sh => liveAt(sh, 'C21', terms(sh).pv);
+const fvBalance = sh => !!sh.cellAt('C22').formula && Math.abs(sh.value('C22')) < 0.01 && liveness(sh, 'C22').ok;
 const fvDone = sh => liveAt(sh, 'C22', terms(sh).fv);
 
 export default {
@@ -68,15 +71,23 @@ export default {
       keys: '"=C16*C13" ↵ "=C17-C6" ↵', requires: ['formula-basics', 'formula-operators'],
       hintStuck: 'pulse cell C18 · Everything paid less what was borrowed is what the bank earns.',
       check: (s, ses) => { const sh = loans(ses); return !!sh && payment(sh) && totals(sh) && settled(ses); } },
-    { id: 'pv', teach: 'PV runs PMT backwards: given the rate, the periods and a payment, it returns the loan that payment clears. The payment goes in as a negative, cash out, so the loan reads positive.',
-      text: 'In C21 =PV(C12,C13,-35000) gives the loan a $35,000 monthly payment supports on the same terms.',
-      keys: '↓ ×2 "=PV(C12,C13,-35000)" ↵', requires: ['pmt-pv-fv', 'formula-basics', 'arrow-keys'],
-      hintStuck: 'pulse cell C21 · Same rate, same periods, a smaller payment than the one in C16.',
+    { id: 'pv-proof', teach: 'PV runs PMT backwards: given the rate, the periods and a payment, it returns the loan that payment clears. The payment goes in as a negative, cash out, so the loan reads positive.',
+      text: 'Prove the payment with PV: in C21 =PV(C12,C13,-C16) turns the monthly payment back into the $3.5m loan in C6.',
+      keys: '↓ ×2 "=PV(C12,C13,-C16)" ↵', requires: ['pmt-pv-fv', 'formula-basics', 'arrow-keys'],
+      hintStuck: 'pulse cell C21 · The same rate and periods, and the payment from C16 as cash out.',
+      check: (s, ses) => { const sh = loans(ses); return !!sh && totals(sh) && pvProof(sh) && settled(ses); } },
+    { id: 'pv', text: 'Now ask PV a real question: change C21 to =PV(C12,C13,-35000) for the loan a $35,000 monthly payment supports.',
+      keys: '↑ "=PV(C12,C13,-35000)" ↵', requires: ['pmt-pv-fv', 'formula-basics', 'arrow-keys'],
+      hintStuck: 'pulse cell C21 · A smaller payment than C16 supports a smaller loan.',
       check: (s, ses) => { const sh = loans(ses); return !!sh && totals(sh) && pvDone(sh) && settled(ses); } },
-    { id: 'fv', teach: 'FV runs it forwards: FV(rate, periods, payment, present value) is what a sum grows to. With no payment and $1m put in today as cash out, it reads the balance after ten years at 7%.',
-      text: 'In C22 =FV(C7,C8,0,-1000000) shows what $1m grows to in ten years at the loan’s annual rate.',
-      keys: '"=FV(C7,C8,0,-1000000)" ↵', requires: ['pmt-pv-fv', 'formula-basics'],
-      hintStuck: 'pulse cell C22 · This one compounds once a year, so it takes the annual rate and the years.',
+    { id: 'fv-balance', teach: 'FV runs it forwards: FV(rate, periods, payment, present value) is what is left after the last period. With the loan going in as cash out and the payment coming back, it reads the balance after 120 payments.',
+      text: 'In C22 check the loan clears: =FV(C12,C13,C16,-C6) is the balance after the last payment, and it reads zero.',
+      keys: '"=FV(C12,C13,C16,-C6)" ↵', requires: ['pmt-pv-fv', 'formula-basics'],
+      hintStuck: 'pulse cell C22 · The payment is cash in this time, the loan cash out.',
+      check: (s, ses) => { const sh = loans(ses); return !!sh && pvDone(sh) && fvBalance(sh) && settled(ses); } },
+    { id: 'fv', text: 'Put FV to work on growth: change C22 to =FV(C7,C8,0,-1000000), what $1m grows to in ten years at the loan’s annual rate.',
+      keys: '↑ "=FV(C7,C8,0,-1000000)" ↵', requires: ['pmt-pv-fv', 'formula-basics', 'arrow-keys'],
+      hintStuck: 'pulse cell C22 · This one compounds once a year, so it takes the annual rate and the years, and no payment.',
       check: (s, ses) => { const sh = loans(ses); return !!sh && pvDone(sh) && fvDone(sh) && settled(ses); } },
     { id: 'tie', closer: true, demo: { script: 'Ctrl+G "Loans!C7" Enter "6%" Enter Ctrl+G "Loans!C16" Enter Escape Escape Escape', cadence: 320 },
       text: 'Does it tie? Watch the rate in C7 change to 6% and the payment in C16 and the interest in C18 both fall.', requires: [],
@@ -91,5 +102,5 @@ export default {
     'The Cedar Park loan costs $40,638 a month for ten years, and the bank earns about $1.38m of interest on the $3.5m it lent. Every figure reads the four blue inputs, so a new rate or term runs straight through.',
     'Read the signs the way Excel writes them: money going out is negative, money coming in is positive. PMT, PV and FV all follow that rule, so a minus in the right place is what makes the page read the way a buyer expects.',
   ],
-  solution: 'Ctrl+PgDn Right Right Ctrl+Down Ctrl+Down Ctrl+Shift+Down Ctrl+Down Down Down Down "=C7/C9" Enter "=C8*C9" Enter Down Down "=-PMT(C12,C13,C6)" Enter "=C16*C13" Enter "=C17-C6" Enter Down Down "=PV(C12,C13,-35000)" Enter "=FV(C7,C8,0,-1000000)" Enter',
+  solution: 'Ctrl+PgDn Right Right Ctrl+Down Ctrl+Down Ctrl+Shift+Down Ctrl+Down Down Down Down "=C7/C9" Enter "=C8*C9" Enter Down Down "=-PMT(C12,C13,C6)" Enter "=C16*C13" Enter "=C17-C6" Enter Down Down "=PV(C12,C13,-C16)" Enter Up "=PV(C12,C13,-35000)" Enter "=FV(C12,C13,C16,-C6)" Enter Up "=FV(C7,C8,0,-1000000)" Enter',
 };

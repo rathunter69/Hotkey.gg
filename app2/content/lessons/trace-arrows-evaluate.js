@@ -3,9 +3,9 @@
 // while the export runs to row 94 (the last row is an Airport wash), D67 is a typed 1,240, C69 a
 // text "12", C73 an external link and the new-price column multiplies by 1.05 inside the formula.
 // This lesson traces the total in D72 back with Alt M P, follows Airport's SUMIF, draws the typed
-// number's three dependents with Alt M D, clears the arrows, steps through Airport's SUMIF with
+// number's three dependents with Alt M D and the next level after them, clears the arrows, steps through Airport's SUMIF with
 // Evaluate Formula, then fixes the five ranges at once with Replace inside the selection. The
-// other faults are the next lessons'. Checks read the arrows and the dialog the engine keeps, and
+// Evaluate runs again on the fixed SUMIF. The other faults are the next lessons'. Checks read the arrows and the dialog the engine keeps, and
 // the fixed SUMIFs against the full export.
 import { liveness } from '../../app/graders.js';
 
@@ -61,6 +61,10 @@ export default {
       keys: '↑ ×3 Alt M D', requires: ['trace-arrows', 'keytips', 'arrow-keys'],
       hintStuck: 'pulse cell D67 · The new price, the share and the total all read it.',
       check: (s, ses) => onSummary(ses) && hasArrow(ses, 'dependent', 'D67', null) && settled(ses) },
+    { id: 'dependents-next', text: 'Press Alt M D again for the next level: the total in D72 feeds the growth, the check and every share, so the 1,240 reached them all.',
+      keys: 'Alt M D', requires: ['trace-arrows', 'keytips'],
+      hintStuck: 'pulse cell D72 · Each press of Trace Dependents follows the chain one step further.',
+      check: (s, ses) => onSummary(ses) && hasArrow(ses, 'dependent', 'D72', null) && settled(ses) },
     { id: 'remove', text: 'Clear every arrow off the sheet with Remove Arrows, Alt M A A.',
       keys: 'Alt M A A', requires: ['trace-arrows', 'keytips'],
       hintStuck: 'pulse cell D67 · The arrows are drawings, so removing them changes nothing in a cell.',
@@ -75,6 +79,10 @@ export default {
       keys: '↵ Ctrl+↑ ↓ Shift+↓ ×5 Ctrl+H "$93" Tab "$94" Alt+A Esc', requires: ['find-replace', 'replace-all', 'ctrl-arrow', 'shift-arrow', 'arrow-keys'],
       hintStuck: 'pulse range D66:D71 · Only the five SUMIFs carry $93; the typed 1,240 is the next lesson’s.',
       check: (s, ses) => onSummary(ses) && fixed(ses) && settled(ses) },
+    { id: 're-evaluate', text: 'Evaluate Airport’s SUMIF in D70 again with Alt M V: it now reads the export’s last wash too, then close it.',
+      keys: 'Ctrl+↓ ↑ ×2 Alt M V ↵ ×3', requires: ['evaluate-formula', 'keytips', 'ctrl-arrow', 'arrow-keys'],
+      hintStuck: 'pulse cell D70 · The ranges run to row 94 now, so the total is larger.',
+      check: (s, ses) => onSummary(ses) && fixed(ses) && !!ses.dlg && ses.dlg.kind === 'evalfx' && ses.dlg.cell === 'D70' && ses.dlg.done },
     { id: 'tie', closer: true, demo: { script: 'Ctrl+G "Transactions!E6" Enter "45" Enter Ctrl+G "Summary!D66" Enter Escape Escape Escape', cadence: 320 },
       text: 'Does it tie? Watch a Domain wash on Transactions change and Domain’s fixed total in D66 move with it.', requires: [],
       hintStuck: 'pulse cell D66 · The SUMIF reads every row of the export now.',
@@ -88,5 +96,5 @@ export default {
     'The arrows showed what the total was made of, and Evaluate showed the Airport SUMIF stopping a row short: the export’s last wash never reached the block. Five ranges fixed in one Replace.',
     'The typed 1,240, the text 12, the link to last year’s file and the 1.05 inside the formula are still there. The next two lessons find them with sweeps that cover the whole sheet.',
   ],
-  solution: 'Ctrl+G "D72" Enter Alt M P Up Up Alt M P Up Up Up Alt M D Alt M A A Down Down Down Alt M V Enter Enter Enter Ctrl+Up Down Shift+Down Shift+Down Shift+Down Shift+Down Shift+Down Ctrl+H "$93" Tab "$94" Alt+A Escape',
+  solution: 'Ctrl+G "D72" Enter Alt M P Up Up Alt M P Up Up Up Alt M D Alt M D Alt M A A Down Down Down Alt M V Enter Enter Enter Ctrl+Up Down Shift+Down Shift+Down Shift+Down Shift+Down Shift+Down Ctrl+H "$93" Tab "$94" Alt+A Escape Ctrl+Down Up Up Alt M V Enter Enter Enter',
 };

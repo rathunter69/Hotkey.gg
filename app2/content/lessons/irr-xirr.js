@@ -1,10 +1,11 @@
 // Chapter 3 · 3.5.3 IRR and XIRR (clearcoat-databook, S5b → S5c)
 // The Cedar Park case on Loans again: the learner finds the site's own return with IRR (C36), proves
 // it by pointing the discount rate at it and reading NPV at zero, puts 10% back with Ctrl+Z, adds
-// XIRR on the dates (C37), then payback: cumulative cash across C38:H38, the fraction of the
+// XIRR on the dates (C37) and puts it to work by slipping the sale a year (undone), then payback: cumulative cash across C38:H38, the fraction of the
 // crossing year across C39:G39 and the payback in C40. Checks read the figures the current flows
 // give and the shared liveness rule. The closer halves the sale value in H28.
 import { liveness } from '../../app/graders.js';
+import { CASE } from '../workbooks/clearcoat-databook.js';
 
 const sheetOf = (ses, name) => { const e = ses.sheets.find(x => x.name === name); return e ? e.sheet : null; };
 const loans = ses => sheetOf(ses, 'Loans');
@@ -48,7 +49,7 @@ export default {
   headline: 'IRR',
   conventions: ['C3'],
   teaches: ['irr'],
-  uses: ['npv', 'fill-down-right', 'sum-family', 'formula-basics', 'formula-operators', 'go-to', 'undo-redo', 'ctrl-arrow', 'shift-arrow', 'arrow-keys', 'tab-commits'],
+  uses: ['npv', 'fill-down-right', 'sum-family', 'formula-basics', 'formula-operators', 'go-to', 'undo-redo', 'date-format', 'type-to-enter', 'ctrl-arrow', 'shift-arrow', 'arrow-keys', 'tab-commits'],
   prerequisites: ['npv-xnpv'],
   brief: 'The rate where NPV is zero is the internal rate of return: the return the site itself earns. IRR takes the cash flows, year 0 included, and finds it; XIRR takes dates and does the same for uneven timing. Payback is simpler and buyers ask for it too: the year the cash out is recovered. Add all three to the case and read them the way a buyer does. The key is `IRR`.',
   wow: 'You have the site’s own return now, and the year it pays itself back.',
@@ -71,11 +72,15 @@ export default {
       keys: 'Ctrl+↓ ↓ "=XIRR(C29:H29,C26:H26)" ↵', requires: ['irr', 'formula-basics', 'ctrl-arrow', 'arrow-keys'],
       hintStuck: 'pulse cell C37 · The flows first, then the dates in row 26.',
       check: (s, ses) => { const sh = loans(ses); return !!sh && rateBack(sh) && xirrDone(sh) && settled(ses); } },
+    { id: 'delay', text: 'Put XIRR to work: the sale slips a year, so type 10/1/2032 over the year 5 date in H26 and watch C37 fall while C36 stays.',
+      keys: 'Ctrl+↑ ×2 ↑ ×3 Ctrl+→ "10/1/2032" ↵', requires: ['irr', 'date-format', 'type-to-enter', 'ctrl-arrow', 'arrow-keys'],
+      hintStuck: 'pulse cell H26 · IRR only knows the order of the flows; XIRR reads the dates.',
+      check: (s, ses) => { const sh = loans(ses); return !!sh && irrDone(sh) && xirrDone(sh) && sh.value('H26') - CASE.dates[5] >= 300 && settled(ses); } },
     { id: 'cumulative', teach: 'Payback reads the cash added up year by year: year 0 is its own flow, and every later year is the last running total plus that year’s flow. The year the running total turns positive is the year the build is paid back.',
-      text: 'Run cumulative cash along row 38: =C29 in C38, =C38+D29 in D38, then fill D38 right to H38.',
-      keys: '"=C29" Tab "=C38+D29" Tab ← Shift+→ ×4 Ctrl+R', requires: ['fill-down-right', 'formula-basics', 'formula-operators', 'tab-commits', 'shift-arrow', 'arrow-keys'], convention: 'C3',
+      text: 'Put the date back with Ctrl+Z, then run cumulative cash along row 38: =C29 in C38, =C38+D29 in D38, filled right to H38.',
+      keys: 'Ctrl+Z Ctrl+← → Ctrl+↓ ×3 ↓ "=C29" Tab "=C38+D29" Tab ← Shift+→ ×4 Ctrl+R', requires: ['undo-redo', 'fill-down-right', 'formula-basics', 'formula-operators', 'tab-commits', 'ctrl-arrow', 'shift-arrow', 'arrow-keys'], convention: 'C3',
       hintStuck: 'pulse range C38:H38 · Each year adds its own flow to the total before it.',
-      check: (s, ses) => { const sh = loans(ses); return !!sh && xirrDone(sh) && cumulative(sh) && settled(ses); } },
+      check: (s, ses) => { const sh = loans(ses); return !!sh && xirrDone(sh) && sh.value('H26') === CASE.dates[5] && cumulative(sh) && settled(ses); } },
     { id: 'fraction', teach: 'In the year the total crosses zero, the part of the year it took is what was still owed at the start over that year’s flow. =IF(AND(C38<0,D38>=0),-C38/D29,0) gives that fraction in the crossing year and zero everywhere else.',
       text: 'In C39 write =IF(AND(C38<0,D38>=0),-C38/D29,0) for the fraction of the crossing year, and fill it right to G39.',
       keys: '↓ ← \'=IF(AND(C38<0,D38>=0),-C38/D29,0)\' ↵ ↑ Shift+→ ×4 Ctrl+R', requires: ['fill-down-right', 'formula-basics', 'formula-operators', 'shift-arrow', 'arrow-keys'],
@@ -98,5 +103,5 @@ export default {
     'Cedar Park earns about 26% a year on its own cash, well above the 10% a buyer asks for, and the build is paid back a little over five years in, most of it by the sale.',
     'Read the two together the way a buyer does: IRR against the discount rate says whether the site is worth building, and payback against the hold says how long the money is out.',
   ],
-  solution: 'Ctrl+G "Loans!C36" Enter "=IRR(C29:H29)" Enter Ctrl+Up Ctrl+Up Down "=C36" Enter Ctrl+Z Ctrl+Down Down "=XIRR(C29:H29,C26:H26)" Enter "=C29" Tab "=C38+D29" Tab Left Shift+Right Shift+Right Shift+Right Shift+Right Ctrl+R Down Left \'=IF(AND(C38<0,D38>=0),-C38/D29,0)\' Enter Up Shift+Right Shift+Right Shift+Right Shift+Right Ctrl+R Down \'=COUNTIF(C38:H38,"<0")+SUM(C39:G39)\' Enter',
+  solution: 'Ctrl+G "Loans!C36" Enter "=IRR(C29:H29)" Enter Ctrl+Up Ctrl+Up Down "=C36" Enter Ctrl+Z Ctrl+Down Down "=XIRR(C29:H29,C26:H26)" Enter Ctrl+Up Ctrl+Up Up Up Up Ctrl+Right "10/1/2032" Enter Ctrl+Z Ctrl+Left Right Ctrl+Down Ctrl+Down Ctrl+Down Down "=C29" Tab "=C38+D29" Tab Left Shift+Right Shift+Right Shift+Right Shift+Right Ctrl+R Down Left \'=IF(AND(C38<0,D38>=0),-C38/D29,0)\' Enter Up Shift+Right Shift+Right Shift+Right Shift+Right Ctrl+R Down \'=COUNTIF(C38:H38,"<0")+SUM(C39:G39)\' Enter',
 };
