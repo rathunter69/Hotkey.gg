@@ -652,8 +652,9 @@ const SCAFFOLD_415 = Object.fromEntries([
   ...SITE_R.map(r => ['J' + r, { formula: `=XLOOKUP(B${r},Lists!$B$5:$B$10,Lists!$F$5:$F$10)`, fontColor: 'green', fmtStyle: 'custom', numFmt: FMT.countDash }]),
   ['I15', { value: 'Not listed code', bold: true }], ['J15', { formula: '=XLOOKUP("AUS-XXX",Lists!$B$5:$B$10,Lists!$F$5:$F$10,"Not listed")', fontColor: 'green' }],
   ['I16', { value: 'Code from name', bold: true }], ['J16', { formula: '=XLOOKUP("Airport",Lists!$C$5:$C$10,Lists!$B$5:$B$10)', fontColor: 'green' }],
+  ['I19', { value: 'Two-way, nested', bold: true }], ['J19', { formula: '=XLOOKUP(C35,$C$14:$E$14,XLOOKUP(C34,$B$15:$B$20,$C$15:$E$20))', fmtStyle: 'custom', numFmt: FMT.countDash }],
 ]);
-// 4.1.5 XLOOKUP: capacity, a not-found message, right to left
+// 4.1.5 XLOOKUP: capacity, a not-found message, right to left, and two nested for the two-way answer (it ties to 4.1.4's)
 const S415 = derive(S414, s => { plant(s, 'Summary', SCAFFOLD_415); });
 
 const SCAFFOLD_416 = Object.fromEntries([
@@ -668,10 +669,11 @@ const SCAFFOLD_416 = Object.fromEntries([
 // 4.1.6 Approximate match for bands: the bonus by VLOOKUP TRUE and by INDEX/MATCH 1 against the IFS ladder; IFERROR around a lookup that misses
 const S416 = derive(S415, s => { plant(s, 'Summary', SCAFFOLD_416); });
 
-// 4.1.7 Multi-criteria lookups: the key column on Export, the "Washes for a site on a day" block (the key column route and SUMIFS as a lookup)
+// 4.1.7 Multi-criteria lookups: the key column on Export, the "Washes for a site on a day" block (the key column route and SUMIFS as a lookup), the array MATCH beside the cube
 const MD = SUMMARY.multi;
 const S417 = derive(S416, s => {
   plant(s, 'Export', EXPORT_WORK.key);
+  plant(s, 'Summary', { I20: { value: 'Washes, array MATCH', bold: true }, J20: { formula: `=INDEX(Export!$E$5:$E$94,MATCH(1,(Export!$B$5:$B$94=C${MD.site})*(Export!$A$5:$A$94=C${MD.date}),0))`, fmtStyle: 'custom', numFmt: FMT.countDash } });
   take(s, SOLVED, 'Summary', ['B' + MD.title, ...blockRefs([MD.site, MD.date, MD.key, MD.im, MD.sumifs], COLS('BC'))]);
 });
 
@@ -709,8 +711,8 @@ export const CHALLENGE_41 = {
     G: { formula: `=IFERROR(XLOOKUP(B${r},Lists!$B$5:$B$10,Lists!$E$5:$E$10),"Not listed")`, fontColor: 'green', ...DATE_FMT },
   }),
 };
-/** Module 4.1's scaffold cells on Summary: everything right of column D in rows 4 to 18, cleared when module 4.2 starts. */
-const SCAFFOLD_41_REFS = [...blockRefs([4, ...SITE_R], COLS('EFGHIJKLMNO')), ...blockRefs([13, 14, 15, 16, 17, 18], COLS('HIJ'))];
+/** Module 4.1's scaffold cells on Summary: everything right of column D in rows 4 to 10, and H to J in rows 13 to 20, cleared when module 4.2 starts. */
+const SCAFFOLD_41_REFS = [...blockRefs([4, ...SITE_R], COLS('EFGHIJKLMNO')), ...blockRefs([13, 14, 15, 16, 17, 18, 19, 20], COLS('HIJ'))];
 function challenge41(base, which) {
   return derive(base, s => {
     drop(s, 'Summary', SCAFFOLD_41_REFS);

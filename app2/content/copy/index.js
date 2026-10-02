@@ -1359,6 +1359,114 @@ export const COPY = {
    "mac_note": "",
    "story_beat": ""
   },
+  "why-lookups": {
+   "id": "why-lookups",
+   "module": "lookups",
+   "order": "4.1.1",
+   "title": "Why lookups: a model reads a dataset it can’t hold",
+   "brief": "The question log is the buyers’ diligence questions, numbered, with an owner and a status, and every answer points at a cell. The first asks the Deluxe price, and the answer in F5 is a typed 15: the day the price list changes, it is wrong and nobody knows. A lookup finds the row for D in the package list on Lists and brings back its price, so the answer moves when the list does. Watch a typed answer and a looked-up one part ways, then make the log read the list. The key is `VLOOKUP`.",
+   "closing": "The answer reads the list now, so it can’t be wrong the day the list changes. || A typed answer is a copy of the data taken on one day; a lookup is a question the sheet asks every time it calculates. Every number in the log will point at a cell that reads the data, and the next lessons show how a lookup fails, so you know what to check.",
+   "wow": "The answer reads the list now, so it can’t be wrong the day the list changes.",
+   "convention_line": "One input, one cell; formulas reference it; Links green; external links avoided",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "vlookup-hlookup-fail": {
+   "id": "vlookup-hlookup-fail",
+   "module": "lookups",
+   "order": "4.1.2",
+   "title": "VLOOKUP and HLOOKUP, and how they fail",
+   "brief": "VLOOKUP(key, table, column number, FALSE) looks down the first column for the key and returns the nth column; HLOOKUP does the same across a row. It fails three ways, and each one looks like a number: leave off FALSE and an unsorted list returns a near key, insert a column and the counted column moves, look up by anything but the first column and it reads #N/A. Fill the site block on Summary, then break it each way and read what it says. The key is `VLOOKUP`.",
+   "closing": "VLOOKUP works, and now you’ve seen the three ways it breaks. || Each failure came back looking like an answer or an error you might wave through: a wrong site, a blank read as 0, a #N/A. Best practice: always write FALSE, and treat a counted column number as a promise that nobody will ever insert a column. The next lesson removes the count.",
+   "wow": "VLOOKUP works, and now you’ve seen the three ways it breaks.",
+   "convention_line": "The count, the proposal, the error code; Links green; external links avoided",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "match-index-match": {
+   "id": "match-index-match",
+   "module": "lookups",
+   "order": "4.1.3",
+   "title": "MATCH, then INDEX/MATCH",
+   "brief": "MATCH answers one question: which row is this key on. INDEX answers another: what is in the nth row of this column. Together they do what VLOOKUP does without its faults, because the key can sit in any column, the return column is pointed at rather than counted, and an inserted column changes nothing. It is two functions instead of one, and it is the lookup the standard uses, so rebuild the site block with it. The key is `MATCH`.",
+   "closing": "Two functions make a lookup that survives an inserted column. || MATCH finds the row and INDEX fetches from whichever column you point at, so nothing is counted and the key can sit anywhere. The rest of the chapter writes its lookups this way.",
+   "wow": "Two functions make a lookup that survives an inserted column.",
+   "convention_line": "Links green; external links avoided; Ctrl+D down, Ctrl+R across",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "two-way-index-match": {
+   "id": "two-way-index-match",
+   "module": "lookups",
+   "order": "4.1.4",
+   "title": "Two-way INDEX/MATCH: any site, any week",
+   "brief": "A two-way lookup finds a row and a column: the washes for any site in any week, from the cube on Summary. INDEX takes a whole block and two positions, one MATCH for the site down the side and one for the week across the top, and one cell answers any pair. The cube is pasted values for now; 4.3.1 builds it live from the export. Wire the answer to two typed inputs so a buyer can ask any site, any week. The key is `INDEX`.",
+   "closing": "One cell answers any site in any week. || Two MATCHes give the coordinates and INDEX reads the figure where they cross. In 4.2.4 the site input becomes a drop-down, so nobody can ask for a code that isn’t there.",
+   "wow": "One cell answers any site in any week.",
+   "convention_line": "Inputs blue, formulas black; One input, one cell; formulas reference it",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "xlookup": {
+   "id": "xlookup",
+   "module": "lookups",
+   "order": "4.1.5",
+   "title": "XLOOKUP: exact, not-found, two-way",
+   "brief": "XLOOKUP is the modern lookup: the key, the column to search, the column to return, and an optional message for a miss. It is exact by default, looks in any direction, and nests for a two-way answer. Banks lag versions, so most models you inherit still read INDEX/MATCH; learn XLOOKUP so you can use it where the file allows and read it where you find it. The key is `XLOOKUP`.",
+   "closing": "One function does what two did, when the file allows it. || XLOOKUP is exact by default, says what you tell it on a miss, and looks either way. INDEX/MATCH stays the standard in a shared model, because every version of Excel can read it.",
+   "wow": "One function does what two did, when the file allows it.",
+   "convention_line": "The count, the proposal, the error code; Links green; external links avoided",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "approximate-match-bands": {
+   "id": "approximate-match-bands",
+   "module": "lookups",
+   "order": "4.1.6",
+   "title": "Approximate match for bands, and IFERROR around a lookup",
+   "brief": "Sometimes the key isn’t in the list on purpose: a manager whose site does 282 washes a day earns the bonus for the 250 band, and the tier table holds only the band edges. That is approximate match, VLOOKUP with TRUE or MATCH with 1 on a list sorted ascending, returning the nearest edge below. It replaces the IFS ladder from 3.1.2 with a table anyone can edit, and a lookup that can miss gets IFERROR from 3.1.4 with an honest message. The key is `MATCH`.",
+   "closing": "A band lookup replaced the IFS ladder, and a miss says so in words. || Approximate match needs one thing to be true, a list sorted ascending, and then any band table becomes a lookup an ops manager can edit without touching a formula. The IFS column goes when module 4.2 starts; the table stays.",
+   "wow": "A band lookup replaced the IFS ladder, and a miss says so in words.",
+   "convention_line": "One input, one cell; formulas reference it; MIN/MAX or a lookup instead",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "multi-criteria-lookups": {
+   "id": "multi-criteria-lookups",
+   "module": "lookups",
+   "order": "4.1.7",
+   "title": "Multi-criteria lookups: a key column, a two-condition MATCH, SUMIFS as a lookup",
+   "brief": "Sponsor B wants the washes for one site on one day, and no single column of the export holds that key. Three ways, in the order the standard prefers: a key column that joins the two with & so a normal INDEX/MATCH works; SUMIFS as a lookup, when the answer is a number and the pair is unique; and the two-condition MATCH, which needs no helper column. Build all three on the export and read when each is the right one. The key is `&`.",
+   "closing": "Three ways to look up on two conditions, and you know which one to write. || The key column is the one a reviewer can read row by row; SUMIFS is the shortest when the answer is a number; the array MATCH is for a file you can’t add a column to. Sponsor B’s question gets its answer in the log in module 4.3.",
+   "wow": "Three ways to look up on two conditions, and you know which one to write.",
+   "convention_line": "Ctrl+D down, Ctrl+R across; One input, one cell; formulas reference it",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "offset-indirect-why-not": {
+   "id": "offset-indirect-why-not",
+   "module": "lookups",
+   "order": "4.1.8",
+   "title": "OFFSET and INDIRECT, and why the standard avoids them",
+   "brief": "OFFSET returns a cell some rows and columns away from a starting cell; INDIRECT turns a text string into a reference. You will meet both in other people’s models, so learn to read them, and learn why the standard avoids them: both recalculate on every change, so a big model crawls, and neither shows the trace arrows what it reads, so an audit goes blind. Build one of each, watch the arrow miss, break both with one row, and rewrite them. The key is `OFFSET`.",
+   "closing": "You can read OFFSET and INDIRECT now, and you know why you won’t write them. || Both recalculate on every keystroke, neither shows a reviewer where its number comes from, and one inserted row sent both to a blank. When you inherit them, rewrite them as INDEX/MATCH, or INDEX with a 0 for a whole column (E6).",
+   "wow": "You can read OFFSET and INDIRECT now, and you know why you won’t write them.",
+   "convention_line": "MIN/MAX or a lookup instead",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "challenge-lookup-summary": {
+   "id": "challenge-lookup-summary",
+   "module": "lookups",
+   "order": "4.1.C",
+   "title": "Challenge: a broken lookup summary rebuilt",
+   "brief": "Another cluster’s site block reads its list through five broken lookups: one without FALSE, one counting a moved column, one keyed on the wrong column, one OFFSET, one that errors silently. Rebuild every line with INDEX/MATCH or XLOOKUP so it ties to Lists.",
+   "closing": "",
+   "wow": "",
+   "convention_line": "MIN/MAX or a lookup instead; Links green; external links avoided; The count, the proposal, the error code",
+   "mac_note": "",
+   "story_beat": ""
+  },
   "remix-format-on-the-pnl": {
    "id": "remix-format-on-the-pnl",
    "module": "remixes",
@@ -8824,6 +8932,496 @@ export const COPY = {
     "why": "",
     "hint_stuck": ""
    }
+  ],
+  "why-lookups": [
+   {
+    "lesson_id": "why-lookups",
+    "goal_index": "0",
+    "text": "On Lists, select the Deluxe retail price in the package list, D15.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell D15 on Lists · The package list sits under the site list, codes in B14:B16."
+   },
+   {
+    "lesson_id": "why-lookups",
+    "goal_index": "1",
+    "text": "Back on Q&A, enter =VLOOKUP(\"D\",Lists!$B$14:$E$16,3,FALSE) in G5, beside the typed answer.",
+    "teach": "VLOOKUP(key, table, column, FALSE) looks down the table’s first column for the key and returns the column you count to: \"D\" in Lists!$B$14:$E$16, column 3, is the Deluxe retail price. FALSE asks for an exact match, and the anchors keep the table still wherever the formula goes.",
+    "why": "",
+    "hint_stuck": "pulse cell G5 on Q&A · The table is the package list, B14:E16 on Lists; the price is its third column."
+   },
+   {
+    "lesson_id": "why-lookups",
+    "goal_index": "2",
+    "text": "Change the Deluxe price on Lists to 16 and watch G5 read 16 while the typed F5 still reads 15.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell D15 on Lists · Type over the price; the lookup on Q&A follows it."
+   },
+   {
+    "lesson_id": "why-lookups",
+    "goal_index": "3",
+    "text": "Press Ctrl+Z to put the Deluxe price back to 15.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell D15 on Lists · Undo takes back the last change on the sheet."
+   },
+   {
+    "lesson_id": "why-lookups",
+    "goal_index": "4",
+    "text": "Retype the answer in F5 as the same lookup and color it green, a link to another sheet.",
+    "teach": "An answer in the log is a reference to a cell that reads the data, never a typed figure, because a buyer will change the data and expect the answer to move. The lookup reads another sheet, so it is green like every link.",
+    "why": "",
+    "hint_stuck": "pulse cell F5 on Q&A · Ctrl+Enter keeps the cell selected for the color."
+   },
+   {
+    "lesson_id": "why-lookups",
+    "goal_index": "5",
+    "text": "Clear the working lookup in G5 with Delete, so the log holds one answer.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell G5 on Q&A · F5 holds the answer now."
+   },
+   {
+    "lesson_id": "why-lookups",
+    "goal_index": "6",
+    "text": "Does it tie? Watch the Deluxe price on Lists move to 17 and the answer in F5 follow it.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell F5 on Q&A · The answer reads the list, so the list leads."
+   }
+  ],
+  "vlookup-hlookup-fail": [
+   {
+    "lesson_id": "vlookup-hlookup-fail",
+    "goal_index": "0",
+    "text": "Fill the site names into Summary C5:C10 with =VLOOKUP(B5,Lists!$B$5:$H$10,2,FALSE) and Ctrl+Enter.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C5:C10 on Summary · The codes in B5:B10 are the keys; the site name is the table’s second column."
+   },
+   {
+    "lesson_id": "vlookup-hlookup-fail",
+    "goal_index": "1",
+    "text": "Capacity is column 5 of the same table: fill D5:D10 the same way.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range D5:D10 · Count across from Code in B: Site, Cluster, Opened, Capacity."
+   },
+   {
+    "lesson_id": "vlookup-hlookup-fail",
+    "goal_index": "2",
+    "text": "Fail one: in E8, leave FALSE off, =VLOOKUP(B8,Lists!$B$5:$H$10,2), and read Cedar Park come back for South Lamar.",
+    "teach": "Leave off FALSE and VLOOKUP assumes the first column is sorted, then returns the nearest key at or below the one you asked for. The site codes aren’t sorted, so the answer is a wrong site, said with confidence.",
+    "why": "",
+    "hint_stuck": "pulse cell E8 · The fourth argument is the one to leave off."
+   },
+   {
+    "lesson_id": "vlookup-hlookup-fail",
+    "goal_index": "3",
+    "text": "Fail three: retype E8 keyed on the name, =VLOOKUP(C8,Lists!$B$5:$H$10,5,FALSE), and read #N/A.",
+    "teach": "VLOOKUP only looks down the table’s first column, so a key from any other column finds nothing. #N/A is Excel saying the key isn’t there, and it is the error to read first on any lookup.",
+    "why": "",
+    "hint_stuck": "pulse cell E8 · The name in C8 is the key this time."
+   },
+   {
+    "lesson_id": "vlookup-hlookup-fail",
+    "goal_index": "4",
+    "text": "Clear E8 with Delete; the two failures have made their point.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell E8 · Delete empties the cell."
+   },
+   {
+    "lesson_id": "vlookup-hlookup-fail",
+    "goal_index": "5",
+    "text": "Fail two: insert a column on Lists at F, before capacity, read D5 drop to 0, then press Ctrl+Z.",
+    "teach": "A column number is counted once, when the formula is written. Insert a column inside the table and the table widens, but 5 still means the fifth column, which is now the new blank one.",
+    "why": "",
+    "hint_stuck": "pulse cell F5 on Lists · Ctrl+Space takes the whole column, Ctrl+Shift+= inserts one before it."
+   },
+   {
+    "lesson_id": "vlookup-hlookup-fail",
+    "goal_index": "6",
+    "text": "In I14, read Domain’s washes for the week in H14 with =HLOOKUP(H14,$C$14:$E$20,2,FALSE).",
+    "teach": "HLOOKUP(key, table, row, FALSE) looks across the table’s top row for the key and returns the row you count down to. The cube’s header row holds the week labels, so Domain, the first site, is row 2.",
+    "why": "",
+    "hint_stuck": "pulse cell I14 on Summary · The weeks run across C14:E14; Domain is the first row under them."
+   },
+   {
+    "lesson_id": "vlookup-hlookup-fail",
+    "goal_index": "7",
+    "text": "Does it tie? Watch Domain’s capacity on Lists move to 130 and D5 follow it.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell D5 on Summary · The lookup reads Lists every time it calculates."
+   }
+  ],
+  "match-index-match": [
+   {
+    "lesson_id": "match-index-match",
+    "goal_index": "0",
+    "text": "Find each code’s row on Lists: fill Summary E5:E10 with =MATCH(B5,Lists!$B$5:$B$10,0).",
+    "teach": "MATCH(key, range, 0) returns where the key sits in a one-column range: AUS-DOM is 1 in Lists!$B$5:$B$10, AUS-CED is 6. The 0 asks for an exact match, the same job FALSE does in VLOOKUP.",
+    "why": "",
+    "hint_stuck": "pulse range E5:E10 on Summary · The codes in B5:B10 are the keys, the code column on Lists the range."
+   },
+   {
+    "lesson_id": "match-index-match",
+    "goal_index": "1",
+    "text": "Bring back each name in F5:F10 with =INDEX(Lists!$C$5:$C$10,E5), the row MATCH found.",
+    "teach": "INDEX(range, n) returns the nth cell of a range. Give it the name column and the row MATCH found, and it brings back the name; give it another column and it brings back that instead.",
+    "why": "",
+    "hint_stuck": "pulse range F5:F10 · E5 holds Domain’s row; the names are Lists!$C$5:$C$10."
+   },
+   {
+    "lesson_id": "match-index-match",
+    "goal_index": "2",
+    "text": "Capacity with nothing counted: fill G5:G10 with =INDEX(Lists!$F$5:$F$10,MATCH(B5,Lists!$B$5:$B$10,0)).",
+    "teach": "Put the MATCH inside the INDEX and the lookup is one cell: point INDEX at the capacity column, and nothing is counted. This is INDEX/MATCH, the lookup the standard uses.",
+    "why": "",
+    "hint_stuck": "pulse range G5:G10 · The column to return is Lists!$F$5:$F$10; the MATCH is the one from E5."
+   },
+   {
+    "lesson_id": "match-index-match",
+    "goal_index": "3",
+    "text": "Insert a column on Lists at F again, read G5 hold at Domain’s capacity while D5 drops, then press Ctrl+Z.",
+    "teach": "An inserted column moves Lists!$F$5:$F$10 to G with it, so INDEX/MATCH still points at capacity, while the VLOOKUP in D5 still counts to 5. Tip from the desk: inherited models often write VLOOKUP(B5,Lists!$B$5:$H$10,MATCH(\"Capacity (cars an hour)\",Lists!$B$4:$H$4,0),FALSE), which cures the count but still needs the key in the first column.",
+    "why": "",
+    "hint_stuck": "pulse cell F5 on Lists · The same insert as last lesson; watch G5 this time."
+   },
+   {
+    "lesson_id": "match-index-match",
+    "goal_index": "4",
+    "text": "Look up each code from its name in H5:H10: INDEX on the code column, MATCH on the name in C5.",
+    "teach": "The key can sit in any column: MATCH the name in the name column and INDEX the code column, right to left, which VLOOKUP cannot do. Best practice: INDEX/MATCH for anything that lives longer than a week, VLOOKUP for a one-off you will delete.",
+    "why": "",
+    "hint_stuck": "pulse range H5:H10 on Summary · MATCH(C5,Lists!$C$5:$C$10,0) finds the name; INDEX the codes in Lists!$B$5:$B$10."
+   },
+   {
+    "lesson_id": "match-index-match",
+    "goal_index": "5",
+    "text": "Does it tie? Watch Domain’s capacity on Lists move to 130 and G5 answer.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell G5 on Summary · INDEX points at the capacity column wherever it goes."
+   }
+  ],
+  "two-way-index-match": [
+   {
+    "lesson_id": "two-way-index-match",
+    "goal_index": "0",
+    "text": "Select the washes in the cube on Summary, C15:E20: sites run down B15:B20, weeks across C14:E14.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C15:E20 on Summary · The cube sits under Washes by site and week."
+   },
+   {
+    "lesson_id": "two-way-index-match",
+    "goal_index": "1",
+    "text": "Type the question into the blue inputs: AUS-AIR in C34 and Week of 21-Sep in C35.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C34:C35 · The labels in B34:B35 say which is which; type the week exactly as the cube’s header reads."
+   },
+   {
+    "lesson_id": "two-way-index-match",
+    "goal_index": "2",
+    "text": "Row position in C36: =MATCH(C34,$B$15:$B$20,0) finds the site down the side.",
+    "teach": "A two-way lookup needs two positions. MATCH down the codes in B15:B20 says which row of the cube the site is on, and MATCH across the week labels in C14:E14 says which column.",
+    "why": "",
+    "hint_stuck": "pulse cell C36 · The codes run down B15:B20."
+   },
+   {
+    "lesson_id": "two-way-index-match",
+    "goal_index": "3",
+    "text": "Column position in C37: =MATCH(C35,$C$14:$E$14,0) finds the week across the top.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C37 · The weeks run across C14:E14."
+   },
+   {
+    "lesson_id": "two-way-index-match",
+    "goal_index": "4",
+    "text": "In C38, =INDEX($C$15:$E$20,C36,C37) reads the washes where the two positions cross.",
+    "teach": "INDEX(block, row, column) returns the cell where a row and a column of the block cross, so the two positions read one figure out of eighteen.",
+    "why": "",
+    "hint_stuck": "pulse cell C38 · The block is the cube’s figures, C15:E20."
+   },
+   {
+    "lesson_id": "two-way-index-match",
+    "goal_index": "5",
+    "text": "Collapse it into one cell: put both MATCHes inside the INDEX in C38.",
+    "teach": "The helper cells show the working; the one-cell version is what goes in a model, because it can’t lose a helper. Best practice: keep the inputs in their own blue cells and never type them inside the formula.",
+    "why": "",
+    "hint_stuck": "pulse cell C38 · Swap C36 and C37 for the two MATCHes they hold."
+   },
+   {
+    "lesson_id": "two-way-index-match",
+    "goal_index": "6",
+    "text": "Does it tie? Watch the inputs change to AUS-MUE and Week of 28-Sep and C38 move with them.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C38 on Summary · The inputs lead; the answer follows."
+   }
+  ],
+  "xlookup": [
+   {
+    "lesson_id": "xlookup",
+    "goal_index": "0",
+    "text": "Capacity by XLOOKUP in Summary J5:J10: =XLOOKUP(B5,Lists!$B$5:$B$10,Lists!$F$5:$F$10).",
+    "teach": "XLOOKUP(key, lookup range, return range) finds the key in the first range and returns the cell beside it in the second. No column is counted and no FALSE is needed, because exact is the default.",
+    "why": "",
+    "hint_stuck": "pulse range J5:J10 on Summary · Search the codes, return the capacities."
+   },
+   {
+    "lesson_id": "xlookup",
+    "goal_index": "1",
+    "text": "In J15, look up a code that isn’t on Lists, AUS-XXX, and read #N/A.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell J15 · Type the code in quotes as the key."
+   },
+   {
+    "lesson_id": "xlookup",
+    "goal_index": "2",
+    "text": "Add the fourth argument to J15, \"Not listed\", so the miss says so in words.",
+    "teach": "The fourth argument is what XLOOKUP returns when the key isn’t there. A message in words tells the reader the code is missing; a #N/A only tells them something broke.",
+    "why": "",
+    "hint_stuck": "pulse cell J15 · The message goes in quotes after the return range."
+   },
+   {
+    "lesson_id": "xlookup",
+    "goal_index": "3",
+    "text": "In J16, look up Airport’s code right to left: search the names in Lists!$C$5:$C$10, return the codes.",
+    "teach": "The lookup range and the return range are separate, so the return can sit left of the key: search the names, return the codes, no rearranging.",
+    "why": "",
+    "hint_stuck": "pulse cell J16 · The codes in Lists!$B$5:$B$10 sit left of the names."
+   },
+   {
+    "lesson_id": "xlookup",
+    "goal_index": "4",
+    "text": "Nest two XLOOKUPs in J19 for the two-way answer, and read it match C38.",
+    "teach": "An XLOOKUP can return a whole row: the inner one finds the site’s row of the cube, and the outer one finds the week across the top and returns that cell of the row. Best practice: XLOOKUP where the file is yours and the version allows, INDEX/MATCH in anything a bank’s model will read; XMATCH is MATCH with exact as the default and goes inside INDEX the same way.",
+    "why": "",
+    "hint_stuck": "pulse cell J19 · Inside: the site’s row of C15:E20. Outside: the week across C14:E14."
+   },
+   {
+    "lesson_id": "xlookup",
+    "goal_index": "5",
+    "text": "Does it tie? Watch Domain’s capacity on Lists move to 130 and J5 follow it.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell J5 on Summary · XLOOKUP reads Lists like any lookup."
+   }
+  ],
+  "approximate-match-bands": [
+   {
+    "lesson_id": "approximate-match-bands",
+    "goal_index": "0",
+    "text": "On Lists, select the bonus tiers in J5:K8: the band edges run ascending, 0 to 350 washes a day.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range J5:K8 on Lists · The tiers sit right of the site list, under Washes a day."
+   },
+   {
+    "lesson_id": "approximate-match-bands",
+    "goal_index": "1",
+    "text": "Bonus by band in Summary K5:K10: =VLOOKUP($F15/15,Lists!$J$5:$K$8,2,TRUE), each site’s washes a day.",
+    "teach": "With TRUE, VLOOKUP walks a list sorted ascending and stops at the largest edge at or below the key: 282 washes a day lands on 250 and returns $50. The key here is a calculation, the cube total over fifteen days, and $F15 keeps the formula on the total column as it fills.",
+    "why": "",
+    "hint_stuck": "pulse range K5:K10 on Summary · F15:F20 hold each site’s export total; fifteen days make the daily figure."
+   },
+   {
+    "lesson_id": "approximate-match-bands",
+    "goal_index": "2",
+    "text": "The same band by INDEX/MATCH in L5:L10, MATCH type 1 on the edges in Lists!$J$5:$J$8.",
+    "teach": "MATCH with 1 as its last argument does the same walk and returns the position of the edge, so INDEX on the bonus column gives the same answer from a table you point at.",
+    "why": "",
+    "hint_stuck": "pulse range L5:L10 · INDEX the bonuses in Lists!$K$5:$K$8; MATCH the edges with 1."
+   },
+   {
+    "lesson_id": "approximate-match-bands",
+    "goal_index": "3",
+    "text": "Write the IFS ladder from 3.1.2 in M5:M10 and read it agree with the table.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range M5:M10 · Test the top band first: 350, then 300, then 250, then TRUE for 0."
+   },
+   {
+    "lesson_id": "approximate-match-bands",
+    "goal_index": "4",
+    "text": "In J17, wrap a lookup that misses: =IFERROR(XLOOKUP(\"AUS-XXX\",…),\"Not listed\") on the codes and capacities.",
+    "teach": "They agree, but only the table can be changed by someone who can’t read a formula, and the ladder hides four typed figures. IFERROR belongs only where a miss is expected, and its fallback should say what happened: a blank reads as a zero, a message reads as a missing code.",
+    "why": "",
+    "hint_stuck": "pulse cell J17 on Summary · The XLOOKUP from J15 without its fourth argument goes inside the IFERROR."
+   },
+   {
+    "lesson_id": "approximate-match-bands",
+    "goal_index": "5",
+    "text": "Does it tie? Watch the 250 edge on Lists drop to 220, and Mueller and Riverside move into the $50 band.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range K5:K10 on Summary · The table leads; the bonuses follow."
+   }
+  ],
+  "multi-criteria-lookups": [
+   {
+    "lesson_id": "multi-criteria-lookups",
+    "goal_index": "0",
+    "text": "On Export, fill the key column J5:J94 with =B5&\"|\"&TEXT(A5,\"yyyy-mm-dd\"), site and date in one string.",
+    "teach": "A key column joins the two conditions into one string, AUS-SLA|2026-09-19, so a single MATCH can find the row. TEXT writes the date one fixed way (3.4.1), because a date on its own joins as its serial number.",
+    "why": "",
+    "hint_stuck": "pulse range J5:J94 on Export · One formula for all ninety rows, entered with Ctrl+Enter."
+   },
+   {
+    "lesson_id": "multi-criteria-lookups",
+    "goal_index": "1",
+    "text": "On Summary, build the same key in C43 from the site in C41 and the date in C42.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C43 on Summary · The same pattern as the key column, on the two inputs."
+   },
+   {
+    "lesson_id": "multi-criteria-lookups",
+    "goal_index": "2",
+    "text": "Washes by the key column in C44: INDEX on Export’s washes, MATCH on the key in Export!$J$5:$J$94.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C44 · Total washes are Export!$E$5:$E$94; the key from C43 is what MATCH looks for."
+   },
+   {
+    "lesson_id": "multi-criteria-lookups",
+    "goal_index": "3",
+    "text": "Washes by SUMIFS in C45, on the site and the date: the pair is unique, so the sum is the one row.",
+    "teach": "When the answer is a number and only one row can match, SUMIFS on the two conditions adds up exactly that row, so it works as a lookup with no helper column. If the pair could repeat, it would add them together without a word.",
+    "why": "",
+    "hint_stuck": "pulse cell C45 · Sum the washes where the site is C41 and the date is C42."
+   },
+   {
+    "lesson_id": "multi-criteria-lookups",
+    "goal_index": "4",
+    "text": "In J20, find it with no key column: =INDEX(Export!$E$5:$E$94,MATCH(1,(sites=C41)*(dates=C42),0)).",
+    "teach": "Each comparison over the export returns a column of TRUE and FALSE, and multiplying the two makes 1 only where both hold, so MATCH(1, …, 0) finds the row with no key column. Best practice: a key column when the lookup returns text or must be audited by eye, SUMIFS when it returns a number, and the array MATCH when you can’t add a column, noted beside it as an array.",
+    "why": "",
+    "hint_stuck": "pulse cell J20 on Summary · Sites are Export!$B$5:$B$94, dates Export!$A$5:$A$94."
+   },
+   {
+    "lesson_id": "multi-criteria-lookups",
+    "goal_index": "5",
+    "text": "Does it tie? Watch the date in C42 move to Sep 20 and all three answers move together.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C43:C45 on Summary · All three read the same two inputs."
+   }
+  ],
+  "offset-indirect-why-not": [
+   {
+    "lesson_id": "offset-indirect-why-not",
+    "goal_index": "0",
+    "text": "Reach capacity the long way in Summary N5:N10: =OFFSET(Lists!$B$4,MATCH(B5,Lists!$B$5:$B$10,0),4).",
+    "teach": "OFFSET(start, rows, columns) counts away from a starting cell: from Lists!B4, down as many rows as MATCH says and four columns across, lands on the site’s capacity. It is volatile, so Excel recalculates it on every change anywhere in the file.",
+    "why": "",
+    "hint_stuck": "pulse range N5:N10 on Summary · Start at the header cell Lists!$B$4 and count down to the site."
+   },
+   {
+    "lesson_id": "offset-indirect-why-not",
+    "goal_index": "1",
+    "text": "Trace N5 with Alt M P, read the arrow stop at Lists!B4 instead of a capacity, then clear it with Alt M A A.",
+    "teach": "Trace Precedents draws what a formula reads (3.6.1). On OFFSET it points at the starting cell and the code list, never at the capacity it returns, so a reviewer following arrows can’t see where the number came from.",
+    "why": "",
+    "hint_stuck": "pulse cell N5 · The arrows are drawings; clearing them changes no cell."
+   },
+   {
+    "lesson_id": "offset-indirect-why-not",
+    "goal_index": "2",
+    "text": "Reach it again in O5:O10 from a string: =INDIRECT(\"Lists!F\"&(4+MATCH(B5,Lists!$B$5:$B$10,0))).",
+    "teach": "INDIRECT(text) treats a string as an address: \"Lists!F\" joined to a row number becomes the capacity cell. The address is text, so nothing in the file knows it points there, and it is volatile too.",
+    "why": "",
+    "hint_stuck": "pulse range O5:O10 · The site list starts on row 5, so row 4 plus the MATCH is the site’s row."
+   },
+   {
+    "lesson_id": "offset-indirect-why-not",
+    "goal_index": "3",
+    "text": "Insert a row on Lists at row 5, the top of the site list, watch N5 and O5 go wrong while G5 holds, then Ctrl+Z.",
+    "teach": "Insert a row at the top of the list and every real reference moves with it, but OFFSET still counts from B4 and INDIRECT still builds the old address. Both return the new blank row; INDEX/MATCH in G5 follows the list.",
+    "why": "",
+    "hint_stuck": "pulse cell B5 on Lists · Shift+Space takes the row, Ctrl+Shift+= inserts one above it."
+   },
+   {
+    "lesson_id": "offset-indirect-why-not",
+    "goal_index": "4",
+    "text": "Rewrite N5:N10 as INDEX/MATCH and retitle N4 Capacity (INDEX/MATCH).",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range N4:N10 on Summary · The INDEX/MATCH from G5 is the one to write."
+   },
+   {
+    "lesson_id": "offset-indirect-why-not",
+    "goal_index": "5",
+    "text": "Clear the INDIRECT column, O4:O10, with Clear All, Alt H E A, so only the INDEX/MATCH stays.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range O4:O10 · Clear All takes the formats with the formulas."
+   },
+   {
+    "lesson_id": "offset-indirect-why-not",
+    "goal_index": "6",
+    "text": "In J18, sum the second week of the cube without OFFSET: =SUM(INDEX($C$15:$E$20,0,2)).",
+    "teach": "INDEX(block, 0, n) returns the whole nth column of a block, so SUM around it adds one week of the cube. It does what an OFFSET over a moving column does, and the trace arrows can see the block it reads.",
+    "why": "",
+    "hint_stuck": "pulse cell J18 on Summary · Row 0 means every row; column 2 is the second week."
+   },
+   {
+    "lesson_id": "offset-indirect-why-not",
+    "goal_index": "7",
+    "text": "Does it tie? Watch Domain’s capacity on Lists move to 130 and N5 follow it, traceably.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell N5 on Summary · INDEX/MATCH reads the capacity column itself."
+   }
+  ],
+  "challenge-lookup-summary": [
+   {
+    "lesson_id": "challenge-lookup-summary",
+    "goal_index": "0",
+    "text": "Restore exact match on the site names in Summary C5:C10.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-lookup-summary",
+    "goal_index": "1",
+    "text": "Fix capacity in D5:D10 so no column number is counted.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-lookup-summary",
+    "goal_index": "2",
+    "text": "Key hours open in E5:E10 on the code in column B, not the name.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-lookup-summary",
+    "goal_index": "3",
+    "text": "Rewrite daily site costs in F5:F10 without OFFSET.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-lookup-summary",
+    "goal_index": "4",
+    "text": "Key the opened dates in G5:G10 on the code, and make a miss say Not listed instead of a blank.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
   ]
  },
  "modules": {
@@ -8994,6 +9592,13 @@ export const COPY = {
    "objective": "Build the San Antonio databook end to end, then prove it against the clock; or test out of the chapter.",
    "story_beat": "The databook, tied out. || A fresh export, a fresh site list, a Summary someone else abandoned. Rebuild it so every number reads the export and the flag reads OK, then value the next site on the list. Build it, then build it again on the clock. The assessment is the test-out.",
    "page_name": "The KPI databook"
+  },
+  "lookups": {
+   "id": "lookups",
+   "name": "Lookups",
+   "objective": "Why a model reads a dataset; VLOOKUP and HLOOKUP and how they fail; MATCH, then INDEX/MATCH; two-way INDEX/MATCH; XLOOKUP; approximate match for bands and IFERROR around a lookup; multi-criteria lookups; OFFSET and INDIRECT and why the standard avoids them.",
+   "story_beat": "The model can’t hold the data. || Sponsor A’s first question is simple, the Deluxe price, and the price list is on another sheet. A lookup reaches into a table, finds a row by its key and brings back the column you asked for, so a page can read a dataset it could never hold. Every model a buyer sends you is built on them, and every one has a way to fail.",
+   "page_name": "The question log, answered"
   }
  },
  "site": {

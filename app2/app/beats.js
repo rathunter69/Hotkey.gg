@@ -72,6 +72,9 @@ const BEATS_DEFAULT = {
     body: 'Before you built yours, someone started a Summary sheet and left. It has a SUMIF pointing at a range a row short, a typed number in a formula column, a text "12", and a total that agrees with nothing. Chapter 1 taught the three looks; this module adds the tools a reviewer uses on a sheet they didn’t build, and the checks block that says, in one cell, whether the databook ties.' },
   'ch3-project-and-assessment': { eyebrow: 'Module 3.7 · project and assessment', title: 'The databook, tied out.',
     body: 'A fresh export, a fresh site list, a Summary someone else abandoned. Rebuild it so every number reads the export and the flag reads OK, then value the next site on the list. Build it, then build it again on the clock. The assessment is the test-out.' },
+  // Chapter 4 · Data and lookups (script-ch4.md story cards)
+  lookups: { eyebrow: 'Module 4.1 · lookups', title: 'The model can’t hold the data.',
+    body: 'Sponsor A’s first question is simple, the Deluxe price, and the price list is on another sheet. A lookup reaches into a table, finds a row by its key and brings back the column you asked for, so a page can read a dataset it could never hold. Every model a buyer sends you is built on them, and every one has a way to fail.' },
   'project-and-assessment': { eyebrow: 'Module 1.8 · project, assessment, test-out', title: 'Management’s next feed is in.',
     body: 'A fresh week, a blank Report, and everything the chapter taught. Build the page start to finish, then prove it against the clock on Monday morning; or test out of the chapter in five minutes.' },
 };

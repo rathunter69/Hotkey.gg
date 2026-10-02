@@ -282,6 +282,19 @@ export const CONCEPTS = {
   'goto-special-types': 'Go To Special’s Numbers, Text, Logicals and Errors boxes narrow Constants or Formulas to one kind of value',
   'edit-links': 'Edit Links (Alt A K) lists every other workbook the file reads; when no cell reads one, Excel says the workbook has no links',
   'rollup-flag': 'a roll-up flag: COUNTIF counts the checks that are not zero and IF turns the count into OK or CHECK, so one cell says whether the book ties',
+  // Chapter 4 · 4.1 Lookups (the diligence pack)
+  'vlookup': 'VLOOKUP(key, table, column, FALSE) finds the key in the table’s first column and returns the column you count to; FALSE means exact match',
+  'hlookup': 'HLOOKUP(key, table, row, FALSE) does the same across: it finds the key in the table’s top row and returns the row you count down to',
+  'lookup-failures': 'a VLOOKUP fails three ways: with no FALSE it returns a near key from an unsorted list, an inserted column moves the column it counts, and a key outside the first column reads #N/A',
+  'match-function': 'MATCH(key, range, 0) returns the position of the key in a one-column or one-row range; 0 means exact',
+  'index-function': 'INDEX(range, n) returns the nth cell of a range, and INDEX(block, row, column) the cell where a row and a column cross',
+  'index-match': 'INDEX/MATCH: MATCH finds the row and INDEX returns that row of the column you point at, so the key can sit in any column and an inserted column breaks nothing',
+  'two-way-lookup': 'a two-way lookup: INDEX on a block with one MATCH down the side and one across the top, so one cell answers any pair',
+  'xlookup': 'XLOOKUP(key, lookup range, return range, if not found) is exact by default, looks in any direction, and takes a message for a miss',
+  'approximate-match': 'approximate match on a list sorted ascending (VLOOKUP with TRUE, MATCH with 1) returns the largest key at or below the value: the band it falls in',
+  'multi-criteria-lookup': 'a lookup on two conditions: a key column that joins them with &, SUMIFS when the answer is a number and the pair is unique, or MATCH(1, (range=x)*(range=y), 0) with no helper column',
+  'offset-indirect': 'OFFSET(start, rows, columns) returns the cell a set distance away and INDIRECT(text) turns a string into a reference; both are volatile and neither shows the trace arrows what it reads',
+  'index-slice': 'INDEX(block, 0, n) returns the block’s whole nth column, so SUM(INDEX(block, 0, n)) adds one column with no OFFSET',
 };
 
 /**

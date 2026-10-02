@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 117: MATCH, then INDEX/MATCH — Data and lookups · hotkey.gg</title>
+<meta name="description" content="MATCH answers one question: which row is this key on. INDEX answers another: what is in the nth row of this column. Together they do what VLOOKUP does without its faults, because the key can sit in any column, the return column is pointed at rather than counted, and an inserted column changes nothing. It is two functions instead of one, and it is the lookup the standard uses, so rebuild the site block with it. The key is MATCH.">
+<meta name="generator" content="app2/tests/public-pages.js — generated from lesson data; do not edit by hand">
+<script>try{var v=JSON.parse(localStorage.getItem('hotkey_theme_vars'));if(v&&v.vars){var r=document.documentElement;for(var k in v.vars)r.style.setProperty('--'+k,v.vars[k]);r.setAttribute('data-dark',v.dark?'1':'0');}}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../ui/public.css">
+</head>
+<body>
+<nav class="top"><a class="brand" href="../index.html#/">hotkey<b>.gg</b></a><a href="../index.html#/learn">Learn</a><a href="../index.html#/practice">Practice</a><a href="../index.html#/leaderboard">Leaderboard</a><a href="../index.html#/reference">Reference</a></nav>
+<main>
+<div class="crumb"><a href="../index.html#/learn">Learn</a> › <a href="index.html">Data and lookups</a> › Lookups</div>
+<h1>Lesson 117: MATCH, then INDEX/MATCH</h1>
+<div class="meta">Data and lookups · Lookups · medium · <span class="">Paid</span></div>
+<div class="card">
+<p style="margin:0">MATCH answers one question: which row is this key on. INDEX answers another: what is in the nth row of this column. Together they do what VLOOKUP does without its faults, because the key can sit in any column, the return column is pointed at rather than counted, and an inserted column changes nothing. It is two functions instead of one, and it is the lookup the standard uses, so rebuild the site block with it. The key is <kbd>MATCH</kbd>.</p>
+</div>
+<h2>What you will do</h2>
+<ol class="goals"><li><span class="muted">MATCH(key, range, 0) returns where the key sits in a one-column range: AUS-DOM is 1 in Lists!$B$5:$B$10, AUS-CED is 6. The 0 asks for an exact match, the same job FALSE does in VLOOKUP.</span> Find each code’s row on Lists: fill Summary E5:E10 with =MATCH(B5,Lists!$B$5:$B$10,0).</li><li><span class="muted">INDEX(range, n) returns the nth cell of a range. Give it the name column and the row MATCH found, and it brings back the name; give it another column and it brings back that instead.</span> Bring back each name in F5:F10 with =INDEX(Lists!$C$5:$C$10,E5), the row MATCH found.</li><li><span class="muted">Put the MATCH inside the INDEX and the lookup is one cell: point INDEX at the capacity column, and nothing is counted. This is INDEX/MATCH, the lookup the standard uses.</span> Capacity with nothing counted: fill G5:G10 with =INDEX(Lists!$F$5:$F$10,MATCH(B5,Lists!$B$5:$B$10,0)).</li><li><span class="muted">An inserted column moves Lists!$F$5:$F$10 to G with it, so INDEX/MATCH still points at capacity, while the VLOOKUP in D5 still counts to 5. Tip from the desk: inherited models often write VLOOKUP(B5,Lists!$B$5:$H$10,MATCH(&quot;Capacity (cars an hour)&quot;,Lists!$B$4:$H$4,0),FALSE), which cures the count but still needs the key in the first column.</span> Insert a column on Lists at F again, read G5 hold at Domain’s capacity while D5 drops, then press Ctrl+Z.</li><li><span class="muted">The key can sit in any column: MATCH the name in the name column and INDEX the code column, right to left, which VLOOKUP cannot do. Best practice: INDEX/MATCH for anything that lives longer than a week, VLOOKUP for a one-off you will delete.</span> Look up each code from its name in H5:H10: INDEX on the code column, MATCH on the name in C5.</li><li>Does it tie? Watch Domain’s capacity on Lists move to 130 and G5 answer.</li></ol>
+<div class="cta"><a class="btn" href="../index.html#/lesson/match-index-match">Start this lesson</a><span class="path">Read → Guided → Try solo → Timed</span></div>
+
+<div class="prevnext"><span>← <a href="vlookup-hlookup-fail.html">Lesson 116: VLOOKUP and HLOOKUP, and how they fail</a></span><span><a href="two-way-index-match.html">Lesson 118: Two-way INDEX/MATCH: any site, any week</a> →</span></div>
+</main>
+<footer><a href="../index.html#/pricing">Pricing</a><a href="../index.html#/teams">Teams</a><a href="../index.html#/about">About</a><a href="../index.html#/terms">Terms</a><a href="../index.html#/privacy">Privacy</a><a href="../index.html#/contact">Contact</a><span>© hotkey.gg</span></footer>
+</body>
+</html>

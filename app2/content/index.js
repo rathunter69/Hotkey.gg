@@ -121,6 +121,16 @@ import parse_the_memo from './lessons/parse-the-memo.js';
 import text_to_numbers from './lessons/text-to-numbers.js';
 import text_to_columns_flash_fill from './lessons/text-to-columns-flash-fill.js';
 import challenge_text_dump from './lessons/challenge-text-dump.js';
+// Chapter 4 · Data and lookups (Run R4, the diligence pack on clearcoat-pack): 4.1 Lookups
+import why_lookups from './lessons/why-lookups.js';
+import vlookup_hlookup_fail from './lessons/vlookup-hlookup-fail.js';
+import match_index_match from './lessons/match-index-match.js';
+import two_way_index_match from './lessons/two-way-index-match.js';
+import xlookup from './lessons/xlookup.js';
+import approximate_match_bands from './lessons/approximate-match-bands.js';
+import multi_criteria_lookups from './lessons/multi-criteria-lookups.js';
+import offset_indirect_why_not from './lessons/offset-indirect-why-not.js';
+import challenge_lookup_summary from './lessons/challenge-lookup-summary.js';
 
 export const CHAPTERS = [
   {
@@ -201,6 +211,25 @@ export const CHAPTERS = [
       pv_fv_pmt, npv_xnpv, irr_xirr, payment_schedule, challenge_new_site_case,
       trace_arrows_evaluate, f9_show_formulas_at_scale, hardcode_external_link_hunt, checks_block_rollup, challenge_six_faults,
       ch3_project, ch3_assessment,
+    ],
+  },
+  {
+    id: 'data-and-lookups',
+    title: 'Data and lookups',
+    access: 'paid',
+    blurb: 'Lookups, lists, summaries from raw rows, pivot tables, scenarios and names: the buyers’ questions answered from the POS export, and the management case with its sensitivities, in one diligence pack.',
+    // Chapter 4's sections in order (script-ch4.md): modules 4.1 to 4.6, then the project and assessment.
+    sections: [
+      { name: 'Lookups', blurb: 'Why a model reads a dataset; VLOOKUP and HLOOKUP and how they fail; MATCH, then INDEX/MATCH; two-way INDEX/MATCH; XLOOKUP; approximate match for bands and IFERROR around a lookup; multi-criteria lookups; OFFSET and INDIRECT and why the standard avoids them.' },
+      { name: 'Lists and tables', blurb: 'Sort, AutoFilter and SUBTOTAL, Remove Duplicates, Data Validation, filter tricks, and UNIQUE, FILTER and SORT.' },
+      { name: 'Summaries from raw rows', blurb: 'The SUMIFS cube, the KPI block, date-range criteria, the KPI page linked and checked, a buyer’s question end to end, and 3D references.' },
+      { name: 'Pivot tables', blurb: 'Build and rearrange, group dates and value settings, refresh and GETPIVOTDATA.' },
+      { name: 'Scenarios and sensitivity', blurb: 'A case toggle, one-way and two-way data tables, Goal Seek, the pass-through driver, and the cases side by side.' },
+      { name: 'Names and structure', blurb: 'Naming toggles and key inputs sparingly, the Name Manager, and a validation list driven by a name.' },
+      { name: 'Project and assessment', blurb: 'The diligence pack on a fresh export, then a fresh export against the clock.' },
+    ],
+    lessons: [
+      why_lookups, vlookup_hlookup_fail, match_index_match, two_way_index_match, xlookup, approximate_match_bands, multi_criteria_lookups, offset_indirect_why_not, challenge_lookup_summary,
     ],
   },
 ];
