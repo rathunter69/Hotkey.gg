@@ -124,7 +124,8 @@ const across = fn => (col, r) => COLS.includes(col) ? fn(col, r) : null;
  */
 function page(spec) {
   if (firstPass) { ROWS[spec.name] = dryRows(spec); return null; }   // the layout pass needs only where the rows land
-  const { sheet, at } = buildPage(spec);
+  // the model's figures run to six figures in thousands and seven on the one-site page, bold with a dollar sign on the totals, which 89 shows as ####
+  const { sheet, at } = buildPage({ figureW: 108, ...spec });
   const cells = sheet.cells;
   ROWS[spec.name] = at;
   const figCols = Object.keys(cells).filter(k => /^[C-Z]4$/.test(k)).map(k => k[0]);
