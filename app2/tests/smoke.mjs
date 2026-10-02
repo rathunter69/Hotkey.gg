@@ -94,7 +94,8 @@ try {
   if (!(await page.$('#coEmailForm'))) fail('#/checkout: the signed-out code sign-in is missing');
   // accounts (phase B): with every non-loopback request blocked, the account page still renders
   // the sign-in form, the user chip reads guest, and the save state stays honest
-  await page.goto(base + '#/account');
+  // (#/account itself is the profile now; signed out, the account's own page carries the form)
+  await page.goto(base + '#/account?section=data');
   await page.waitForTimeout(400);
   const acct = await page.evaluate(() => ({
     hasVendor: !!(window.supabase && window.supabase.createClient),
@@ -153,7 +154,7 @@ try {
     // the first visit after a lesson shows the coach marks, dismissed with Enter
     await page.goto(base + '#/'); await page.waitForSelector('.home-level', { timeout: 5000 }).catch(() => fail('journey: Home did not render'));
     const home = await page.evaluate(() => ({
-      next: (document.querySelector('.panel-h-page') || {}).textContent || '',
+      next: (document.querySelector('.learn-continue .lc-title') || {}).textContent || '',
       empty: [...document.querySelectorAll('.panel')].filter(c => !c.innerText.trim()).map(c => c.className),
       panels: ['.home-chapter', '.home-level', '.home-today', '.home-ach', '.home-chapter .row-module.current'].filter(sel => !document.querySelector(sel)),
       coach: !!document.querySelector('.coach'),
@@ -162,14 +163,14 @@ try {
     if (home.empty.length) fail('journey: Home has empty panels: ' + home.empty.join(', '));
     if (home.panels.length) fail('journey: Home is missing ' + home.panels.join(', '));
     if (!home.coach) fail('journey: no coach marks on the first Home after a lesson');
-    else { for (let i = 0; i < 8 && (await page.$('.coach')); i++) { await page.keyboard.press('Enter'); await page.waitForTimeout(60); } if (await page.$('.coach')) fail('journey: Enter did not dismiss the coach marks'); }
+    else { for (let i = 0; i < 12 && (await page.$('.coach')); i++) { await page.keyboard.press('Enter'); await page.waitForTimeout(60); } if (await page.$('.coach')) fail('journey: Enter did not dismiss the coach marks'); }
     // Learn (3.0): the chapter table with module 1.1 open and current, and its page built beside it
     await page.goto(base + '#/learn'); await page.waitForSelector('.learn-table', { timeout: 5000 }).catch(() => fail('journey: Learn did not render'));
     if (!(await page.$('.learn-table .row-module.open'))) fail('journey: Learn has no open module');
     if (!/built/.test(await page.evaluate(() => (document.querySelector('.learn-side') || {}).textContent || ''))) fail('journey: Learn does not show page 1.1 as built');
-    // Practice renders its catalog, with the first drills unlocked by 1.1
+    // Practice renders its catalog (the drills open as their modules finish; a closed row says which)
     await page.goto(base + '#/practice'); await page.waitForTimeout(300);
-    if ((await page.$$('.row-drill[data-href]')).length < 3) fail('journey: Practice shows fewer than three drills');
+    if ((await page.$$('.row-drill')).length < 3) fail('journey: Practice shows fewer than three drills');
     if (await page.evaluate(() => { const h = document.querySelector('.hdr'); if (!h) return false; const cs = getComputedStyle(h); return (document.activeElement === h) || (cs.outlineStyle !== 'none' && cs.outlineColor !== 'rgba(0, 0, 0, 0)' && parseFloat(cs.outlineWidth) > 0); })) fail('journey: Practice\'s header block draws a stray outline');
     t('home, learn, practice');
     // the Daily: the Ready panel, the drill by keyboard, the result panel

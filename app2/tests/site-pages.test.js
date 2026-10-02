@@ -68,11 +68,11 @@ test('chapterModel: a row per module with its number, title, minutes, status and
   assert.equal(rows[1].statusText, 'Not started');
   assert.equal(rows.flatMap(r => r.lessons).filter(l => l.next).length, 1, 'exactly one next item');
   assert.equal(rows[0].lessons[rows[0].lessons.length - 1].kind, 'challenge', 'the challenge last');
-  // every lesson done and the challenge passed: Complete, with the tier
+  // every lesson done and the challenge passed: Done, with the tier
   const all = {};
   for (const l of ch1.lessons.filter(l => l.module === rows[0].id)) all[l.id] = { completed: true, challenge: l.kind === 'challenge', tier: 'pro' };
   const done = chapterModel(ch1, all, [], {});
-  assert.equal(done[0].status, 'complete'); assert.equal(done[0].statusText, 'Complete'); assert.equal(done[0].tier, 'pro');
+  assert.equal(done[0].status, 'complete'); assert.equal(done[0].statusText, 'Done'); assert.equal(done[0].tier, 'pro');
   assert.equal(done[1].current, true, 'the next module carries the cursor');
   // the chapter Verified: module 1.8 says so
   assert.equal(chapterModel(ch1, all, [], { assessment: true })[rows.length - 1].statusText, 'Verified');
