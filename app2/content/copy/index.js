@@ -1863,6 +1863,18 @@ export const COPY = {
    "mac_note": "",
    "story_beat": ""
   },
+  "keyboard-only-linking": {
+   "id": "keyboard-only-linking",
+   "module": "model-speed",
+   "order": "5.7.3",
+   "title": "Link the cash flow by keyboard alone",
+   "brief": "The cash flow statement has its labels, formats and subtotals, and not one link: net income, depreciation, working capital, capex, the debt lines and the revolver are all empty. Link it without touching the mouse: select a row, type the reference once and press Ctrl+Enter, so every year links to its own column. Then the totals the same way, and green on every link through Font Color and F4. The key is `Ctrl+Enter`.",
+   "closing": "You linked a cash flow statement without touching the mouse, and the cash check held at zero. || Eleven link rows took seven entries, because a relative reference typed once reads its own column across the row and its own line down a block. Best practice: link a statement row by row from its FY24 column, and color each link green as you go so nothing typed hides among them.",
+   "wow": "You linked a cash flow statement without touching the mouse.",
+   "convention_line": "Links green; external links avoided; Write once, fill right",
+   "mac_note": "",
+   "story_beat": ""
+  },
   "remix-format-on-the-pnl": {
    "id": "remix-format-on-the-pnl",
    "module": "remixes",
@@ -11795,6 +11807,72 @@ export const COPY = {
     "teach": "",
     "why": "",
     "hint_stuck": "pulse cell C11 · The cross-foot sums the block down, then across, and takes one from the other."
+   }
+  ],
+  "keyboard-only-linking": [
+   {
+    "lesson_id": "keyboard-only-linking",
+    "goal_index": "0",
+    "text": "Link net income, =IS!C31 into CF C6:J6, and depreciation, =Schedules!C64 into C7:J7, each with Ctrl+Enter.",
+    "teach": "A link row is one entry: select the row from FY24 to FY31, type the reference for FY24 and press Ctrl+Enter, and each column reads its own year because the reference is relative. Typing the reference is faster than pointing at it on another sheet, and Ctrl+G gets you to the row.",
+    "why": "",
+    "hint_stuck": "pulse range C6:J6 · Net income is the last line of the IS, row 31."
+   },
+   {
+    "lesson_id": "keyboard-only-linking",
+    "goal_index": "1",
+    "text": "The three working capital changes sit in Schedules rows 53 to 55: select C8:J10 and enter =Schedules!C53 with Ctrl+Enter.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C8:J10 · One entry fills three rows: each row reads the Schedules row in the same order."
+   },
+   {
+    "lesson_id": "keyboard-only-linking",
+    "goal_index": "2",
+    "text": "Capex is cash going out: enter =-Schedules!C63 into C14:J14 with Ctrl+Enter.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C14:J14 · The schedule keeps capex positive; the cash flow shows it as an outflow."
+   },
+   {
+    "lesson_id": "keyboard-only-linking",
+    "goal_index": "3",
+    "text": "Link the term loan, =Schedules!C80 into C18:J19, and the delayed draw, =Schedules!C90 into C20:J21, each with Ctrl+Enter.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C18:J19 · Drawn and repaid sit next to each other on the schedule, so two rows take one entry."
+   },
+   {
+    "lesson_id": "keyboard-only-linking",
+    "goal_index": "4",
+    "text": "The revolver nets its draw and repayment: enter =Schedules!C101+Schedules!C102 into C24:J24 with Ctrl+Enter.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C24:J24 · Row 101 is the draw and row 102 the repayment, already negative."
+   },
+   {
+    "lesson_id": "keyboard-only-linking",
+    "goal_index": "5",
+    "text": "Net change in cash is =C11+C15+C25 in C28:J28, and closing cash =C29+C28 in C30:J30, each with Ctrl+Enter.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C28:J28 · The three section totals, operating, investing and financing, add to the change in cash."
+   },
+   {
+    "lesson_id": "keyboard-only-linking",
+    "goal_index": "6",
+    "text": "Color the links green: C6:J10 through Font Color, then F4 on C14:J14, C18:J21 and C24:J24.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C6:J10 · Green marks a figure that comes from another sheet; the totals stay black."
+   },
+   {
+    "lesson_id": "keyboard-only-linking",
+    "goal_index": "7",
+    "text": "Does it tie? Watch FY31 washes per day in Inputs J22 go from 250 to 300: closing cash climbs and the cash check, Checks J7, holds at 0.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell J7 · The check is the balance sheet’s cash less the cash flow’s closing cash."
    }
   ]
  },

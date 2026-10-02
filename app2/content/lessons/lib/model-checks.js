@@ -56,6 +56,20 @@ export function like(ses, name, refs, want = finished()) {
 }
 
 /**
+ * Every keyed row on sheet `name` holds formulas that read what the workbook says now: `want(col, v)`
+ * returns the expected figure from the learner's own cells (v(sheet, ref) reads one). For a link made
+ * before the circle it sits in is closed, when the finished model's figure is not yet the right one.
+ */
+export function echoes(ses, name, keys, want, cols = COLS) {
+  const sh = sheetIn(ses, name); if (!sh) return false;
+  const v = (sheet, ref) => { const s = sheetIn(ses, sheet); const c = s && s.cells[ref]; return c ? (c.value ?? 0) : 0; };
+  return [].concat(keys).every(key => cols.every(col => {
+    const c = sh.cells[col + ROW[name][key]];
+    return !!c && !!c.formula && agree(c.value, want(col, v, key));
+  }));
+}
+
+/**
  * The what-if (the shared liveness rule, at the model's scale): nudge the typed input `input`
  * ('Inputs!J21'), recalculate the workbook, see `target` ('Schedules!J9') move, then put the input
  * back and recalculate, so the sheet ends exactly as it was. A typed number never moves.
