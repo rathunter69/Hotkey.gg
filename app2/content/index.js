@@ -177,6 +177,7 @@ import challenge_schedules from './lessons/challenge-schedules.js';
 import is_from_schedules from './lessons/is-from-schedules.js';
 import cf_indirect from './lessons/cf-indirect.js';
 import bs_cash_not_a_plug from './lessons/bs-cash-not-a-plug.js';
+import cash_sweep_revolver from './lessons/cash-sweep-revolver.js';
 
 export const CHAPTERS = [
   {
@@ -311,7 +312,7 @@ export const CHAPTERS = [
     ],
     lessons: [
       revenue_build, cost_build, working_capital_schedule, ppe_and_depreciation, debt_and_interest_circle, tax_schedule, challenge_schedules,
-      is_from_schedules, cf_indirect, bs_cash_not_a_plug,
+      is_from_schedules, cf_indirect, bs_cash_not_a_plug, cash_sweep_revolver,
     ],
   },
 ];
