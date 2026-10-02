@@ -603,6 +603,342 @@ export const COPY = {
    "mac_note": "",
    "story_beat": ""
   },
+  "title-units-timeline-answer": {
+   "id": "title-units-timeline-answer",
+   "module": "the-page-a-buyer-reads",
+   "order": "2.3.1",
+   "title": "Title, units, timeline, sections, answer",
+   "brief": "A financial page reads top to bottom in one order: what it is, what it’s in, when, the lines, the answer. The title in A1 says which company and which statement; the units line under it says the currency and the sign convention; the timeline is row 4; the sections are Revenue, Site costs, Site contribution, Head office, EBITDA. And EBITDA is the answer, so the page is built to land on it. Put the anatomy in place. The key is `Ctrl+B`.",
+   "closing": "The page reads in the order a buyer reads it, and it lands on EBITDA. || A title a size up, a units line, a timeline, four sections and four bold answers: that is the anatomy of every financial page in the book. The codes went back to the ledger, and the blue figures say which numbers were typed.",
+   "wow": "",
+   "convention_line": "The page reads in one order, title to answer, and it lands on EBITDA.",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "actuals-vs-estimates-divider": {
+   "id": "actuals-vs-estimates-divider",
+   "module": "the-page-a-buyer-reads",
+   "order": "2.3.2",
+   "title": "Actuals vs estimates: the divider",
+   "brief": "Two of the three years happened; one is a forecast. A reader has to see the line between them without reading the flags, so the page carries a divider: a vertical border between the last actual and the first estimate, and a light shade on the estimate header. That’s the one vertical border a page is allowed, and the one fill besides the input tint. The key is `Alt H B R`.",
+   "closing": "One vertical line and one shade tell a reader what happened and what’s forecast. || The eye finds the line between FY25A and FY26E before it reads a figure, and Monthly says every one of its months is an estimate. A buyer prices actuals and questions estimates, so the page tells them apart.",
+   "wow": "",
+   "convention_line": "One vertical line and one shade: actuals on the left, the forecast on the right.",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "borders-that-mean-something": {
+   "id": "borders-that-mean-something",
+   "module": "the-page-a-buyer-reads",
+   "order": "2.3.3",
+   "title": "Borders that mean something",
+   "brief": "On a page, a border is a sentence: a top border says “this row adds up what’s above”, a double bottom says “this is the final answer”, and a grid says nothing at all. The P&L has four totals and one answer. Give each the line it means, take off anything else, and turn the gridlines off so the borders are the only lines a reader sees. The key is `Alt H B`.",
+   "closing": "Every line on the page means something, and there are no lines that don’t. || Four top borders say four totals, the double says the answer, and the divider says where the forecast starts. With the gridlines off, a reader sees those lines and nothing else.",
+   "wow": "",
+   "convention_line": "A top border on a total, a double bottom on the answer, and no grid.",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "labels-footnotes-sources": {
+   "id": "labels-footnotes-sources",
+   "module": "the-page-a-buyer-reads",
+   "order": "2.3.4",
+   "title": "Labels, footnotes and sources",
+   "brief": "The labels came out of the system in capitals; a buyer reads sentence case. Memo lines are figures that aren’t dollars (sites, washes, revenue per wash), and they sit below the answer, labeled as memo. Every table carries a source line under it, in one line, and a footnote marker where a figure needs a word. Fix the labels by hand here; module 2.6 does it with formulas. The key is `F2`.",
+   "closing": "The labels read like English, and the page says where its numbers came from. || Sentence case, units on the memo lines, a marker where a figure needs a word and a source under the table: a buyer judges the detail before the numbers. Module 2.6 cleans labels like these with formulas when there are sixty of them.",
+   "wow": "",
+   "convention_line": "Labels in sentence case, a marker where a figure needs a word, a source under every table.",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "widths-and-the-label-column": {
+   "id": "widths-and-the-label-column",
+   "module": "the-page-a-buyer-reads",
+   "order": "2.3.5",
+   "title": "Widths and the label column",
+   "brief": "A financial page has a shape: a narrow margin in column A, labels in B fitted to the longest one, and every figure column the same width. The export has 8.43 everywhere and codes in A. Set the margin, fit the labels, set one width across the years, and see why the period columns are set by hand and the label column by AutoFit. The key is `Alt H O W`.",
+   "closing": "The margin, the label fit and three equal columns give the page the shape every financial page has. || The years are set by hand so they read as equals, the labels by AutoFit so the longest one fits, and the title and the source run across the page without stretching anything. The panes hold the labels and the timeline while a reader scrolls.",
+   "wow": "",
+   "convention_line": "A narrow margin, the labels fitted, and one width across the periods.",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "cell-styles-format-painter": {
+   "id": "cell-styles-format-painter",
+   "module": "the-page-a-buyer-reads",
+   "order": "2.3.6",
+   "title": "One page’s formats carried to the next",
+   "brief": "Monthly is the P&L twelve columns wide, and formatting it cell by cell would take the morning. Paste Special Formats carries a format from one place to many: copy one formatted column, paste its formats over a wider block, and the column repeats across every month. A cell style names a look so any page can use it by name. Dress Monthly from the P&L, then give it the P&L’s title, total line, widths and settings. The key is `Ctrl+Alt+V`.",
+   "closing": "One page formatted became the template for the next. || One column of the P&L dressed thirteen on Monthly in a single paste, the total line became a style with a name, and the label column, the title and the widths followed. Monthly now reads as the P&L’s sibling, not its cousin.",
+   "wow": "",
+   "convention_line": "Format one page, then carry its formats to the next.",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "challenge-pnl-presentation-quality": {
+   "id": "challenge-pnl-presentation-quality",
+   "module": "the-page-a-buyer-reads",
+   "order": "2.3.C",
+   "title": "Challenge: a three-year P&L to presentation quality",
+   "brief": "A fresh export, already formatted for numbers. Give it the anatomy: title, units, sections, borders, the divider, labels, source, widths.",
+   "closing": "",
+   "wow": "",
+   "convention_line": "Title, sections, answers, borders that mean something, the divider, labels, a source and the page’s shape.",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "alignment-at-scale": {
+   "id": "alignment-at-scale",
+   "module": "alignment-and-structure",
+   "order": "2.4.1",
+   "title": "Wrap, indent, Center Across Selection at scale",
+   "brief": "Alignment is the same three moves you know, done on a whole page at once: headers right over figures, sub-lines indented, long headers wrapped rather than widened, titles centered across the block. The Monthly page has twelve month headers, a full year, two levels of lines and a title over fifteen columns. Finish its alignment in a handful of presses. The key is `Alt H W`.",
+   "closing": "Fourteen headers, two levels of lines and fifteen columns got aligned in a handful of moves. || The headers read as one row, the full year wraps inside the width every month has, and the label column says what belongs to what. Alignment done on a whole page at once is the same three moves you already know.",
+   "wow": "",
+   "convention_line": "Headers bold and right over their figures, and a long header wraps rather than widens.",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "grouping-and-outline-levels": {
+   "id": "grouping-and-outline-levels",
+   "module": "alignment-and-structure",
+   "order": "2.4.2",
+   "title": "Grouping and outline levels",
+   "brief": "The site-cost detail is seven rows a buyer wants on demand, not on the page. Group them and an outline button appears in the margin: press it and the seven rows fold to the total; press it again and they’re back. The memo block folds the same way, and groups nest: a second level over revenue to head office folds the page to its answer. The key is `Alt+Shift+→`.",
+   "closing": "The page reads short and stays complete, and a button decides which. || Folded one level, the P&L is its totals and its answer; folded two, it is the answer alone; opened, every line is there. A folded row still counts in every total, which is why grouping is safe where hiding is not.",
+   "wow": "",
+   "convention_line": "Group the detail a reader wants on demand; never hide it.",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "hide-group-or-separate-sheet": {
+   "id": "hide-group-or-separate-sheet",
+   "module": "alignment-and-structure",
+   "order": "2.4.3",
+   "title": "Hiding vs grouping vs a separate sheet",
+   "brief": "Three ways to get detail out of the way, and only one is right for each case. Hidden rows vanish and get forgotten: a reader who finds one wonders what else is hidden. Grouped rows fold and show a button, right for detail that belongs on the page. A separate sheet is right when the detail is a different page: the cluster block belongs on its own sheet, not under the P&L. The key is `Alt H O U`.",
+   "closing": "Nothing is hidden, the detail is grouped and the other page has its own sheet. || The margins fold behind a button a reader can see, and the cluster block reads as a page of its own behind the P&L. A cut keeps every formula pointing at its own rows, so the block works the same on its new sheet.",
+   "wow": "",
+   "convention_line": "Group detail that belongs on the page, and give a different page its own sheet.",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "navigation-column": {
+   "id": "navigation-column",
+   "module": "alignment-and-structure",
+   "order": "2.4.4",
+   "title": "A navigation column for a long sheet",
+   "brief": "Monthly detail runs to seventy-five rows once the four clusters and the company block are in, and a reader shouldn’t scroll to find the EBITDA line. A navigation column is a short list at the top of the sheet: each entry a hyperlink to a named block, so following it lands you there, and Ctrl+G with the name does the same. Name the blocks, list them, link them. The key is `Ctrl+K`.",
+   "closing": "Three links at the top make a seventy-five-row sheet read like a short one. || A reader finds revenue, site costs and EBITDA from the list and lands on each by following its link, or with Ctrl+G and its name. Names are for the few places people jump to; everything else stays an address.",
+   "wow": "",
+   "convention_line": "Name the few places people jump to, and list them at the top of the sheet.",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "challenge-grouped-navigable": {
+   "id": "challenge-grouped-navigable",
+   "module": "alignment-and-structure",
+   "order": "2.4.C",
+   "title": "Challenge: a flat P&L into a grouped, navigable one",
+   "brief": "A flat P&L with a stray block under it and rows someone hid. Finish the headers, group the detail on two levels, unhide what was hidden and group it, move the stray block to its own sheet, and add a navigation column.",
+   "closing": "",
+   "wow": "",
+   "convention_line": "Group, don’t hide; a different page on its own sheet; names for the places people jump to.",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "highlight-rules": {
+   "id": "highlight-rules",
+   "module": "conditional-formatting",
+   "order": "2.5.1",
+   "title": "Highlight rules: negatives, exceptions",
+   "brief": "Conditional formatting is a rule a range applies to itself, and the built-in rules cover most of what a page needs: less than, greater than, between, equal to, duplicate values. Highlight a negative margin, a month under a threshold and a duplicate label, and choose the format a reader will understand, not the loudest one. The key is `Alt H L`.",
+   "closing": "With three rules in and the duplicate gone, the page points at its own soft spots. || A margin under zero now reads red without anyone looking for it, and the slow winter months show on Monthly at a glance. Rules like these are a second pair of eyes: one quiet format each, on the cells that matter.",
+   "wow": "",
+   "convention_line": "Read the page before anyone else does; No color for decoration",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "formula-driven-rules": {
+   "id": "formula-driven-rules",
+   "module": "conditional-formatting",
+   "order": "2.5.2",
+   "title": "Formula-driven rules: a check that isn’t zero turns red",
+   "brief": "The built-in rules ask about the cell’s own value; a formula rule can ask anything. The checks row should turn red when a check isn’t zero, and a whole row can highlight when the flag at its left says so. Write the rule once with the right anchors and it applies across the range like any formula. The key is `Alt H L N`.",
+   "closing": "The check turns red before anyone else sees it. || A formula rule asks any question a formula can, and its anchors work the way they do in a cell: the dollar on the A holds the flag column while the row moves down. The checks block now flags itself, which is what a buyer’s analyst will test first.",
+   "wow": "",
+   "convention_line": "The check is a live difference → 0; Know the four anchor states",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "data-bars-and-scales": {
+   "id": "data-bars-and-scales",
+   "module": "conditional-formatting",
+   "order": "2.5.3",
+   "title": "Data bars and scales, and when not to",
+   "brief": "Data bars and color scales draw a chart inside the cells, and on a working sheet they can show a shape in a second. On a page in the book they’re decoration: a buyer reads figures, not bars. Learn to add them so you know what they do, then take them off the page and keep one on a working sheet. The key is `Alt H L D`.",
+   "closing": "Bars stay on the working sheet; the page gets figures. || A bar shows a shape faster than a column of numbers, which is why it belongs where you work, and a scale shades a line by rank, which is why a reader asks what the colors mean. The book’s pages carry the figures and the two quiet rules that flag a problem.",
+   "wow": "",
+   "convention_line": "No color for decoration; Title, units, timeline, then the answer",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "managing-rules": {
+   "id": "managing-rules",
+   "module": "conditional-formatting",
+   "order": "2.5.4",
+   "title": "Managing rules",
+   "brief": "Rules pile up, overlap and outlive the ranges they were written for, and a page with six rules nobody remembers is a page nobody trusts. Manage Rules lists them, shows their ranges, and lets you delete, reorder and set Stop If True. Tidy the rules on the P&L to the two the page needs. The key is `Alt H L R`.",
+   "closing": "Two rules remain, both named and both where you’d look for them. || The checks rule runs first and stops there, and the margin rule now covers growth as well. When the page goes to the data room, anyone who opens Manage Rules finds two rules that each do one job.",
+   "wow": "",
+   "convention_line": "The check is a live difference → 0; The count, the proposal, the error code",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "challenge-checks-flags": {
+   "id": "challenge-checks-flags",
+   "module": "conditional-formatting",
+   "order": "2.5.C",
+   "title": "Challenge: the checks flags on a model",
+   "brief": "A cluster model with a checks block and no rules on it, plus three stray rules someone left. Make the check flag red, light the flagged row, strip the decoration and tidy the list.",
+   "closing": "",
+   "wow": "",
+   "convention_line": "The check is a live difference → 0; No color for decoration",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "text-for-labels": {
+   "id": "text-for-labels",
+   "module": "dates-and-text-for-presentation",
+   "order": "2.6.1",
+   "title": "TEXT for labels and headers",
+   "brief": "TEXT turns a value into words in a format you choose: =TEXT(C4,\"mmm-yy\") gives Jan-26 as text, and =TEXT(C10,\"#,##0\") gives 33,000 with its comma. A header built with TEXT reads from the date under it, so it can never disagree with it. Build Monthly’s month names from its dates, and the book’s FY labels from the P&L’s timeline and flags. The key is `=`.",
+   "closing": "The header reads the date under it, so they can never disagree. || TEXT writes a number or a date as words through the same codes as the Custom box, and & joins the pieces. Every label on the page that names a period now comes from the timeline, so the day the dates move, the words move with them.",
+   "wow": "",
+   "convention_line": "Timeline on top, equal widths; Links green; external links avoided",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "eomonth-edate": {
+   "id": "eomonth-edate",
+   "module": "dates-and-text-for-presentation",
+   "order": "2.6.2",
+   "title": "EOMONTH and EDATE for period ends",
+   "brief": "A timeline is a chain: each period end is the last day of the month a step after the one before. EOMONTH(date, n) gives the last day of the month n months on; EDATE gives the same day n months on. Build Monthly’s twelve month ends from one typed date, and the P&L’s year ends from the first, so rolling the page forward is one edit. The key is `=`.",
+   "closing": "One typed date drives every header on two sheets. || EOMONTH steps from month end to month end, so February ends on the 28th without anyone counting days, and EDATE keeps the day of the month. The year ends now come from the one date on Inputs, and the FY labels Print builds from them follow.",
+   "wow": "",
+   "convention_line": "Timeline on top, equal widths; Inputs blue, formulas black",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "dynamic-titles": {
+   "id": "dynamic-titles",
+   "module": "dates-and-text-for-presentation",
+   "order": "2.6.3",
+   "title": "Dynamic titles with &",
+   "brief": "The & joins text to text, so a title can be built from cells: the company name on Inputs, the statement name, the period from the timeline. Change the name once and every page’s title follows. Build the P&L, Monthly and Print titles from Inputs, and a period line that reads the first and last year ends. The key is `&`.",
+   "closing": "Three titles read one source, so a name change is one edit. || The & joins the name on Inputs to the words each page needs, and TEXT turns the year ends into the years the period line names. The day the book goes out under the holding company’s name, the pages say so without anyone retyping a title.",
+   "wow": "",
+   "convention_line": "One input, one cell; formulas reference it; Title, units, timeline, then the answer",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "cleaning-imported-labels": {
+   "id": "cleaning-imported-labels",
+   "module": "dates-and-text-for-presentation",
+   "order": "2.6.4",
+   "title": "Cleaning imported labels: TRIM, PROPER, SUBSTITUTE",
+   "brief": "Monthly detail’s labels came in the way exports do: capitals, double spaces, an underscore where a space belongs. Three functions clean them without retyping: TRIM strips stray spaces, PROPER capitalizes each word, SUBSTITUTE swaps one piece of text for another. Build the clean label beside the dirty one, then paste values over the original. The key is `=`.",
+   "closing": "One formula and one paste cleaned sixty-one labels. || SUBSTITUTE, TRIM and PROPER fix what an export does to text, and Paste Special Values keeps the result once the helper is gone. PROPER gives Title Case, which is fine on a working sheet; the book’s pages keep the sentence case they were given when the page was built.",
+   "wow": "",
+   "convention_line": "Attention to detail is judged first; Values to snapshot, never over live formulas",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "units-and-period-line": {
+   "id": "units-and-period-line",
+   "module": "dates-and-text-for-presentation",
+   "order": "2.6.5",
+   "title": "A units line that writes itself",
+   "brief": "The units line has been typed on every page so far. Build it once on Inputs from the currency and the units, and point every page’s A2 at it, so the day the book goes to euros or to millions is one edit. The key is `&`.",
+   "closing": "The header block reads Inputs, and the page can’t disagree with itself. || The title, the period line, the FY labels and now the units line all come from Inputs and the timeline. Change the company, the year, the currency or the units in one cell and every page says so.",
+   "wow": "",
+   "convention_line": "A units line: \"USD unless stated\"; One input, one cell; formulas reference it",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "challenge-dynamic-header-block": {
+   "id": "challenge-dynamic-header-block",
+   "module": "dates-and-text-for-presentation",
+   "order": "2.6.C",
+   "title": "Challenge: the dynamic header block",
+   "brief": "A three-sheet model with typed titles, text dates and dirty labels. Make the header block write itself from Inputs.",
+   "closing": "",
+   "wow": "",
+   "convention_line": "Timeline on top, equal widths; A units line: \"USD unless stated\"; One input, one cell; formulas reference it",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "print-areas-titles-footers": {
+   "id": "print-areas-titles-footers",
+   "module": "printing-and-page-layout",
+   "order": "2.7.1",
+   "title": "Print areas, titles, fit to width, headers and footers",
+   "brief": "Chapter 1 set one page to print; a pack needs the same on every sheet, and Monthly is wider than a page. Fit to one page wide lets a wide sheet run down two pages tall; print titles repeat the header rows on each; the footer carries the file, the page number and the date on every sheet. The key is `Alt P S P`.",
+   "closing": "Three sheets share one footer, so every page knows which file it came from. || Landscape, one page wide, the title rows on every page, and a footer that names the file, the page and the day: the pack prints the way a reader turns it. Monthly runs to two pages tall, and the next lesson decides where the second one starts.",
+   "wow": "",
+   "convention_line": "Fit to page, titles, footer; Title, units, timeline, then the answer",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "one-page-summary": {
+   "id": "one-page-summary",
+   "module": "printing-and-page-layout",
+   "order": "2.7.3",
+   "title": "The one-page summary linked from the detail",
+   "brief": "The first page of the section is the summary: six lines, three years, no detail, and every figure a link to the P&L behind it, so the summary can never disagree with the detail. Build Print from links and format it to the standard. The key is `Ctrl+PgDn`.",
+   "closing": "Every one of the six lines is a link, so the summary can't disagree with the detail. || Six lines and three years, each figure pointed at the P&L, formatted from it and shown green, with a check that reads zero. Change any line on the P&L and the summary answers before anyone can ask. The pack is ready for the data room.",
+   "wow": "",
+   "convention_line": "Links green; external links avoided; Build references by pointing; F2 to read back; The check is a live difference → 0; Title, units, timeline, then the answer",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "challenge-print-pack": {
+   "id": "challenge-print-pack",
+   "module": "printing-and-page-layout",
+   "order": "2.7.C",
+   "title": "Challenge: a three-sheet model prints as a clean pack",
+   "brief": "Three sheets, no print set-up. Orientation, fit, titles, one footer everywhere and the page centered: a pack a reader can print without thinking.",
+   "closing": "",
+   "wow": "",
+   "convention_line": "Fit to page, titles, footer; Title, units, timeline, then the answer",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "ch2-project": {
+   "id": "ch2-project",
+   "module": "ch2-project-and-assessment",
+   "order": "2.8.P",
+   "title": "Project: the historical financials section",
+   "brief": "A fresh export has landed: the same accounting system, the same faults, a year on, FY25A to FY27E. Everything the chapter taught goes onto this one workbook until the P&L, Monthly and Print are ready for the data room. No clock, and nothing here is new. The key is `Ctrl+1`.",
+   "closing": "A raw export in, three pages out: the P&L formatted by line with its signs stated, Monthly built to the same standard, Print reading from both, and the pack set to print. || A buyer’s analyst opens the section and checks what the checks check, then that every figure carries its unit and every page fits the paper. Now the same section on the clock.",
+   "wow": "You took a raw export to a three-page financials section in one sitting, and that is Chapter 2.",
+   "convention_line": "Inputs blue, formulas black; Links green; external links avoided; Timeline on top, equal widths; Income positive, costs negative; Hidden columns get forgotten; Name toggles and key inputs only; One decimals setting per line; A top border, never an all-borders grid; Indent sub-items; headers over numbers; Units live in the format, not typed text; The check is a live difference → 0; Fit to page, titles, footer; Attention to detail is judged first",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "ch2-assessment": {
+   "id": "ch2-assessment",
+   "module": "ch2-project-and-assessment",
+   "order": "2.8.A",
+   "title": "Assessment: the section on fresh figures",
+   "brief": "A sister operator in the same case world has sent its export: the same lines, the same faults and different figures. Make the same three pages, the P&L, Monthly and Print, formatted, checked and set to print, on the clock with no help and the keyboard only. Pass, and the chapter is Verified; this is also the test-out. The key is `Ctrl+1`.",
+   "closing": "A company you had never seen, three pages to the standard: every figure in its format, the signs stated, the heads built from formulas, the checks at zero and the pack set to print. || That is what a buyer’s analyst looks for when the section lands in the data room, and you met it under a clock.",
+   "wow": "You built the financials section on figures you had never seen, on the clock, and the chapter is Verified.",
+   "convention_line": "Inputs blue, formulas black; Links green; external links avoided; Timeline on top, equal widths; Income positive, costs negative; Hidden columns get forgotten; Name toggles and key inputs only; One decimals setting per line; A top border, never an all-borders grid; Indent sub-items; headers over numbers; Units live in the format, not typed text; The check is a live difference → 0; Fit to page, titles, footer; Attention to detail is judged first",
+   "mac_note": "",
+   "story_beat": ""
+  },
   "remix-format-on-the-pnl": {
    "id": "remix-format-on-the-pnl",
    "module": "remixes",
@@ -3757,18 +4093,18 @@ export const COPY = {
    {
     "lesson_id": "conditional-codes-and-hidden-zeros",
     "goal_index": "3",
-    "text": "Set C5:E5 back to General, the top of Ctrl+1’s list, and the flags show again.",
-    "teach": "General is the format with no format: General at the top of Ctrl+1’s list returns a cell to showing its value as typed.",
+    "text": "On Inputs, the switch in B12 holds a 1: give it On;;Off, with the negative section left empty, so it reads On and still multiplies.",
+    "teach": "",
     "why": "",
-    "hint_stuck": "pulse range C5:E5 · The A and E never left the cells."
+    "hint_stuck": "pulse cell B12 · Positive; negative; zero: a 0 would read Off."
    },
    {
     "lesson_id": "conditional-codes-and-hidden-zeros",
     "goal_index": "4",
-    "text": "On Inputs, the switch in B12 holds a 1: give it the code On;;Off so it reads On and still multiplies as a number.",
-    "teach": "",
+    "text": "Back on the P&L, set the flags C5:E5 to General, the top of Ctrl+1’s list, and they show again.",
+    "teach": "General is the format with no format: General at the top of Ctrl+1’s list returns a cell to showing its value as typed.",
     "why": "",
-    "hint_stuck": "pulse cell B12 · Positive; negative; zero: a 0 would read Off."
+    "hint_stuck": "pulse range C5:E5 · The A and E never left the cells."
    },
    {
     "lesson_id": "conditional-codes-and-hidden-zeros",
@@ -3832,6 +4168,1806 @@ export const COPY = {
     "lesson_id": "challenge-house-format-set",
     "goal_index": "6",
     "text": "Give the margins block C27:F30 the percent code 0.0%_);(0.0%);-_).",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "title-units-timeline-answer": [
+   {
+    "lesson_id": "title-units-timeline-answer",
+    "goal_index": "0",
+    "text": "Type \"Clearcoat Express - Historical Financials\" in A1, bold it with Ctrl+B and take it one size up with Alt, H, F, G.",
+    "teach": "The title says which company and which statement, and it is the one line on the page a size up. Increase Font Size is Alt, H, F, G, one step up the size list.",
+    "why": "",
+    "hint_stuck": "pulse cell A1 · Ctrl+Enter keeps you on the cell you typed in."
+   },
+   {
+    "lesson_id": "title-units-timeline-answer",
+    "goal_index": "1",
+    "text": "Center the title across A1:E1 with Ctrl+1, Alignment, Center Across Selection, so it sits over the figures without a merge.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range A1:E1 · The title spans the label column and the three years."
+   },
+   {
+    "lesson_id": "title-units-timeline-answer",
+    "goal_index": "2",
+    "text": "Type Revenue in B6, Site costs in B12 and Memo in B32, and bold all four section headers, Margins and growth in B26 too.",
+    "teach": "Sections group the lines a reader adds in their head: what came in, what the sites cost, and the blocks under the answer. The units line in A2 is already there from module 2.1, italic, saying the currency and that costs show as negatives.",
+    "why": "",
+    "hint_stuck": "pulse cell B6 · Each header sits on the empty row above its block."
+   },
+   {
+    "lesson_id": "title-units-timeline-answer",
+    "goal_index": "3",
+    "text": "Bold the answer lines B24:E24, B22:E22, B20:E20 and B10:E10, with Ctrl+B on the first and F4 on the rest.",
+    "teach": "Bold is for the lines the page adds down to, and nothing else: total revenue, total site costs, site contribution and EBITDA. F4 repeats the last action, so one Ctrl+B does all four.",
+    "why": "",
+    "hint_stuck": "pulse range B24:E24 · Work up the page from EBITDA."
+   },
+   {
+    "lesson_id": "title-units-timeline-answer",
+    "goal_index": "4",
+    "text": "Indent the sub-lines B7:B9 once with Alt, H, 6, then B13:B19 with F4.",
+    "teach": "An indent says a line belongs to the total under it. Increase Indent is Alt, H, 6 and Decrease Indent is Alt, H, 5, one level at a time.",
+    "why": "",
+    "hint_stuck": "pulse range B13:B19 · The site costs run from chemicals and water to marketing."
+   },
+   {
+    "lesson_id": "title-units-timeline-answer",
+    "goal_index": "5",
+    "text": "The checks block takes the same anatomy: bold its header B38 and indent B39:B40 once.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell B38 · The checks sit at the foot of the page."
+   },
+   {
+    "lesson_id": "title-units-timeline-answer",
+    "goal_index": "6",
+    "text": "Select C7:E34, keep only the typed figures with Go To Special Constants (Alt, H, F, D, N), and color them blue.",
+    "teach": "Typed figures are blue and formulas black, on the page as in the model, so a reader knows which numbers came in from the ledger. Go To Special Constants picks the typed cells out of a block and leaves the formulas.",
+    "why": "",
+    "hint_stuck": "pulse range C7:E34 · Constants leaves the totals and the margins behind."
+   },
+   {
+    "lesson_id": "title-units-timeline-answer",
+    "goal_index": "7",
+    "text": "Monthly takes the same rule: select its months C7:N23 and color only the typed figures blue with Go To Special Constants again.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range Monthly!C7:N23 · The subtotals and the full year are formulas and stay black."
+   },
+   {
+    "lesson_id": "title-units-timeline-answer",
+    "goal_index": "8",
+    "text": "Back on the P&L, select the account codes and their header in A4:A23 and clear them with Alt, H, E, A.",
+    "teach": "The account codes belong to the ledger, not to the page. Clear All (Alt, H, E, A) takes the contents and the formats, so nothing of them is left behind.",
+    "why": "",
+    "hint_stuck": "pulse range A4:A23 · The codes stop at head office in row 23."
+   },
+   {
+    "lesson_id": "title-units-timeline-answer",
+    "goal_index": "9",
+    "text": "Does it tie? Watch C7 change to 18500, and EBITDA in C24 answer under the title.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C24 · The page lands on EBITDA."
+   }
+  ],
+  "actuals-vs-estimates-divider": [
+   {
+    "lesson_id": "actuals-vs-estimates-divider",
+    "goal_index": "0",
+    "text": "Shade the estimate header E4:E5 gray with Alt, H, H, → and Enter.",
+    "teach": "The estimate header takes the gray header shade, so the eye finds the forecast before it reads a number. Fill Color is Alt, H, H; → steps along the swatches and Enter picks one.",
+    "why": "",
+    "hint_stuck": "pulse range E4:E5 · FY26E and its E flag sit in column E."
+   },
+   {
+    "lesson_id": "actuals-vs-estimates-divider",
+    "goal_index": "1",
+    "text": "On Monthly, all twelve months are estimates: shade the whole header row C4:N4 the same gray.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C4:N4 · The full year in O is a total, not a month."
+   },
+   {
+    "lesson_id": "actuals-vs-estimates-divider",
+    "goal_index": "2",
+    "text": "Back on the P&L, select the last actual column D4:D35, from FY25A down to revenue per wash.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range D4:D35 · FY25A is the last year that happened."
+   },
+   {
+    "lesson_id": "actuals-vs-estimates-divider",
+    "goal_index": "3",
+    "text": "Give D4:D35 a right border with Alt, H, B, R.",
+    "teach": "The divider is a right border down the last actual column: Alt, H, B, R. It is the one vertical line a page allows, so it reads as a statement.",
+    "why": "",
+    "hint_stuck": "pulse range D4:D35 · Right, not outside: one line between D and E."
+   },
+   {
+    "lesson_id": "actuals-vs-estimates-divider",
+    "goal_index": "4",
+    "text": "Land on E5 and read E in the formula bar: the flag sits under the shade, right-aligned and italic.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell E5 · The flag row sits under the timeline."
+   },
+   {
+    "lesson_id": "actuals-vs-estimates-divider",
+    "goal_index": "5",
+    "text": "Does it tie? Watch E7 change to 27000, and EBITDA in E24 answer on the estimate side of the line.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell E24 · The estimate column is as live as the actuals."
+   }
+  ],
+  "borders-that-mean-something": [
+   {
+    "lesson_id": "borders-that-mean-something",
+    "goal_index": "0",
+    "text": "The export left a grid over C7:E24: select it and take every border off with Alt, H, B, N.",
+    "teach": "A grid on every cell says nothing, because every line is the same line. No Border (Alt, H, B, N) takes every edge off the selection at once.",
+    "why": "",
+    "hint_stuck": "pulse range C7:E24 · The grid runs from retail wash revenue to EBITDA."
+   },
+   {
+    "lesson_id": "borders-that-mean-something",
+    "goal_index": "1",
+    "text": "Put the divider back on D7:D24 with Alt, H, B, R.",
+    "teach": "No Border means every edge, so the divider went with the grid. It is the one line that was meant, and it goes straight back.",
+    "why": "",
+    "hint_stuck": "pulse range D7:D24 · FY25A is the last actual column."
+   },
+   {
+    "lesson_id": "borders-that-mean-something",
+    "goal_index": "2",
+    "text": "Give total revenue B10:E10 a top border with Alt, H, B, P, then B20:E20, B22:E22 and B24:E24 with F4.",
+    "teach": "A top border says the row adds up what is above it, so every total takes one: Alt, H, B, P. F4 repeats it down the page.",
+    "why": "",
+    "hint_stuck": "pulse range B10:E10 · Four totals, one top border each."
+   },
+   {
+    "lesson_id": "borders-that-mean-something",
+    "goal_index": "3",
+    "text": "Give EBITDA B24:E24 a double bottom from Ctrl+1’s Border tab.",
+    "teach": "The double bottom marks the one final answer on the page, and EBITDA is it. On Ctrl+1’s Border tab, ↓ reaches the line styles and ↑ from None lands on the double.",
+    "why": "",
+    "hint_stuck": "pulse range B24:E24 · The answer keeps its top border and gains the double under it."
+   },
+   {
+    "lesson_id": "borders-that-mean-something",
+    "goal_index": "4",
+    "text": "Turn the gridlines off with Alt, W, V, G, so the borders are the only lines on the page.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse the View tab · View, Show, Gridlines."
+   },
+   {
+    "lesson_id": "borders-that-mean-something",
+    "goal_index": "5",
+    "text": "Does it tie? Watch C13 change to -4500, and the bordered totals in C20, C22 and C24 answer.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C20 · A cost line moves every total under it."
+   }
+  ],
+  "labels-footnotes-sources": [
+   {
+    "lesson_id": "labels-footnotes-sources",
+    "goal_index": "0",
+    "text": "Retype B7 as Retail wash revenue in sentence case and press Enter.",
+    "teach": "Sentence case is a capital on the first word and nowhere else, the way a buyer reads a sentence. Typing over a cell replaces its words and keeps its bold and its indent.",
+    "why": "",
+    "hint_stuck": "pulse cell B7 · The first line under Revenue."
+   },
+   {
+    "lesson_id": "labels-footnotes-sources",
+    "goal_index": "1",
+    "text": "Type down the rest of the block the same way: Membership revenue in B8, Other revenue in B9 and Total revenue in B10.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range B8:B10 · Enter takes you down one line at a time."
+   },
+   {
+    "lesson_id": "labels-footnotes-sources",
+    "goal_index": "2",
+    "text": "Add the footnote marker (1) to the end of B9 with F2, so it reads Other revenue (1).",
+    "teach": "A footnote marker says a figure needs a word, and the word goes under the table. F2 opens the cell with the caret at the end, so the marker is added without retyping the label.",
+    "why": "",
+    "hint_stuck": "pulse cell B9 · F2 puts the caret after the last letter."
+   },
+   {
+    "lesson_id": "labels-footnotes-sources",
+    "goal_index": "3",
+    "text": "Retype the site costs B13:B20 in sentence case, Chemicals and water down to Total site costs, pressing Enter after each.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range B13:B20 · Eight labels, one capital each."
+   },
+   {
+    "lesson_id": "labels-footnotes-sources",
+    "goal_index": "4",
+    "text": "Retype B22 as Site contribution and B23 as Head office; EBITDA in B24 is an acronym and stays in capitals.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range B22:B23 · The two lines above the answer."
+   },
+   {
+    "lesson_id": "labels-footnotes-sources",
+    "goal_index": "5",
+    "text": "Label the memo lines B33:B35 Sites (year end), Washes (thousands) and Revenue per wash ($).",
+    "teach": "A memo line is a figure that isn’t dollars, so its label carries its unit. Sites are counted at the year end and washes run in thousands.",
+    "why": "",
+    "hint_stuck": "pulse range B33:B35 · The memo block sits under the margins."
+   },
+   {
+    "lesson_id": "labels-footnotes-sources",
+    "goal_index": "6",
+    "text": "Type the source line in B36, \"Source: management accounts; FY24 and FY25 audited; FY26 per the September budget\", and set it italic.",
+    "teach": "Every table says where its numbers came from, in one line under it, so a buyer can trace any figure to the ledger. Italic keeps it quiet.",
+    "why": "",
+    "hint_stuck": "pulse cell B36 · The source sits straight under the memo block."
+   },
+   {
+    "lesson_id": "labels-footnotes-sources",
+    "goal_index": "7",
+    "text": "Type the footnote \"(1) Detailing and vending\" in B37 and set it italic.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell B37 · The footnote goes under the source."
+   },
+   {
+    "lesson_id": "labels-footnotes-sources",
+    "goal_index": "8",
+    "text": "Does it tie? Nothing here moves a number: watch C7 change to 18500 and C24 still answer.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C24 · Labels are words; the formulas never read them."
+   }
+  ],
+  "widths-and-the-label-column": [
+   {
+    "lesson_id": "widths-and-the-label-column",
+    "goal_index": "0",
+    "text": "Make column A the margin: Alt, H, O, W, width 2.",
+    "teach": "Column A is a margin: it holds the title and the units line and nothing under them, so it only needs to be narrow. Column Width (Alt, H, O, W) takes a width in characters.",
+    "why": "",
+    "hint_stuck": "pulse column A · The title runs across from A1, so A can be narrow."
+   },
+   {
+    "lesson_id": "widths-and-the-label-column",
+    "goal_index": "1",
+    "text": "Select columns C:E and give the three years one width, 12.",
+    "teach": "Period columns are set by hand to one width, so FY24A, FY25A and FY26E read as equals. AutoFit would give each year its own width.",
+    "why": "",
+    "hint_stuck": "pulse range C:E · Ctrl+Space selects the whole column."
+   },
+   {
+    "lesson_id": "widths-and-the-label-column",
+    "goal_index": "2",
+    "text": "Back at A1 with Ctrl+Home, make row 1 a little taller for the title: Alt, H, O, H, height 24.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse row 1 · The title is a size up, so its row gets a little more room."
+   },
+   {
+    "lesson_id": "widths-and-the-label-column",
+    "goal_index": "3",
+    "text": "Fit column B to its labels, not the title or the source: select B4:B35 and AutoFit with Alt, H, O, I.",
+    "teach": "The label column is fitted to its labels by AutoFit, over the labels only: the title and the source line run long on purpose and would stretch it. Select B4:B35 and AutoFit with Alt, H, O, I.",
+    "why": "",
+    "hint_stuck": "pulse range B4:B35 · From revenue per wash up to the timeline label."
+   },
+   {
+    "lesson_id": "widths-and-the-label-column",
+    "goal_index": "4",
+    "text": "Freeze the panes at C5 with Alt, W, F, F, so the labels and the timeline stay in view as the page scrolls.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C5 · Everything above and left of C5 stays put."
+   },
+   {
+    "lesson_id": "widths-and-the-label-column",
+    "goal_index": "5",
+    "text": "Does it tie? Watch E7 change to 27000: the widths hold and E24 answers.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell E24 · A width changes how a figure reads, never what it is."
+   }
+  ],
+  "cell-styles-format-painter": [
+   {
+    "lesson_id": "cell-styles-format-painter",
+    "goal_index": "0",
+    "text": "Copy P&L!C6:C30 and paste its formats over Monthly!C6:O30 in one paste with Ctrl+Alt+V, T.",
+    "teach": "Paste Special Formats (Ctrl+Alt+V, T) pastes how the cells look and nothing they hold. A one-column source pasted over a wider block repeats across every column, so one P&L column dresses all thirteen.",
+    "why": "",
+    "hint_stuck": "pulse range C6:O30 · Column C on the P&L has no divider, so it is the one to copy."
+   },
+   {
+    "lesson_id": "cell-styles-format-painter",
+    "goal_index": "1",
+    "text": "The label column takes its own formats: copy P&L!B6:B30 and paste formats onto Monthly!B6.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range B6:B30 · Bold sections, indented lines, bold totals with their borders."
+   },
+   {
+    "lesson_id": "cell-styles-format-painter",
+    "goal_index": "2",
+    "text": "The full year O7:O24 is formulas, not typed: set its font color back to Automatic from Ctrl+1’s Font tab.",
+    "teach": "The P&L’s column C is blue because it is typed; Monthly’s full year is formulas, so it goes back to black. On Ctrl+1’s Font tab, Alt+C reaches the color and ← steps back to Automatic.",
+    "why": "",
+    "hint_stuck": "pulse range O7:O24 · Every cell in O is a SUM across the months."
+   },
+   {
+    "lesson_id": "cell-styles-format-painter",
+    "goal_index": "3",
+    "text": "Copy the P&L’s title cell A1, paste its formats onto Monthly!A1, then center it across A1:O1.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range A1:O1 · Paste onto A1 alone, then center across the fifteen columns."
+   },
+   {
+    "lesson_id": "cell-styles-format-painter",
+    "goal_index": "4",
+    "text": "On P&L!B10, open New Cell Style with Alt, H, J, N, name it Total line, untick Number with Alt+N and press Enter.",
+    "teach": "Cell Styles (Alt, H, J) name a look so a page can use it by name. New Cell Style (N) saves the active cell’s look, and its ticks choose the parts it carries: untick Number (Alt+N) and each figure keeps its own code. Total is Excel’s own style, so this one takes its own name.",
+    "why": "",
+    "hint_stuck": "pulse cell B10 · Total revenue: bold with a top border."
+   },
+   {
+    "lesson_id": "cell-styles-format-painter",
+    "goal_index": "5",
+    "text": "Apply Total line to Monthly’s subtotals B10:O10, B20:O20 and B22:O22: Alt, H, J, ← once to it under Custom, Enter.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range B10:O10 · Your own styles sit last in the gallery, one step left of the first."
+   },
+   {
+    "lesson_id": "cell-styles-format-painter",
+    "goal_index": "6",
+    "text": "Give Monthly the P&L’s widths: column A 2, and the months and full year C:O 12.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C4:O4 · A width set on one row applies to the whole column."
+   },
+   {
+    "lesson_id": "cell-styles-format-painter",
+    "goal_index": "7",
+    "text": "Fit Monthly’s label column to its labels: select B4:B30 and AutoFit with Alt, H, O, I.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range B4:B30 · The labels stop at revenue growth; the source runs long."
+   },
+   {
+    "lesson_id": "cell-styles-format-painter",
+    "goal_index": "8",
+    "text": "Freeze Monthly’s panes at C5 with Alt, W, F, F and turn its gridlines off with Alt, W, V, G.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C5 · The same two settings the P&L carries."
+   },
+   {
+    "lesson_id": "cell-styles-format-painter",
+    "goal_index": "9",
+    "text": "Does it tie? Watch Monthly!C7 change to 2000, and Monthly!C24 answer in the borrowed format.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C24 · Formats moved; the formulas never did."
+   }
+  ],
+  "challenge-pnl-presentation-quality": [
+   {
+    "lesson_id": "challenge-pnl-presentation-quality",
+    "goal_index": "0",
+    "text": "Make the title in A1 bold and one size up, and center it across A1:E1.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-pnl-presentation-quality",
+    "goal_index": "1",
+    "text": "Type the section headers Revenue in B6, Site costs in B12 and Memo in B32, bold all four headers and the four answer lines.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-pnl-presentation-quality",
+    "goal_index": "2",
+    "text": "Indent the sub-lines B7:B9 and B13:B19 one level with Alt, H, 6.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-pnl-presentation-quality",
+    "goal_index": "3",
+    "text": "Take the grid off C7:E24, give the four totals a top border and EBITDA a double bottom.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-pnl-presentation-quality",
+    "goal_index": "4",
+    "text": "Put the divider down D4:D35 with Alt, H, B, R and shade the estimate header E4:E5 gray.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-pnl-presentation-quality",
+    "goal_index": "5",
+    "text": "Retype the revenue labels B7:B10 in sentence case, and type the source line in B36 in italic.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-pnl-presentation-quality",
+    "goal_index": "6",
+    "text": "Make column A 2 wide, the years C:E 12, AutoFit B over B4:B35, and turn the gridlines off.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "alignment-at-scale": [
+   {
+    "lesson_id": "alignment-at-scale",
+    "goal_index": "0",
+    "text": "On Monthly, bold the whole header row B4:O4 with one Ctrl+B.",
+    "teach": "A header sits bold and right-aligned over its figures, so the eye reads straight down a column. The months are already right-aligned; one Ctrl+B on the row makes the whole header read as one.",
+    "why": "",
+    "hint_stuck": "pulse range B4:O4 · Month ending, twelve months and the full year."
+   },
+   {
+    "lesson_id": "alignment-at-scale",
+    "goal_index": "1",
+    "text": "Retype the capitals in the full-year header O4 as Full year, in sentence case.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell O4 · Typing over a header keeps its bold and its alignment."
+   },
+   {
+    "lesson_id": "alignment-at-scale",
+    "goal_index": "2",
+    "text": "Wrap O4 with Alt, H, W rather than widening column O.",
+    "teach": "A long header wraps inside its column rather than widening it, so every period column keeps the same width. Wrap Text is Alt, H, W.",
+    "why": "",
+    "hint_stuck": "pulse cell O4 · Column O keeps the width every month has."
+   },
+   {
+    "lesson_id": "alignment-at-scale",
+    "goal_index": "3",
+    "text": "Set the units line in A2 italic with Ctrl+I, left and unwrapped, as it reads on the P&L.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell A2 · The units line sits under the title."
+   },
+   {
+    "lesson_id": "alignment-at-scale",
+    "goal_index": "4",
+    "text": "Land on Labor in B14 and read the levels down column B: section, line and total.",
+    "teach": "The label column now says the hierarchy without a word added: a bold section, its lines one level in, and a bold total with its top border. The indents came across with the P&L’s formats in the last lesson.",
+    "why": "",
+    "hint_stuck": "pulse cell B14 · Site costs is the section; total site costs closes it."
+   },
+   {
+    "lesson_id": "alignment-at-scale",
+    "goal_index": "5",
+    "text": "Does it tie? Watch Monthly!C7 change to 2000, and the full year in O10 answer.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell O10 · The full year adds the twelve months."
+   }
+  ],
+  "grouping-and-outline-levels": [
+   {
+    "lesson_id": "grouping-and-outline-levels",
+    "goal_index": "0",
+    "text": "Select rows 13:19 whole, chemicals and water to marketing, and group them with Alt+Shift+→.",
+    "teach": "A group puts a button in the margin that folds its rows away and brings them back, and the rows never stop being there. Select the rows whole with Shift+Space and group them with Alt+Shift+→.",
+    "why": "",
+    "hint_stuck": "pulse rows 13:19 · The detail stops above total site costs."
+   },
+   {
+    "lesson_id": "grouping-and-outline-levels",
+    "goal_index": "1",
+    "text": "Fold the detail with Hide Detail, Alt, A, H.",
+    "teach": "Hide Detail (Alt, A, H) folds the group the active cell sits in; Show Detail (Alt, A, J) opens it again. The outline button in the margin does the same with one click.",
+    "why": "",
+    "hint_stuck": "pulse rows 13:19 · The active cell is inside the group."
+   },
+   {
+    "lesson_id": "grouping-and-outline-levels",
+    "goal_index": "2",
+    "text": "Land on total site costs in B20 and read the page: site costs are one line now.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell B20 · The total stays when its lines fold."
+   },
+   {
+    "lesson_id": "grouping-and-outline-levels",
+    "goal_index": "3",
+    "text": "Open the rows back up from the total with Show Detail, Alt, A, J.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell B20 · Show Detail works from the row under the group."
+   },
+   {
+    "lesson_id": "grouping-and-outline-levels",
+    "goal_index": "4",
+    "text": "Group the memo block, rows 33:35, the same way, so sites, washes and revenue per wash fold behind their own button.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse rows 33:35 · The three lines under the Memo header."
+   },
+   {
+    "lesson_id": "grouping-and-outline-levels",
+    "goal_index": "5",
+    "text": "Add a second level: select rows 7:23, retail wash revenue to head office, and group them over the detail with Alt+Shift+→.",
+    "teach": "Group rows that already hold a group and the inner one goes a level deeper: the detail is level 2, the whole block level 1, and each folds on its own.",
+    "why": "",
+    "hint_stuck": "pulse rows 7:23 · Everything above EBITDA, below the Revenue header."
+   },
+   {
+    "lesson_id": "grouping-and-outline-levels",
+    "goal_index": "6",
+    "text": "Fold the outer level from row 7 with Hide Detail, Alt, A, H, so the P&L reads as its timeline and EBITDA.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse rows 7:23 · Row 7 sits in the outer group and in no inner one."
+   },
+   {
+    "lesson_id": "grouping-and-outline-levels",
+    "goal_index": "7",
+    "text": "Open it again with Show Detail, Alt, A, J, and every line is back.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse rows 7:23 · Show Detail opens the group the cell sits in."
+   },
+   {
+    "lesson_id": "grouping-and-outline-levels",
+    "goal_index": "8",
+    "text": "Does it tie? Watch the detail fold, C13 change to -4500 through the fold, and C24 answer.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C24 · Folded rows still count."
+   }
+  ],
+  "hide-group-or-separate-sheet": [
+   {
+    "lesson_id": "hide-group-or-separate-sheet",
+    "goal_index": "0",
+    "text": "Someone hid rows 26:30: select rows 25:31 whole and unhide them with Alt, H, O, U, O.",
+    "teach": "A hidden row leaves no button and no trace, so a reader who finds one wonders what else is hidden. Select across the gap, whole rows, and Unhide Rows is Alt, H, O, U, O.",
+    "why": "",
+    "hint_stuck": "pulse rows 25:31 · The row numbers jump from 25 to 31."
+   },
+   {
+    "lesson_id": "hide-group-or-separate-sheet",
+    "goal_index": "1",
+    "text": "Group the margins block, rows 26:30, instead, so it folds behind a button rather than vanishing.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse rows 26:30 · Margins and growth, the header and its four lines."
+   },
+   {
+    "lesson_id": "hide-group-or-separate-sheet",
+    "goal_index": "2",
+    "text": "Go to Print, insert a sheet with Shift+F11 and name it Monthly detail with Alt, H, O, R.",
+    "teach": "The cluster block is a different page, so it gets its own sheet rather than a fold under the P&L. Shift+F11 inserts a sheet in front of the active one, and Alt, H, O, R renames it.",
+    "why": "",
+    "hint_stuck": "pulse the sheet tabs · Print is the last tab."
+   },
+   {
+    "lesson_id": "hide-group-or-separate-sheet",
+    "goal_index": "3",
+    "text": "Move Monthly detail to the end with Alt, H, O, M and (move to end), so the working sheet sits behind the pages.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse the sheet tabs · Outputs on the left, working sheets on the right."
+   },
+   {
+    "lesson_id": "hide-group-or-separate-sheet",
+    "goal_index": "4",
+    "text": "Cut the stray block A41:O58 off the P&L with Ctrl+X and paste it onto Monthly detail at A1.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range A41:O58 · The block starts with its own title under the checks."
+   },
+   {
+    "lesson_id": "hide-group-or-separate-sheet",
+    "goal_index": "5",
+    "text": "Does it tie? Watch P&L!C7 change to 18500, and C24 answer with nothing hidden.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C24 · Every row of the P&L is on show or one button away."
+   }
+  ],
+  "navigation-column": [
+   {
+    "lesson_id": "navigation-column",
+    "goal_index": "0",
+    "text": "On Monthly detail, name the company’s total revenue B66:O66 Rev with Define Name, Alt, M, M, D.",
+    "teach": "A defined name labels a range, and Go To accepts the name wherever it accepts an address. Name the blocks a reader jumps to and nothing else.",
+    "why": "",
+    "hint_stuck": "pulse range B66:O66 · The company block sits under the four clusters."
+   },
+   {
+    "lesson_id": "navigation-column",
+    "goal_index": "1",
+    "text": "Name the company’s total site costs on the row under it, B67:O67, SiteCosts.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range B67:O67 · One row under total revenue."
+   },
+   {
+    "lesson_id": "navigation-column",
+    "goal_index": "2",
+    "text": "Name the company’s EBITDA row B70:O70 EBITDA.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range B70:O70 · The answer, with its double bottom."
+   },
+   {
+    "lesson_id": "navigation-column",
+    "goal_index": "3",
+    "text": "Type the navigation column: Go to in Q4 in bold, then Revenue, Site costs and EBITDA in Q5:Q7.",
+    "teach": "The navigation column sits at the top of the sheet, beside the frozen header, where a reader starts. Each entry says the block in words; the name behind it does the jumping.",
+    "why": "",
+    "hint_stuck": "pulse range Q4:Q7 · Column Q sits just right of the full year."
+   },
+   {
+    "lesson_id": "navigation-column",
+    "goal_index": "4",
+    "text": "Link Revenue in Q5 to its block: Ctrl+K, Place in This Document with Alt+A, Alt+C to the list, ↓ twice to Rev, Enter.",
+    "teach": "Ctrl+K opens Insert Hyperlink. Place in This Document (Alt+A) lists the sheets and then the defined names; Alt+C reaches the list, ↓ walks it, and Enter links the cell. The cell keeps its words and takes the hyperlink look.",
+    "why": "",
+    "hint_stuck": "pulse cell Q5 · The names come after the sheets, in order: EBITDA, Rev, SiteCosts."
+   },
+   {
+    "lesson_id": "navigation-column",
+    "goal_index": "5",
+    "text": "Link Site costs in Q6 to SiteCosts and EBITDA in Q7 to EBITDA the same way.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range Q6:Q7 · The list opens on this sheet; the names sit under it."
+   },
+   {
+    "lesson_id": "navigation-column",
+    "goal_index": "6",
+    "text": "Jump to the EBITDA line by name: Ctrl+G, EBITDA, Enter.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range B70:O70 · Go To takes the name where it takes an address."
+   },
+   {
+    "lesson_id": "navigation-column",
+    "goal_index": "7",
+    "text": "Come back to the top with Ctrl+Home, which lands on C5 under the frozen panes.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C5 · With the panes frozen, home is the first figure."
+   },
+   {
+    "lesson_id": "navigation-column",
+    "goal_index": "8",
+    "text": "Does it tie? Watch the EBITDA link followed from Q7, head office in C69 change to -600, and the company’s EBITDA in C70 answer.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C70 · The name lands on the row; the row is live."
+   }
+  ],
+  "challenge-grouped-navigable": [
+   {
+    "lesson_id": "challenge-grouped-navigable",
+    "goal_index": "0",
+    "text": "On Monthly, bold the header row B4:O4, retype O4 as Full year and wrap it.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-grouped-navigable",
+    "goal_index": "1",
+    "text": "On the P&L, group the site-cost detail rows 13:19 and the memo rows 33:35, then rows 7:23 over the detail for a second level.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-grouped-navigable",
+    "goal_index": "2",
+    "text": "Find the rows someone hid, 26:30, unhide them and group them instead.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-grouped-navigable",
+    "goal_index": "3",
+    "text": "Move the stray block A41:O58 onto a new sheet, Monthly detail, at A1, with the sheet at the end.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-grouped-navigable",
+    "goal_index": "4",
+    "text": "Name Monthly’s answer rows: B10:O10 Rev, B20:O20 SiteCosts and B24:O24 EBITDA.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-grouped-navigable",
+    "goal_index": "5",
+    "text": "Type the navigation column on Monthly: Go to in Q4 in bold, then Revenue, Site costs and EBITDA in Q5:Q7.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "highlight-rules": [
+   {
+    "lesson_id": "highlight-rules",
+    "goal_index": "0",
+    "text": "Select the three margin lines, C27:E29, the cells the first rule will watch.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C27:E29 · Gross, site contribution and EBITDA margin, under Margins and growth."
+   },
+   {
+    "lesson_id": "highlight-rules",
+    "goal_index": "1",
+    "text": "Add a rule to C27:E29: Less Than 0, Red Text.",
+    "teach": "Alt, H, L opens Conditional Formatting, H the Highlight Cells Rules, and L is Less Than. Type the value, pick the format with the arrows, and Enter adds the rule. Red Text is enough: a margin under zero needs to be noticed, not shouted.",
+    "why": "",
+    "hint_stuck": "pulse range C27:E29 · Four steps right of the first format is Red Text."
+   },
+   {
+    "lesson_id": "highlight-rules",
+    "goal_index": "2",
+    "text": "On Monthly, give revenue under 3,800 in C10:N10 a Yellow Fill with Dark Yellow Text, so the slow months show up.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C10:N10 · January to December, not the full year in O."
+   },
+   {
+    "lesson_id": "highlight-rules",
+    "goal_index": "3",
+    "text": "Back on the P&L, select the labels B7:B35 and add Duplicate Values with Alt, H, L, H, D, Enter.",
+    "teach": "A label that repeats is the easiest error to miss and the first one a buyer finds. Highlight Cells Rules › Duplicate Values (Alt, H, L, H, D) lights every label that appears more than once.",
+    "why": "",
+    "hint_stuck": "pulse range B7:B35 · Every label from retail wash revenue to the memo."
+   },
+   {
+    "lesson_id": "highlight-rules",
+    "goal_index": "4",
+    "text": "B18 and B19 light up because B18 repeats Marketing: type Card fees over it.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell B18 · The line between maintenance and marketing."
+   },
+   {
+    "lesson_id": "highlight-rules",
+    "goal_index": "5",
+    "text": "Open Manage Rules with Alt, H, L, R and read the two rules on the P&L, the newest on top, and the ranges they apply to.",
+    "teach": "Alt, H, L, R opens Manage Rules: every rule on the sheet, its format and the range it applies to, in the order they run.",
+    "why": "",
+    "hint_stuck": "pulse range C27:E29 · Duplicate Values on the labels, then the margin rule."
+   },
+   {
+    "lesson_id": "highlight-rules",
+    "goal_index": "6",
+    "text": "Close Manage Rules with Enter, leaving the rules as they are.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C27:E29 · Enter is OK."
+   },
+   {
+    "lesson_id": "highlight-rules",
+    "goal_index": "7",
+    "text": "Does it tie? Watch January’s retail revenue in Monthly!C7 rise to 2,300, the month reach 4,000, and its yellow clear.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C10 · The rule reads the value every time it changes."
+   }
+  ],
+  "formula-driven-rules": [
+   {
+    "lesson_id": "formula-driven-rules",
+    "goal_index": "0",
+    "text": "Select the checks C39:C40 and add a formula rule, =C39<>0, with the Light Red Fill.",
+    "teach": "Alt, H, L, N opens a new rule that uses a formula: the cell is painted wherever the formula is TRUE. =C39<>0 reads “C39 is not zero”, so a check paints itself the moment two figures disagree.",
+    "why": "",
+    "hint_stuck": "pulse range C39:C40 · The first format in the list is the light red one."
+   },
+   {
+    "lesson_id": "formula-driven-rules",
+    "goal_index": "1",
+    "text": "Select the revenue lines B7:E9 and add =$A7=\"x\" with the Yellow Fill, so the row flagged x in A8 lights up.",
+    "teach": "A formula rule is written for the top-left cell of the selection and read in every cell as if it had been filled. $A7 locks the column, so every cell of a row looks at its own flag in A, and the row stays free to move down.",
+    "why": "",
+    "hint_stuck": "pulse range B7:E9 · A dollar before the A and none before the 7."
+   },
+   {
+    "lesson_id": "formula-driven-rules",
+    "goal_index": "2",
+    "text": "Type x in A9 and watch B9:E9 light up too: the rule follows each row.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell A9 · Beside other revenue, in the narrow margin column."
+   },
+   {
+    "lesson_id": "formula-driven-rules",
+    "goal_index": "3",
+    "text": "Clear the flags in A8:A9 with Delete, so the page keeps no x and no yellow.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range A8:A9 · The rules stay; only the flags go."
+   },
+   {
+    "lesson_id": "formula-driven-rules",
+    "goal_index": "4",
+    "text": "Open Manage Rules with Alt, H, L, R and read the four rules, the newest on top.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range B7:E9 · The row rule, the checks rule, Duplicate Values, then the margin rule."
+   },
+   {
+    "lesson_id": "formula-driven-rules",
+    "goal_index": "5",
+    "text": "Close Manage Rules with Enter.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C39:C40 · Enter is OK."
+   },
+   {
+    "lesson_id": "formula-driven-rules",
+    "goal_index": "6",
+    "text": "Does it tie? Watch total revenue in C10 typed over as 32000, and the check in C39 leave zero and turn red.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C39 · A typed total no longer matches its lines."
+   }
+  ],
+  "data-bars-and-scales": [
+   {
+    "lesson_id": "data-bars-and-scales",
+    "goal_index": "0",
+    "text": "On Monthly, put data bars on the revenue line C10:N10 and read the seasonal shape.",
+    "teach": "Alt, H, L, D opens the Data Bars gallery: Enter takes the first, a blue bar in each cell sized to its value. Read the shape: winter low, summer high.",
+    "why": "",
+    "hint_stuck": "pulse range C10:N10 · January to December; the full year in O would flatten every bar."
+   },
+   {
+    "lesson_id": "data-bars-and-scales",
+    "goal_index": "1",
+    "text": "On Monthly detail, the working sheet nobody prints, put data bars on the company revenue line C66:N66.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C66:N66 · Total revenue in the company block at the foot of the clusters."
+   },
+   {
+    "lesson_id": "data-bars-and-scales",
+    "goal_index": "2",
+    "text": "Back on Monthly, put a color scale on chemicals and water, C13:N13, and read which months cost most.",
+    "teach": "Alt, H, L, S opens Color Scales: green to red by default, each cell shaded by where it sits in the range.",
+    "why": "",
+    "hint_stuck": "pulse range C13:N13 · The first line under Site costs."
+   },
+   {
+    "lesson_id": "data-bars-and-scales",
+    "goal_index": "3",
+    "text": "With C13:N13 still selected, take the scale off with Clear Rules from Selected Cells.",
+    "teach": "Alt, H, L, C, S is Clear Rules from Selected Cells: every rule that meets the selection goes. Monthly is a page in the book, so the decoration comes off.",
+    "why": "",
+    "hint_stuck": "pulse range C13:N13 · C for Clear Rules, S for Selected Cells."
+   },
+   {
+    "lesson_id": "data-bars-and-scales",
+    "goal_index": "4",
+    "text": "Open Manage Rules, delete the data bars at the top of the list, and keep the slow-month rule on C10:N10.",
+    "teach": "Clearing C10:N10 would take the slow-month rule as well, since it sits on the same cells. Manage Rules deletes one rule and leaves the rest.",
+    "why": "",
+    "hint_stuck": "pulse range C10:N10 · Delete removes the selected rule, the first in the list."
+   },
+   {
+    "lesson_id": "data-bars-and-scales",
+    "goal_index": "5",
+    "text": "Does it tie? Watch Austin’s January retail revenue in C6 go up to 2,000 and January’s bar on row 66 grow.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C66 · The company line adds the four clusters."
+   }
+  ],
+  "managing-rules": [
+   {
+    "lesson_id": "managing-rules",
+    "goal_index": "0",
+    "text": "On the P&L, open Manage Rules with Alt, H, L, R and read the four rules and the ranges they apply to.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range B7:E9 · The row rule from the last lesson sits on top."
+   },
+   {
+    "lesson_id": "managing-rules",
+    "goal_index": "1",
+    "text": "Delete the row rule on B7:E9, now that no row carries a flag.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range B7:E9 · The first rule in the list is selected when it opens."
+   },
+   {
+    "lesson_id": "managing-rules",
+    "goal_index": "2",
+    "text": "Select the duplicate-values rule on B7:B35 with ↓ and delete it, now that the labels are fixed; close the list with Enter.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range B7:B35 · Second in the list, under the checks rule."
+   },
+   {
+    "lesson_id": "managing-rules",
+    "goal_index": "3",
+    "text": "Select the margins and growth C27:E30 and add the rule again: Less Than 0, Red Text.",
+    "teach": "A rule written for C27:E29 misses the growth line under it. Add the same rule over C27:E30, and the old one becomes a duplicate to delete.",
+    "why": "",
+    "hint_stuck": "pulse range C27:E30 · Four lines now: three margins and revenue growth."
+   },
+   {
+    "lesson_id": "managing-rules",
+    "goal_index": "4",
+    "text": "In Manage Rules, select the old margin rule on C27:E29, third in the list, and delete it.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C27:E29 · The new rule is on top; the old one is at the bottom."
+   },
+   {
+    "lesson_id": "managing-rules",
+    "goal_index": "5",
+    "text": "Move the checks rule to the top with U, tick Stop If True with S, and press Enter.",
+    "teach": "Rules run from the top. Move Up (U) puts the checks rule first, and Stop If True (S) means that where a check fires, nothing below it paints the cell.",
+    "why": "",
+    "hint_stuck": "pulse range C39:C40 · The checks rule is the one selected after the delete."
+   },
+   {
+    "lesson_id": "managing-rules",
+    "goal_index": "6",
+    "text": "Does it tie? Watch total revenue in C10 typed over as 32000: the checks rule fires on C39, and nothing else does.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C39 · One rule fires, the one that matters."
+   }
+  ],
+  "challenge-checks-flags": [
+   {
+    "lesson_id": "challenge-checks-flags",
+    "goal_index": "0",
+    "text": "Give the check in C39 a formula rule, =C39<>0, with the Light Red Fill.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-checks-flags",
+    "goal_index": "1",
+    "text": "Light the revenue row flagged x in column A: a rule on B7:E9 that reads =$A7=\"x\", with the Yellow Fill.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-checks-flags",
+    "goal_index": "2",
+    "text": "Take the data bars off C10:E10 and the color scale off C13:E19.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-checks-flags",
+    "goal_index": "3",
+    "text": "Delete the stray Greater Than 1,000 rule on C7:E9, so only the flagged row lights.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-checks-flags",
+    "goal_index": "4",
+    "text": "In Manage Rules (Alt, H, L, R), put the checks rule on top with U and tick Stop If True with S.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "text-for-labels": [
+   {
+    "lesson_id": "text-for-labels",
+    "goal_index": "0",
+    "text": "In Monthly!C5, under the first month end, enter =TEXT(C4,\"mmmm yyyy\") and read January 2026.",
+    "teach": "TEXT(value, \"code\") writes a value through a format code and returns text: the codes are the ones you typed in the Custom box, so mmmm is the month in full and yyyy the year.",
+    "why": "",
+    "hint_stuck": "pulse cell C5 · The date sits right above it in C4."
+   },
+   {
+    "lesson_id": "text-for-labels",
+    "goal_index": "1",
+    "text": "Fill C5 right to N5 with Ctrl+R, one month name under each date.",
+    "teach": "Ctrl+Shift+← from N5 stops at the first filled cell, C5, so the selection runs C5:N5 and Ctrl+R fills it from the left.",
+    "why": "",
+    "hint_stuck": "pulse range C5:N5 · January to December, not the full year in O."
+   },
+   {
+    "lesson_id": "text-for-labels",
+    "goal_index": "2",
+    "text": "With C5:N5 still selected, set the month names in italic with Ctrl+I and right-align them under the dates.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C5:N5 · Right-aligned, so each name sits over its column of figures."
+   },
+   {
+    "lesson_id": "text-for-labels",
+    "goal_index": "3",
+    "text": "In Print!C4 enter =\"FY\"&TEXT('P&L'!C4,\"yy\")&'P&L'!C5 and read FY24A.",
+    "teach": "The & joins text to text: \"FY\", the two-digit year from TEXT, and the A or E flag under the date make FY24A. A sheet name with an & in it takes single quotes.",
+    "why": "",
+    "hint_stuck": "pulse cell C4 · Three pieces joined: the letters, the year, the flag."
+   },
+   {
+    "lesson_id": "text-for-labels",
+    "goal_index": "4",
+    "text": "Fill C4 right to E4 with Ctrl+R to read FY24A, FY25A, FY26E.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C4:E4 · The references move one column with each cell."
+   },
+   {
+    "lesson_id": "text-for-labels",
+    "goal_index": "5",
+    "text": "Make C4:E4 bold and right-aligned, and color them green: they read another sheet.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C4:E4 · Green is the eighth step along the font colors."
+   },
+   {
+    "lesson_id": "text-for-labels",
+    "goal_index": "6",
+    "text": "In Inputs!B19 build the headline Revenue of 50,000k in FY26E with & and TEXT('P&L'!E10,\"#,##0\"), and color it green.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell B19 · TEXT keeps the comma that a plain & would drop."
+   },
+   {
+    "lesson_id": "text-for-labels",
+    "goal_index": "7",
+    "text": "Does it tie? Watch the FY26 flag in P&L!E5 change to A, and the header in Print!E4 read FY26A.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell E4 · The header reads the flag, so it follows it."
+   }
+  ],
+  "eomonth-edate": [
+   {
+    "lesson_id": "eomonth-edate",
+    "goal_index": "0",
+    "text": "Leave Monthly!C4 typed as 1/31/2026 and color it blue: it is the one date the chain starts from.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C4 · Blue is the fourth step along the font colors."
+   },
+   {
+    "lesson_id": "eomonth-edate",
+    "goal_index": "1",
+    "text": "In D4 enter =EOMONTH(C4,1) and read Feb-26, the month end after C4.",
+    "teach": "EOMONTH(date, n) is the last day of the month n months after the date, so =EOMONTH(C4,1) is the end of February whatever day January ended on.",
+    "why": "",
+    "hint_stuck": "pulse cell D4 · One month on from the cell to its left."
+   },
+   {
+    "lesson_id": "eomonth-edate",
+    "goal_index": "2",
+    "text": "Fill D4 right to N4 with Ctrl+R: twelve month ends from one typed date.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range D4:N4 · Stop at December; the full year in O is a label."
+   },
+   {
+    "lesson_id": "eomonth-edate",
+    "goal_index": "3",
+    "text": "On the P&L, link C4 to the first fiscal year end with =Inputs!B6 and color it green.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C4 · The year end the CFO keeps on Inputs."
+   },
+   {
+    "lesson_id": "eomonth-edate",
+    "goal_index": "4",
+    "text": "Enter =EOMONTH(C4,12) in D4, then Tab, and =EOMONTH(D4,12) in E4.",
+    "teach": "Twelve months on is a year end. Type E4 rather than fill it: Ctrl+R would carry D4’s divider and its A code onto the estimate.",
+    "why": "",
+    "hint_stuck": "pulse range D4:E4 · Each year end reads the one before it."
+   },
+   {
+    "lesson_id": "eomonth-edate",
+    "goal_index": "5",
+    "text": "In Inputs!B18 enter =EDATE(B10,3), the as-of date plus three months, and give it the code m/d/yyyy.",
+    "teach": "EDATE(date, n) is the same day n months on. A formula that returns a date can arrive as a bare serial, so give it a date code.",
+    "why": "",
+    "hint_stuck": "pulse cell B18 · The as-of date is in B10."
+   },
+   {
+    "lesson_id": "eomonth-edate",
+    "goal_index": "6",
+    "text": "Does it tie? Watch Inputs!B6 change to 12/31/2025, and the P&L’s timeline in C4:E4 roll forward a year.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C4:E4 · One typed date drives the whole row."
+   }
+  ],
+  "dynamic-titles": [
+   {
+    "lesson_id": "dynamic-titles",
+    "goal_index": "0",
+    "text": "In P&L!A1 join Inputs!B3 to the words Historical Financials with &, and see the title still center across A1:E1.",
+    "teach": "A title typed on every page goes wrong one page at a time. Built with &, it reads the company name from the one cell on Inputs, and the formats on A1 stay as they were.",
+    "why": "",
+    "hint_stuck": "pulse cell A1 · The text in quotes keeps its spaces."
+   },
+   {
+    "lesson_id": "dynamic-titles",
+    "goal_index": "1",
+    "text": "In Monthly!A1 join Inputs!B3 to the words FY26 by month with & in the same way.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell A1 · The same name, a different statement."
+   },
+   {
+    "lesson_id": "dynamic-titles",
+    "goal_index": "2",
+    "text": "Copy P&L!A1 and paste its formats onto Print!A1 with Ctrl+Alt+V, T.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell A1 · Formats only: bold, the size and the centering."
+   },
+   {
+    "lesson_id": "dynamic-titles",
+    "goal_index": "3",
+    "text": "In Print!A1 join Inputs!B3 to the words Summary financials with &.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell A1 · Type straight over the formatted cell."
+   },
+   {
+    "lesson_id": "dynamic-titles",
+    "goal_index": "4",
+    "text": "In Print!B4 build the line Fiscal years 2024 to 2026 with & from TEXT('P&L'!C4,\"yyyy\") and TEXT('P&L'!E4,\"yyyy\").",
+    "teach": "TEXT with yyyy writes a year end as its year, and & strings the words around it, so the line can never name the wrong years.",
+    "why": "",
+    "hint_stuck": "pulse cell B4 · Two TEXTs, one for each end of the timeline."
+   },
+   {
+    "lesson_id": "dynamic-titles",
+    "goal_index": "5",
+    "text": "Make B4 bold and color it green, since it reads the P&L.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell B4 · Green is the eighth step along the font colors."
+   },
+   {
+    "lesson_id": "dynamic-titles",
+    "goal_index": "6",
+    "text": "Read B4 back with F2, follow its pieces, and leave it with Esc.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell B4 · Esc leaves the cell as it was."
+   },
+   {
+    "lesson_id": "dynamic-titles",
+    "goal_index": "7",
+    "text": "Does it tie? Watch Inputs!B3 change to Clearcoat Express Holdings, and three titles change with it.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell A1 · One name, three pages."
+   }
+  ],
+  "cleaning-imported-labels": [
+   {
+    "lesson_id": "cleaning-imported-labels",
+    "goal_index": "0",
+    "text": "In Monthly detail!R5 enter =PROPER(TRIM(SUBSTITUTE(B5,\"_\",\" \"))) and read Austin.",
+    "teach": "Read it from the inside out: SUBSTITUTE swaps each _ for a space, TRIM strips the doubled and trailing spaces, and PROPER capitalizes each word. Column R is free, past the navigation column.",
+    "why": "",
+    "hint_stuck": "pulse cell R5 · Three functions, one inside the other."
+   },
+   {
+    "lesson_id": "cleaning-imported-labels",
+    "goal_index": "1",
+    "text": "Select R5:R69 with Go To and fill the formula down with Ctrl+D, to the head office line.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range R5:R69 · Every label from Austin down to head office."
+   },
+   {
+    "lesson_id": "cleaning-imported-labels",
+    "goal_index": "2",
+    "text": "With R5:R69 still selected, type =PROPER(TRIM(SUBSTITUTE(SUBSTITUTE(B5,\"_\",\" \"),\"(1)\",\"\"))) and press Ctrl+Enter.",
+    "teach": "R8 still reads Other Revenue (1): the marker belongs in a footnote, not in the label. A second SUBSTITUTE swaps \"(1)\" for nothing, and Ctrl+Enter writes the formula into every selected cell at once.",
+    "why": "",
+    "hint_stuck": "pulse cell R8 · The marker goes before TRIM tidies the space it leaves."
+   },
+   {
+    "lesson_id": "cleaning-imported-labels",
+    "goal_index": "3",
+    "text": "Copy R5:R69 and paste it as values over the labels at B5 with Ctrl+Alt+V, V.",
+    "teach": "Paste Special Values writes the words and drops the formulas, so the labels stand on their own once the helper goes. Stop at row 69: PROPER would write EBITDA in B70 as Ebitda.",
+    "why": "",
+    "hint_stuck": "pulse range B5:B69 · Values only, so the formats on the labels stay."
+   },
+   {
+    "lesson_id": "cleaning-imported-labels",
+    "goal_index": "4",
+    "text": "Clear the gap rows the paste filled with empty text, B19, B34, B49 and B64, with Delete.",
+    "teach": "A formula that returns nothing pastes as empty text, and Excel counts empty text as content: the four gaps between the blocks now hold it. Delete makes them truly empty again.",
+    "why": "",
+    "hint_stuck": "pulse cell B19 · It looks empty; the paste says otherwise."
+   },
+   {
+    "lesson_id": "cleaning-imported-labels",
+    "goal_index": "5",
+    "text": "Clear the helper column R5:R69 with Delete, now that the labels stand on their own.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range R5:R69 · The labels in B no longer read it."
+   },
+   {
+    "lesson_id": "cleaning-imported-labels",
+    "goal_index": "6",
+    "text": "Does it tie? Nothing here moved a number: watch Austin’s chemicals in C10 change to 900 and the total in C17 answer.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C17 · The labels changed; the formulas never noticed."
+   }
+  ],
+  "units-and-period-line": [
+   {
+    "lesson_id": "units-and-period-line",
+    "goal_index": "0",
+    "text": "In Inputs!B17 enter =B4&\" \"&B5&\" unless stated; costs shown as negatives\" and read the units line.",
+    "teach": "Text in quotes rides along with the cells it joins: B4 is the currency, \" \" the space between, B5 the units, and the rest of the sentence after them.",
+    "why": "",
+    "hint_stuck": "pulse cell B17 · Currency, a space, units, then the words."
+   },
+   {
+    "lesson_id": "units-and-period-line",
+    "goal_index": "1",
+    "text": "Point P&L!A2 at it with =Inputs!B17, so the typed units line goes.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell A2 · The italic stays; only the content changes."
+   },
+   {
+    "lesson_id": "units-and-period-line",
+    "goal_index": "2",
+    "text": "Do the same in Monthly!A2: =Inputs!B17.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell A2 · Under the title, as on the P&L."
+   },
+   {
+    "lesson_id": "units-and-period-line",
+    "goal_index": "3",
+    "text": "In Print!A2 enter =Inputs!B17 and set it in italic with Ctrl+I, like the other two.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell A2 · Print had no units line until now."
+   },
+   {
+    "lesson_id": "units-and-period-line",
+    "goal_index": "4",
+    "text": "On Inputs, type millions into B5, read the three units lines, then put thousands back with Ctrl+Z.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell B5 · Ctrl+Z puts thousands back."
+   },
+   {
+    "lesson_id": "units-and-period-line",
+    "goal_index": "5",
+    "text": "Does it tie? Watch Inputs!B4 change to EUR, and the units line on all three pages change with it.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell A2 · One cell on Inputs, three pages."
+   }
+  ],
+  "challenge-dynamic-header-block": [
+   {
+    "lesson_id": "challenge-dynamic-header-block",
+    "goal_index": "0",
+    "text": "Build the P&L and Monthly titles in A1 from Inputs!B3 with &, as \"- Historical Financials\" and \"- FY26 by month\".",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-dynamic-header-block",
+    "goal_index": "1",
+    "text": "On the P&L, link C4 to Inputs!B6 and chain D4:E4 from it with EOMONTH, twelve months a step.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-dynamic-header-block",
+    "goal_index": "2",
+    "text": "On Monthly, type 1/31/2026 over the text in C4 and chain D4:N4 from it with =EOMONTH(C4,1).",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-dynamic-header-block",
+    "goal_index": "3",
+    "text": "Name each month in C5:N5 from the date above it with =TEXT(C4,\"mmmm yyyy\").",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-dynamic-header-block",
+    "goal_index": "4",
+    "text": "Build the units line once in Inputs!B17 from B4 and B5, and point A2 on the P&L and Monthly at it.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-dynamic-header-block",
+    "goal_index": "5",
+    "text": "Clean Monthly detail’s labels B5:B69 with PROPER, TRIM and SUBSTITUTE as values, leaving no helper and no empty text behind.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "print-areas-titles-footers": [
+   {
+    "lesson_id": "print-areas-titles-footers",
+    "goal_index": "0",
+    "text": "The P&L and Monthly both run wider than they are tall: turn the pack landscape with Alt, P, O, L.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse the Page Layout tab · Orientation sits on Page Layout, and L is landscape."
+   },
+   {
+    "lesson_id": "print-areas-titles-footers",
+    "goal_index": "1",
+    "text": "Open Page Setup with Alt, P, S, P and set Fit to 1 page wide by 2 tall, so Monthly runs down the page and not off it.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse the Page Setup dialog · Alt+F picks Fit to; Tab moves to the tall count."
+   },
+   {
+    "lesson_id": "print-areas-titles-footers",
+    "goal_index": "2",
+    "text": "Repeat the title, units line, timeline and flags on every printed page: Print Titles with Alt, P, I, rows 1:5.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse the Sheet tab of Page Setup · Rows to repeat at top takes 1:5."
+   },
+   {
+    "lesson_id": "print-areas-titles-footers",
+    "goal_index": "3",
+    "text": "In Page Setup's Custom Footer, Alt+U, put &[File] left, Page &[Page] of &[Pages] in the center and &[Date] right.",
+    "teach": "A pack prints many pages, so the footer numbers them: &[Page] is this page and &[Pages] the count, and Page &[Page] of &[Pages] reads Page 2 of 3. Alt+L, Alt+C and Alt+R move between the three sections of Custom Footer.",
+    "why": "",
+    "hint_stuck": "pulse the Header/Footer tab · H reaches the tab, Alt+U opens Custom Footer."
+   },
+   {
+    "lesson_id": "print-areas-titles-footers",
+    "goal_index": "4",
+    "text": "On Page Setup's Margins tab, tick Center on page Horizontally with Alt+Z and keep the margins as they are.",
+    "teach": "Center on page puts the same white space either side of the figures, so a page narrower than the paper sits in the middle. Excel's Normal margins keep the header margin, 0.3 inches, under the top margin, 0.75, so the header never prints over the title row.",
+    "why": "",
+    "hint_stuck": "pulse the Margins tab · M reaches the tab, and Alt+Z ticks Horizontally."
+   },
+   {
+    "lesson_id": "print-areas-titles-footers",
+    "goal_index": "5",
+    "text": "Does it tie? Watch C7 change to 18500 and total revenue in C10 answer: the print set-up changed nothing on the sheet.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C10 · Print settings live beside the sheet, not in it."
+   }
+  ],
+  "one-page-summary": [
+   {
+    "lesson_id": "one-page-summary",
+    "goal_index": "0",
+    "text": "On Print, type the six labels down B5:B10: Revenue, Site contribution, EBITDA, EBITDA margin, Sites (year end), Washes (thousands).",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell B5 · Print is the last of the pack's pages; the labels run down from B5."
+   },
+   {
+    "lesson_id": "one-page-summary",
+    "goal_index": "1",
+    "text": "Select Print!C5:E5, type =, point at P&L!C10 across sheets and press Ctrl+Enter for a row of links to total revenue.",
+    "teach": "A summary holds no typed figure: every number is a link to the detail behind it, so the two can never disagree. With C5:E5 selected, one pointed link and Ctrl+Enter writes all three, each reading its own year.",
+    "why": "",
+    "hint_stuck": "pulse range C5:E5 · Ctrl+PgUp walks back to the P&L while the formula is open."
+   },
+   {
+    "lesson_id": "one-page-summary",
+    "goal_index": "2",
+    "text": "Link rows 6 to 10 the same way, to P&L rows 22, 24, 29, 33 and 34: site contribution, EBITDA, its margin, sites and washes.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C6:E10 · One row at a time: select it, point, Ctrl+Enter."
+   },
+   {
+    "lesson_id": "one-page-summary",
+    "goal_index": "3",
+    "text": "Under the lines, put Source: the P&L sheet in B11 in italic, Checks in B13 in bold and Last year EBITDA less the P&L in B14, indented.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell B11 · The foot reads like the P&L's: the source, then the checks."
+   },
+   {
+    "lesson_id": "one-page-summary",
+    "goal_index": "4",
+    "text": "In C14, point =E7-'P&L'!E24 so the check reads zero, and give it the red check code 0_);[Red](0);-_).",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C14 · Last year's EBITDA on Print less the same figure on the P&L."
+   },
+   {
+    "lesson_id": "one-page-summary",
+    "goal_index": "5",
+    "text": "Bring the P&L's number formats onto C5:E10 with Paste Formats, Ctrl+Alt+V then T: lines from C7:E8, margins from C27:E27, memo from C33:E34.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C5:E10 · Copy on the P&L, Paste Special Formats on Print."
+   },
+   {
+    "lesson_id": "one-page-summary",
+    "goal_index": "6",
+    "text": "Every figure on Print is a link to another sheet: turn C5:E10 green with Alt, H, F, C.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C5:E10 · Green is the ninth swatch along."
+   },
+   {
+    "lesson_id": "one-page-summary",
+    "goal_index": "7",
+    "text": "Draw the A/E divider on Print: a right border down D4:D10 with Alt, H, B, R, and the gray shade on E4 with Alt, H, H.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range D4:D10 · The estimate year is E, so the line runs down the right of D."
+   },
+   {
+    "lesson_id": "one-page-summary",
+    "goal_index": "8",
+    "text": "Lay Print out like the P&L: A at width 2, B fitted over B4:B10, C:E at 12, gridlines off and the panes frozen at C5.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse column B · Alt, H, O, W sets a width and Alt, H, O, I fits one."
+   },
+   {
+    "lesson_id": "one-page-summary",
+    "goal_index": "9",
+    "text": "Does it tie? Watch P&L!E7 change to 27000, and Print's revenue in E5 and EBITDA in E7 answer while the check in C14 stays at zero.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell E5 · Every figure on Print is a link, so it moves with the P&L."
+   }
+  ],
+  "challenge-print-pack": [
+   {
+    "lesson_id": "challenge-print-pack",
+    "goal_index": "0",
+    "text": "Turn the pack landscape with Alt, P, O, L.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-print-pack",
+    "goal_index": "1",
+    "text": "In Page Setup, Alt, P, S, P, fit the pack to 1 page wide by 2 tall.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-print-pack",
+    "goal_index": "2",
+    "text": "Repeat rows 1:5 at the top of every printed page with Print Titles, Alt, P, I.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-print-pack",
+    "goal_index": "3",
+    "text": "In Custom Footer, Alt+U, put &[File] left, Page &[Page] of &[Pages] in the center and &[Date] right.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-print-pack",
+    "goal_index": "4",
+    "text": "On Page Setup's Margins tab, center the page horizontally with Alt+Z.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "ch2-project": [
+   {
+    "lesson_id": "ch2-project",
+    "goal_index": "0",
+    "text": "On the P&L give C7:E24 the desk number format, $ on rows 7, 10 and 24, and the memo rows 33 to 35 their own codes.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-project",
+    "goal_index": "1",
+    "text": "Turn the costs in rows 13 to 19 and 23 negative with Paste Special Multiply, then make C22 and C24 additions filled to E.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-project",
+    "goal_index": "2",
+    "text": "Head the Margins and growth block at B26, four margin lines in C27:E30 in italic percent, and the CAGR in F30.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-project",
+    "goal_index": "3",
+    "text": "Link C4 to Inputs B6 and step D4:E4 a year with EOMONTH, FY codes in green, the A, A and E flags in row 5.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-project",
+    "goal_index": "4",
+    "text": "On Inputs give B12:B16 their unit codes, then the units line in B17, the next update in B18 and the headline in B19.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-project",
+    "goal_index": "5",
+    "text": "Give the P&L its anatomy: clear column A, title and units line from Inputs, sections bold, lines indented, totals ruled, inputs blue.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-project",
+    "goal_index": "6",
+    "text": "Draw the A/E divider down D4:D35, then retype the labels B7:B35 in sentence case with the source and footnote in B36:B37.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-project",
+    "goal_index": "7",
+    "text": "Set the P&L widths, the title row to 24, freeze panes at C5, and group rows 13 to 19, 26 to 30 and 33 to 35.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-project",
+    "goal_index": "8",
+    "text": "Bring Monthly to the P&L: labels into B6:B30, costs negative, rows 22 and 24 as additions, the margins block and Paste Formats.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-project",
+    "goal_index": "9",
+    "text": "Head Monthly: title and units line from Inputs, month ends in D4:N4 by EOMONTH, C4 blue, month names in C5:N5 by TEXT.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-project",
+    "goal_index": "10",
+    "text": "Finish Monthly with its source in B31, two checks against the P&L in C34:C35, the P&L widths, panes at C5 and gridlines off.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-project",
+    "goal_index": "11",
+    "text": "Type the Go to column in Q4:Q7, then name Monthly rows 10, 20 and 24 as Rev, SiteCosts and EBITDA.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-project",
+    "goal_index": "12",
+    "text": "Add the rules: Monthly C10:N10 yellow below 4,500, the P&L checks C39:C40 light red and stopping, negative margins in red text.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-project",
+    "goal_index": "13",
+    "text": "Build Print from links: title, period line and FY heads, six lines pointed at the P&L, formats, its check, divider and layout.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-project",
+    "goal_index": "14",
+    "text": "In Page Setup, Alt, P, S, P, set the pack landscape, one page wide by two tall, rows 1:5 repeated, the three-part footer, centered.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-project",
+    "goal_index": "15",
+    "text": "Does it tie? Change FY25A retail wash revenue on the P&L and watch Print C5 answer while every check stays at zero.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "ch2-assessment": [
+   {
+    "lesson_id": "ch2-assessment",
+    "goal_index": "0",
+    "text": "On the P&L give C7:E24 the desk number format, $ on rows 7, 10 and 24, and the memo rows 33 to 35 their own codes.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-assessment",
+    "goal_index": "1",
+    "text": "Turn the costs in rows 13 to 19 and 23 negative with Paste Special Multiply, then make C22 and C24 additions filled to E.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-assessment",
+    "goal_index": "2",
+    "text": "Head the Margins and growth block at B26, four margin lines in C27:E30 in italic percent, and the CAGR in F30.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-assessment",
+    "goal_index": "3",
+    "text": "Link C4 to Inputs B6 and step D4:E4 a year with EOMONTH, FY codes in green, the A, A and E flags in row 5.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-assessment",
+    "goal_index": "4",
+    "text": "On Inputs give B12:B16 their unit codes, then the units line in B17, the next update in B18 and the headline in B19.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-assessment",
+    "goal_index": "5",
+    "text": "Give the P&L its anatomy: clear column A, title and units line from Inputs, sections bold, lines indented, totals ruled, inputs blue.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-assessment",
+    "goal_index": "6",
+    "text": "Draw the A/E divider down D4:D35, then retype the labels B7:B35 in sentence case with the source and footnote in B36:B37.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-assessment",
+    "goal_index": "7",
+    "text": "Set the P&L widths, the title row to 24, freeze panes at C5, and group rows 13 to 19, 26 to 30 and 33 to 35.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-assessment",
+    "goal_index": "8",
+    "text": "Bring Monthly to the P&L: labels into B6:B30, costs negative, rows 22 and 24 as additions, the margins block and Paste Formats.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-assessment",
+    "goal_index": "9",
+    "text": "Head Monthly: title and units line from Inputs, month ends in D4:N4 by EOMONTH, C4 blue, month names in C5:N5 by TEXT.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-assessment",
+    "goal_index": "10",
+    "text": "Finish Monthly with its source in B31, two checks against the P&L in C34:C35, the P&L widths, panes at C5 and gridlines off.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-assessment",
+    "goal_index": "11",
+    "text": "Type the Go to column in Q4:Q7, then name Monthly rows 10, 20 and 24 as Rev, SiteCosts and EBITDA.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-assessment",
+    "goal_index": "12",
+    "text": "Add the rules: Monthly C10:N10 yellow below 3,000, the P&L checks C39:C40 light red and stopping, negative margins in red text.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-assessment",
+    "goal_index": "13",
+    "text": "Build Print from links: title, period line and FY heads, six lines pointed at the P&L, formats, its check, divider and layout.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-assessment",
+    "goal_index": "14",
+    "text": "In Page Setup, Alt, P, S, P, set the pack landscape, one page wide by two tall, rows 1:5 repeated, the three-part footer, centered.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-assessment",
+    "goal_index": "15",
+    "text": "Does it tie? Change FY25A retail wash revenue on the P&L and watch Print C5 answer while every check stays at zero.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -3958,6 +6094,48 @@ export const COPY = {
    "objective": "Custom number formats: the four-section code, units in the format, custom date codes for the timeline, conditions and hidden zeros.",
    "story_beat": "Every number on the page has to say what it is. || A buyer flips to the financials and reads margins, multiples and thousands without a legend, so the number format has to carry the unit. A format code can write k or m after a figure, show a zero as a dash, color a negative and turn a plain date into FY26E, with the value underneath untouched. This module is the format code, one section at a time.",
    "page_name": "The number-format set"
+  },
+  "the-page-a-buyer-reads": {
+   "id": "the-page-a-buyer-reads",
+   "name": "The page a buyer reads",
+   "objective": "The anatomy of a financial page: title, units, timeline, sections and the answer; the actuals-to-estimates divider; borders that mean something; labels, footnotes and sources; widths and the label column; one page’s formats carried to the next, the total line as a cell style.",
+   "story_beat": "The first page a buyer turns to. || The book, the information memorandum, is the document that describes the company to buyers, and its financials page is the one they turn to first. A page like that has an anatomy: a title that says what it is, a units line, a timeline, sections that add down to the answer, and a source under the table. Build it on the P&L the way the book will print it.",
+   "page_name": "The P&L, presentation quality"
+  },
+  "alignment-and-structure": {
+   "id": "alignment-and-structure",
+   "name": "Alignment and structure",
+   "objective": "Alignment and outline at scale: headers and wraps on a long page; grouping on two levels; hiding against grouping against a separate sheet; a linked navigation column.",
+   "story_beat": "Forty lines is too many to read. || By the time the site costs are broken out by line and the memo block is in, the P&L runs to forty rows, and a buyer wants the six that matter with the rest on demand. Groups fold the detail behind a button; indents show what belongs to what; a navigation column jumps a long sheet. The page stays complete and reads short.",
+   "page_name": "The P&L, grouped and navigable"
+  },
+  "conditional-formatting": {
+   "id": "conditional-formatting",
+   "name": "Conditional formatting",
+   "objective": "Conditional formatting: highlight rules for negatives and exceptions; formula-driven rules; data bars and scales, and when not to use them; managing the rules.",
+   "story_beat": "Make the page flag its own mistakes. || The book will be read by people looking for a reason to pay less, so the page has to catch its own errors before they do. A conditional format is a rule the cell applies to itself: a check that isn’t zero turns red, a negative margin highlights, an exception stands out. Used well it’s a second pair of eyes, and used badly it’s wallpaper, so this module is about learning the difference.",
+   "page_name": "The checks that flag themselves"
+  },
+  "dates-and-text-for-presentation": {
+   "id": "dates-and-text-for-presentation",
+   "name": "Dates and text for presentation",
+   "objective": "Text and date functions for presentation: TEXT for labels and headers; EOMONTH and EDATE for period ends; dynamic titles with &; cleaning imported labels with TRIM, PROPER and SUBSTITUTE; a units line that writes itself.",
+   "story_beat": "The headers should write themselves. || Every quarter the page rolls forward a year, and every time someone retypes the title, the headers and the units line. And one of them is wrong. A title that reads the company name from Inputs, headers that read the dates under them, a units line that reads the currency: change one cell and the whole page updates. The Monthly sheet, with its text dates and capitalized labels, is where to learn it.",
+   "page_name": "The header block that writes itself"
+  },
+  "printing-and-page-layout": {
+   "id": "printing-and-page-layout",
+   "name": "Printing and page layout",
+   "objective": "Printing at pack scale: fit to one page wide, print titles, one footer on every page; the one-page summary linked from the detail.",
+   "story_beat": "The book goes to print. || The financials section is three pages, and the book is a PDF that gets printed, so each page has to land on one sheet, carry its title rows, say which file and which page it is, and break where a reader would break. The one-page summary reads from the detail behind it. Set the pack up to print and it's ready for the data room.",
+   "page_name": "The pack, print-ready"
+  },
+  "ch2-project-and-assessment": {
+   "id": "ch2-project-and-assessment",
+   "name": "Project and assessment",
+   "objective": "The historical financials section built end to end from a raw export; the assessment is the test-out.",
+   "story_beat": "The financials section, start to finish. || A fresh export has landed: the same accounting system, the same faults, a different three years. Everything the chapter taught goes onto one workbook, until three pages are ready for the data room. Build it, then build it again on the clock, because the assessment is the test-out.",
+   "page_name": "The historical financials section"
   },
   "remixes": {
    "id": "remixes",
@@ -4182,7 +6360,7 @@ export const COPY = {
   "home_lesson_of": "Lesson {n} of {m}",
   "home_goal_of": "Goal {n} of {m}",
   "home_minutes_left": "About {n} minutes left",
-  "home_all_done": "Chapter {n} is Verified. The next chapter is Pro.",
+  "home_all_done": "Chapter {n} is Verified. The next chapter is in Full Access.",
   "chapter_heading": "Chapter {n}, {name}",
   "chapter_modules_done": "{d} of {m} modules done",
   "col_module": "Module",
@@ -4240,7 +6418,7 @@ export const COPY = {
   "col_best": "Your best",
   "practice_not_played": "Not played",
   "practice_after": "After {n}",
-  "practice_pro": "Pro",
+  "practice_pro": "Full Access",
   "practice_set_heading": "The set",
   "reason_due": "Due a refresher",
   "reason_slowest": "Slowest against its par",
@@ -4250,7 +6428,7 @@ export const COPY = {
   "daily_title": "The Daily",
   "daily_line": "Today it’s {drill}: ninety seconds on the same sheet as everyone else.",
   "daily_play": "Play today’s Daily",
-  "daily_pro_note": "Today’s drill is from Chapter {n}, which is Pro. Everyone plays the same sheet, so play it anyway.",
+  "daily_pro_note": "Today’s drill is from Chapter {n}, which is in Full Access. Everyone plays the same sheet, so play it anyway.",
   "daily_clean_runs": "{n} clean runs so far",
   "daily_not_played": "You haven’t played today.",
   "rapid_title": "Rapid-fire",

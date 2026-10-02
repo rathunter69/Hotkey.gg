@@ -11,6 +11,7 @@ import { WORKBOOKS } from '../content/workbooks/index.js';
 import { DRILLS } from '../content/drills.js';
 import { LessonRun } from '../app/runner.js';
 import { Sheet } from '../engine/sheet.js';
+import { Session } from '../engine/keyboard.js';
 import { sheetStandard } from '../app/graders.js';
 import { parseRef } from '../engine/refs.js';
 
@@ -31,11 +32,24 @@ test('every workbook declares its finished pages, and each one is to standard', 
   for (const [id, wb] of Object.entries(WORKBOOKS)) {
     if (PENDING_WORKBOOKS.has(id)) continue;
     assert.ok(wb.STANDARD && Array.isArray(wb.STANDARD.pages) && wb.STANDARD.pages.length, `${id} declares STANDARD.pages`);
+    const sessions = new Map();   // one live workbook per state: several pages share a state
     for (const [stateId, name, opts = {}] of wb.STANDARD.pages) {
       const st = wb.stateOf(stateId);
       const spec = st.sheets.find(s => s.name === name);
       assert.ok(spec, `${id} ${stateId} has a sheet ${name}`);
-      const out = sheetStandard(new Sheet(spec), { chapter: wb.CHAPTER || 1, read: opts.read !== false });
+      // the whole workbook, so a page's links to other sheets (a title from Inputs, a summary of the P&L) read their values
+      if (!sessions.has(stateId)) {
+        const build = sp => new Sheet({ cells: structuredClone(sp.cells || {}), colW: sp.colW, rowH: sp.rowH, hiddenRows: sp.hiddenRows, hiddenCols: sp.hiddenCols, freeze: sp.freeze, gridlines: sp.gridlines, groups: sp.groups, condFmt: sp.condFmt });
+        const ses = new Session(build(st.sheets[0]), { now: () => 0 });
+        ses.sheets[0].name = st.sheets[0].name;
+        for (const sh of st.sheets.slice(1)) ses.addSheet(sh.name, build(sh), undefined, { recalc: false });
+        const set = st.settings || {};   // as the runner assembles it: a model that carries a circle iterates
+        Object.assign(ses.settings, { iterative: !!set.iterative, maxIterations: set.maxIterations || 100, maxChange: set.maxChange == null ? 0.001 : set.maxChange });
+        if (st.names && Object.keys(st.names).length) ses.names = st.names; else ses.recalcAll();   // the names setter recalculates the workbook
+        sessions.set(stateId, ses);
+      }
+      const ses = sessions.get(stateId);
+      const out = sheetStandard(ses.sheets.find(e => e.name === name).sheet, { chapter: wb.CHAPTER || 1, read: opts.read !== false });
       assert.deepEqual(out, [], `${id} ${stateId} ${name}`);
     }
     // every sheet of the workbook is either a page or a named exception

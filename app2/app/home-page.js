@@ -116,10 +116,10 @@ export function mountHomePage(root, ctx = {}) {
     const row = rows.find(r => r.lessons.some(x => x.id === l.id)) || null;
     const num = row ? (row.lessons.find(x => x.id === l.id) || {}).n : '';
     const button = next.kind === 'assessment' ? buttonHtml({ label: t('home_start_assessment'), key: 'Enter', href: '#/lesson/' + l.id, primary: true, id: 'homeResume' })
-      : next.kind === 'pro' ? buttonHtml({ label: t('paywall_go'), key: 'Enter', href: '#/pricing', primary: true, id: 'homeResume' })
+      : next.kind === 'pro' ? buttonHtml({ label: t('paywall_go_pro'), key: 'Enter', href: '#/pricing', primary: true, id: 'homeResume' })
       : buttonHtml({ label: next.started ? t('home_resume') : t('home_start'), key: 'Enter', href: '#/lesson/' + l.id, primary: true, id: 'homeResume' });
     nextPanel = continueHtml({ num, title: next.kind === 'assessment' ? t('home_next_assessment', { n: 1 }) : l.title, eyebrow: next.kind === 'pro' ? t('paywall_pro') : t('learn_up_next'), where: next.module, keys: routeKeys(l.solution),
-      nodes: row && next.kind === 'lesson' ? nodesOf(row) : [], place: next.of ? t('home_lesson_of', { n: next.n, m: next.of }) : '', line: next.kind === 'pro' ? siteCopy('paywall_line', '') : '', id: 'homeResume', button });
+      nodes: row && next.kind === 'lesson' ? nodesOf(row) : [], place: next.of ? t('home_lesson_of', { n: next.n, m: next.of }) : '', line: next.kind === 'pro' ? siteCopy('paywall_line', 'Get full access for the rest of the content.') : '', id: 'homeResume', button });
   }
   const chapterN = (CHAPTERS.indexOf(chapter) >= 0 ? CHAPTERS.indexOf(chapter) : 0) + 1;
   const modRows = rows.map(r => moduleRowHtml({ ...r, nodes: nodesOf(r) }, { status: r.status === 'complete' || r.current ? r.statusText : '', minutes: fmtMinutes(r.minutes), href: '#/learn?ch=' + chapter.id + '&doc=' + r.id })).join('');

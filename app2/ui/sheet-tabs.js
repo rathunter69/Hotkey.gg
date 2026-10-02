@@ -9,6 +9,7 @@
 //   tabs.render(); tabs.destroy();
 
 import { recordMouse, MODAL_DIALOGS } from './ribbon-commands.js';
+import { TAB_COLORS } from '../engine/sheet.js';
 
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
@@ -16,6 +17,8 @@ const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;'
  * @param {HTMLElement} el   the strip's element (gets class wb-tabs; its content is owned here)
  * @param {import('../engine/keyboard.js').Session} session
  */
+/** A coloured tab (Alt H O T) carries its colour as a band along the bottom edge, as Excel draws it. */
+const tabColorStyle = sheet => { const t = sheet && sheet.tabColor && TAB_COLORS.find(x => x.k === sheet.tabColor); return t ? ` style="box-shadow: inset 0 -3px 0 ${t.hex}"` : ''; };
 export function mountSheetTabs(el, session) {
   el.classList.add('wb-tabs');
   el.setAttribute('role', 'tablist'); el.setAttribute('aria-label', 'Sheets');
@@ -29,7 +32,7 @@ export function mountSheetTabs(el, session) {
     let html = '<span class="wb-lead">SHEETS</span>';
     sheets.forEach((sh, i) => {
       const label = i === ren ? (session.dlg.name || '…') : sh.name;
-      html += `<span class="wb-tab${i === cur ? ' cur' : ''}${i === ren ? ' ren' : ''}${session.group && session.group.size > 1 && session.group.has(i) ? ' grp' : ''}" role="tab" aria-selected="${i === cur}" data-i="${i}" title="${esc(sh.name)}${i === cur ? ' — double-click to rename' : ' — click, or Ctrl+PgDn / Ctrl+PgUp; double-click to rename'}">${esc(label)}</span>`;
+      html += `<span class="wb-tab${i === cur ? ' cur' : ''}${i === ren ? ' ren' : ''}${session.group && session.group.size > 1 && session.group.has(i) ? ' grp' : ''}" role="tab" aria-selected="${i === cur}" data-i="${i}"${tabColorStyle(sh.sheet)} title="${esc(sh.name)}${i === cur ? ' — double-click to rename' : ' — click, or Ctrl+PgDn / Ctrl+PgUp; double-click to rename'}">${esc(label)}</span>`;
     });
     html += '<button type="button" class="wb-add" data-add="1" tabindex="-1" title="New sheet (Shift+F11)" aria-label="New sheet">⊕</button>';
     el.innerHTML = html;

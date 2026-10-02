@@ -175,3 +175,70 @@
 .fd-results .od-item{display:grid; grid-template-columns:1fr 60px 1fr 1fr; gap:6px}
 .fd-results .fd-h{font-weight:700; color:var(--muted); cursor:default}
 .nt-box{min-height:70px; padding:6px 8px; border:1px solid var(--line); border-radius:4px; background:var(--note-bg); color:var(--note-text); font-family:var(--sans); font-size:12px; white-space:pre-wrap}
+
+/* ---- the Formulas and Data tool cards (ui/tool-cards.js): Goal Seek, Data Table, Text to Columns, Edit Links, the Watch Window,
+   PivotTable, Insert Hyperlink, Style, Sort, Remove Duplicates, Data Validation, Evaluate Formula, Error Checking, the filter menu ---- */
+.wb-card{position:fixed; z-index:30; flex-direction:column; font-size:12px}
+.pd-box.pd-narrow{width:300px; max-width:calc(100vw - 16px)}
+.wb-card.wb-pane .pd-box{border-color:var(--accent-dim)}
+.wb-card.wb-pane .pd-box.pd-mid{width:330px}
+.tc-list{height:auto; max-height:170px}
+.tc-list.tc-wide{min-width:100%}
+.tc-row.tc-h, .od-item.tc-h{font-weight:700; color:var(--muted); cursor:default; background:transparent}
+.tc-links, .tc-watch, .tc-sort{display:grid; gap:6px; width:100%; align-items:center}
+.tc-links{grid-template-columns:1fr 80px 50px 70px}
+.tc-watch{grid-template-columns:52px 1fr 1fr 48px 1fr 1.4fr}
+.tc-sort{grid-template-columns:60px 1fr 1fr 1fr}
+.tc-links span, .tc-watch span{overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.od-item.on .od-combo{color:var(--on-accent); border-color:var(--on-accent); background:transparent}
+.od-combo.tc-foc, .od-combo[data-act]{cursor:pointer}
+.od-combo.tc-foc{border-color:var(--accent); box-shadow:0 0 0 2px var(--accent-glow); color:var(--text)}
+.od-item .od-box{margin-right:2px}
+.tc-grid2{display:grid; grid-template-columns:auto 1fr; gap:4px 10px; align-items:center; margin:2px 0 6px}
+.tc-val{font-family:var(--mono); font-size:11.5px; color:var(--text); overflow-wrap:anywhere}
+.tc-eval{font-family:var(--mono); font-size:11.5px; color:var(--text); min-height:60px; padding:4px 6px; border:1px solid var(--line); border-radius:4px; background:var(--surface); overflow-wrap:anywhere}
+.tc-eval u{text-decoration-color:var(--accent); text-decoration-thickness:2px}
+.tc-cols2{display:grid; grid-template-columns:1fr 1fr; gap:0 10px}
+.tc-preview{max-height:130px; overflow:auto; border:1px solid var(--line); border-radius:4px; background:var(--surface)}
+.tc-preview table{border-collapse:collapse; font-family:var(--mono); font-size:11px}
+.tc-preview th, .tc-preview td{padding:1px 8px; border-right:1px solid var(--line); text-align:left; white-space:nowrap; color:var(--text)}
+.tc-preview th{color:var(--muted); background:var(--surface2); cursor:pointer}
+.tc-preview .on{background:var(--accent); color:var(--on-accent)}
+.tc-areas{display:grid; grid-template-columns:1fr 1fr; gap:6px; margin:2px 0 6px}
+.tc-area{border:1px solid var(--line); border-radius:5px; padding:3px 5px; min-height:44px; background:var(--surface2)}
+.tc-chip-row{display:flex; flex-wrap:wrap; gap:4px}
+.tc-hyper{display:grid; grid-template-columns:170px 1fr; gap:10px}
+.tc-linkto{display:flex; flex-direction:column; gap:3px}
+.tc-hmain{min-width:0}
+.od-lbl.tc-w{min-width:72px}
+.tc-errcheck{display:grid; grid-template-columns:1fr 180px; gap:10px}
+.tc-errbtns{display:flex; flex-direction:column; gap:5px}
+.tc-errbtns .pd-btn, .cf-btns .pd-btn{cursor:pointer}
+.tc-andor{display:flex; gap:14px; margin:2px 0}
+.tc-dv{max-height:200px}
+.wb-card .rdrop-item{display:flex; align-items:center; gap:8px; padding:3px 6px; border-radius:5px; cursor:pointer; color:var(--text)}
+.wb-card .rdrop-item:hover{background:var(--accent-glow)}
+.ribbon .opt.st-custom, .rdrop .opt.st-custom{font-style:italic}
+
+/* ---- the outline (nested groups): one bracket per level in the header, the ⊖ / ⊕ in its level's lane, the level buttons in the corner ---- */
+#grid th .ol-bar{position:absolute; pointer-events:none; background:var(--accent); z-index:8}
+#grid th.rowhdr .ol-bar{top:0; bottom:0; width:2px; left:calc(2px + (var(--ol-l) - 1) * 6px)}
+#grid th.rowhdr .ol-bar.end{bottom:3px; border-bottom:2px solid var(--accent); width:5px; background:linear-gradient(var(--accent), var(--accent)) left / 2px 100% no-repeat}
+#grid tr:first-child th .ol-bar{left:0; right:0; height:2px; top:calc(2px + (var(--ol-l) - 1) * 4px)}
+#grid tr:first-child th .ol-bar.end{right:3px; border-right:2px solid var(--accent); height:5px; background:linear-gradient(var(--accent), var(--accent)) top / 100% 2px no-repeat}
+#grid th .ol-btn.lv{left:calc(1px + (var(--ol-l) - 1) * 6px)}
+#grid tr:first-child th .ol-btn.lv{left:auto; top:calc(1px + (var(--ol-l) - 1) * 4px)}
+#grid th.ol-corner{overflow:visible}
+#grid th .ol-lv{position:absolute; display:flex; gap:1px; z-index:9}
+#grid th .ol-lv.r{left:1px; bottom:1px}
+#grid th .ol-lv.c{right:1px; top:1px; flex-direction:column}
+#grid th .ol-lv-b{width:11px; height:11px; padding:0; font-family:var(--mono); font-size:8.5px; line-height:9px; font-weight:700; color:var(--muted); background:var(--surface); border:1px solid var(--line); border-radius:2px; cursor:pointer}
+#grid th .ol-lv-b:hover{color:var(--on-accent); background:var(--accent); border-color:var(--accent)}
+
+/* ---- Page Break Preview (View › Page Break Preview, Alt W I): the pages in blue, a manual break solid, an automatic one dashed, the page number over each ---- */
+#grid td.pbp-out{background:var(--line)}
+.pbp{position:absolute; left:0; top:0; pointer-events:none; z-index:5}
+.pbp-page{position:absolute; box-sizing:border-box; border:2px solid var(--accent); display:grid; place-items:center; overflow:hidden}
+.pbp-page.auto-t{border-top-style:dashed}
+.pbp-page.auto-l{border-left-style:dashed}
+.pbp-num{font-family:var(--sans); font-size:var(--pbp-fs, 28px); font-weight:700; color:var(--faint); opacity:.55; white-space:nowrap}

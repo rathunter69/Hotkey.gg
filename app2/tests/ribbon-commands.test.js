@@ -88,8 +88,9 @@ test('AutoSum and the audit jumps go through the session, as the keyboard does',
   const k = fresh(); k.sheet.goTo(3, 2); k.run('Alt H U S'); assert.equal(k.editBuf, s.editBuf);
   s.run('Enter'); assert.equal(s.sheet.value('B3'), 30);
   s = fresh(); s.sheet.goTo(3, 2); runCommand(s, 'MUS'); assert.equal(s.editBuf, '=SUM(B1:B2'); s.run('Escape');
-  s = fresh(); s.sheet.goTo(4, 2); runCommand(s, 'MP'); assert.equal(s.sheet.selectionText(), 'B1');
-  runCommand(s, 'MD'); assert.equal(s.sheet.selectionText(), 'B4');
+  s = fresh(); s.sheet.goTo(4, 2); runCommand(s, 'MP'); assert.equal(s.sheet.selectionText(), 'B4', 'Trace Precedents draws arrows and leaves the selection'); assert.ok(s.sheet.arrows.length >= 1);
+  s.sheet.goTo(1, 2); runCommand(s, 'MD'); assert.equal(s.sheet.selectionText(), 'B1'); assert.ok(s.sheet.arrows.some(a => a.kind === 'dependent'));
+  runCommand(s, 'MAA'); assert.deepEqual(s.sheet.arrows, []);
 });
 
 test('a click while editing commits the entry first; a refused entry keeps the editor and drops the click', () => {

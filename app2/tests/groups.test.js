@@ -43,8 +43,9 @@ test('the Group / Ungroup dialog over a cell range: Enter takes the rows the ran
   assert.deepEqual(S.groups.rows, [{ r1: 3, r2: 4, collapsed: false }]); assert.deepEqual(S.groups.cols, []); assert.equal(s.mode, 'normal');
   assert.deepEqual(keys(s).slice(-2), ['Alt+Shift+→', '↵']);
   s.run('Alt+Shift+Right C Enter'); assert.deepEqual(S.groups.cols, [{ c1: 2, c2: 3, collapsed: false }]);
-  s.run('Alt+Shift+Right Down Enter'); assert.deepEqual(S.groups.cols, [{ c1: 2, c2: 3, collapsed: false }], 'inside a band: nothing new');
+  s.run('Alt+Shift+Right Down Enter'); assert.deepEqual(S.groups.cols, [{ c1: 2, c2: 3, collapsed: false }, { c1: 2, c2: 3, collapsed: false, level: 2 }], 'inside a band: a second level, as Excel nests it');
   s.run('Alt+Shift+Left Enter'); assert.deepEqual(S.groups.rows, [], 'Ungroup asks the same question');
+  s.run('Alt+Shift+Left Down Enter'); assert.deepEqual(S.groups.cols, [{ c1: 2, c2: 3, collapsed: false }], 'Ungroup takes one level off');
   s.run('Alt+Shift+Left Down Enter'); assert.deepEqual(S.groups.cols, []);
   s.run('Alt+Shift+Left Enter'); assert.equal(s.toasts.at(-1), NO_GROUP_NOTE);
   // the ribbon's split buttons: Alt A G opens the menu, the second G is Group…; Alt A U U ungroups; Alt A U C clears the outline
@@ -93,8 +94,6 @@ test('touching bands merge into one level; ungrouping the middle of a band leave
   const S = new Sheet({ rows: 20, cols: 8 });
   S.select('B1:B20'); S.group('c'); S.select('C1:D20'); S.group('c');
   assert.deepEqual(S.groups.cols, [{ c1: 2, c2: 4, collapsed: false }], 'adjacent bands join');
-  assert.equal(S.group('c'), false, 'a band already inside a group is a no-op (one level)');
-  S.select('B1:D20'); assert.equal(S.group('c'), false, 'the same band again is a no-op');
   S.select('C1:C20'); assert.equal(S.ungroup('c'), true);
   assert.deepEqual(S.groups.cols, [{ c1: 2, c2: 2, collapsed: false }, { c1: 4, c2: 4, collapsed: false }]);
   S.select('F1:F20'); assert.equal(S.ungroup('c'), false, 'nothing grouped there');

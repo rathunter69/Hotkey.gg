@@ -34,10 +34,11 @@ import { serialToDate } from './format.js';
 import { formatValue, FormatError, numToText } from './numfmt.js';
 export { numToText };
 
-export const ERROR_CODES = ['#NULL!', '#DIV/0!', '#VALUE!', '#REF!', '#NAME?', '#NUM!', '#N/A'];
+export const ERROR_CODES = ['#NULL!', '#DIV/0!', '#VALUE!', '#REF!', '#NAME?', '#NUM!', '#N/A', '#SPILL!', '#CALC!'];
 
 export class FxError extends Error {
-  constructor(code) { super(code); this.code = code; }
+  // thrown and caught thousands of times in a recalc (IFERROR, lookups): no stack trace is captured
+  constructor(code) { const lim = Error.stackTraceLimit; Error.stackTraceLimit = 0; super(code); Error.stackTraceLimit = lim; this.code = code; }
 }
 export const isErrVal = v => typeof v === 'string' && ERROR_CODES.includes(v);
 const err = code => new FxError(code);
@@ -56,7 +57,7 @@ const MAX_DEPTH = 512;   // parentheses / unary nesting: far above anything type
 const RE_NUM = /^(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?/;
 const RE_IDENT = /^[A-Za-z_][A-Za-z0-9_.]*/;
 const RE_REF = /^\$?[A-Za-z]{1,3}\$?\d+$/;
-const RE_ERR = /^#(?:NULL!|DIV\/0!|VALUE!|REF!|NAME\?|NUM!|N\/A)/i;   // error literals are case-insensitive, like everything else
+const RE_ERR = /^#(?:NULL!|DIV\/0!|VALUE!|REF!|NAME\?|NUM!|N\/A|SPILL!|CALC!)/i;   // error literals are case-insensitive, like everything else
 const OPS2 = ['<>', '<=', '>='];
 
 export function tokenize(src) {
@@ -79,10 +80,13 @@ export function tokenize(src) {
     }
     if ((m = RE_ERR.exec(rest))) { out.push({ t: 'err', v: m[0].toUpperCase(), pos: i, end: i + m[0].length }); i += m[0].length; continue; }
     if ((m = RE_NUM.exec(rest))) { out.push({ t: 'num', v: parseFloat(m[0]), pos: i, end: i + m[0].length }); i += m[0].length; continue; }
-    if (ch === "'" || ch === '$' || /[A-Za-z_]/.test(ch)) {
+    if (ch === "'" || ch === '$' || ch === '[' || /[A-Za-z_]/.test(ch)) {
       // sheet-prefixed reference: Name!A1 or 'My Sheet'!A1 — the prefix and the ref are ONE token
       // (the whole span, so text rewriters replace it as a unit); the corner after ':' stays plain
-      const sm = /^(?:'((?:[^']|'')+)'|([A-Za-z_][A-Za-z0-9_.]*))!/.exec(rest);
+      // a 3D reference names a run of sheets, First:Last!B5 or 'Jan 1:Mar 1'!B5 (never A1:Sheet2!B5, a cell before the colon)
+      let sm = /^([A-Za-z_][A-Za-z0-9_.]*:[A-Za-z_][A-Za-z0-9_.]*)!/.exec(rest);
+      if (sm && /^\$?[A-Za-z]{1,3}\$?\d+:/.test(sm[1])) sm = null;
+      if (sm) sm = [sm[0], undefined, sm[1]]; else sm = /^(?:'((?:[^']|'')+)'|(\[[^\]'!]+\][A-Za-z_][A-Za-z0-9_.]*|[A-Za-z_][A-Za-z0-9_.]*))!/.exec(rest);   // [Book.xlsx]Sheet!A1: another workbook (Edit Links)
       if (sm) {
         const sheetName = sm[1] ? sm[1].replace(/''/g, "'") : sm[2];
         const tail = rest.slice(sm[0].length);
@@ -93,7 +97,7 @@ export function tokenize(src) {
         out.push({ t: 'ref', v: rm2[0].toUpperCase(), sheet: sheetName.toUpperCase(), sheetTxt: sm[0], pos: i, end: i + sm[0].length + rm2[0].length });
         i += sm[0].length + rm2[0].length; continue;
       }
-      if (ch === "'") throw new SyntaxError('unexpected character ' + ch);
+      if (ch === "'" || ch === '[') throw new SyntaxError('unexpected character ' + ch);
       // reference ($A$1, a1), function name (SUM( ), or a bare name (TRUE, FALSE, A for A:A)
       const dm = /^\$?[A-Za-z]{1,3}\$?\d+/.exec(rest);
       const im = RE_IDENT.exec(rest);
@@ -102,7 +106,11 @@ export function tokenize(src) {
       if (dm && (!im || dm[0].length >= im[0].length) && RE_REF.test(dm[0])) {
         // guard: "A1B" is not a ref followed by a name — require a non-identifier char after
         const nx = s[i + dm[0].length];
-        if (!nx || !/[A-Za-z0-9_.]/.test(nx)) { out.push({ t: 'ref', v: dm[0].toUpperCase(), pos: i, end: i + dm[0].length }); i += dm[0].length; continue; }
+        if (!nx || !/[A-Za-z0-9_.]/.test(nx)) {
+          // A1#: the spilled range of the dynamic-array formula in A1 (the # is part of the one token)
+          const spill = nx === '#' && !/[A-Za-z0-9_.$]/.test(s[i + dm[0].length + 1] || '');
+          out.push({ t: 'ref', v: dm[0].toUpperCase(), pos: i, end: i + dm[0].length + (spill ? 1 : 0), ...(spill ? { spill: true } : {}) }); i += dm[0].length + (spill ? 1 : 0); continue;
+        }
       }
       if (ch === '$') {
         // an absolute corner of a whole-column / whole-row range: $A:$A, A:$A, $1:$1, 1:$1
@@ -139,17 +147,32 @@ export function tokenize(src) {
  * Checked by the parser, so parses()/autocorrectFormula and evalFormula agree.
  */
 const MIN_ARGS = { SUM: 1, MAX: 1, MIN: 1, ABS: 1, SIGN: 1, INT: 1, TRUNC: 1, AVERAGE: 1, PRODUCT: 1, MEDIAN: 1, COUNT: 1, COUNTA: 1, COUNTBLANK: 1, ROUND: 2, ROUNDUP: 2, ROUNDDOWN: 2, MOD: 2, SQRT: 1, POWER: 2, EXP: 1, LN: 1, LOG: 1, LOG10: 1,
-  LARGE: 2, SMALL: 2, RANK: 2, 'RANK.EQ': 2, SUMPRODUCT: 1, SUMIF: 2, COUNTIF: 2, AVERAGEIF: 2, SUMIFS: 3, COUNTIFS: 2, AVERAGEIFS: 3, MAXIFS: 3, MINIFS: 3, AND: 1, OR: 1, XOR: 1, NOT: 1,
+  LARGE: 2, SMALL: 2, RANK: 2, 'RANK.EQ': 2, QUARTILE: 2, 'QUARTILE.INC': 2, PERCENTILE: 2, 'PERCENTILE.INC': 2, SUMPRODUCT: 1, SUMIF: 2, COUNTIF: 2, AVERAGEIF: 2, SUMIFS: 3, COUNTIFS: 2, AVERAGEIFS: 3, MAXIFS: 3, MINIFS: 3, AND: 1, OR: 1, XOR: 1, NOT: 1,
   IF: 2, IFS: 2, IFERROR: 2, IFNA: 2, CHOOSE: 2, SWITCH: 3, ISERROR: 1, ISERR: 1, ISNA: 1,
-  ISBLANK: 1, ISNUMBER: 1, ISTEXT: 1, ISNONTEXT: 1, ISLOGICAL: 1, MATCH: 2, INDEX: 2, VLOOKUP: 3, HLOOKUP: 3, XLOOKUP: 3, OFFSET: 3, ROWS: 1, COLUMNS: 1, LEN: 1, LEFT: 1, RIGHT: 1, MID: 3,
+  ISBLANK: 1, ISNUMBER: 1, ISTEXT: 1, ISNONTEXT: 1, ISLOGICAL: 1, ISFORMULA: 1, HYPERLINK: 1, MATCH: 2, INDEX: 2, VLOOKUP: 3, HLOOKUP: 3, XLOOKUP: 3, OFFSET: 3, ROWS: 1, COLUMNS: 1, LEN: 1, LEFT: 1, RIGHT: 1, MID: 3,
   FIND: 2, SEARCH: 2, TRIM: 1, UPPER: 1, LOWER: 1, PROPER: 1, CONCATENATE: 1, CONCAT: 1, TEXTJOIN: 3, SUBSTITUTE: 3, REPT: 2, EXACT: 2, VALUE: 1, TEXT: 2, T: 1, N: 1,
-  DATE: 3, YEAR: 1, MONTH: 1, DAY: 1, WEEKDAY: 1, DAYS: 2, EDATE: 2, EOMONTH: 2, YEARFRAC: 2, NPV: 2, IRR: 1, PMT: 3, PV: 3, FV: 3 };
+  DATE: 3, YEAR: 1, MONTH: 1, DAY: 1, WEEKDAY: 1, DAYS: 2, EDATE: 2, EOMONTH: 2, YEARFRAC: 2, NPV: 2, IRR: 1, PMT: 3, PV: 3, FV: 3,
+  REPLACE: 4, RRI: 3, QUARTILE: 2, 'QUARTILE.INC': 2, PERCENTILE: 2, 'PERCENTILE.INC': 2, ISFORMULA: 1, FILTER: 2, SORT: 1, UNIQUE: 1, SEQUENCE: 1, TRANSPOSE: 1, XMATCH: 2,
+  'NETWORKDAYS.INTL': 2, DATEDIF: 3, RATE: 3, NPER: 3, ADDRESS: 2, GETPIVOTDATA: 2 };
 const MAX_ARGS = { ABS: 1, SIGN: 1, INT: 1, TRUNC: 2, COUNTBLANK: 1, ROUND: 2, ROUNDUP: 2, ROUNDDOWN: 2, MOD: 2, SQRT: 1, POWER: 2, EXP: 1, LN: 1, LOG: 2, LOG10: 1, PI: 0, RAND: 0,
-  LARGE: 2, SMALL: 2, RANK: 3, 'RANK.EQ': 3, SUMIF: 3, COUNTIF: 2, AVERAGEIF: 3, NOT: 1, TRUE: 0, FALSE: 0, NA: 0,
-  IF: 3, IFERROR: 2, IFNA: 2, ISERROR: 1, ISERR: 1, ISNA: 1, ISBLANK: 1, ISNUMBER: 1, ISTEXT: 1, ISNONTEXT: 1, ISLOGICAL: 1,
+  LARGE: 2, SMALL: 2, RANK: 3, 'RANK.EQ': 3, QUARTILE: 2, 'QUARTILE.INC': 2, PERCENTILE: 2, 'PERCENTILE.INC': 2, SUMIF: 3, COUNTIF: 2, AVERAGEIF: 3, NOT: 1, TRUE: 0, FALSE: 0, NA: 0,
+  IF: 3, IFERROR: 2, IFNA: 2, ISERROR: 1, ISERR: 1, ISNA: 1, ISBLANK: 1, ISNUMBER: 1, ISTEXT: 1, ISNONTEXT: 1, ISLOGICAL: 1, ISFORMULA: 1, HYPERLINK: 2,
   MATCH: 3, INDEX: 4, VLOOKUP: 4, HLOOKUP: 4, XLOOKUP: 6, OFFSET: 5, ROWS: 1, COLUMNS: 1, ROW: 1, COLUMN: 1, LEN: 1, LEFT: 2, RIGHT: 2, MID: 3,
   FIND: 3, SEARCH: 3, TRIM: 1, UPPER: 1, LOWER: 1, PROPER: 1, SUBSTITUTE: 4, REPT: 2, EXACT: 2, VALUE: 1, TEXT: 2, T: 1, N: 1,
-  TODAY: 0, DATE: 3, YEAR: 1, MONTH: 1, DAY: 1, WEEKDAY: 2, DAYS: 2, EDATE: 2, EOMONTH: 2, YEARFRAC: 3, IRR: 2, PMT: 5, PV: 5, FV: 5 };
+  TODAY: 0, DATE: 3, YEAR: 1, MONTH: 1, DAY: 1, WEEKDAY: 2, DAYS: 2, EDATE: 2, EOMONTH: 2, YEARFRAC: 3, IRR: 2, PMT: 5, PV: 5, FV: 5,
+  REPLACE: 4, RRI: 3, QUARTILE: 2, 'QUARTILE.INC': 2, PERCENTILE: 2, 'PERCENTILE.INC': 2, ISFORMULA: 1, FILTER: 3, SORT: 4, UNIQUE: 3, SEQUENCE: 4, TRANSPOSE: 1, XMATCH: 4,
+  'NETWORKDAYS.INTL': 4, DATEDIF: 3, RATE: 6, NPER: 5, ADDRESS: 5, GETPIVOTDATA: 254 };
+/**
+ * The scalar functions Excel 365 lifts over a multi-cell argument, one call per cell, giving an
+ * array: ABS(A1:A5) inside SUMPRODUCT, ROUND(B2:B9,0), LEN(A2:A9), TEXT(dates,"mmm"). The aggregates,
+ * the lookups and the criteria functions take whole ranges and are not here.
+ */
+const LIFT = new Set(['ABS', 'SIGN', 'INT', 'TRUNC', 'ROUND', 'ROUNDUP', 'ROUNDDOWN', 'MOD', 'SQRT', 'POWER', 'EXP', 'LN', 'LOG', 'LOG10', 'NOT', 'LEN', 'LEFT', 'RIGHT', 'MID',
+  'FIND', 'SEARCH', 'TRIM', 'UPPER', 'LOWER', 'PROPER', 'SUBSTITUTE', 'REPLACE', 'REPT', 'EXACT', 'VALUE', 'TEXT', 'T', 'N', 'DATE', 'YEAR', 'MONTH', 'DAY', 'WEEKDAY', 'DAYS',
+  'EDATE', 'EOMONTH', 'YEARFRAC']);
+/** The functions that take a 3D reference (Excel's list, as far as the engine computes them). */
+const THREE_D = new Set(['SUM', 'AVERAGE', 'AVERAGEA', 'COUNT', 'COUNTA', 'MAX', 'MIN', 'PRODUCT']);
+const is3D = n => !!n && (n.k === 'ref' || n.k === 'range') && typeof n.sheet === 'string' && n.sheet.includes(':');
 const BP = { '=': 1, '<>': 1, '<': 1, '<=': 1, '>': 1, '>=': 1, '&': 2, '+': 3, '-': 3, '*': 4, '/': 4, '^': 5 };
 const BP_UNARY = 6, BP_PCT = 7;
 
@@ -193,6 +216,7 @@ export function parseFormula(src) {
           if (d && d.t === 'ref' && !d.sheet) { p += 2; return tk.sheet ? { k: 'range', a: tk.v, b: d.v, sheet: tk.sheet } : { k: 'range', a: tk.v, b: d.v }; }
           throw new SyntaxError('bad range');
         }
+        if (tk.spill) return { k: 'ref', ref: tk.v, spill: true };
         return tk.sheet ? { k: 'ref', ref: tk.v, sheet: tk.sheet } : { k: 'ref', ref: tk.v };
       }
       case 'name': {
@@ -270,6 +294,22 @@ export class Range {
   keys() { const out = []; for (let r = this.r1; r <= this.r2; r++) for (let c = this.c1; c <= this.c2; c++) out.push(this.pfx(refKey(r, c))); return out; }
 }
 const isRange = v => v instanceof Range;
+/**
+ * An in-formula array (Excel 365's dynamic arrays): what (A1:A5="x")*(B1:B5), FILTER(), SORT(),
+ * SEQUENCE() and a lifted scalar function over a range produce. `data` is row-major; an element is a
+ * number | string | boolean | null | FxError (an error travels per element, as in Excel, and is
+ * thrown when a scalar is wanted). At the top of a formula an Arr spills (evalFormula's ctx.onSpill).
+ */
+export class Arr {
+  constructor(rows, cols, data) { this.rows = rows; this.cols = cols; this.data = data; }
+  get size() { return this.rows * this.cols; }
+  static of(rows2d) { const rows = rows2d.length, cols = rows ? rows2d[0].length : 0; return new Arr(rows, cols, [].concat(...rows2d)); }
+  /** Row-major rows, error elements as their code strings (what the sheet writes into the spilled cells). */
+  toRows() { const out = []; for (let r = 0; r < this.rows; r++) { const row = []; for (let c = 0; c < this.cols; c++) { const x = this.data[r * this.cols + c]; row.push(x instanceof FxError ? x.code : x); } out.push(row); } return out; }
+}
+export const isArr = v => v instanceof Arr;
+/** A value that holds more than one cell: an Arr, or a Range of two or more cells. */
+const isMulti = v => isArr(v) || (isRange(v) && v.size > 1);
 
 const RE_NUMERIC_TEXT = /^\s*[-+]?\$?\s*(?:\d{1,3}(?:,\d{3})+|\d+)?(?:\.\d*)?(?:[eE][+-]?\d+)?\s*%?\s*$/;
 const RE_PAREN_NEG = /^\s*\(\s*\$?\s*(?:\d{1,3}(?:,\d{3})+|\d+)?(?:\.\d*)?\s*\)\s*$/;
@@ -353,7 +393,8 @@ const num15 = n => parseFloat(Number(n).toPrecision(15));
 
 function numeq(a, b) { return num15(a) === num15(b); }
 
-const cmpText = (a, b) => a.localeCompare(b, 'en', { sensitivity: 'accent' });
+const COLLATOR = new Intl.Collator('en', { sensitivity: 'accent' });
+const cmpText = (a, b) => a === b ? 0 : COLLATOR.compare(a, b);
 /**
  * Excel's comparison of two plain values (number | string | boolean | null) under = <> < <= > >=:
  * numbers < text < booleans, text case-insensitive, a blank reads as the other side's zero ("" / 0 /
@@ -407,6 +448,14 @@ function globTest(toks, str) {
 /* ============================================================================
    EVALUATOR
    ============================================================================ */
+// parsed formulas, by text: a recalc evaluates the same formulas again and again (the evaluator never mutates a tree)
+const PARSE_CACHE = new Map(); const PARSE_CACHE_MAX = 4000;
+function parseCached(expr) {
+  const key = String(expr); const hit = PARSE_CACHE.get(key); if (hit) return hit;
+  const ast = parseFormula(expr);
+  if (PARSE_CACHE.size >= PARSE_CACHE_MAX) PARSE_CACHE.clear();
+  PARSE_CACHE.set(key, ast); return ast;
+}
 export function evalFormula(expr, ctx = {}) {
   const rawIn = ctx.raw || (() => null);
   // a key of the form NAME!B3 comes from a sheet-prefixed reference: ctx.sheetRaw resolves it
@@ -423,7 +472,7 @@ export function evalFormula(expr, ctx = {}) {
   // references per cell, exactly as translateFormula would rewrite the text (a reference pushed
   // above row 1 or left of column A is #REF! — or, with offset.wrap, runs round the sheet edge,
   // as Excel's conditional-formatting references do)
-  const ast = expr && typeof expr === 'object' ? expr : parseFormula(expr);   // SyntaxError propagates: the commit gate decides what to do
+  const ast = expr && typeof expr === 'object' ? expr : parseCached(expr);   // SyntaxError propagates: the commit gate decides what to do
   const OFF = ctx.offset && (ctx.offset.dr || ctx.offset.dc) ? ctx.offset : null;
   const offR = r => OFF.wrap ? wrapIndex(r, ROWS) : r, offC = c => OFF.wrap ? wrapIndex(c, COLS) : c;
 
@@ -431,6 +480,7 @@ export function evalFormula(expr, ctx = {}) {
   const cellVal = key => { const v = raw(key); if (v === undefined) return null; if (isErrVal(v)) throw err(v); return v; };
   const deref = v => {
     if (v === undefined) return null;   // an omitted argument slot reads as a blank
+    if (isArr(v)) { if (v.size !== 1) throw err('#VALUE!'); const x = v.data[0]; if (x instanceof FxError) throw x; return x; }
     if (!isRange(v)) return v;
     if (v.size === 1) return cellVal(v.cell(0));
     throw err('#VALUE!');
@@ -468,6 +518,52 @@ export function evalFormula(expr, ctx = {}) {
   const toInt = v => Math.trunc(toNum(v));
   const capText = s => { if (s.length > MAX_TEXT) throw err('#VALUE!'); return s; };
   const argRange = v => { if (isRange(v)) return v; throw err('#VALUE!'); };
+
+  /* ---- arrays: a 2-D view over a Range, an Arr or a scalar; element-wise lifting -------- */
+  // Excel 365 evaluates every formula as an array formula: (A1:A5="x")*(B1:B5) is five products,
+  // ABS(A1:A5) five absolutes, IF(A1:A5>0,B1:B5) five picks. A multi-cell operand lifts the
+  // operator or scalar function cell by cell (broadcast); the aggregates then read the Arr as they
+  // read a range (text and booleans skipped, errors propagated); at the top the Arr spills.
+  const grid = v => {   // rows, cols, size, raw(i): the element as a cell holds it (an error as its code string, a blank null, an omitted argument undefined)
+    if (isRange(v)) return { rows: v.rows, cols: v.cols, size: v.size, raw: i => { const x = raw(v.cell(i)); return x === undefined ? null : x; } };
+    if (isArr(v)) return { rows: v.rows, cols: v.cols, size: v.size, raw: i => { const x = v.data[i]; return x instanceof FxError ? x.code : x; } };
+    return { rows: 1, cols: 1, size: 1, raw: () => v };
+  };
+  const gval = (g, i) => { const x = g.raw(i); if (isErrVal(x)) throw err(x); return x; };   // a value, errors propagating
+  const glook = (g, i) => { const x = g.raw(i); return isErrVal(x) ? SKIP : x; };          // a lookup cell: an error is stepped over
+  /** A piece of a Range (a Range, still on its sheet) or of an Arr / scalar (an Arr); corners 0-based, inclusive. */
+  const slice = (src, r1, c1, r2, c2) => {
+    if (isRange(src)) return new Range(src.r1 + r1, src.c1 + c1, src.r1 + r2, src.c1 + c2, src.sheet);
+    const g = grid(src), data = [];
+    for (let r = r1; r <= r2; r++) for (let c = c1; c <= c2; c++) data.push(isArr(src) ? src.data[r * g.cols + c] : src);
+    return new Arr(r2 - r1 + 1, c2 - c1 + 1, data);
+  };
+  /**
+   * Element-wise evaluation over the arguments: a single row or column stretches across the result,
+   * a scalar repeats, a cell outside a smaller array is #N/A, and an error in one cell is an error
+   * in that element alone. With `rawErrors` the function sees an error element as its code string
+   * (the classifiers and IFERROR read errors instead of propagating them).
+   */
+  function broadcast(vals, fn, rawErrors = false) {
+    const gs = vals.map(grid);
+    const R = Math.max(...gs.map(g => g.rows)), C = Math.max(...gs.map(g => g.cols));
+    const data = new Array(R * C);
+    for (let r = 0; r < R; r++) for (let c = 0; c < C; c++) {
+      try {
+        const a = gs.map(g => {
+          const rr = g.rows === 1 ? 0 : r, cc = g.cols === 1 ? 0 : c;
+          if (rr >= g.rows || cc >= g.cols) throw err('#N/A');
+          return rawErrors ? g.raw(rr * g.cols + cc) : gval(g, rr * g.cols + cc);
+        });
+        let x = fn(...a);
+        if (isRange(x) || isArr(x)) x = deref(x);
+        data[r * C + c] = x === null || x === undefined ? 0 : x;   // a blank picked into an array is 0, as Excel holds it
+      } catch (e) { if (!(e instanceof FxError)) throw e; data[r * C + c] = e; }
+    }
+    return new Arr(R, C, data);
+  }
+  /** Every element of a Range or an Arr, as a cell holds it (errors as code strings), for the counters and the text joiners. */
+  const eachRaw = (v, fn) => { const g = grid(v); for (let i = 0; i < g.size; i++) fn(g.raw(i)); };
   const rangeOf = (a, b, sheet) => {
     const A = refParts(a), B = refParts(b);
     return new Range(Math.min(A.r, B.r), Math.min(A.c, B.c), Math.max(A.r, B.r), Math.max(A.c, B.c), sheet);
@@ -533,8 +629,9 @@ export function evalFormula(expr, ctx = {}) {
     const out = [];
     for (const v of args) {
       if (v === undefined || v === null) continue;
-      if (isRange(v)) {
-        for (const k of v.keys()) { const x = cellVal(k); if (typeof x === 'number') out.push(x); else if (keepBoolInRange && typeof x === 'boolean') out.push(x ? 1 : 0); }
+      if (isRange(v) || isArr(v)) {
+        const g = grid(v);
+        for (let i = 0; i < g.size; i++) { const x = gval(g, i); if (typeof x === 'number') out.push(x); else if (keepBoolInRange && typeof x === 'boolean') out.push(x ? 1 : 0); }
       } else out.push(toNum(v));
     }
     return out;
@@ -590,9 +687,35 @@ export function evalFormula(expr, ctx = {}) {
     }
     return hit;
   }
-  const colVals = (rg, c) => { const out = []; for (let r = 0; r < rg.rows; r++) out.push(lookVal(rg.at(r, c))); return out; };
-  const rowVals = (rg, r) => { const out = []; for (let c = 0; c < rg.cols; c++) out.push(lookVal(rg.at(r, c))); return out; };
-  const flatVals = rg => rg.keys().map(lookVal);
+  const colVals = (g, c) => { const out = []; for (let r = 0; r < g.rows; r++) out.push(glook(g, r * g.cols + c)); return out; };
+  const rowVals = (g, r) => { const out = []; for (let c = 0; c < g.cols; c++) out.push(glook(g, r * g.cols + c)); return out; };
+  const flatVals = g => { const out = []; for (let i = 0; i < g.size; i++) out.push(glook(g, i)); return out; };
+  /** XLOOKUP's and XMATCH's search: the index of `key` in `vals`, or -1. match_mode 0 exact · -1 exact or next smaller · 1 exact or next larger · 2 wildcard; search_mode 1 first-to-last · -1 last-to-first (2 / -2, the binary searches, give the same answers on the sorted data they require). */
+  function xfind(key, vals, mode, smode) {
+    if (![0, 1, -1, 2].includes(mode) || ![1, -1, 2, -2].includes(smode)) throw err('#VALUE!');
+    key = deref(key); if (key === null) key = 0;
+    const same = v => typeof v === typeof key;
+    const eq = v => same(v) && (typeof v === 'number' ? numeq(v, key) : typeof v === 'string' ? cmpText(v, key) === 0 : v === key);
+    const order = vals.map((_, j) => j); if (smode < 0) order.reverse();
+    let i = -1;
+    if (mode === 2 && typeof key === 'string') { const g = compileGlob(key); i = order.find(j => typeof vals[j] === 'string' && globTest(g, vals[j])) ?? -1; }
+    else {
+      i = order.find(j => eq(vals[j])) ?? -1;
+      if (i < 0 && mode !== 0) {
+        // the closest candidate on the wanted side; strict comparisons keep the first-encountered row on ties
+        for (const j of order) { const v = vals[j]; if (!same(v)) continue;
+          if (mode === 1 ? compare('>', v, key) && (i < 0 || compare('<', v, vals[i])) : compare('<', v, key) && (i < 0 || compare('>', v, vals[i]))) i = j; }
+      }
+    }
+    return i;
+  }
+  /** Excel's sort order for SORT and UNIQUE: numbers, then text (case-insensitive), then booleans; blanks always last. */
+  const sortCmp = (a, b) => {
+    if (a === null && b === null) return 0; if (a === null) return 1; if (b === null) return -1;
+    const ea = a instanceof FxError || isErrVal(a), eb = b instanceof FxError || isErrVal(b); if (ea || eb) return ea && eb ? 0 : ea ? 1 : -1;
+    return compareValues('<', a, b) ? -1 : compareValues('>', a, b) ? 1 : 0;
+  };
+  const sameCell = (a, b) => (a === null ? '' : a) === (b === null ? '' : b) || (typeof a === 'string' && typeof b === 'string' && cmpText(a, b) === 0);
 
   /* ---- TEXT(value, format) — Excel number-format codes, via numfmt.js (the grid's engine) ---- */
   // A numeric- or date-looking string reads as its number; text passes through unless a text section
@@ -608,11 +731,23 @@ export function evalFormula(expr, ctx = {}) {
   }
   /* ---- the function table --------------------------------------------------------- */
   function callFn(name, node) {
+    // a 3D reference (Jan:Mar!B5) is one argument per sheet of the run, in the functions Excel lets take one; anywhere else it is #VALUE!
+    if (node.args.some(is3D)) {
+      if (!THREE_D.has(name)) throw err('#VALUE!');
+      const ex = [];
+      for (const a of node.args) { if (!is3D(a)) { ex.push(a); continue; } const [x, y] = a.sheet.split(':'); const names = ctx.sheetSpan ? ctx.sheetSpan(x, y) : null; if (!names) throw err('#REF!'); for (const nm of names) ex.push({ ...a, sheet: String(nm).toUpperCase() }); }
+      return callFn(name, { ...node, args: ex });
+    }
     const slots = node.args;   // null = omitted slot; arity was checked by the parser
     // lazy forms first: they choose which arguments to evaluate, or classify an error instead of propagating it
     switch (name) {
       case 'IF': {
-        const c = toBool(evArg(slots[0]));
+        const cv = evArg(slots[0]);
+        if (isMulti(cv)) {   // an array test picks element by element: MEDIAN(IF(A2:A9="x",B2:B9)) sees B where A is x, FALSE elsewhere
+          const a = evArg(slots[1]), b = slots[2] === undefined ? false : evArg(slots[2]);
+          return broadcast([cv, a, b], (c, x, y) => toBool(c) ? x : y);
+        }
+        const c = toBool(cv);
         const pick = c ? slots[1] : slots[2];
         if (pick === undefined) return false;   // no value_if_false → FALSE
         return evArg(pick);                      // an omitted slot reads as 0
@@ -624,7 +759,7 @@ export function evalFormula(expr, ctx = {}) {
       }
       case 'IFERROR': case 'IFNA': {
         let v;
-        try { v = deref(evArg(slots[0])); }
+        try { v = evArg(slots[0]); if (isMulti(v)) { const alt = evArg(slots[1]); return broadcast([v, alt], (x, y) => isErrVal(x) && (name === 'IFERROR' || x === '#N/A') ? y : x, true); } v = deref(v); }
         catch (e) { if (!(e instanceof FxError)) throw e; if (name === 'IFNA' && e.code !== '#N/A') throw e; return evArg(slots[1]); }
         if (typeof v === 'number' && !isFinite(v)) return evArg(slots[1]);
         return v;
@@ -642,19 +777,31 @@ export function evalFormula(expr, ctx = {}) {
         throw err('#N/A');
       }
       case 'ISERROR': case 'ISERR': case 'ISNA': {
-        try { deref(evArg(slots[0])); return false; }
+        try { const v = evArg(slots[0]); if (isMulti(v)) return broadcast([v], x => isErrVal(x) && (name === 'ISERROR' || (name === 'ISNA') === (x === '#N/A')), true); deref(v); return false; }
         catch (e) { if (!(e instanceof FxError)) throw e; if (name === 'ISERROR') return true; if (name === 'ISNA') return e.code === '#N/A'; return e.code !== '#N/A'; }
       }
       case 'ISBLANK': case 'ISNUMBER': case 'ISTEXT': case 'ISNONTEXT': case 'ISLOGICAL': {
         // the argument is classified, so an error inside it (ISNUMBER(MATCH(…)), ISNUMBER(SEARCH(…))) is FALSE, not a propagation
         let v;
-        try { v = evArg(slots[0]); if (name !== 'ISBLANK') v = deref(v); }
+        const classify = x => { if (isErrVal(x)) return name === 'ISNONTEXT'; if (name === 'ISBLANK') return x === null; if (name === 'ISNUMBER') return typeof x === 'number'; if (name === 'ISTEXT') return typeof x === 'string'; if (name === 'ISNONTEXT') return typeof x !== 'string'; return typeof x === 'boolean'; };
+        try { v = evArg(slots[0]); if (isMulti(v)) return broadcast([v], classify, true); if (name !== 'ISBLANK') v = deref(v); }   // ISNUMBER(range): one answer per cell (M75)
         catch (e) { if (!(e instanceof FxError)) throw e; return name === 'ISNONTEXT'; }
         if (name === 'ISBLANK') { if (isRange(v) && v.size === 1) { const x = raw(v.cell(0)); return x === null || x === undefined; } return v === null; }
         if (name === 'ISNUMBER') return typeof v === 'number';
         if (name === 'ISTEXT') return typeof v === 'string';
         if (name === 'ISNONTEXT') return typeof v !== 'string';
         return typeof v === 'boolean';
+      }
+      case 'GETPIVOTDATA': {   // a figure from a PivotTable: the data field, a cell of the pivot, then field / item pairs (the sheet answers through ctx.pivotCell, which names the cell that holds it)
+        const field = toText(evArg(slots[0])); const ref = evArg(slots[1]); if (!isRange(ref)) throw err('#REF!');
+        const pairs = slots.slice(2).map(a => { const v = deref(evArg(a)); return typeof v === 'number' ? v : toText(v); });
+        const k = ctx.pivotCell ? ctx.pivotCell(ref.cell(0), field, pairs) : null; if (!k) throw err('#REF!');
+        const v = raw(k); if (v === null || v === undefined) throw err('#REF!'); if (isErrVal(v)) throw err(v); return v;
+      }
+      case 'ISFORMULA': {   // TRUE for a cell that holds a formula (the sheet answers through ctx.isFormula); over a range, one answer per cell (M75)
+        const v = evArg(slots[0]); if (!isRange(v)) throw err('#VALUE!');
+        const f = k => { const r = ctx.isFormula ? ctx.isFormula(k) : false; if (r === null) throw err('#REF!'); return !!r; };   // null: no such sheet
+        return v.size === 1 ? f(v.cell(0)) : new Arr(v.rows, v.cols, v.keys().map(f));
       }
       case 'ROW': case 'COLUMN': {
         if (!slots.length || slots[0] === null) { if (!ctx.cell) throw err('#VALUE!'); return name === 'ROW' ? ctx.cell.r : ctx.cell.c; }
@@ -667,7 +814,7 @@ export function evalFormula(expr, ctx = {}) {
       let k = 0;
       for (const v of vals) {
         if (v === undefined) continue;
-        if (isRange(v)) { for (const key of v.keys()) { const x = raw(key); if (name === 'COUNT' ? typeof x === 'number' : (x !== null && x !== undefined)) k++; } }
+        if (isRange(v) || isArr(v)) eachRaw(v, x => { if (name === 'COUNT' ? typeof x === 'number' : (x !== null && x !== undefined)) k++; });
         else if (v && v.__err) { if (name === 'COUNTA') k++; }
         else if (name === 'COUNT') { if (typeof v === 'number' || typeof v === 'boolean' || (typeof v === 'string' && numOfText(v) !== null)) k++; }   // a literal "12:00" or "1/31/2026" counts, as Excel's COUNT documents
         else if (v !== null) k++;
@@ -675,6 +822,11 @@ export function evalFormula(expr, ctx = {}) {
       return k;
     }
     const args = evArgs(node);
+    // a scalar function over a multi-cell argument runs once per cell (ABS(A1:A5), ROUND(B2:B9,0), LEN(A:A)) and gives an array
+    if (LIFT.has(name) && args.some(isMulti)) return broadcast(args, (...a) => callScalar(name, a));
+    return callScalar(name, args);
+  }
+  function callScalar(name, args) {
     const n = args.length;
     const nums = (opts) => collectNums(args, opts);
     switch (name) {
@@ -707,8 +859,10 @@ export function evalFormula(expr, ctx = {}) {
       case 'LARGE': case 'SMALL': { const xs = collectNums([args[0]]).sort((a, b) => name === 'LARGE' ? b - a : a - b); const k = toInt(args[1]); if (k < 1 || k > xs.length) throw err('#NUM!'); return xs[k - 1]; }
       case 'RANK': case 'RANK.EQ': { const x = toNum(args[0]); const xs = collectNums([argRange(args[1])]); const asc = has(args, 2) && toNum(args[2]) !== 0;
         if (!xs.some(v => numeq(v, x))) throw err('#N/A'); return xs.filter(v => asc ? v < x : v > x).length + 1; }
-      case 'SUMPRODUCT': { const rgs = args.map(argRange); const L = rgs[0].size; if (rgs.some(r => r.size !== L)) throw err('#VALUE!');
-        let t = 0; for (let i = 0; i < L; i++) { let m = 1; for (const rg of rgs) { const v = cellVal(rg.cell(i)); m *= typeof v === 'number' ? v : 0; } t += m; } return t; }
+      case 'SUMPRODUCT': {   // ranges or arrays of one shape: (A2:A9="x")*(B2:B9) arrives as one array of products, ABS(C2:C9) as one of absolutes; text and booleans read 0
+        const gs = args.map(grid); const L = gs[0].size; if (gs.some(g => g.rows !== gs[0].rows || g.cols !== gs[0].cols)) throw err('#VALUE!');
+        let t = 0; for (let i = 0; i < L; i++) { let m = 1; for (const g of gs) { const v = gval(g, i); m *= typeof v === 'number' ? v : 0; } t += m; } return t; }
+      case 'HYPERLINK': { const v = has(args, 1) ? deref(args[1]) : deref(args[0]); return v === null ? 0 : v; }   // the cell shows the friendly name (or the link text); nothing is followed here
       case 'SUMIF': case 'AVERAGEIF': case 'COUNTIF': {
         const rg = argRange(args[0]); const crit = criterion(args[1]);
         const sumRg = name === 'COUNTIF' ? null : (has(args, 2) ? argRange(args[2]) : rg);
@@ -733,7 +887,7 @@ export function evalFormula(expr, ctx = {}) {
       /* ---- logical ---- */
       case 'AND': case 'OR': case 'XOR': {
         const bs = []; for (const v of args) { if (v === undefined) continue;
-          if (isRange(v)) { for (const key of v.keys()) { const x = cellVal(key); if (typeof x === 'number') bs.push(x !== 0); else if (typeof x === 'boolean') bs.push(x); } }
+          if (isRange(v) || isArr(v)) { const g = grid(v); for (let i = 0; i < g.size; i++) { const x = gval(g, i); if (typeof x === 'number') bs.push(x !== 0); else if (typeof x === 'boolean') bs.push(x); } }
           else if (v !== null) bs.push(toBool(v)); }
         if (!bs.length) throw err('#VALUE!');
         if (name === 'AND') return bs.every(Boolean); if (name === 'OR') return bs.some(Boolean); return bs.filter(Boolean).length % 2 === 1;
@@ -742,51 +896,77 @@ export function evalFormula(expr, ctx = {}) {
       case 'TRUE': return true; case 'FALSE': return false;
       case 'NA': throw err('#N/A');
       /* ---- lookup ---- */
-      case 'MATCH': { const rg = argRange(args[1]); const mode = has(args, 2) ? Math.sign(toNum(args[2])) : 1;
-        const vals = flatVals(rg); const i = lookupIndex(args[0], vals, mode); if (i < 0) throw err('#N/A'); return i + 1; }
-      case 'INDEX': { const rg = argRange(args[0]);
-        const r = has(args, 1) ? toInt(args[1]) : 0, c = has(args, 2) ? toInt(args[2]) : (rg.rows === 1 && !has(args, 2) && has(args, 1) && rg.cols > 1 ? r : 0);
-        if (rg.rows === 1 && rg.cols > 1 && !has(args, 2) && has(args, 1)) { if (r < 1 || r > rg.cols) throw err('#REF!'); return new Range(rg.r1, rg.c1 + r - 1, rg.r1, rg.c1 + r - 1); }
-        if (r < 0 || c < 0 || r > rg.rows || c > rg.cols) throw err('#REF!');
-        if (r === 0 && c === 0) return rg;
-        if (r === 0) return new Range(rg.r1, rg.c1 + c - 1, rg.r2, rg.c1 + c - 1);
-        if (c === 0) { if (rg.cols === 1) return new Range(rg.r1 + r - 1, rg.c1, rg.r1 + r - 1, rg.c1); return new Range(rg.r1 + r - 1, rg.c1, rg.r1 + r - 1, rg.c2); }
-        return new Range(rg.r1 + r - 1, rg.c1 + c - 1, rg.r1 + r - 1, rg.c1 + c - 1); }
-      case 'VLOOKUP': case 'HLOOKUP': { const rg = argRange(args[1]); const idx = toInt(args[2]); const approx = has(args, 3) ? toBool(args[3]) : true;
-        const vert = name === 'VLOOKUP'; if (idx < 1 || idx > (vert ? rg.cols : rg.rows)) throw err('#REF!');
-        const keys = vert ? colVals(rg, 0) : rowVals(rg, 0); const i = lookupIndex(args[0], keys, approx ? 1 : 0); if (i < 0) throw err('#N/A');
-        const v = cellVal(vert ? rg.at(i, idx - 1) : rg.at(idx - 1, i)); return v === null ? 0 : v; }
+      case 'MATCH': { const mode = has(args, 2) ? Math.sign(toNum(args[2])) : 1;
+        const vals = flatVals(grid(args[1])); const i = lookupIndex(args[0], vals, mode); if (i < 0) throw err('#N/A'); return i + 1; }
+      case 'XMATCH': { const i = xfind(args[0], flatVals(grid(args[1])), has(args, 2) ? toInt(args[2]) : 0, has(args, 3) ? toInt(args[3]) : 1); if (i < 0) throw err('#N/A'); return i + 1; }
+      case 'INDEX': {   // a piece of the range (still a reference on its sheet) or of the array: a cell, a whole row (c = 0), a whole column (r = 0)
+        const src = args[0]; if (!isRange(src) && !isArr(src)) throw err('#VALUE!'); const g = grid(src);
+        const r = has(args, 1) ? toInt(args[1]) : 0, c = has(args, 2) ? toInt(args[2]) : 0;
+        if (g.rows === 1 && g.cols > 1 && !has(args, 2) && has(args, 1)) { if (r < 1 || r > g.cols) throw err('#REF!'); return slice(src, 0, r - 1, 0, r - 1); }   // one row: the second argument walks along it
+        if (r < 0 || c < 0 || r > g.rows || c > g.cols) throw err('#REF!');
+        if (r === 0 && c === 0) return src;
+        if (r === 0) return slice(src, 0, c - 1, g.rows - 1, c - 1);
+        if (c === 0) return slice(src, r - 1, 0, r - 1, g.cols - 1);
+        return slice(src, r - 1, c - 1, r - 1, c - 1); }
+      case 'VLOOKUP': case 'HLOOKUP': { if (!isRange(args[1]) && !isArr(args[1])) throw err('#VALUE!'); const g = grid(args[1]); const idx = toInt(args[2]); const approx = has(args, 3) ? toBool(args[3]) : true;
+        const vert = name === 'VLOOKUP'; if (idx < 1 || idx > (vert ? g.cols : g.rows)) throw err('#REF!');
+        const keys = vert ? colVals(g, 0) : rowVals(g, 0); const i = lookupIndex(args[0], keys, approx ? 1 : 0); if (i < 0) throw err('#N/A');
+        const v = gval(g, vert ? i * g.cols + idx - 1 : (idx - 1) * g.cols + i); return v === null ? 0 : v; }
       case 'XLOOKUP': {
         // match_mode: 0 exact · -1 exact or next smaller · 1 exact or next larger · 2 wildcard — none needs sorted data.
-        // search_mode: 1 first-to-last · -1 last-to-first (2 / -2, the binary searches, give the same answers on the sorted data they require).
-        const look = argRange(args[1]), ret = argRange(args[2]);
-        const mode = has(args, 4) ? toInt(args[4]) : 0, smode = has(args, 5) ? toInt(args[5]) : 1;
-        if (![0, 1, -1, 2].includes(mode) || ![1, -1, 2, -2].includes(smode)) throw err('#VALUE!');
+        // search_mode: 1 first-to-last · -1 last-to-first. The lookup array is one row or one column; the
+        // return array matches it on that side and may be wider: a column lookup over a block returns the
+        // whole row (a record), a row lookup over a block the whole column, so XLOOKUP(x, A:A, XLOOKUP(y,
+        // 1:1, B2:E10)) is the two-way lookup, the inner one handing the outer its return column.
+        if (!isRange(args[1]) && !isArr(args[1]) || !isRange(args[2]) && !isArr(args[2])) throw err('#VALUE!');
+        const look = grid(args[1]), ret = grid(args[2]);
         const vert = look.cols === 1;
         if ((look.rows > 1 && look.cols > 1) || (vert ? ret.rows !== look.rows : ret.cols !== look.cols)) throw err('#VALUE!');
-        const vals = flatVals(look);
-        let key = deref(args[0]); if (key === null) key = 0;
-        const same = v => typeof v === typeof key;
-        const eq = v => same(v) && (typeof v === 'number' ? numeq(v, key) : typeof v === 'string' ? cmpText(v, key) === 0 : v === key);
-        const order = vals.map((_, j) => j); if (smode < 0) order.reverse();
-        let i = -1;
-        if (mode === 2 && typeof key === 'string') { const g = compileGlob(key); i = order.find(j => typeof vals[j] === 'string' && globTest(g, vals[j])) ?? -1; }
-        else {
-          i = order.find(j => eq(vals[j])) ?? -1;
-          if (i < 0 && mode !== 0) {
-            // the closest candidate on the wanted side; strict comparisons keep the first-encountered row on ties
-            for (const j of order) { const v = vals[j]; if (!same(v)) continue;
-              if (mode === 1 ? compare('>', v, key) && (i < 0 || compare('<', v, vals[i])) : compare('<', v, key) && (i < 0 || compare('>', v, vals[i]))) i = j; }
-          }
-        }
+        const i = xfind(args[0], flatVals(look), has(args, 4) ? toInt(args[4]) : 0, has(args, 5) ? toInt(args[5]) : 1);
         if (i < 0) { if (has(args, 3)) return args[3]; throw err('#N/A'); }
-        const v = cellVal(vert ? ret.at(i, 0) : ret.at(0, i)); return v === null ? 0 : v; }
+        const piece = vert ? slice(args[2], i, 0, i, ret.cols - 1) : slice(args[2], 0, i, ret.rows - 1, i);
+        if (piece.size > 1) return piece;
+        const v = deref(piece); return v === null ? 0 : v; }
       case 'OFFSET': { const base = argRange(args[0]); const dr = toInt(args[1]), dc = toInt(args[2]);
         const h = has(args, 3) ? toInt(args[3]) : base.rows, w = has(args, 4) ? toInt(args[4]) : base.cols;
         if (h < 1 || w < 1) throw err('#REF!'); const r1 = base.r1 + dr, c1 = base.c1 + dc; if (r1 < 1 || c1 < 1) throw err('#REF!');
-        return new Range(r1, c1, r1 + h - 1, c1 + w - 1); }
-      case 'ROWS': return argRange(args[0]).rows;
-      case 'COLUMNS': return argRange(args[0]).cols;
+        return new Range(r1, c1, r1 + h - 1, c1 + w - 1, base.sheet); }
+      case 'ROWS': { const v = args[0]; if (!isRange(v) && !isArr(v)) throw err('#VALUE!'); return v.rows; }
+      case 'COLUMNS': { const v = args[0]; if (!isRange(v) && !isArr(v)) throw err('#VALUE!'); return v.cols; }
+      /* ---- dynamic arrays (M61): each gives an Arr, which spills at the top of a formula ---- */
+      case 'FILTER': {   // the rows (a column of tests) or columns (a row of tests) of `array` whose test is true; none → if_empty, else #CALC!
+        const src = args[0]; if (!isRange(src) && !isArr(src)) throw err('#VALUE!'); const g = grid(src), inc = grid(args[1]);
+        const byRow = inc.cols === 1 && inc.rows === g.rows, byCol = !byRow && inc.rows === 1 && inc.cols === g.cols;
+        if (!byRow && !byCol) throw err('#VALUE!');
+        const keep = []; for (let i = 0; i < inc.size; i++) if (toBool(gval(inc, i))) keep.push(i);
+        if (!keep.length) { if (has(args, 2)) return args[2]; throw err('#CALC!'); }
+        const rows = []; if (byRow) for (const r of keep) { const row = []; for (let c = 0; c < g.cols; c++) row.push(g.raw(r * g.cols + c)); rows.push(row); }
+        else for (let r = 0; r < g.rows; r++) { const row = []; for (const c of keep) row.push(g.raw(r * g.cols + c)); rows.push(row); }
+        return Arr.of(rows); }
+      case 'SORT': {   // the rows of `array` by column sort_index (1), ascending (1) or descending (-1); by_col TRUE sorts the columns by a row
+        const src = args[0]; if (!isRange(src) && !isArr(src)) throw err('#VALUE!'); const g = grid(src);
+        const idx = has(args, 1) ? toInt(args[1]) : 1, ord = has(args, 2) ? toInt(args[2]) : 1, byCol = has(args, 3) ? toBool(args[3]) : false;
+        if (![1, -1].includes(ord)) throw err('#VALUE!');
+        const rows = []; for (let r = 0; r < g.rows; r++) { const row = []; for (let c = 0; c < g.cols; c++) row.push(g.raw(r * g.cols + c)); rows.push(row); }
+        const lines = byCol ? rows[0].map((_, c) => rows.map(row => row[c])) : rows;
+        if (idx < 1 || idx > lines[0].length) throw err('#VALUE!');
+        const sorted = lines.map((l, i) => [l, i]).sort((a, b) => (ord * sortCmp(a[0][idx - 1], b[0][idx - 1])) || (a[1] - b[1])).map(x => x[0]);
+        return Arr.of(byCol ? sorted[0].map((_, r) => sorted.map(col => col[r])) : sorted); }
+      case 'UNIQUE': {   // distinct rows (columns with by_col), in first-seen order; exactly_once keeps only the ones that appear once; text compares case-insensitively
+        const src = args[0]; if (!isRange(src) && !isArr(src)) throw err('#VALUE!'); const g = grid(src);
+        const byCol = has(args, 1) ? toBool(args[1]) : false, once = has(args, 2) ? toBool(args[2]) : false;
+        const rows = []; for (let r = 0; r < g.rows; r++) { const row = []; for (let c = 0; c < g.cols; c++) row.push(g.raw(r * g.cols + c)); rows.push(row); }
+        const lines = byCol ? rows[0].map((_, c) => rows.map(row => row[c])) : rows;
+        const groups = [];
+        for (const l of lines) { const hit = groups.find(gr => gr.line.every((x, i) => sameCell(x, l[i]))); if (hit) hit.n++; else groups.push({ line: l, n: 1 }); }
+        const out = groups.filter(gr => !once || gr.n === 1).map(gr => gr.line);
+        if (!out.length) throw err('#CALC!');
+        return Arr.of(byCol ? out[0].map((_, r) => out.map(col => col[r])) : out); }
+      case 'SEQUENCE': {   // rows × columns of numbers from start, by step, filled across then down
+        const R = toInt(args[0]), C = has(args, 1) ? toInt(args[1]) : 1, st = has(args, 2) ? toNum(args[2]) : 1, step = has(args, 3) ? toNum(args[3]) : 1;
+        if (R < 1 || C < 1) throw err('#VALUE!'); if (R * C > 1048576) throw err('#NUM!');
+        const data = []; for (let i = 0; i < R * C; i++) data.push(st + step * i); return new Arr(R, C, data); }
+      case 'TRANSPOSE': { const src = args[0]; const g = grid(src); const rows = []; for (let c = 0; c < g.cols; c++) { const row = []; for (let r = 0; r < g.rows; r++) row.push(g.raw(r * g.cols + c)); rows.push(row); } return Arr.of(rows); }
       /* ---- text ---- */
       case 'LEN': return toText(args[0]).length;
       case 'LEFT': { const t = toText(args[0]); const k = has(args, 1) ? toInt(args[1]) : 1; if (k < 0) throw err('#VALUE!'); return t.slice(0, k); }
@@ -803,9 +983,9 @@ export function evalFormula(expr, ctx = {}) {
       case 'UPPER': return toText(args[0]).toUpperCase();
       case 'LOWER': return toText(args[0]).toLowerCase();
       case 'PROPER': return toText(args[0]).toLowerCase().replace(/(^|[^A-Za-z])([a-z])/g, (m, a, b) => a + b.toUpperCase());
-      case 'CONCATENATE': case 'CONCAT': { let s = ''; for (const v of args) { if (v === undefined) continue; if (isRange(v)) { if (name === 'CONCATENATE' && v.size > 1) throw err('#VALUE!'); for (const k of v.keys()) s = capText(s + toText(cellVal(k))); } else s = capText(s + toText(v)); } return s; }
+      case 'CONCATENATE': case 'CONCAT': { let s = ''; for (const v of args) { if (v === undefined) continue; if (isRange(v) || isArr(v)) { if (name === 'CONCATENATE' && v.size > 1) throw err('#VALUE!'); const g = grid(v); for (let i = 0; i < g.size; i++) s = capText(s + toText(gval(g, i))); } else s = capText(s + toText(v)); } return s; }
       case 'TEXTJOIN': { const d = toText(args[0]); const skip = toBool(args[1]); const parts = [];
-        for (const v of args.slice(2)) { if (v === undefined) continue; const vs = isRange(v) ? v.keys().map(k => toText(cellVal(k))) : [toText(v)]; for (const t of vs) if (!skip || t !== '') parts.push(t); }
+        for (const v of args.slice(2)) { if (v === undefined) continue; const vs = isRange(v) || isArr(v) ? (() => { const g = grid(v), o = []; for (let i = 0; i < g.size; i++) o.push(toText(gval(g, i))); return o; })() : [toText(v)]; for (const t of vs) if (!skip || t !== '') parts.push(t); }
         return capText(parts.join(d)); }
       case 'SUBSTITUTE': { const t = toText(args[0]), o = toText(args[1]), nw = toText(args[2]); if (o === '') return t;
         if (has(args, 3)) { const inst = toInt(args[3]); if (inst < 1) throw err('#VALUE!'); let idx = -1; for (let k = 0; k < inst; k++) { idx = t.indexOf(o, idx + 1); if (idx < 0) return t; } return capText(t.slice(0, idx) + nw + t.slice(idx + o.length)); }
@@ -851,7 +1031,14 @@ export function evalFormula(expr, ctx = {}) {
           if (isFebEnd(A) && isFebEnd(B)) d2 = 30; if (isFebEnd(A)) d1 = 30; if (d2 === 31 && d1 >= 30) d2 = 30; if (d1 === 31) d1 = 30;
         }
         return ((y2 - y1) * 360 + (m2 - m1) * 30 + (d2 - d1)) / 360; }
+      case 'REPLACE': { const t = toText(args[0]); const st = toInt(args[1]), k = toInt(args[2]); if (st < 1 || k < 0) throw err('#VALUE!'); return capText(t.slice(0, st - 1) + toText(args[3]) + t.slice(st - 1 + k)); }
+      case 'QUARTILE': case 'QUARTILE.INC': case 'PERCENTILE': case 'PERCENTILE.INC': {   // Excel's inclusive method: the k-th value by linear interpolation on (n − 1) intervals
+        const xs = collectNums([args[0]]).sort((a, b) => a - b); if (!xs.length) throw err('#NUM!');
+        let p; if (name.startsWith('QUARTILE')) { const q = toInt(args[1]); if (q < 0 || q > 4) throw err('#NUM!'); p = q / 4; } else { p = toNum(args[1]); if (p < 0 || p > 1) throw err('#NUM!'); }
+        const pos = p * (xs.length - 1), lo = Math.floor(pos), hi = Math.ceil(pos); return xs[lo] + (xs[hi] - xs[lo]) * (pos - lo); }
       /* ---- financial ---- */
+      case 'RRI': { const np = toNum(args[0]), pv = toNum(args[1]), fv = toNum(args[2]); if (np <= 0 || pv === 0) throw err('#NUM!');   // the equivalent compound rate: (fv / pv) ^ (1 / nper) − 1; a negative ratio works only where the power does (a whole nper)
+        const v = Math.pow(fv / pv, 1 / np) - 1; if (isNaN(v) || !isFinite(v)) throw err('#NUM!'); return num15(v); }
       case 'NPV': { const rate = toNum(args[0]); const flows = collectNums(args.slice(1)); if (rate === -1) throw err('#DIV/0!'); let t = 0; for (let i = 0; i < flows.length; i++) t += flows[i] / Math.pow(1 + rate, i + 1); return t; }
       case 'IRR': { const flows = collectNums([args[0]]); if (!(flows.some(x => x > 0) && flows.some(x => x < 0))) throw err('#NUM!');
         const f = r => { let t = 0; for (let i = 0; i < flows.length; i++) t += flows[i] / Math.pow(1 + r, i); return t; };
@@ -864,6 +1051,47 @@ export function evalFormula(expr, ctx = {}) {
         if (r === 0) return -(pmt * np + fv); const q = Math.pow(1 + r, np); return -(fv + pmt * (1 + r * type) * (q - 1) / r) / q; }
       case 'FV': { const r = toNum(args[0]), np = toNum(args[1]), pmt = toNum(args[2]), pv = has(args, 3) ? toNum(args[3]) : 0, type = has(args, 4) ? toNum(args[4]) : 0;
         if (r === 0) return -(pv + pmt * np); const q = Math.pow(1 + r, np); return -(pv * q + pmt * (1 + r * type) * (q - 1) / r); }
+      case 'NETWORKDAYS.INTL': {   // the working days from start to end, both counted: weekend 1..7 (a pair from Sat/Sun), 11..17 (one day from Sunday), or a "0000011" mask Monday first; the holidays come off when they are working days in the span
+        const a = Math.floor(toNum(args[0])), b = Math.floor(toNum(args[1])); if (a < 0 || b < 0) throw err('#NUM!');
+        let off = [false, false, false, false, false, true, true];   // by Monday-first index 0..6
+        if (has(args, 2)) { const w = deref(args[2]);
+          if (typeof w === 'string') { if (!/^[01]{7}$/.test(w)) throw err('#VALUE!'); if (w === '1111111') throw err('#VALUE!'); off = w.split('').map(x => x === '1'); }
+          else { const n = toInt(w); off = [0, 0, 0, 0, 0, 0, 0].map(() => false);
+            if (n >= 1 && n <= 7) { off[(n + 4) % 7] = true; off[(n + 5) % 7] = true; } else if (n >= 11 && n <= 17) off[(n - 11 + 6) % 7] = true; else throw err('#NUM!'); } }
+        const isOff = sr => off[(ymd(sr).wd + 6) % 7];
+        const lo = Math.min(a, b), hi = Math.max(a, b); let n = 0;
+        const full = Math.floor((hi - lo + 1) / 7); n += full * off.filter(x => !x).length;
+        for (let d = lo + full * 7; d <= hi; d++) if (!isOff(d)) n++;
+        if (has(args, 3)) { const hs = new Set(collectNums([args[3]]).map(Math.floor)); for (const h of hs) if (h >= lo && h <= hi && !isOff(h)) n--; }
+        return a <= b ? n : -n; }
+      case 'DATEDIF': {   // the whole years, months or days between two dates; MD, YM and YD ignore the larger units
+        const a = Math.floor(toNum(args[0])), b = Math.floor(toNum(args[1])); if (a > b) throw err('#NUM!');
+        const A = ymd(a), B = ymd(b); const u = toText(args[2]).toUpperCase();
+        let months = (B.y - A.y) * 12 + (B.m - A.m); if (B.d < A.d) months--;
+        if (u === 'D') return b - a;
+        if (u === 'M') return months;
+        if (u === 'Y') return Math.floor(months / 12);
+        if (u === 'YM') return ((months % 12) + 12) % 12;
+        if (u === 'MD') { if (B.d >= A.d) return B.d - A.d; const prevLast = new Date(Date.UTC(B.y, B.m - 1, 0)).getUTCDate(); return prevLast - A.d + B.d; }
+        if (u === 'YD') { let y = B.y; let st = serial(y, A.m, A.d); if (st > b) st = serial(y - 1, A.m, A.d); return b - st; }
+        throw err('#NUM!'); }
+      case 'RATE': {   // the rate per period, by Newton's method from the guess (10%): 20 tries to agree to 1e-7, else #NUM!
+        const np = toNum(args[0]), pmt = toNum(args[1]), pv = toNum(args[2]), fv = has(args, 3) ? toNum(args[3]) : 0, type = has(args, 4) ? toNum(args[4]) : 0;
+        let r = has(args, 5) ? toNum(args[5]) : 0.1; if (np <= 0) throw err('#NUM!');
+        const f = x => x === 0 ? pv + pmt * np + fv : pv * Math.pow(1 + x, np) + pmt * (1 + x * type) * (Math.pow(1 + x, np) - 1) / x + fv;
+        for (let i = 0; i < 100; i++) { const y = f(r), h = 1e-7 * Math.max(1, Math.abs(r)); const d = (f(r + h) - f(r - h)) / (2 * h); if (!isFinite(y) || !isFinite(d) || d === 0) break;
+          const nr = r - y / d; if (Math.abs(nr - r) < 1e-10) return num15(nr); r = nr; if (r <= -1) break; }
+        throw err('#NUM!'); }
+      case 'NPER': { const r = toNum(args[0]), pmt = toNum(args[1]), pv = toNum(args[2]), fv = has(args, 3) ? toNum(args[3]) : 0, type = has(args, 4) ? toNum(args[4]) : 0;
+        if (r === 0) { if (pmt === 0) throw err('#NUM!'); return -(pv + fv) / pmt; }
+        const k = pmt * (1 + r * type); const x = (k - fv * r) / (k + pv * r); if (!(x > 0) || r <= -1) throw err('#NUM!'); return Math.log(x) / Math.log(1 + r); }
+      case 'ADDRESS': {   // the address as text: abs_num 1 $A$1, 2 A$1, 3 $A1, 4 A1; a1 FALSE gives R1C1 (relative parts in brackets); a sheet name goes in front, quoted when it needs it
+        const r = toInt(args[0]), c = toInt(args[1]); const abs = has(args, 2) ? toInt(args[2]) : 1; const a1 = has(args, 3) ? toBool(deref(args[3])) : true;
+        if (r < 1 || c < 1 || r > 1048576 || c > 16384 || abs < 1 || abs > 4) throw err('#VALUE!');
+        const ar = abs === 1 || abs === 2, ac = abs === 1 || abs === 3;
+        const t = a1 ? (ac ? '$' : '') + colLetter(c) + (ar ? '$' : '') + r : 'R' + (ar ? r : '[' + r + ']') + 'C' + (ac ? c : '[' + c + ']');
+        if (!has(args, 4)) return t; const sh = toText(args[4]); if (sh === '') return '!' + t;
+        return (/^[A-Za-z_][A-Za-z0-9_.]*$/.test(sh) ? sh : "'" + sh.replace(/'/g, "''") + "'") + '!' + t; }
       default: throw err('#NAME?');
     }
   }
@@ -871,6 +1099,7 @@ export function evalFormula(expr, ctx = {}) {
 
   /* ---- operators ---------------------------------------------------------------- */
   function binop(op, a, b) {
+    if (isMulti(a) || isMulti(b)) return broadcast([a, b], (x, y) => binop(op, x, y));   // array arithmetic: (A1:A5="x")*(B1:B5), A1:A5*2, A1:A3&"x"
     if (BP[op] === 1) return compare(op, a, b);
     if (op === '&') return capText(toText(a) + toText(b));
     const x = toNum(a), y = toNum(b);
@@ -890,6 +1119,7 @@ export function evalFormula(expr, ctx = {}) {
       case 'num': return node.v;
       case 'str': return node.v;
       case 'bool': return node.v;
+      case 'val': { const x = node.v; if (isErrVal(x)) throw err(x); return x; }   // a piece Evaluate Formula has already computed (a scalar or an Arr)
       case 'err': throw err(node.v);
       case 'name': {   // a defined name (Define Name, M40): ctx.name resolves it to its cell or range, on this sheet or another
         const t = ctx.name ? ctx.name(node.v) : null;
@@ -897,12 +1127,18 @@ export function evalFormula(expr, ctx = {}) {
         return new Range(t.r1, t.c1, t.r2, t.c2, t.sheet || undefined);
       }
       case 'paren': return ev(node.x);
-      case 'ref': { const p = refParts(node.ref); return new Range(p.r, p.c, p.r, p.c, node.sheet); }
-      case 'range': return rangeOf(node.a, node.b, node.sheet);
+      case 'ref': { if (is3D(node)) throw err('#VALUE!'); const p = refParts(node.ref);
+        if (node.spill) {   // A1#: the range A1 spills into (the sheet answers through ctx.spillRange); a formula that does not spill is its one cell; anything else is #REF!
+          const sp = ctx.spillRange ? ctx.spillRange(refKey(p.r, p.c)) : null;
+          if (sp) return new Range(sp.r1, sp.c1, sp.r2, sp.c2);
+          if (!(ctx.isFormula && ctx.isFormula(refKey(p.r, p.c)))) throw err('#REF!');
+        }
+        return new Range(p.r, p.c, p.r, p.c, node.sheet); }
+      case 'range': if (is3D(node)) throw err('#VALUE!'); return rangeOf(node.a, node.b, node.sheet);
       case 'colrange': { const a = offCol(node.a, node.absA), b = offCol(node.b, node.absB); return new Range(1, Math.min(a, b), ROWS, Math.max(a, b)); }
       case 'rowrange': { const a = offRow(node.a, node.absA), b = offRow(node.b, node.absB); return new Range(Math.min(a, b), 1, Math.max(a, b), COLS); }
-      case 'un': { const v = ev(node.x); if (node.op === '+') return v; return -toNum(v); }   // unary plus is a no-op in Excel: text stays text
-      case 'pct': return toNum(ev(node.x)) / 100;
+      case 'un': { const v = ev(node.x); if (node.op === '+') return v; if (isMulti(v)) return broadcast([v], x => -toNum(x)); return -toNum(v); }   // unary plus is a no-op in Excel: text stays text
+      case 'pct': { const v = ev(node.x); if (isMulti(v)) return broadcast([v], x => toNum(x) / 100); return toNum(v) / 100; }
       case 'bin': {
         // a left-associative chain (=1+1+1+…, 4,096 terms in an 8,192-char formula) folds iteratively, never one recursion per term
         const ops = [], rights = [];
@@ -918,7 +1154,13 @@ export function evalFormula(expr, ctx = {}) {
 
   try {
     let v = ev(ast);
-    if (isRange(v)) v = cellVal(v.cell(0));   // a multi-cell result spills in Excel 365; the formula cell shows its top-left value
+    if (isMulti(v)) {   // a multi-cell result spills (Excel 365): the sheet writes the block through ctx.onSpill; the formula cell shows its top-left value
+      if (ctx.onSpill) { const g = grid(v); const rows = []; for (let r = 0; r < g.rows; r++) { const row = []; for (let c = 0; c < g.cols; c++) row.push(g.raw(r * g.cols + c)); rows.push(row); } ctx.onSpill(rows); }
+      v = isArr(v) ? v.data[0] : cellVal(v.cell(0));
+      if (v instanceof FxError) throw v;
+    }
+    if (isArr(v)) v = deref(v);
+    if (isRange(v)) v = cellVal(v.cell(0));
     if (v === null || v === undefined) return 0;
     if (typeof v === 'number') { if (!isFinite(v)) return '#NUM!'; return Object.is(v, -0) ? 0 : v; }
     if (typeof v === 'string' && v.length > MAX_TEXT) return '#VALUE!';
@@ -937,11 +1179,13 @@ export function evalFormula(expr, ctx = {}) {
 /** Every function the evaluator computes (formula.test.js keeps this list and callFn in step). */
 export const FUNCTION_NAMES = ['ABS', 'AND', 'AVERAGE', 'AVERAGEIF', 'AVERAGEIFS', 'CHOOSE', 'COLUMN', 'COLUMNS', 'CONCAT', 'CONCATENATE', 'COUNT', 'COUNTA',
   'COUNTBLANK', 'COUNTIF', 'COUNTIFS', 'DATE', 'DAY', 'DAYS', 'EDATE', 'EOMONTH', 'EXACT', 'EXP', 'FALSE', 'FIND', 'FV', 'HLOOKUP', 'IF', 'IFERROR', 'IFNA',
-  'IFS', 'INDEX', 'INT', 'IRR', 'ISBLANK', 'ISERR', 'ISERROR', 'ISLOGICAL', 'ISNA', 'ISNONTEXT', 'ISNUMBER', 'ISTEXT', 'LARGE', 'LEFT', 'LEN', 'LN', 'LOG',
-  'LOG10', 'LOWER', 'MATCH', 'MAX', 'MAXIFS', 'MEDIAN', 'MID', 'MIN', 'MINIFS', 'MOD', 'MONTH', 'N', 'NA', 'NOT', 'NPV', 'OFFSET', 'OR', 'PI', 'PMT',
-  'POWER', 'PRODUCT', 'PROPER', 'PV', 'RAND', 'RANK', 'RANK.EQ', 'REPT', 'RIGHT', 'ROUND', 'ROUNDDOWN', 'ROUNDUP', 'ROW', 'ROWS', 'SEARCH', 'SIGN',
+  'HYPERLINK', 'IFS', 'INDEX', 'INT', 'IRR', 'ISBLANK', 'ISERR', 'ISERROR', 'ISFORMULA', 'ISLOGICAL', 'ISNA', 'ISNONTEXT', 'ISNUMBER', 'ISTEXT', 'LARGE', 'LEFT', 'LEN', 'LN', 'LOG',
+  'LOG10', 'LOWER', 'MATCH', 'MAX', 'MAXIFS', 'MEDIAN', 'MID', 'MIN', 'MINIFS', 'MOD', 'MONTH', 'N', 'NA', 'NOT', 'NPV', 'OFFSET', 'OR', 'PERCENTILE', 'PERCENTILE.INC', 'PI', 'PMT',
+  'POWER', 'PRODUCT', 'PROPER', 'PV', 'QUARTILE', 'QUARTILE.INC', 'RAND', 'RANK', 'RANK.EQ', 'REPT', 'RIGHT', 'ROUND', 'ROUNDDOWN', 'ROUNDUP', 'ROW', 'ROWS', 'RRI', 'SEARCH', 'SIGN',
   'SMALL', 'SQRT', 'SUBSTITUTE', 'SUM', 'SUMIF', 'SUMIFS', 'SUMPRODUCT', 'SWITCH', 'T', 'TEXT', 'TEXTJOIN', 'TODAY', 'TRIM', 'TRUE', 'TRUNC', 'UPPER',
-  'VALUE', 'VLOOKUP', 'WEEKDAY', 'XLOOKUP', 'XOR', 'YEAR', 'YEARFRAC'];
+  'VALUE', 'VLOOKUP', 'WEEKDAY', 'XLOOKUP', 'XOR', 'YEAR', 'YEARFRAC',
+  'FILTER', 'ISFORMULA', 'PERCENTILE', 'PERCENTILE.INC', 'QUARTILE', 'QUARTILE.INC', 'REPLACE', 'RRI', 'SEQUENCE', 'SORT', 'TRANSPOSE', 'UNIQUE', 'XMATCH',
+  'NETWORKDAYS.INTL', 'DATEDIF', 'RATE', 'NPER', 'ADDRESS', 'GETPIVOTDATA'];
 /**
  * The functions Formula AutoComplete lists (M83): desktop Excel's catalogue, so =AV offers AVEDEV
  * first as Excel's list does; the evaluator's own set plus the common ones it does not compute.
@@ -957,6 +1201,85 @@ export const AUTOCOMPLETE_FUNCTIONS = [...new Set(FUNCTION_NAMES.concat(['ACOS',
 
 /** True when text is a formula that parses. */
 export function parses(expr) { try { parseFormula(expr); return true; } catch (e) { return false; } }
+
+/* ============================================================================
+   EVALUATE FORMULA (Formulas › Evaluate Formula, Alt M V) — a stepper over the AST
+   ============================================================================ */
+/** A value as formula text: 6, "ab", TRUE, #N/A, or {…} for an array (its first cells). */
+export function valueText(v) {
+  if (v === null || v === undefined) return '0';
+  if (typeof v === 'number') return numToText(v);
+  if (typeof v === 'boolean') return v ? 'TRUE' : 'FALSE';
+  if (isArr(v)) { const rows = v.toRows().slice(0, 3).map(r => r.slice(0, 5).map(valueText).join(',')); return '{' + rows.join(';') + (v.rows > 3 || v.cols > 5 ? ';…' : '') + '}'; }
+  if (isErrVal(v)) return v;
+  return '"' + String(v).replace(/"/g, '""') + '"';
+}
+/** The text of an AST, as the formula bar would show it (references upper-case, sheet names quoted when needed). `mark` wraps one node in \u0001…\u0002 so the caller can find its span. */
+export function unparseAst(node, mark) {
+  const sheetTxt = n => n ? (/^[A-Z_][A-Z0-9_.]*(:[A-Z_][A-Z0-9_.]*)?$/i.test(n) ? n : "'" + n.replace(/'/g, "''") + "'") + '!' : '';
+  const u = n => {
+    const t = (() => {
+      switch (n.k) {
+        case 'num': return numToText(n.v);
+        case 'str': return '"' + n.v.replace(/"/g, '""') + '"';
+        case 'bool': return n.v ? 'TRUE' : 'FALSE';
+        case 'err': return n.v;
+        case 'val': return valueText(n.v);
+        case 'name': return n.v;
+        case 'ref': return sheetTxt(n.sheet) + n.ref + (n.spill ? '#' : '');
+        case 'range': return sheetTxt(n.sheet) + n.a + ':' + n.b;
+        case 'colrange': return (n.absA ? '$' : '') + n.a + ':' + (n.absB ? '$' : '') + n.b;
+        case 'rowrange': return (n.absA ? '$' : '') + n.a + ':' + (n.absB ? '$' : '') + n.b;
+        case 'paren': return '(' + u(n.x) + ')';
+        case 'un': return n.op + u(n.x);
+        case 'pct': return u(n.x) + '%';
+        case 'bin': return u(n.l) + n.op + u(n.r);
+        case 'fn': return n.name + '(' + n.args.map(a => a === null ? '' : u(a)).join(',') + ')';
+        default: return '';
+      }
+    })();
+    return n === mark ? '\u0001' + t + '\u0002' : t;
+  };
+  return u(node);
+}
+const LEAF = new Set(['num', 'str', 'bool', 'err', 'val', 'range', 'colrange', 'rowrange', 'name']);
+/** The next node Excel's Evaluate Formula underlines: the first unevaluated piece in evaluation order (arguments left to right, innermost first); null when only a value is left. */
+function nextStep(node) {
+  if (LEAF.has(node.k)) return null;
+  if (node.k === 'ref') return node;   // a cell reference is the first thing shown as its value
+  const kids = node.k === 'fn' ? node.args.filter(a => a !== null) : node.k === 'bin' ? [node.l, node.r] : [node.x];
+  for (const kid of kids) { const n = nextStep(kid); if (n) return n; }
+  return node.k === 'paren' ? null : node;   // brackets vanish once their inside is a value
+}
+function withoutParens(node) {   // (6) reads 6: a bracket around a value is dropped in the shown text
+  if (node.k === 'paren' && LEAF.has(node.x.k)) return node.x;
+  if (node.k === 'fn') node.args = node.args.map(a => a === null ? null : withoutParens(a));
+  else if (node.k === 'bin') { node.l = withoutParens(node.l); node.r = withoutParens(node.r); }
+  else if (node.k === 'paren' || node.k === 'un' || node.k === 'pct') node.x = withoutParens(node.x);
+  return node;
+}
+/**
+ * Evaluate Formula, as a stepper: `text` is the formula so far with the next piece to evaluate
+ * between \u0001 and \u0002 (none once only the value is left); `step()` replaces that piece by its
+ * value (Evaluate); `done` when nothing is left to evaluate. ctx is the sheet's evalCtx (with cell).
+ */
+export function evaluateStepper(formula, ctx) {
+  let ast = withoutParens(parseFormula(formula));
+  const st = {
+    get done() { return nextStep(ast) === null; },
+    get text() { const n = nextStep(ast); return '=' + unparseAst(ast, n); },
+    get value() { const n = nextStep(ast); return n ? undefined : evalFormula(ast, ctx); },
+    step() {
+      const n = nextStep(ast); if (!n) return false;
+      const sub = { k: 'paren', x: n };   // evaluate the piece on its own
+      let rows = null; const v = evalFormula(sub, { ...ctx, onSpill: r => { rows = r; } });   // an array result stays an array for the piece around it
+      n.k = 'val'; n.v = rows ? Arr.of(rows) : v; for (const key of ['args', 'l', 'r', 'x', 'name', 'ref', 'op']) delete n[key];
+      ast = withoutParens(ast);
+      return true;
+    },
+  };
+  return st;
+}
 
 // whole-column / whole-row corners as the tokenizer emits them: name A / $A, integer num 1 / $1
 const isColTok = t => !!t && t.t === 'name' && /^\$?[A-Z]{1,3}$/.test(t.v);
@@ -1047,7 +1370,7 @@ export function translateFormula(f, dr, dc, wrap) {
     if (isColonTok(n1) && t.t === 'ref' && n2 && n2.t === 'ref') { rep = pair(shiftRef(t.v), shiftRef(n2.v)); if (t.sheetTxt && rep !== '#REF!') rep = t.sheetTxt + rep; end = n2.end; i += 2; }
     else if (isColonTok(n1) && isColTok(t) && isColTok(n2)) { rep = pair(shiftCol(t), shiftCol(n2)); end = n2.end; i += 2; }
     else if (isColonTok(n1) && isRowTok(t) && isRowTok(n2)) { rep = pair(shiftRow(t), shiftRow(n2)); end = n2.end; i += 2; }
-    else if (t.t === 'ref') { rep = shiftRef(t.v); if (rep === null) rep = '#REF!'; else if (t.sheetTxt) rep = t.sheetTxt + rep; }
+    else if (t.t === 'ref') { rep = shiftRef(t.v); if (rep === null) rep = '#REF!'; else { if (t.sheetTxt) rep = t.sheetTxt + rep; if (t.spill) rep += '#'; } }
     if (rep !== null) { out += body.slice(last, t.pos) + rep; last = end; }
   }
   out += body.slice(last);
@@ -1078,7 +1401,7 @@ export function transposeFormula(f, sr, sc, tr, tc) {
     const t = toks[i], n1 = toks[i + 1], n2 = toks[i + 2];
     let rep = null, end = t.end;
     if (isColonTok(n1) && t.t === 'ref' && n2 && n2.t === 'ref') { const a = turn(t.v), b = turn(n2.v); rep = a === null || b === null ? '#REF!' : (t.sheetTxt || '') + a + ':' + b; end = n2.end; i += 2; }
-    else if (t.t === 'ref') { const a = turn(t.v); rep = a === null ? '#REF!' : (t.sheetTxt || '') + a; }
+    else if (t.t === 'ref') { const a = turn(t.v); rep = a === null ? '#REF!' : (t.sheetTxt || '') + a + (t.spill ? '#' : ''); }
     if (rep !== null) { out += body.slice(last, t.pos) + rep; last = end; }
   }
   out += body.slice(last);
@@ -1174,7 +1497,7 @@ export function adjustFormulaStructure(f, axis, at, delta) {
       const a = parts(t.v);
       const n = adj(axis === 'r' ? a.r : a.c);
       if (n === null) rep = '#REF!';
-      else { if (axis === 'r') a.r = n; else a.c = n; rep = build(a); }
+      else { if (axis === 'r') a.r = n; else a.c = n; rep = build(a) + (t.spill ? '#' : ''); }
       end = t.end;
     }
     out += body.slice(last, t.pos) + rep; last = end;
