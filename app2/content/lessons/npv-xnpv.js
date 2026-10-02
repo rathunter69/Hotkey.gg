@@ -6,7 +6,7 @@
 // inside NPV, discounted a year too far) and replaces it with XNPV on the dates, then puts XNPV to
 // work by slipping the sale a year (H26) and undoing it. Checks read the
 // figures the current inputs give and the shared liveness rule. The closer moves the rate to 15%.
-import { liveness } from '../../app/graders.js';
+import { livenessMemo as liveness } from '../../app/graders.js';
 import { CASE } from '../workbooks/clearcoat-databook.js';
 
 const sheetOf = (ses, name) => { const e = ses.sheets.find(x => x.name === name); return e ? e.sheet : null; };

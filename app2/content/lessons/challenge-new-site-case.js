@@ -5,7 +5,7 @@
 // twelve rows of the schedule. Every check reads the figure the seeded inputs give and the shared
 // liveness rule, so any legitimate route passes; the workload never moves across seeds.
 import { stateOf } from '../workbooks/clearcoat-databook.js';
-import { liveness } from '../../app/graders.js';
+import { livenessMemo as liveness } from '../../app/graders.js';
 import { parsFrom } from '../../app/pars.js';
 
 const sheetOf = (ses, name) => { const e = ses.sheets.find(x => x.name === name); return e ? e.sheet : null; };

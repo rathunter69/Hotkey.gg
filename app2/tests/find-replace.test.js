@@ -72,6 +72,22 @@ test('replaceAll touches formulas, counts cells, and is case-insensitive', () =>
   assert.equal(S.replaceAll('nope', 'x'), 0);
 });
 
+test('Replace All with a range selected stays inside the selection, as Excel does; one cell selected means the whole sheet', () => {
+  const s = fresh(); const S = s.sheet;
+  S.select('C1:C2');
+  s.run('Ctrl+H "Q1" Tab "Q2" Alt+A Escape');
+  assert.equal(S.value('C1'), 'Q2 total'); assert.equal(S.value('C2'), 'Q2 target');
+  S.select('A3:A5');
+  s.run('Ctrl+H "Sales" Tab "Revenue" Alt+A');
+  assert.equal(s.note, FIND_NONE_NOTE, 'nothing inside A3:A5 matches');
+  s.run('Escape');
+  assert.equal(S.value('A1'), 'Weekly Sales Report', 'A1 is outside the selection and keeps its text');
+  S.goTo(1, 1);
+  s.run('Ctrl+H "Sales" Tab "Revenue" Alt+A Escape');
+  assert.equal(S.value('A1'), 'Weekly Revenue Report', 'a single cell: the whole sheet');
+  assert.equal(S.value('D1'), 'Revenue team');
+});
+
 test('the ribbon routes: Alt H F D F opens Find, Alt H F D R opens Replace on the menu path', () => {
   const s = fresh();
   s.run('Alt H F D R');

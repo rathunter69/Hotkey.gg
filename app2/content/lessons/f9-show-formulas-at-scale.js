@@ -7,7 +7,7 @@
 // =C18 like its neighbours; then turns formulas off. Checks read the key log for the F9 presses
 // (every press is Escaped, so the formula stays), the selection Go To Special leaves, and the
 // fixed cells against the export and the site counts.
-import { liveness } from '../../app/graders.js';
+import { livenessMemo as liveness } from '../../app/graders.js';
 
 const sheetOf = (ses, name) => { const e = ses.sheets.find(x => x.name === name); return e ? e.sheet : null; };
 const summary = ses => sheetOf(ses, 'Summary');

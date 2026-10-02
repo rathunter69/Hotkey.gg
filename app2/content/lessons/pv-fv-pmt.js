@@ -6,7 +6,7 @@
 // answers its own question in C21; FV first proves the loan clears (zero), then compounds $1m in C22. Every check
 // reads the figure the current inputs give and the shared liveness rule, so any legitimate route
 // passes. The closer moves the rate to 6% and the payment and the interest fall.
-import { liveness } from '../../app/graders.js';
+import { livenessMemo as liveness } from '../../app/graders.js';
 
 const sheetOf = (ses, name) => { const e = ses.sheets.find(x => x.name === name); return e ? e.sheet : null; };
 const loans = ses => sheetOf(ses, 'Loans');

@@ -7,7 +7,7 @@
 // and points the six formulas at it with Replace inside the selection. Checks read the links the
 // session finds, the cells, and the shared liveness rule; the literal check reads parsed tokens on
 // E66:E71 only.
-import { liveness, noLiteralInFormula } from '../../app/graders.js';
+import { livenessMemo as liveness, noLiteralInFormula } from '../../app/graders.js';
 
 const sheetOf = (ses, name) => { const e = ses.sheets.find(x => x.name === name); return e ? e.sheet : null; };
 const summary = ses => sheetOf(ses, 'Summary');

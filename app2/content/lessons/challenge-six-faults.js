@@ -7,7 +7,7 @@
 // Checks read the values the export and the counts give, the links the session finds, parsed
 // tokens for the literal (on E66:E71 only) and the shared liveness rule.
 import { stateOf } from '../workbooks/clearcoat-databook.js';
-import { liveness, noLiteralInFormula } from '../../app/graders.js';
+import { livenessMemo as liveness, noLiteralInFormula } from '../../app/graders.js';
 import { formulaRefs } from '../../engine/formula.js';
 import { parsFrom } from '../../app/pars.js';
 
@@ -97,7 +97,7 @@ export default {
   graders: [
     ses => { if (!summary(ses)) return { ok: false, why: 'the Summary sheet is missing' };
       if (!airport(ses)) return { ok: false, why: 'D70 does not read the whole export: its ranges stop at row 93' };
-      if (!revenue(ses)) return { ok: false, why: 'a site’s retail revenue in D66:D71 is not a live SUMIF of the export' };
+      if (!revenue(ses)) return { ok: false, why: 'a site’s retail revenue in D66:D71 is not a live SUMIF of the export rows' };
       if (!counts(ses)) return { ok: false, why: 'a wash count in C66:C71 is not a live link to the site counts' };
       return { ok: true }; },
     ses => { if (!summary(ses)) return { ok: false, why: 'the Summary sheet is missing' };

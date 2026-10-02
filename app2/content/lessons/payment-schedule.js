@@ -7,7 +7,7 @@
 // IPMT and PPMT check the split, a running total of interest runs down J, and two checks at C167 and
 // C168 read zero. Checks recompute the schedule from the loan's inputs, and liveness is read on the
 // first and last rows. The closer moves the rate to 6% and the schedule still lands on zero.
-import { liveness } from '../../app/graders.js';
+import { livenessMemo as liveness } from '../../app/graders.js';
 
 const sheetOf = (ses, name) => { const e = ses.sheets.find(x => x.name === name); return e ? e.sheet : null; };
 const loans = ses => sheetOf(ses, 'Loans');

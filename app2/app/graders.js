@@ -361,6 +361,22 @@ export function liveness(sheet, ref) {
 }
 
 /**
+ * The liveness rule for goal checks that run on every key: the same verdict, remembered per sheet
+ * and cell for as long as the cell's formula and value stay the same, so a check that guards an
+ * earlier goal's cell does not clone and recalculate the sheet on each keystroke.
+ */
+const LIVE_MEMO = new WeakMap();
+export function livenessMemo(sheet, ref) {
+  const cell = sheet.cells[ref];
+  if (!isFormulaCell(cell)) return liveness(sheet, ref);
+  let memo = LIVE_MEMO.get(sheet); if (!memo) { memo = new Map(); LIVE_MEMO.set(sheet, memo); }
+  const f = cell.formula, v = sheet.value(ref), hit = memo.get(ref);
+  if (hit && hit.f === f && Object.is(hit.v, v)) return hit.res;
+  const res = liveness(sheet, ref); memo.set(ref, { f, v, res });
+  return res;
+}
+
+/**
  * Audit lessons: nothing changed beyond the allowed refs. `before` is the sheet's cells as
  * authored (a state's sheet.cells); `allowed` lists the refs the fixes may touch.
  */

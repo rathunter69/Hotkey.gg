@@ -7,7 +7,7 @@
 // Evaluate Formula, then fixes the five ranges at once with Replace inside the selection. The
 // Evaluate runs again on the fixed SUMIF. The other faults are the next lessons'. Checks read the arrows and the dialog the engine keeps, and
 // the fixed SUMIFs against the full export.
-import { liveness } from '../../app/graders.js';
+import { livenessMemo as liveness } from '../../app/graders.js';
 
 const sheetOf = (ses, name) => { const e = ses.sheets.find(x => x.name === name); return e ? e.sheet : null; };
 const summary = ses => sheetOf(ses, 'Summary');

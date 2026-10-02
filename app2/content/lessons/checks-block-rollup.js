@@ -6,7 +6,7 @@
 // (Formulas, Text only, over column C) and gives them one conditional format that turns CHECK red.
 // Checks read each cell's value and the shared liveness rule; the roll-up is graded by perturbing a
 // check (the count must move), and the conditional format by the rule the sheet keeps.
-import { liveness } from '../../app/graders.js';
+import { livenessMemo as liveness } from '../../app/graders.js';
 import { formulaRefs } from '../../engine/formula.js';
 
 const sheetOf = (ses, name) => { const e = ses.sheets.find(x => x.name === name); return e ? e.sheet : null; };

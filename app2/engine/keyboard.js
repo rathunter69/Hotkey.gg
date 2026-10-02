@@ -1046,7 +1046,8 @@ export class Session {
     if (key === 'Backspace') { d[d.focus] = d.focus === 'find' && d.findSel ? '' : d[d.focus].slice(0, -1); d.findSel = false; this.note = ''; return; }
     if (key.length === 1) { d[d.focus] = ((d.focus === 'find' && d.findSel ? '' : d[d.focus]) + key).slice(0, 64); if (d.focus === 'find') d.findSel = false; this.note = ''; return; }   // letters keep their typed case (dialogKey exempts 'find'); the last search, selected, is replaced by typing (Excel)
     if (key === 'ReplaceAll' && d.replace) {
-      const n = S.replaceAll(d.find, d.repl);
+      const rects = S.selRects(); const one = rects.length === 1 && rects[0].r1 === rects[0].r2 && rects[0].c1 === rects[0].c2;
+      const n = S.replaceAll(d.find, d.repl, one ? null : rects);   // a range selected: Replace All stays inside it, as Excel's does
       this.note = n ? 'All done. We made ' + n + ' replacement' + (n === 1 ? '' : 's') + '.' : FIND_NONE_NOTE;
     }
   }

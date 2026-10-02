@@ -1547,14 +1547,17 @@ export class Sheet {
   }
   /**
    * Replace every occurrence of `find` (case-insensitive, substring) in values and formulas with
-   * `repl`, across the whole sheet, in one undo step. Returns the number of cells changed.
+   * `repl`, in one undo step: across the whole sheet, or only inside `rects` (Excel limits Replace
+   * All to the selection when more than one cell is selected). Returns the number of cells changed.
    */
-  replaceAll(find, repl) {
+  replaceAll(find, repl, rects = null) {
     const t = String(find == null ? '' : find); if (!t) return 0;
     const rx = new RegExp(t.replace(/[.*+?^$()|[\]{}\\]/g, '\\$&'), 'gi');
     const to = String(repl == null ? '' : repl);
+    const inScope = k => { if (!rects) return true; const p = parseRef(k); return !!p && rects.some(q => p.r >= q.r1 && p.r <= q.r2 && p.c >= q.c1 && p.c <= q.c2); };
     const hits = [];
     for (const k in this.cells) {
+      if (!inScope(k)) continue;
       const cell = this.cells[k];
       if (cell.formula && rx.test(cell.formula)) hits.push(k);
       else if (typeof cell.value === 'string' && (rx.lastIndex = 0, rx.test(cell.value))) hits.push(k);

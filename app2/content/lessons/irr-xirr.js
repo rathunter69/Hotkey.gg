@@ -4,7 +4,7 @@
 // XIRR on the dates (C37) and puts it to work by slipping the sale a year (undone), then payback: cumulative cash across C38:H38, the fraction of the
 // crossing year across C39:G39 and the payback in C40. Checks read the figures the current flows
 // give and the shared liveness rule. The closer halves the sale value in H28.
-import { liveness } from '../../app/graders.js';
+import { livenessMemo as liveness } from '../../app/graders.js';
 import { CASE } from '../workbooks/clearcoat-databook.js';
 
 const sheetOf = (ses, name) => { const e = ses.sheets.find(x => x.name === name); return e ? e.sheet : null; };
