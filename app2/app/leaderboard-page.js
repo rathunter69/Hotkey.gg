@@ -107,7 +107,7 @@ export function mountBoard(el, { ref, seed = null, title, yours, dayLabel = '' }
     else {
       const model = boardModel(state.rows, { prevPlace: seenPlaces()[key] });
       if (model.mine) rememberPlace(key, model.mine.place);
-      facts = esc(dayLabel ? t('boards_day_runs', { day: dayLabel, n: model.count }) : t('boards_clean_runs', { n: model.count }));
+      facts = esc(dayLabel ? t(model.count === 1 ? 'boards_day_runs_one' : 'boards_day_runs', { day: dayLabel, n: model.count }) : t(model.count === 1 ? 'boards_clean_runs_one' : 'boards_clean_runs', { n: model.count }));
       table = model.rows.length ? boardTableHtml(model, { routeKeys }) : `<p class="panel-line">${esc(t('boards_empty'))}</p>`;
       if (!live) line = `<p class="panel-line">${esc(t('boards_signed_out'))}</p>`;
     }

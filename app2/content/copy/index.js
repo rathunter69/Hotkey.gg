@@ -4704,7 +4704,17 @@ export const COPY = {
   "rapid_how_2": "Every hit scores, and every fifth hit in a row scores more.",
   "rapid_how_3": "When the clock runs out, your hits and best combo are your score.",
   "challenges_intro": "Each module ends on a challenge: the whole module on a fresh file, against the clock.",
-  "challenges_passed": "{n} of {m} passed"
+  "challenges_passed": "{n} of {m} passed",
+  "boards_clean_runs_one": "One clean run",
+  "boards_day_runs_one": "{day}, one clean run",
+  "daily_today": "Today",
+  "daily_not_clean": "No clean run",
+  "daily_missed": "Not played",
+  "daily_week": "Your week",
+  "daily_week_played": "{n} of 7 days played clean",
+  "daily_keys": "The keys it drills",
+  "daily_rules": "One public board a day. Only a clean run posts a time: no help, no mouse.",
+  "save_line_boards": "A free account puts your Daily time on the public board next to everyone else's, and keeps your progress on any device."
  },
  "micro": {
   "enter-tab-direction": {

@@ -24,6 +24,7 @@ import { siteCopy } from '../content/copy/apply.js';
 import { esc, fill, fmtClock, fmtLength, numberWord, prettyDay } from '../ui/components/format.js';
 import { panelHtml, tableHtml, buttonHtml, headerBlockHtml, wireRows, wireTabs } from '../ui/components/table.js';
 import { routeKeys, keysRowHtml, chapterCardsHtml, drillTileHtml } from '../ui/components/path.js';
+import { saveNudgeHtml, wireSaveNudge } from '../ui/components/nudge.js';
 import { tierMarksHtml } from '../ui/components/marks.js';
 import { paywallHtml } from '../ui/components/paywall.js';
 import { auth } from './auth.js';
@@ -212,7 +213,20 @@ function dailyPage(el, ctx) {
   const day = dayOf(); const pick = dailyFor(day); const drill = DRILLS_BY_ID[pick.drillId] || null;
   const chapterN = drill ? (COURSE.chapters.find(c => c.id === drill.chapter) || {}).n : 1;
   const proNote = drill && drill.access === 'paid' && !entitlement.entitled() ? `<p class="panel-line">${esc(t('daily_pro_note', { n: chapterN }))}</p>` : '';
-  el.innerHTML = `${headerBlockHtml({ title: t('daily_title'), facts: esc(prettyDay(day)), line: esc(t('daily_line', { drill: drill ? drill.title : '' })), button: buttonHtml({ label: t('daily_play'), key: 'Enter', href: '#/daily', primary: true, id: 'playDaily' }), cls: 'hdr-daily' })}${proNote}<div class="board-host"></div>`;
+  // the week under the board: each day's drill, the keys it drilled and your time, so the page is a record and not one button
+  const mine = store.attempts({ kind: 'daily' });
+  const week = Array.from({ length: 7 }, (_, i) => { const d = new Date(day + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() - i); return d.toISOString().slice(0, 10); });
+  const weekRows = week.map(d => {
+    const pk = dailyFor(d); const dr = DRILLS_BY_ID[pk.drillId] || null; const e = CATALOG.find(x => x.id === pk.drillId);
+    const runs = mine.filter(a => a.day === d && a.secs != null); const clean = runs.filter(a => a.clean).sort((a, b) => a.secs - b.secs)[0];
+    const res = clean ? `<span class="dt-time">${esc(fmtClock(clean.secs, true))}</span>${tierMarksHtml(clean.tier || 'none')}` : `<span class="dt-new">${esc(d === day ? t('daily_today') : runs.length ? t('daily_not_clean') : t('daily_missed'))}</span>`;
+    return `<div class="wk-row${d === day ? ' today' : ''}${clean ? ' played' : ''}"><span class="wk-day">${esc(prettyDay(d))}</span><span class="row-name">${esc(dr ? dr.title : '')}</span>${keysRowHtml(routeKeys(e && e.route && e.route.solution, 4), { max: 3 })}<span class="wk-res">${res}</span></div>`;
+  }).join('');
+  const keys = routeKeys(CATALOG.find(x => x.id === pick.drillId) ? CATALOG.find(x => x.id === pick.drillId).route.solution : '', 8);
+  const weekPanel = panelHtml({ heading: esc(t('daily_week')), facts: esc(t('daily_week_played', { n: week.filter(d => mine.some(a => a.day === d && a.clean)).length })), body: `<div class="wk-list">${weekRows}</div>`, cls: 'daily-week', stretch: true });
+  const keysPanel = panelHtml({ heading: esc(t('daily_keys')), body: `<div class="learn-keys">${keysRowHtml(keys, { max: 8 })}</div><p class="panel-line ink-2">${esc(t('daily_rules'))}</p>`, cls: 'daily-keys' });
+  el.innerHTML = `${headerBlockHtml({ title: t('daily_title'), facts: esc(prettyDay(day)), line: esc(t('daily_line', { drill: drill ? drill.title : '' })), button: buttonHtml({ label: t('daily_play'), key: 'Enter', href: '#/daily', primary: true, id: 'playDaily' }), cls: 'hdr-daily' })}${proNote}<div class="board-host"></div><div class="pg-two"><div class="pg-main">${weekPanel}</div><div class="pg-side">${saveNudgeHtml({ line: t('save_line_boards') })}${keysPanel}</div></div>`;
+  wireSaveNudge(el);
   const board = mountBoard(el.querySelector('.board-host'), { ref: pick.drillId, seed: pick.seed, title: drill ? drill.title : t('daily_title'), yours: t('boards_yours', { board: t('rail_daily').replace(/^The /, '') }), dayLabel: '' });
   if (ctx.keytips) ctx.keytips.register([{ id: 'play', label: t('daily_play'), el: el.querySelector('#playDaily') }]);
   setTimeout(() => { if (ctx.cursor) ctx.cursor.select(el.querySelector('.hdr'), { focus: false }); }, 0);

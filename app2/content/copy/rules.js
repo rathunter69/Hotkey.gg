@@ -11,6 +11,10 @@ export const RIBBON_WORDS = [
 
 export const SITE_KEYS = [
   // the interface match (2026-10-02)
+  'daily_today', 'daily_not_clean', 'daily_missed', 'daily_week', 'daily_week_played', 'daily_keys', 'daily_rules', 'save_line_boards',
+  // the interface match (2026-10-02)
+  'boards_clean_runs_one', 'boards_day_runs_one',
+  // the interface match (2026-10-02)
   'challenges_passed',
   // the interface match (2026-10-02)
   'challenges_intro',
