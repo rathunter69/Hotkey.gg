@@ -1463,7 +1463,11 @@ export class Sheet {
    * clear operations act on), active = the first key. False when nothing qualifies — Excel says
    * "No cells were found." and the selection stays.
    */
-  selectSpecial(kind) {
+  /**
+   * `types` (Constants and Formulas only) narrows by what the cell holds, as the dialog's four boxes
+   * do: { numbers, text, logicals, errors }, each true unless unticked. Dates are numbers.
+   */
+  selectSpecial(kind, types = null) {
     let rg = this.selRange();
     if (!this.sel) rg = this.regionAround(this.active.r, this.active.c);
     const keys = [];
@@ -1488,7 +1492,12 @@ export class Sheet {
       const cell = this.get(rr, cc);
       const isFormula = !!cell.formula;
       const isBlank = !isFormula && (cell.value === null || cell.value === '');
-      const ok = kind === 'blanks' ? isBlank : kind === 'formulas' ? isFormula : kind === 'constants' ? (!isFormula && !isBlank) : kind === 'notes' ? !!cell.cmt : false;
+      let ok = kind === 'blanks' ? isBlank : kind === 'formulas' ? isFormula : kind === 'constants' ? (!isFormula && !isBlank) : kind === 'notes' ? !!cell.cmt : false;
+      if (ok && types && (kind === 'constants' || kind === 'formulas')) {
+        const v = isFormula ? this.value(refKey(rr, cc)) : cell.value;
+        const t = typeof v === 'boolean' ? 'logicals' : typeof v === 'number' ? 'numbers' : isErrVal(v) ? 'errors' : 'text';
+        ok = types[t] !== false;
+      }
       if (ok) keys.push(refKey(rr, cc));
     }
     if (!keys.length) return false;

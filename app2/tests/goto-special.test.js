@@ -87,3 +87,18 @@ test('Ctrl+Enter fills every cell of the multi (the Excel blanks-fill pattern)',
   assert.equal(S.value('B6'), 0);
   assert.equal(S.value('B3'), 1200, 'filled cells untouched');
 });
+
+test('Go To Special narrows Constants and Formulas by type: Numbers U, Text X, Logicals G, Errors E', () => {
+  const s = new Session(new Sheet({ rows: 20, cols: 8, cells: {
+    B2: { value: 10 }, B3: { value: '20' }, B4: { value: true }, B5: { value: '#N/A' }, B6: { value: 15 }, B7: { formula: '=B2&"x"' }, B8: { formula: '=B2*2' },
+  } }));
+  const S = s.sheet;
+  S.select('B2:B8'); assert.equal(S.selectSpecial('constants', { numbers: false, text: true, logicals: false, errors: false }), true);
+  assert.deepEqual(S.multi, ['B3'], 'a number stored as text is Text');
+  S.select('B2:B8'); assert.equal(S.selectSpecial('formulas', { numbers: true, text: false, logicals: false, errors: false }), true);
+  assert.deepEqual(S.multi, ['B8']);
+  S.select('B2:B6'); s.run('Alt H F D S O U G E Enter');
+  assert.equal(S.selectionText(), 'B3', 'the dialog route: Constants with only Text ticked');
+  S.select('B2:B6'); s.run('Alt H F D S O Enter');
+  assert.equal(S.selectionText(), 'B2,B3,B4,B5,B6', 'every box is ticked when the dialog opens');
+});

@@ -412,6 +412,9 @@ export class RibbonView {
       R(d.pick === 'blanks', 'letter:K', 'Blan<u>k</u>s', 'K') +
       R(d.pick === 'constants', 'letter:O', 'C<u>o</u>nstants', 'O') +
       R(d.pick === 'formulas', 'letter:F', '<u>F</u>ormulas', 'F') +
+      (() => { const on = d.pick === 'constants' || d.pick === 'formulas', t = d.types || {}, C = RibbonView.check;
+        return [['numbers', 'U', 'N<u>u</u>mbers'], ['text', 'X', 'Te<u>x</u>t'], ['logicals', 'G', 'Lo<u>g</u>icals'], ['errors', 'E', '<u>E</u>rrors']]
+          .map(([k, key, label]) => C(t[k] !== false, on ? 'letter:' + key : '', label, key, { cls: 'ind' })).join(''); })() +
       R(d.pick === 'notes', 'letter:N', '<u>N</u>otes', 'N') +
       (ss.note ? `<div class="wb-err">${esc(ss.note)}</div>` : '<div class="od-caplbl">within the selection (the region around the active cell when nothing is selected) · ↵ OK · esc cancel</div>');
   }
@@ -1091,7 +1094,7 @@ export class RibbonView {
       el.innerHTML = '<span class="path">' + (ss.dlg && ss.dlg.replace ? 'replace' : 'find') + ' →</span><span class="opt" style="font-family:var(--mono)">' + esc(ss.dlg ? (ss.dlg.focus === 'repl' ? ss.dlg.repl : ss.dlg.find) || '…' : '…') + '</span><span class="opt">↵ find next' + (ss.dlg && ss.dlg.replace ? ' · alt+a replace all · tab switches fields' : '') + ' · esc close</span>';
       return; }
     if (ss.dialog === 'gotospecial') { el.className = 'ribbon show';
-      el.innerHTML = '<span class="path">go to special →</span><span class="opt" data-act="letter:K"><k>k</k>Blanks</span><span class="opt" data-act="letter:O"><k>o</k>Constants</span><span class="opt" data-act="letter:F"><k>f</k>Formulas</span><span class="opt">↵ OK · esc cancel</span>';
+      el.innerHTML = '<span class="path">go to special →</span><span class="opt" data-act="letter:K"><k>k</k>Blanks</span><span class="opt" data-act="letter:O"><k>o</k>Constants</span><span class="opt" data-act="letter:F"><k>f</k>Formulas</span><span class="opt">u x g e narrow by type · ↵ OK · esc cancel</span>';
       return; }
     if (ss.dialog === 'goto') { el.className = 'ribbon show';   // the floating card carries the field
       el.innerHTML = '<span class="path">go to →</span><span class="opt" style="font-family:var(--mono)">' + esc(ss.dialogBuf || '…') + '</span><span class="opt">type a cell or range · ↵ go · esc cancel</span>';
