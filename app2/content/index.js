@@ -209,6 +209,13 @@ import terminal_value from './lessons/terminal-value.js';
 import discounting_mid_year from './lessons/discounting-mid-year.js';
 import dcf_sensitivity from './lessons/dcf-sensitivity.js';
 import challenge_dcf from './lessons/challenge-dcf.js';
+// Chapter 5 · Finance and Accounting (Run R5): 5.7 Model speed, 5.8 Project and assessment
+import revenue_build_in_three from './lessons/revenue-build-in-three.js';
+import fill_and_format_block from './lessons/fill-and-format-block.js';
+import keyboard_only_linking from './lessons/keyboard-only-linking.js';
+import challenge_model_speed from './lessons/challenge-model-speed.js';
+import ch5_project from './lessons/ch5-project.js';
+import ch5_assessment from './lessons/ch5-assessment.js';
 
 export const CHAPTERS = [
   {
@@ -338,8 +345,8 @@ export const CHAPTERS = [
       { name: 'Linking the statements', blurb: 'The income statement from the schedules, the cash flow statement by the indirect method, the balance sheet with cash as the plug that isn’t a plug, the cash sweep and the revolver, and the order to check when it doesn’t balance.' },
       { name: 'Auditing a model', blurb: 'Tie-outs and cross-foots; error flags and the checks summary; the model-wide sweep for hardcodes and pattern breaks; stress tests.' },
       { name: 'DCF', blurb: 'What a DCF is; unlevered free cash flow; the WACC block; terminal value both ways; discounting and the mid-year convention; sensitivity tables.' },
-      { name: 'Model speed', blurb: 'The revenue build in three minutes, a block filled and formatted in one pass, the statements linked by keyboard.' },
-      { name: 'Project and assessment', blurb: 'The operating model with its DCF page, then one schedule and the links from it against the clock.' },
+      { name: 'Model speed', blurb: 'The chapter’s three benchmarks with the keys shown once: the revenue build in three minutes, a block filled and formatted in one pass, the cash flow statement linked by keyboard alone.' },
+      { name: 'Project and assessment', blurb: 'Build the operating model with its DCF page from an empty shell, then one schedule and its links again on the clock; the assessment is the test-out.' },
     ],
     lessons: [
       the_income_statement, accrual_and_cash, the_cash_flow_statement, the_balance_sheet, how_the_statements_link, one_week_three_statements, read_like_a_buyer, challenge_one_site_month, model_architecture, timeline_flags_counters, fill_patterns, checks_sheet_day_one, populate_from_data, drivers_block, challenge_model_shell,
@@ -347,6 +354,8 @@ export const CHAPTERS = [
       is_from_schedules, cf_indirect, bs_cash_not_a_plug, cash_sweep_revolver, when_it_doesnt_balance, challenge_linked_statements,
       tie_outs_cross_foots, error_flags_checks_summary, model_wide_sweep, stress_tests, challenge_eight_faults,
       what_a_dcf_is, unlevered_free_cash_flow, wacc_block, terminal_value, discounting_mid_year, dcf_sensitivity, challenge_dcf,
+      revenue_build_in_three, fill_and_format_block, keyboard_only_linking, challenge_model_speed,
+      ch5_project, ch5_assessment,
     ],
   },
 ];

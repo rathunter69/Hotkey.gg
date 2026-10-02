@@ -40,7 +40,7 @@ export default {
   conventions: ['F1', 'C3'],
   teaches: ['tie-out', 'cross-foot', 'limit-check'],
   uses: ['check-cell', 'go-to', 'sheet-reference', 'ctrl-enter-fill', 'shift-arrow', 'arrow-keys', 'ctrl-arrow', 'countif-countifs', 'round-function', 'if-function', 'sum-family', 'rollup-flag'],
-  prerequisites: ['challenge-linked-statements', 'ch4-assessment'],
+  prerequisites: ['challenge-linked-statements'],
   brief: 'A tie-out proves a figure in two places is the same figure; a cross-foot proves a block adds both ways, down the lines and across the years. Checks already ties the balance sheet, cash, debt, PP&E and revenue. Fill the three rows still marked pending, add two limit checks that count balances gone below zero, and read the flag on the Cover. The key is `=`.',
   goals: [
     { id: 'equity-roll', teach: 'Equity rolls like every schedule: opening, plus net income, less distributions, is closing. Written as a live difference wrapped in ROUND, it reads zero in every year the roll holds.',

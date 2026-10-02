@@ -12,6 +12,14 @@ import formula_sprint from './drills/formula-sprint.js';
 import combine_two_tabs from './drills/combine-two-tabs.js';
 import before_you_send from './drills/before-you-send.js';
 import weekly_sales_report from './drills/weekly-sales-report.js';
+import ch5_statement_link from './drills/ch5-statement-link.js';
+import ch5_schedule_fill from './drills/ch5-schedule-fill.js';
+import ch5_balance_it from './drills/ch5-balance-it.js';
+import ch5_discount_it from './drills/ch5-discount-it.js';
+import ch5_sweep from './drills/ch5-sweep.js';
+import ch5_checks from './drills/ch5-checks.js';
+import ch5_revenue_build from './drills/ch5-revenue-build.js';
+import puzzle_ch5 from './drills/puzzle-ch5.js';
 import { LESSONS } from './index.js';
 
 /**
@@ -30,6 +38,15 @@ export const DRILLS = [
   combine_two_tabs,
   before_you_send,
   weekly_sales_report,
+  // Chapter 5 (screenplay 6.2): the planned set on the operating model, the benchmark and the puzzle
+  ch5_statement_link,
+  ch5_schedule_fill,
+  ch5_balance_it,
+  ch5_discount_it,
+  ch5_sweep,
+  ch5_checks,
+  ch5_revenue_build,
+  puzzle_ch5,
 ];
 
 /**

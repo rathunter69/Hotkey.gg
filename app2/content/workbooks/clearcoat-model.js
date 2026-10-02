@@ -1122,13 +1122,13 @@ const B535 = derive(B536, s => { strip(s, 'Schedules', SCH.debt, SCH_COLS); stri
 const B534 = derive(B535, s => { strip(s, 'Schedules', SCH.ppe, SCH_COLS); });
 const B533 = derive(B534, s => { strip(s, 'Schedules', SCH.wc, SCH_COLS); });
 const B532 = derive(B533, s => { strip(s, 'Schedules', SCH.costs, SCH_COLS); });
-/** Clear the figures of keyed rows over `cols` and keep each cell's format: what a challenge leaves blank. */
-function blank(state, name, keys, cols = PROJ_COLS) {
+/** Empty keyed rows' figures but keep their look (the shelling rule): formula and value go, the formats stay; `drop` names format fields to take as well. */
+function blank(state, name, keys, cols = COLS, drop = []) {
   const cells = cellsOf(state, name);
   for (const key of keys) for (const col of cols) {
-    const ref = col + rowOf(name, key); const c = cells[ref]; if (!c) continue;
-    const { formula, value, ...fmt } = c;
-    if (Object.keys(fmt).length) cells[ref] = fmt; else delete cells[ref];
+    const k = col + rowOf(name, key); const c = cells[k]; if (!c) continue;
+    delete c.formula; delete c.value; for (const f of drop) delete c[f];
+    if (!Object.keys(c).length) delete cells[k];
   }
 }
 /**
@@ -1140,7 +1140,7 @@ export const CHALLENGE_BLANKS = {
   'challenge-schedules': { Schedules: ['closeSites', 'retailRev', 'clubRev', 'labor', 'rent', 'rec', 'pay', 'wf1', 'ppeClose', 'termInt'] },
   'challenge-linked-statements': { IS: ['dep', 'int', 'tax'], CF: ['dep', 'capex'], BS: ['cash', 'ppe', 'check'], Schedules: ['revDrawn', 'revRepaid'] },
 };
-const blankAll = (s, id) => { for (const [name, keys] of Object.entries(CHALLENGE_BLANKS[id])) blank(s, name, keys); };
+const blankAll = (s, id) => { for (const [name, keys] of Object.entries(CHALLENGE_BLANKS[id])) blank(s, name, keys, PROJ_COLS); };
 // B531 is before 5.3.1 (defined above); B53C: every schedule built (the revolver waits for 5.4.4), ten projected lines blank
 const B53C = derive(B541, s => blankAll(s, 'challenge-schedules'));
 
@@ -1271,34 +1271,61 @@ const B56C = derive(B561, s => {
 
 /* ---------------- module 5.7: model speed (each starts from the finished model) ---------------- */
 
-const B571 = derive(DONE, s => { strip(s, 'Schedules', [...SCH.rollout, ...SCH.revenue]); });
-const FILL_BLOCK = [...span('Schedules', 'cos', 'em'), ...SCH.wc, ...span('Schedules', 'ppeOpen', 'impliedLife')];
-const B572 = derive(DONE, s => {
-  strip(s, 'Schedules', FILL_BLOCK, ['D', 'E', 'F', 'G', 'H', 'I', 'J']);
-  const cells = cellsOf(s, 'Schedules');
-  for (const key of FILL_BLOCK) { const c = cells['C' + rowOf('Schedules', key)]; if (!c) continue; delete c.fmtStyle; delete c.numFmt; delete c.decimals; delete c.bold; delete c.bt; delete c.bdbl; delete c.it; }
+const NUM_FMT = ['fmtStyle', 'numFmt', 'decimals'];
+/** 5.7.1: the rows whose first column keeps its formula (the history read through the flag) and waits to be filled right; the rows typed whole; the rows that lose the desk number format. */
+export const SPEED_REVENUE = {
+  fill: ['openSites', 'newSites', 'closures', 'closeSites', 'washes', 'ticket', 'tickGrowth', 'retailRev', 'clubRev'],
+  type: ['avgSites', 'members', 'rev'],
+  desk: ['openSites', 'newSites', 'closures', 'closeSites', 'washes'],
+};
+// B571: before 5.7.1, the revenue build cut back to each row's first column, three rows empty, the rollout and the washes without the desk number format
+const B571 = derive(DONE, s => {
+  strip(s, 'Schedules', SPEED_REVENUE.fill, COLS.slice(1));
+  blank(s, 'Schedules', SPEED_REVENUE.type);
+  for (const key of SPEED_REVENUE.desk) { const c = cellsOf(s, 'Schedules')['C' + rowOf('Schedules', key)]; NUM_FMT.forEach(f => delete c[f]); }
 });
-const B573 = derive(DONE, s => { strip(s, 'CF', allKeys('CF')); });
+/** 5.7.2: the forty-row block (cost build, working capital, PP&E; the two memo cells that live in C alone stay out), its plain lines, its totals and its ratio lines. */
+export const SPEED_BLOCK = {
+  fill: [...span('Schedules', 'cos', 'em'), ...span('Schedules', 'rec', 'wcCash'), ...span('Schedules', 'ppeOpen', 'capexToDep')],
+  plain: ['labor', 'rent', 'util', 'maint', 'card', 'mkt', 'ho', 'pay', 'def', 'chgRec', 'chgPay', 'chgDef', 'capexNew', 'capexMaint', 'dep'],
+  totals: ['siteCosts', 'contrib', 'ebitda', 'nwc', 'wcCash', 'capexTotal', 'ppeClose'],
+  ratios: ['cosShare', 'cm', 'em'],
+};
+// B572: before 5.7.2, the block holds its first column only: the plain lines without the desk number format, the totals without their top border, the ratios upright
+const B572 = derive(DONE, s => {
+  strip(s, 'Schedules', SPEED_BLOCK.fill, COLS.slice(1));
+  const cells = cellsOf(s, 'Schedules'), c = key => cells['C' + rowOf('Schedules', key)];
+  for (const key of SPEED_BLOCK.plain) NUM_FMT.forEach(f => delete c(key)[f]);
+  for (const key of SPEED_BLOCK.totals) delete c(key).bt;
+  for (const key of SPEED_BLOCK.ratios) delete c(key).it;
+});
+/** 5.7.3: the cash flow lines that are links (green), and the two cash lines that are arithmetic. */
+export const SPEED_LINKS = { links: ['ni', 'dep', 'chgRec', 'chgPay', 'chgDef', 'capex', 'termDrawn', 'termRepaid', 'ddDrawn', 'ddRepaid', 'rev'], calc: ['net', 'close'] };
+// B573: before 5.7.3, the cash flow statement's links, net change and closing cash empty (formats kept, the links not yet green); the totals and opening cash stand
+const B573 = derive(DONE, s => { blank(s, 'CF', SPEED_LINKS.links, COLS, ['fontColor']); blank(s, 'CF', SPEED_LINKS.calc); });
 
 /* ---------------- module 5.8: project and assessment ---------------- */
 
-// B5P: the project's shell: inputs, Data, the timeline, every other page empty labels
+// B5P: the project's shell. Inputs, Data and the Cover's switch and map stand; every formula on the
+// six model sheets is emptied (labels, the helper column, typed figures, titles and formats stay, as
+// the shelling rule has it); the Cover's flag is not linked yet and WACC is not named yet.
 const B5P = derive(DONE, s => {
-  delete s.watches;
-  for (const name of ['IS', 'CF', 'BS', 'Schedules', 'Checks', 'DCF']) stripFigures(s, name);
-  for (const name of ['IS', 'CF', 'BS', 'DCF']) setFormula(s, name, 'A1', `=Inputs!$C$${ROW.Inputs.company}&": ${{ IS: 'income statement', CF: 'cash flow statement', BS: 'balance sheet', DCF: 'DCF' }[name]}"`);
-  // the Cover keeps its title, the case switch and the case names (the live drivers block reads Case); the flag and the map are the project's to build
-  const cover = sheetOf(s, 'Cover'); const done = cellsOf(DONE, 'Cover');
-  const keep = ['A1', 'A2', 'B4', 'C4', 'D4', ...['case', 'casen', 'c1', 'c2', 'c3'].flatMap(k => ['B', 'C'].map(col => col + rowOf('Cover', k))), 'B' + (rowOf('Cover', 'c1') - 1)];
-  cover.cells = Object.fromEntries(keep.filter(k => done[k]).map(k => [k, clone(done[k])]));
-  setFormula(s, 'Cover', 'A1', `=Inputs!$C$${ROW.Inputs.company}&": operating model"`);
-  s.names = { Case: NAMES.Case, LastHistorical: NAMES.LastHistorical, Circ: NAMES.Circ };
-  pend(s, ['su']);
+  // the Watch Window keeps its two rows on the Cover (they read blank until the project links the flag)
+  for (const name of ['IS', 'CF', 'BS', 'Schedules', 'Checks', 'DCF']) {
+    const cells = cellsOf(s, name);
+    for (const k of Object.keys(cells)) {
+      const m = /^([C-Z])(\d+)$/.exec(k); const c = cells[k];
+      if (!m || +m[2] < 5 || !c.formula) continue;
+      delete c.formula; delete c.value;
+    }
+  }
+  blank(s, 'Cover', ['flag', 'diff'], ['C']);
+  delete s.names.WACC;
 });
-// B5A: the assessment: everything built except the debt schedule and its links
+// B5A: the assessment: everything built except the debt schedule and its links (their formats stay)
 const B5A = derive(DONE, s => {
-  strip(s, 'Schedules', [...SCH.debt, ...SCH.revolver]);
-  strip(s, 'IS', ['int']); strip(s, 'CF', ['termDrawn', 'termRepaid', 'ddDrawn', 'ddRepaid', 'rev']); strip(s, 'BS', ['term', 'dd', 'rev']);
+  blank(s, 'Schedules', [...SCH.debt, ...SCH.revolver]);
+  blank(s, 'IS', ['int']); blank(s, 'CF', ['termDrawn', 'termRepaid', 'ddDrawn', 'ddRepaid', 'rev']); blank(s, 'BS', ['term', 'dd', 'rev']);
 });
 
 const BUILDERS = {

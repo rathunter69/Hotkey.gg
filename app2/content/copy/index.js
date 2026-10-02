@@ -2319,6 +2319,78 @@ export const COPY = {
    "mac_note": "",
    "story_beat": ""
   },
+  "revenue-build-in-three": {
+   "id": "revenue-build-in-three",
+   "module": "model-speed",
+   "order": "5.7.1",
+   "title": "The revenue build in three minutes",
+   "brief": "Everything in this chapter you can now do; the question a desk asks is how fast. The revenue build on Schedules is cut back to each row’s FY24 column, and the job is to take it to a total that ties in three minutes: one formula a row filled right, anchors set with F4 as you type, the revenue check reading zero at the end. The keys are shown this once; in Practice the benchmark runs without them. The key is `F4`.",
+   "closing": "You built revenue in three minutes, and the revenue check held at zero as you finished. || Speed in a model comes from two habits more than from fast fingers: write a row’s formula once and fill it, and anchor as you type so the fill is right the first time. Best practice: read the check the moment a block is done, while you still remember what you changed.",
+   "wow": "You built revenue in three minutes, and the check reads zero.",
+   "convention_line": "Write once, fill right; Know the four anchor states",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "fill-and-format-block": {
+   "id": "fill-and-format-block",
+   "module": "model-speed",
+   "order": "5.7.2",
+   "title": "Fill and format a block in one pass",
+   "brief": "The cost build, working capital and PP&E on Schedules hold their FY24 column and nothing else: forty rows waiting to be filled and finished. Fill each block in one motion with Ctrl+R, then format by whole lines: the desk number format, the top border on every total, italic on the margins, each done once and repeated with F4. One pass, no cell touched twice. The key is `Ctrl+R`.",
+   "closing": "You filled and formatted forty rows without touching a cell twice. || Two presses filled the block and three formats finished it, each set once and repeated with F4. The habit scales: a schedule four times this size takes the same handful of moves. Best practice: format by line, never cell by cell, so a line can only ever look one way.",
+   "wow": "You filled and formatted forty rows without touching a cell twice.",
+   "convention_line": "Ctrl+D down, Ctrl+R across; A top border, never an all-borders grid",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "keyboard-only-linking": {
+   "id": "keyboard-only-linking",
+   "module": "model-speed",
+   "order": "5.7.3",
+   "title": "Link the cash flow by keyboard alone",
+   "brief": "The cash flow statement has its labels, formats and subtotals, and not one link: net income, depreciation, working capital, capex, the debt lines and the revolver are all empty. Link it without touching the mouse: select a row, type the reference once and press Ctrl+Enter, so every year links to its own column. Then the totals the same way, and green on every link through Font Color and F4. The key is `Ctrl+Enter`.",
+   "closing": "You linked a cash flow statement without touching the mouse, and the cash check held at zero. || Eleven link rows took seven entries, because a relative reference typed once reads its own column across the row and its own line down a block. Best practice: link a statement row by row from its FY24 column, and color each link green as you go so nothing typed hides among them.",
+   "wow": "You linked a cash flow statement without touching the mouse.",
+   "convention_line": "Links green; external links avoided; Write once, fill right",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "challenge-model-speed": {
+   "id": "challenge-model-speed",
+   "module": "model-speed",
+   "order": "5.7.C",
+   "title": "Challenge: the three benchmarks in one run",
+   "brief": "Fresh Base drivers, and a piece of each benchmark cut back: the rollout and total revenue, the cost build and its format, the debt links on the cash flow. Put all three back before the clock runs out.",
+   "closing": "",
+   "wow": "",
+   "convention_line": "Write once, fill right; Links green; external links avoided",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "ch5-project": {
+   "id": "ch5-project",
+   "module": "ch5-project-and-assessment",
+   "order": "5.8.P",
+   "title": "Project: the operating model with its DCF page",
+   "brief": "Fresh inputs, an empty shell, three historical years typed and sourced on Data. Build the schedules, link the three statements, value it on the DCF page and get the flag on the Cover to OK. No clock, and nothing here is new. The key is `Ctrl+Enter`.",
+   "closing": "An empty shell in, a model out: seven schedules, three statements linked, a DCF with both terminal values and two grids, and the flag on the Cover at OK. || This is the model a buyer’s team rebuilds before they sign. Now one schedule and its links again, on the clock.",
+   "wow": "An empty shell in, a three statement model with its DCF out, the flag at OK, and that is Chapter 5.",
+   "convention_line": "Write once, fill right; Links green; external links avoided; Name toggles and key inputs only; Know the four anchor states; The check is a live difference → 0",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "ch5-assessment": {
+   "id": "ch5-assessment",
+   "module": "ch5-project-and-assessment",
+   "order": "5.8.A",
+   "title": "Assessment: one schedule and the links from it, fifteen minutes",
+   "brief": "The model is built except its debt: the two tranches, the revolver and every link from them are empty, and the lenders have sent fresh terms. Build the schedule with the breaker, link interest to the IS, the draws and repayments to the cash flow and the balances to the BS, until the balance check reads 0 in every year. No help, the keyboard only. Pass, and the chapter is Verified; this is also the test-out. The key is `Ctrl+Enter`.",
+   "closing": "Fresh terms, an empty schedule, and fifteen minutes later the debt ties: three tranches, the circle closed behind the breaker, every link in place and the balance check at 0 in every year. || That is the schedule a lender’s model is checked against, and you built it under a clock.",
+   "wow": "You built the debt and its links on fresh terms, on the clock, and the chapter is Verified.",
+   "convention_line": "Write once, fill right; Links green; external links avoided",
+   "mac_note": "",
+   "story_beat": ""
+  },
   "remix-format-on-the-pnl": {
    "id": "remix-format-on-the-pnl",
    "module": "remixes",
@@ -14408,6 +14480,442 @@ export const COPY = {
     "why": "",
     "hint_stuck": ""
    }
+  ],
+  "revenue-build-in-three": [
+   {
+    "lesson_id": "revenue-build-in-three",
+    "goal_index": "0",
+    "text": "Select the rollout C6:J9 on Schedules and press Ctrl+R, so FY25 to FY31 take each row’s FY24 formula.",
+    "teach": "A benchmark is a build you already know, against the clock. Every row’s formula is written once, in its first column, and filled right in one press: the FY24 cells here already hold it, reading the history through the projection flag, so Ctrl+R carries it across the actuals and the estimates alike.",
+    "why": "",
+    "hint_stuck": "pulse range C6:J9 · The FY24 column holds the formula; one press copies it right."
+   },
+   {
+    "lesson_id": "revenue-build-in-three",
+    "goal_index": "1",
+    "text": "Type =AVERAGE(C6,C9) into C10:J10 with Ctrl+Enter, then fill the washes C15:J15 right with Ctrl+R.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C10:J10 · Average sites sits between the opening and the closing count."
+   },
+   {
+    "lesson_id": "revenue-build-in-three",
+    "goal_index": "2",
+    "text": "Fill the ticket, its growth and retail revenue right in one press: select C20:J22 and press Ctrl+R.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C20:J22 · Three rows, one selection, one Ctrl+R."
+   },
+   {
+    "lesson_id": "revenue-build-in-three",
+    "goal_index": "3",
+    "text": "Type =C19/(Inputs!C45*12) into C23:J23, pressing F4 right after C45, then fill membership revenue C24:J24 right.",
+    "teach": "F4 while the cursor sits just after a reference anchors it as you type, so the fill is right the first time: one press turns Inputs!C45 into Inputs!$C$45. A member washes two and a half times a month, so average members are member washes over thirty a year.",
+    "why": "",
+    "hint_stuck": "pulse range C23:J23 · Without the anchor, D23 would read Inputs!D45, an empty cell."
+   },
+   {
+    "lesson_id": "revenue-build-in-three",
+    "goal_index": "4",
+    "text": "Total revenue in C26:J26: =C22+C24+C25 with Ctrl+Enter, the three revenue lines and not the member count between them.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C26:J26 · Row 23 counts members, not dollars, so AutoSum down the block would add it in."
+   },
+   {
+    "lesson_id": "revenue-build-in-three",
+    "goal_index": "5",
+    "text": "Give the rollout C6:J9 the desk number format in Ctrl+1’s Custom box, then select the washes C15:J15 and press F4.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C6:J9 · The code is #,##0_);(#,##0);\"-\"_), and F4 repeats the last format on the next block."
+   },
+   {
+    "lesson_id": "revenue-build-in-three",
+    "goal_index": "6",
+    "text": "Does it tie? Watch FY31 new sites in Inputs J21 go from 6 to 10: revenue climbs and the revenue check, Checks J10, holds at 0.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell J10 · The check is the IS’s revenue less the build’s, so it reads 0 whatever the case says."
+   }
+  ],
+  "fill-and-format-block": [
+   {
+    "lesson_id": "fill-and-format-block",
+    "goal_index": "0",
+    "text": "Select C30:J56 on Schedules, the cost build and working capital, and fill the block right with Ctrl+R.",
+    "teach": "A block fills in one motion: select from its first formula column to FY31 and press Ctrl+R, and every row takes its own first cell’s formula and format. The memo cells in C57 and C67 live in one column only, so the selections stop short of them.",
+    "why": "",
+    "hint_stuck": "pulse range C30:J56 · Every row’s formula is in C already; one press carries all of them."
+   },
+   {
+    "lesson_id": "fill-and-format-block",
+    "goal_index": "1",
+    "text": "Fill the PP&E block the same way: select C60:J66 and press Ctrl+R.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C60:J66 · Stop at row 66: the implied life in C67 is one cell, not a row."
+   },
+   {
+    "lesson_id": "fill-and-format-block",
+    "goal_index": "2",
+    "text": "Desk number format on the cost lines C32:J37 through Ctrl+1, then F4 on C41:J41, C47:J48, C53:J55, C61:J62 and C64:J64.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C32:J37 · The first line of each block and the totals carry the $ already; the lines between take the plain code."
+   },
+   {
+    "lesson_id": "fill-and-format-block",
+    "goal_index": "3",
+    "text": "Top border on Site costs C38:J38 with Alt H B P, then F4 on the totals in rows 39, 42, 49, 56, 63 and 65.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C38:J38 · A top border marks a total; F4 repeats the border, not the selection."
+   },
+   {
+    "lesson_id": "fill-and-format-block",
+    "goal_index": "4",
+    "text": "Italic on the cost of sales share C31:J31 with Ctrl+I, then F4 on the two margins, C40:J40 and C43:J43.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C31:J31 · Italic sets a ratio apart from the dollars around it."
+   },
+   {
+    "lesson_id": "fill-and-format-block",
+    "goal_index": "5",
+    "text": "Does it tie? Watch labor per site, Inputs C50, go from 257 to 300: every cost line moves and the cross-foot in Checks C11 holds at 0.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C11 · The cross-foot sums the block down, then across, and takes one from the other."
+   }
+  ],
+  "keyboard-only-linking": [
+   {
+    "lesson_id": "keyboard-only-linking",
+    "goal_index": "0",
+    "text": "Link net income, =IS!C31 into CF C6:J6, and depreciation, =Schedules!C64 into C7:J7, each with Ctrl+Enter.",
+    "teach": "A link row is one entry: select the row from FY24 to FY31, type the reference for FY24 and press Ctrl+Enter, and each column reads its own year because the reference is relative. Typing the reference is faster than pointing at it on another sheet, and Ctrl+G gets you to the row.",
+    "why": "",
+    "hint_stuck": "pulse range C6:J6 · Net income is the last line of the IS, row 31."
+   },
+   {
+    "lesson_id": "keyboard-only-linking",
+    "goal_index": "1",
+    "text": "The three working capital changes sit in Schedules rows 53 to 55: select C8:J10 and enter =Schedules!C53 with Ctrl+Enter.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C8:J10 · One entry fills three rows: each row reads the Schedules row in the same order."
+   },
+   {
+    "lesson_id": "keyboard-only-linking",
+    "goal_index": "2",
+    "text": "Capex is cash going out: enter =-Schedules!C63 into C14:J14 with Ctrl+Enter.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C14:J14 · The schedule keeps capex positive; the cash flow shows it as an outflow."
+   },
+   {
+    "lesson_id": "keyboard-only-linking",
+    "goal_index": "3",
+    "text": "Link the term loan, =Schedules!C80 into C18:J19, and the delayed draw, =Schedules!C90 into C20:J21, each with Ctrl+Enter.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C18:J19 · Drawn and repaid sit next to each other on the schedule, so two rows take one entry."
+   },
+   {
+    "lesson_id": "keyboard-only-linking",
+    "goal_index": "4",
+    "text": "The revolver nets its draw and repayment: enter =Schedules!C101+Schedules!C102 into C24:J24 with Ctrl+Enter.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C24:J24 · Row 101 is the draw and row 102 the repayment, already negative."
+   },
+   {
+    "lesson_id": "keyboard-only-linking",
+    "goal_index": "5",
+    "text": "Net change in cash is =C11+C15+C25 in C28:J28, and closing cash =C29+C28 in C30:J30, each with Ctrl+Enter.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C28:J28 · The three section totals, operating, investing and financing, add to the change in cash."
+   },
+   {
+    "lesson_id": "keyboard-only-linking",
+    "goal_index": "6",
+    "text": "Color the links green: C6:J10 through Font Color, then F4 on C14:J14, C18:J21 and C24:J24.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C6:J10 · Green marks a figure that comes from another sheet; the totals stay black."
+   },
+   {
+    "lesson_id": "keyboard-only-linking",
+    "goal_index": "7",
+    "text": "Does it tie? Watch FY31 washes per day in Inputs J22 go from 250 to 300: closing cash climbs and the cash check, Checks J7, holds at 0.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell J7 · The check is the balance sheet’s cash less the cash flow’s closing cash."
+   }
+  ],
+  "challenge-model-speed": [
+   {
+    "lesson_id": "challenge-model-speed",
+    "goal_index": "0",
+    "text": "Fill the rollout C6:J9 on Schedules right, and total revenue in C26:J26 as =C22+C24+C25.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-model-speed",
+    "goal_index": "1",
+    "text": "Fill the cost build C30:J43 right in one press.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-model-speed",
+    "goal_index": "2",
+    "text": "Give the cost lines C32:J37 the desk number format, #,##0_);(#,##0);\"-\"_).",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-model-speed",
+    "goal_index": "3",
+    "text": "Link the debt on the cash flow: =Schedules!C80 into C18:J19, =Schedules!C90 into C20:J21 and the revolver into C24:J24.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-model-speed",
+    "goal_index": "4",
+    "text": "Color the new links green: C18:J21 through Font Color, then F4 on C24:J24.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "ch5-project": [
+   {
+    "lesson_id": "ch5-project",
+    "goal_index": "0",
+    "text": "Build the rollout and revenue on Schedules, rows 6 to 27, each row one formula entered across C:J with Ctrl+Enter.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-project",
+    "goal_index": "1",
+    "text": "Build the cost build down to EBITDA and its margin on Schedules, rows 30 to 43.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-project",
+    "goal_index": "2",
+    "text": "Build working capital on Schedules, rows 46 to 57: the balances by days, the changes in cash and the cycle.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-project",
+    "goal_index": "3",
+    "text": "Build PP&E and the depreciation waterfall on Schedules, rows 60 to 76, each vintage depreciating from the year after it is spent.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-project",
+    "goal_index": "4",
+    "text": "Build the term loan and the delayed draw on Schedules, rows 79 to 95, interest on the average balance behind the breaker.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-project",
+    "goal_index": "5",
+    "text": "Build the revolver and the debt totals on Schedules, rows 98 to 111, drawing to the minimum cash and repaying from any surplus.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-project",
+    "goal_index": "6",
+    "text": "Build tax on Schedules, rows 114 to 121, with the loss carried forward and used against later profit.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-project",
+    "goal_index": "7",
+    "text": "Build the IS from revenue to net income, history from Data and projections from Schedules.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-project",
+    "goal_index": "8",
+    "text": "Build the cash flow statement: the links from the IS and Schedules, the distribution, the section totals and cash.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-project",
+    "goal_index": "9",
+    "text": "Build the BS: cash from the cash flow, the balances from Schedules, equity rolled forward, and the balance check.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-project",
+    "goal_index": "10",
+    "text": "Name DCF C60 WACC with Alt M M D, then build the WACC block in DCF rows 50 to 65.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-project",
+    "goal_index": "11",
+    "text": "Build the DCF in rows 5 to 47: free cash flow, the discount factors, terminal value both ways and the equity bridge.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-project",
+    "goal_index": "12",
+    "text": "Build both sensitivity grids on DCF, rows 68 to 81, each axis stepping from the base case and each cell a live value.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-project",
+    "goal_index": "13",
+    "text": "Build the checks on Checks, rows 6 to 27, each a rounded difference that reads 0 when the model ties.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-project",
+    "goal_index": "14",
+    "text": "Count the errors and hardcodes on Checks, roll everything up to the flag in C45, and link the flag to the Cover.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-project",
+    "goal_index": "15",
+    "text": "Does it tie? Watch FY31 washes a day in Inputs J22 go from 250 to 300: every statement moves and the flag on the Cover holds at OK.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "ch5-assessment": [
+   {
+    "lesson_id": "ch5-assessment",
+    "goal_index": "0",
+    "text": "Build the term loan on Schedules, rows 79 to 82: opening, drawn, repaid at the scheduled amortization or the balance if less, closing.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-assessment",
+    "goal_index": "1",
+    "text": "Add the term loan’s average balance, its interest behind the breaker, and the effective rate in Schedules C83:J85.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-assessment",
+    "goal_index": "2",
+    "text": "Build the delayed draw on Schedules, rows 88 to 92: opening, draws to date, drawn, repaid and closing.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-assessment",
+    "goal_index": "3",
+    "text": "Add the delayed draw’s average balance, its interest behind the breaker, and the effective rate in Schedules C93:J95.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-assessment",
+    "goal_index": "4",
+    "text": "Build the revolver in Schedules C98:J103: cash before it, the minimum, a draw to cover a gap and a repayment from a surplus.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-assessment",
+    "goal_index": "5",
+    "text": "Add the revolver’s average balance, its interest behind the breaker, and the effective rate in Schedules C104:J106.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-assessment",
+    "goal_index": "6",
+    "text": "Total the debt and the interest in rows 109 and 110, and net debt against the BS cash in row 111.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-assessment",
+    "goal_index": "7",
+    "text": "Link interest on the IS, row 28, to the total on Schedules, as a cost, through the projection flag.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-assessment",
+    "goal_index": "8",
+    "text": "Link the draws and repayments on CF: the term loan in C18:J19, the delayed draw in C20:J21, the revolver in C24:J24.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-assessment",
+    "goal_index": "9",
+    "text": "Link the three closing balances to the BS, rows 15 to 17, until the balance check reads 0 in every year.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-assessment",
+    "goal_index": "10",
+    "text": "Does it tie? Watch the minimum cash in Inputs C80 go to 8,000: the revolver draws more and the balance check, Checks row 6, holds at 0.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
   ]
  },
  "modules": {
@@ -14669,6 +15177,20 @@ export const COPY = {
    "objective": "What a DCF is; unlevered free cash flow; the WACC block; terminal value both ways; discounting and the mid-year convention; sensitivity tables.",
    "story_beat": "What the cash flows are worth. || The model says what the business will earn; the DCF says what that’s worth today. Take the cash the business throws off after tax, capex and working capital, before anyone is paid interest, discount it at the return its investors require, add what it’s worth beyond the forecast, and you have an enterprise value. Take off the debt and what’s left is what the owners are selling.",
    "page_name": "The DCF page"
+  },
+  "model-speed": {
+   "id": "model-speed",
+   "name": "Model speed",
+   "objective": "The chapter’s three benchmarks with the keys shown once: the revenue build in three minutes, a block filled and formatted in one pass, the cash flow statement linked by keyboard alone.",
+   "story_beat": "Now do it fast. || Everything in this chapter you can now do; the question a desk asks is how fast. Three benchmarks, each a piece of the model against the clock: the revenue build in three minutes, a block filled and formatted in one pass, the cash flow statement linked without touching the mouse. They live in Practice as this chapter’s benchmarks, and here you run each once with the keys shown.",
+   "page_name": "The benchmarks"
+  },
+  "ch5-project-and-assessment": {
+   "id": "ch5-project-and-assessment",
+   "name": "Project and assessment",
+   "objective": "The operating model with its DCF page; the assessment is one schedule and the links from it, timed.",
+   "story_beat": "The operating model, end to end. || An empty shell with the inputs and the history in it. Build the schedules, link the statements, get the flag to OK and value the business. Build it, then build one schedule and its links again on the clock. The assessment is the test-out.",
+   "page_name": "The operating model"
   }
  },
  "site": {

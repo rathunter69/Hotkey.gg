@@ -13,6 +13,7 @@ import { Sheet } from '../../../engine/sheet.js';
 import { Session } from '../../../engine/keyboard.js';
 import { evalFormula } from '../../../engine/formula.js';
 import { parseRef, refKey } from '../../../engine/refs.js';
+import { applyStatePatch } from '../../workbooks/index.js';
 import { isLiveFormula } from '../../../engine/live.js';
 
 export { sheetIn, settled, calls, live, near, isNum, reads, onSheet, ROW, COLS, PROJ_COLS };
@@ -285,3 +286,114 @@ export function seenThen(ses, tag, stressed, restored) {
   if (!seen.has(tag) && stressed(ses)) seen.add(tag);
   return seen.has(tag) && restored(ses);
 }
+
+/* ---------------- model speed, the project and the drills (5.7, 5.8): the finished model as the answer key ---------------- */
+// A block holds formulas whose figures are the finished model's, and a cell the goal names moves when
+// a typed input on Inputs moves (the shared liveness rule, run as a what-if on the whole workbook,
+// since the model's links cross sheets and its circle iterates).
+
+/** Two figures agree: to a cent in thousands, or a part in a million on a large one (the revolver's circle iterates to a tolerance). */
+export const agree = (a, b) => (isNum(a) && isNum(b) ? Math.abs(a - b) <= Math.max(0.005, 1e-6 * Math.abs(b)) : a === b);
+
+/** A live workbook of a state, assembled as the runner assembles one: the sheets, iteration, the names, one recalculation. */
+export function sessionOf(state) {
+  const build = sp => new Sheet({ rows: sp.rows, cols: sp.cols, cells: JSON.parse(JSON.stringify(sp.cells)), colW: sp.colW, freeze: sp.freeze, gridlines: sp.gridlines, condFmt: sp.condFmt });
+  const s = new Session(build(state.sheets[0]));
+  s.sheets[0].name = state.sheets[0].name;
+  for (const sp of state.sheets.slice(1)) s.addSheet(sp.name, build(sp), undefined, { recalc: false });
+  Object.assign(s.settings, { iterative: !!state.settings.iterative, calcMode: state.settings.calcMode || 'automatic' });
+  if (state.names && Object.keys(state.names).length) s.names = state.names; else s.recalcAll();
+  return s;
+}
+
+const FINISHED = new Map();
+/**
+ * The finished model's figures, with `patch` (a state patch, as a seed writes one) laid over its
+ * inputs: (sheet, ref) → value. Built once per patch and kept: one recalculation of the whole model.
+ */
+export function finished(patch = null) {
+  const key = JSON.stringify(patch || {});
+  if (!FINISHED.has(key)) {
+    const st = stateOf('DONE'); if (patch) applyStatePatch(st, JSON.parse(JSON.stringify(patch)));
+    const s = sessionOf(st);
+    const values = {};
+    for (const e of s.sheets) for (const k in e.sheet.cells) values[e.name + '!' + k] = e.sheet.cells[k].value;
+    FINISHED.set(key, (name, ref) => values[name + '!' + ref]);
+    if (FINISHED.size > 8) FINISHED.delete(FINISHED.keys().next().value);
+  }
+  return FINISHED.get(key);
+}
+
+/** Every ref on sheet `name` holds a formula whose figure is the finished model's (`ref` reads it: finished() by default). */
+export function like(ses, name, refs, want = finished()) {
+  const sh = sheetIn(ses, name); if (!sh) return false;
+  return refs.every(r => { const c = sh.cells[r]; return !!c && !!c.formula && agree(c.value, want(name, r)); });
+}
+
+/**
+ * Every keyed row on sheet `name` holds formulas that read what the workbook says now: `want(col, v)`
+ * returns the expected figure from the learner's own cells (v(sheet, ref) reads one). For a link made
+ * before the circle it sits in is closed, when the finished model's figure is not yet the right one.
+ */
+export function echoes(ses, name, keys, want, cols = COLS) {
+  const sh = sheetIn(ses, name); if (!sh) return false;
+  const v = (sheet, ref) => { const s = sheetIn(ses, sheet); const c = s && s.cells[ref]; return c ? (c.value ?? 0) : 0; };
+  return [].concat(keys).every(key => cols.every(col => {
+    const c = sh.cells[col + ROW[name][key]];
+    return !!c && !!c.formula && agree(c.value, want(col, v, key));
+  }));
+}
+
+// Where each cash flow link reads, by row key: sheet, row, sign. The revolver nets two rows.
+const SR = ROW.Schedules;
+const CF_SOURCE = {
+  ni: ['IS', ROW.IS.ni], dep: ['Schedules', SR.dep], chgRec: ['Schedules', SR.chgRec], chgPay: ['Schedules', SR.chgPay], chgDef: ['Schedules', SR.chgDef],
+  capex: ['Schedules', SR.capexTotal, -1], termDrawn: ['Schedules', SR.termDrawn], termRepaid: ['Schedules', SR.termRepaid], ddDrawn: ['Schedules', SR.ddDrawn], ddRepaid: ['Schedules', SR.ddRepaid],
+};
+const cfSource = (col, v, key) => (key === 'rev' ? v('Schedules', col + SR.revDrawn) + v('Schedules', col + SR.revRepaid) : (CF_SOURCE[key][2] || 1) * v(CF_SOURCE[key][0], col + CF_SOURCE[key][1]));
+/**
+ * The cash flow's link rows `keys` read their sources in the same column, on the learner's own
+ * figures: the circle (interest on the cash balance) stays open until the cash rows are in, so the
+ * finished model's figures are the right ones only then.
+ */
+export const cfLinked = (ses, keys) => echoes(ses, 'CF', keys, cfSource);
+
+/**
+ * The what-if (the shared liveness rule, at the model's scale): nudge the typed input `input`
+ * ('Inputs!J21'), recalculate the workbook, see `target` ('Schedules!J9') move, then put the input
+ * back and recalculate, so the sheet ends exactly as it was. A typed number never moves.
+ */
+export function moves(ses, target, input) {
+  const [tn, tr] = target.split('!'), [inName, inRef] = input.split('!');
+  const T = sheetIn(ses, tn), I = sheetIn(ses, inName); if (!T || !I) return false;
+  const tc = T.cells[tr], ic = I.cells[inRef];
+  if (!tc || !tc.formula || !ic || ic.formula || !isNum(ic.value)) return false;
+  const before = tc.value, old = ic.value;
+  // through the workbook's own graph, naming the one cell changed: only its readers recalculate
+  const recalc = () => (I.book ? I.book.recalc(I, [{ sheet: I, key: inRef }]) : ses.recalcAll());
+  ic.value = old === 0 ? 1 : old * 1.5 + 1;
+  try { recalc(); return isNum(T.cells[tr].value) && !agree(T.cells[tr].value, before); }
+  finally { ic.value = old; recalc(); }
+}
+
+/**
+ * A what-if with a verdict: type `values` ({ 'Inputs!G21': 18 }) over the typed inputs, recalculate,
+ * run `fn(ses)`, then put every input back and recalculate, so the sheet ends exactly as it was.
+ */
+export function under(ses, values, fn) {
+  const kept = [];
+  for (const [key, v] of Object.entries(values)) {
+    const [name, ref] = key.split('!'); const c = sheetIn(ses, name) && sheetIn(ses, name).cells[ref];
+    if (!c || c.formula) { kept.forEach(([k, old]) => { k.value = old; }); return false; }
+    kept.push([c, c.value]); c.value = v;
+  }
+  try { ses.recalcAll(); return !!fn(ses); }
+  finally { kept.forEach(([c, old]) => { c.value = old; }); ses.recalcAll(); }
+}
+
+/** The desk number format, as Format Cells writes the four-section code. */
+export const DESK = '#,##0_);(#,##0);"-"_)';
+/** Every ref carries the custom number format `code`. */
+export const formatted = (sh, refs, code = DESK) => !!sh && refs.every(r => { const c = sh.cells[r]; return !!c && c.fmtStyle === 'custom' && c.numFmt === code; });
+/** Every ref carries the format field `field` (bt, it, bold, fontColor) at `value`. */
+export const carries = (sh, refs, field, value = true) => !!sh && refs.every(r => { const c = sh.cells[r]; return !!c && c[field] === value; });

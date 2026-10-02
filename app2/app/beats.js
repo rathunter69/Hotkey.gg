@@ -103,6 +103,10 @@ const BEATS_DEFAULT = {
     body: 'Three buyers’ analysts are about to open this model looking for the mistake that lets them pay less, so find it first. A model gets audited the way a databook does, and then for the things only a model can get wrong: a row that doesn’t cross-foot, a formula that breaks pattern halfway across, an input that survives a stress test by luck.' },
   dcf: { eyebrow: 'Module 5.6 · DCF', title: 'What the cash flows are worth.',
     body: 'The model says what the business will earn; the DCF says what that’s worth today. Take the cash the business throws off after tax, capex and working capital, before anyone is paid interest, discount it at the return its investors require, add what it’s worth beyond the forecast, and you have an enterprise value. Take off the debt and what’s left is what the owners are selling.' },
+  'model-speed': { eyebrow: 'Module 5.7 · model speed', title: 'Now do it fast.',
+    body: 'Everything in this chapter you can now do; the question a desk asks is how fast. Three benchmarks, each a piece of the model against the clock: the revenue build in three minutes, a block filled and formatted in one pass, the cash flow statement linked without touching the mouse. They live in Practice as this chapter’s benchmarks, and here you run each once with the keys shown.' },
+  'ch5-project-and-assessment': { eyebrow: 'Module 5.8 · project and assessment', title: 'The operating model, end to end.',
+    body: 'An empty shell with the inputs and the history in it. Build the schedules, link the statements, get the flag to OK and value the business. Build it, then build one schedule and its links again on the clock. The assessment is the test-out.' },
   'project-and-assessment': { eyebrow: 'Module 1.8 · project, assessment, test-out', title: 'Management’s next feed is in.',
     body: 'A fresh week, a blank Report, and everything the chapter taught. Build the page start to finish, then prove it against the clock on Monday morning; or test out of the chapter in five minutes.' },
 };

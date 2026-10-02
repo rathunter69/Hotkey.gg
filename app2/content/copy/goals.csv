@@ -1460,3 +1460,56 @@ challenge-dcf,2,"The exit value in C28, FY31 EBITDA at the multiple on Inputs.",
 challenge-dcf,3,"Mid-year discount factors across F21:J21, on the periods in row 20.",,,
 challenge-dcf,4,"Enterprise value in C42 on the method the switch names, and equity value in C44 after FY26 net debt.",,,
 challenge-dcf,5,"Fill one sensitivity grid, perpetuity or exit multiple, against its edges.",,,
+revenue-build-in-three,0,"Select the rollout C6:J9 on Schedules and press Ctrl+R, so FY25 to FY31 take each row’s FY24 formula.","A benchmark is a build you already know, against the clock. Every row’s formula is written once, in its first column, and filled right in one press: the FY24 cells here already hold it, reading the history through the projection flag, so Ctrl+R carries it across the actuals and the estimates alike.",,pulse range C6:J9 · The FY24 column holds the formula; one press copies it right.
+revenue-build-in-three,1,"Type =AVERAGE(C6,C9) into C10:J10 with Ctrl+Enter, then fill the washes C15:J15 right with Ctrl+R.",,,pulse range C10:J10 · Average sites sits between the opening and the closing count.
+revenue-build-in-three,2,"Fill the ticket, its growth and retail revenue right in one press: select C20:J22 and press Ctrl+R.",,,"pulse range C20:J22 · Three rows, one selection, one Ctrl+R."
+revenue-build-in-three,3,"Type =C19/(Inputs!C45*12) into C23:J23, pressing F4 right after C45, then fill membership revenue C24:J24 right.","F4 while the cursor sits just after a reference anchors it as you type, so the fill is right the first time: one press turns Inputs!C45 into Inputs!$C$45. A member washes two and a half times a month, so average members are member washes over thirty a year.",,"pulse range C23:J23 · Without the anchor, D23 would read Inputs!D45, an empty cell."
+revenue-build-in-three,4,"Total revenue in C26:J26: =C22+C24+C25 with Ctrl+Enter, the three revenue lines and not the member count between them.",,,"pulse range C26:J26 · Row 23 counts members, not dollars, so AutoSum down the block would add it in."
+revenue-build-in-three,5,"Give the rollout C6:J9 the desk number format in Ctrl+1’s Custom box, then select the washes C15:J15 and press F4.",,,"pulse range C6:J9 · The code is #,##0_);(#,##0);""-""_), and F4 repeats the last format on the next block."
+revenue-build-in-three,6,"Does it tie? Watch FY31 new sites in Inputs J21 go from 6 to 10: revenue climbs and the revenue check, Checks J10, holds at 0.",,,"pulse cell J10 · The check is the IS’s revenue less the build’s, so it reads 0 whatever the case says."
+fill-and-format-block,0,"Select C30:J56 on Schedules, the cost build and working capital, and fill the block right with Ctrl+R.","A block fills in one motion: select from its first formula column to FY31 and press Ctrl+R, and every row takes its own first cell’s formula and format. The memo cells in C57 and C67 live in one column only, so the selections stop short of them.",,pulse range C30:J56 · Every row’s formula is in C already; one press carries all of them.
+fill-and-format-block,1,Fill the PP&E block the same way: select C60:J66 and press Ctrl+R.,,,"pulse range C60:J66 · Stop at row 66: the implied life in C67 is one cell, not a row."
+fill-and-format-block,2,"Desk number format on the cost lines C32:J37 through Ctrl+1, then F4 on C41:J41, C47:J48, C53:J55, C61:J62 and C64:J64.",,,pulse range C32:J37 · The first line of each block and the totals carry the $ already; the lines between take the plain code.
+fill-and-format-block,3,"Top border on Site costs C38:J38 with Alt H B P, then F4 on the totals in rows 39, 42, 49, 56, 63 and 65.",,,"pulse range C38:J38 · A top border marks a total; F4 repeats the border, not the selection."
+fill-and-format-block,4,"Italic on the cost of sales share C31:J31 with Ctrl+I, then F4 on the two margins, C40:J40 and C43:J43.",,,pulse range C31:J31 · Italic sets a ratio apart from the dollars around it.
+fill-and-format-block,5,"Does it tie? Watch labor per site, Inputs C50, go from 257 to 300: every cost line moves and the cross-foot in Checks C11 holds at 0.",,,"pulse cell C11 · The cross-foot sums the block down, then across, and takes one from the other."
+keyboard-only-linking,0,"Link net income, =IS!C31 into CF C6:J6, and depreciation, =Schedules!C64 into C7:J7, each with Ctrl+Enter.","A link row is one entry: select the row from FY24 to FY31, type the reference for FY24 and press Ctrl+Enter, and each column reads its own year because the reference is relative. Typing the reference is faster than pointing at it on another sheet, and Ctrl+G gets you to the row.",,"pulse range C6:J6 · Net income is the last line of the IS, row 31."
+keyboard-only-linking,1,The three working capital changes sit in Schedules rows 53 to 55: select C8:J10 and enter =Schedules!C53 with Ctrl+Enter.,,,pulse range C8:J10 · One entry fills three rows: each row reads the Schedules row in the same order.
+keyboard-only-linking,2,Capex is cash going out: enter =-Schedules!C63 into C14:J14 with Ctrl+Enter.,,,pulse range C14:J14 · The schedule keeps capex positive; the cash flow shows it as an outflow.
+keyboard-only-linking,3,"Link the term loan, =Schedules!C80 into C18:J19, and the delayed draw, =Schedules!C90 into C20:J21, each with Ctrl+Enter.",,,"pulse range C18:J19 · Drawn and repaid sit next to each other on the schedule, so two rows take one entry."
+keyboard-only-linking,4,The revolver nets its draw and repayment: enter =Schedules!C101+Schedules!C102 into C24:J24 with Ctrl+Enter.,,,"pulse range C24:J24 · Row 101 is the draw and row 102 the repayment, already negative."
+keyboard-only-linking,5,"Net change in cash is =C11+C15+C25 in C28:J28, and closing cash =C29+C28 in C30:J30, each with Ctrl+Enter.",,,"pulse range C28:J28 · The three section totals, operating, investing and financing, add to the change in cash."
+keyboard-only-linking,6,"Color the links green: C6:J10 through Font Color, then F4 on C14:J14, C18:J21 and C24:J24.",,,pulse range C6:J10 · Green marks a figure that comes from another sheet; the totals stay black.
+keyboard-only-linking,7,"Does it tie? Watch FY31 washes per day in Inputs J22 go from 250 to 300: closing cash climbs and the cash check, Checks J7, holds at 0.",,,pulse cell J7 · The check is the balance sheet’s cash less the cash flow’s closing cash.
+challenge-model-speed,0,"Fill the rollout C6:J9 on Schedules right, and total revenue in C26:J26 as =C22+C24+C25.",,,
+challenge-model-speed,1,Fill the cost build C30:J43 right in one press.,,,
+challenge-model-speed,2,"Give the cost lines C32:J37 the desk number format, #,##0_);(#,##0);""-""_).",,,
+challenge-model-speed,3,"Link the debt on the cash flow: =Schedules!C80 into C18:J19, =Schedules!C90 into C20:J21 and the revolver into C24:J24.",,,
+challenge-model-speed,4,"Color the new links green: C18:J21 through Font Color, then F4 on C24:J24.",,,
+ch5-project,0,"Build the rollout and revenue on Schedules, rows 6 to 27, each row one formula entered across C:J with Ctrl+Enter.",,,
+ch5-project,1,"Build the cost build down to EBITDA and its margin on Schedules, rows 30 to 43.",,,
+ch5-project,2,"Build working capital on Schedules, rows 46 to 57: the balances by days, the changes in cash and the cycle.",,,
+ch5-project,3,"Build PP&E and the depreciation waterfall on Schedules, rows 60 to 76, each vintage depreciating from the year after it is spent.",,,
+ch5-project,4,"Build the term loan and the delayed draw on Schedules, rows 79 to 95, interest on the average balance behind the breaker.",,,
+ch5-project,5,"Build the revolver and the debt totals on Schedules, rows 98 to 111, drawing to the minimum cash and repaying from any surplus.",,,
+ch5-project,6,"Build tax on Schedules, rows 114 to 121, with the loss carried forward and used against later profit.",,,
+ch5-project,7,"Build the IS from revenue to net income, history from Data and projections from Schedules.",,,
+ch5-project,8,"Build the cash flow statement: the links from the IS and Schedules, the distribution, the section totals and cash.",,,
+ch5-project,9,"Build the BS: cash from the cash flow, the balances from Schedules, equity rolled forward, and the balance check.",,,
+ch5-project,10,"Name DCF C60 WACC with Alt M M D, then build the WACC block in DCF rows 50 to 65.",,,
+ch5-project,11,"Build the DCF in rows 5 to 47: free cash flow, the discount factors, terminal value both ways and the equity bridge.",,,
+ch5-project,12,"Build both sensitivity grids on DCF, rows 68 to 81, each axis stepping from the base case and each cell a live value.",,,
+ch5-project,13,"Build the checks on Checks, rows 6 to 27, each a rounded difference that reads 0 when the model ties.",,,
+ch5-project,14,"Count the errors and hardcodes on Checks, roll everything up to the flag in C45, and link the flag to the Cover.",,,
+ch5-project,15,Does it tie? Watch FY31 washes a day in Inputs J22 go from 250 to 300: every statement moves and the flag on the Cover holds at OK.,,,
+ch5-assessment,0,"Build the term loan on Schedules, rows 79 to 82: opening, drawn, repaid at the scheduled amortization or the balance if less, closing.",,,
+ch5-assessment,1,"Add the term loan’s average balance, its interest behind the breaker, and the effective rate in Schedules C83:J85.",,,
+ch5-assessment,2,"Build the delayed draw on Schedules, rows 88 to 92: opening, draws to date, drawn, repaid and closing.",,,
+ch5-assessment,3,"Add the delayed draw’s average balance, its interest behind the breaker, and the effective rate in Schedules C93:J95.",,,
+ch5-assessment,4,"Build the revolver in Schedules C98:J103: cash before it, the minimum, a draw to cover a gap and a repayment from a surplus.",,,
+ch5-assessment,5,"Add the revolver’s average balance, its interest behind the breaker, and the effective rate in Schedules C104:J106.",,,
+ch5-assessment,6,"Total the debt and the interest in rows 109 and 110, and net debt against the BS cash in row 111.",,,
+ch5-assessment,7,"Link interest on the IS, row 28, to the total on Schedules, as a cost, through the projection flag.",,,
+ch5-assessment,8,"Link the draws and repayments on CF: the term loan in C18:J19, the delayed draw in C20:J21, the revolver in C24:J24.",,,
+ch5-assessment,9,"Link the three closing balances to the BS, rows 15 to 17, until the balance check reads 0 in every year.",,,
+ch5-assessment,10,"Does it tie? Watch the minimum cash in Inputs C80 go to 8,000: the revolver draws more and the balance check, Checks row 6, holds at 0.",,,

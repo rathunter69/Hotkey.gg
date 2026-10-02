@@ -376,6 +376,10 @@ export const CONCEPTS = {
   'mid-year-discounting': 'a discount factor is 1/(1+WACC)^t; the mid-year convention counts t from the middle of each year (0.5, 1.5 and on) because cash arrives through the year',
   'enterprise-to-equity': 'enterprise value is the discounted cash flows plus the discounted terminal value; take off net debt and what is left is equity value',
   'sensitivity-grid': 'a sensitivity grid is one formula with mixed anchors ($C69 and D$68) written over a block, so each cell values the business at its own row and column inputs',
+  // Chapter 5 · 5.7 Model speed (the operating model's benchmarks)
+  'speed-build': 'a build on the clock: each row’s formula written once in its first column and filled right, anchors set with F4 as the formula is typed, the check read at the end',
+  'one-pass-format': 'a block filled with one Ctrl+R and formatted by whole-block actions, F4 repeating each one on the next range, so no cell is touched twice',
+  'keyboard-linking': 'statement links made without the mouse: the reference typed, or pointed with Ctrl+PgDn and the arrows, then Ctrl+Enter across the row and F4 repeating the green',
 };
 
 /**
@@ -613,7 +617,10 @@ export function validateDrill(d) {
   need(ACCESS.includes(d.access), 'access must be free | paid');
   need(d.benchmark === undefined || typeof d.benchmark === 'boolean', 'benchmark must be true or false');
   need(d.seed === undefined || typeof d.seed === 'function', 'seed must be a function (rng) => cells patch');
-  need(isObject(d.sheet), 'sheet (starting sheet) missing');
+  // a drill starts from its own sheet, or (Chapter 5 on) from a named workbook state with a planting over it
+  const onWorkbook = typeof d.workbook === 'string' && isObject(d.state) && typeof d.state.before === 'string';
+  need(isObject(d.sheet) || onWorkbook, 'sheet (starting sheet) or workbook and state.before missing');
+  need(!onWorkbook || d.seed === undefined, 'a workbook drill plants its fault with plant, not a seed');
   need(d.sheets === undefined || (Array.isArray(d.sheets) && d.sheets.every(isObject)), 'sheets must be an array of { name, cells } records');
   need(Number.isInteger(d.optimalKeys) && d.optimalKeys > 0, 'optimalKeys must be a positive integer');
   const p = d.pars;
@@ -634,6 +641,7 @@ export function validateDrill(d) {
   const ends = Array.isArray(d.endState) ? d.endState.filter(isObject) : [];
   for (const e of ends) { need(typeof e.text === 'string', 'endState entries need text'); need(typeof e.check === 'function', 'endState entries need a check'); }
   need(typeof d.solution === 'string' && d.solution.trim(), 'solution keystrokes missing');
-  if (isObject(d.sheet)) validateStartingSheet(d, goals, ends, need);
+  if (onWorkbook) validateStartingSheet(d, goals, ends, need, { moduleLesson: true, kind: 'drill' });
+  else if (isObject(d.sheet)) validateStartingSheet(d, goals, ends, need);
   return errs;
 }
