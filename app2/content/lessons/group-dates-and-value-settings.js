@@ -1,9 +1,9 @@
 // Chapter 4 · 4.4.2 Group dates and value settings (clearcoat-pack, S441 → S442)
 // The pivot on Cuts reworked through its field list and its shortcut menu: the dates down the
-// side, grouped back into weeks by the export's period key, the revenue shown as a % of Column
+// side, grouped back into weeks by the period key on the export, the revenue shown as a % of Column
 // Total, the washes averaged by site-day, and last the days each site reported, counted. The
 // count reads fifteen for Riverside where Summary reads fourteen: a count counts rows, and one
-// of Riverside's days came in blank.
+// of the days at Riverside came in blank.
 import { pivotLike, settled, at } from './lib/pack-checks.js';
 import { PIVOTS } from '../workbooks/clearcoat-pack.js';
 
@@ -49,7 +49,7 @@ export default {
       hintStuck: 'pulse the field list · The list opens on the field in Values; Total washes is one above it.',
       check: (s, ses) => !!pivotLike(ses, { row: 'Week', col: 'Site', value: 'Total washes', fn: 'average' }) },
     { id: 'count', teach: 'Count counts rows, whatever they hold: a day that came in with no washes still counts as a day.',
-      text: 'Count the days each site reported: Site alone in Rows, then Date in Values as a Count, and close the list.', keys: 'Home ↓ R Home V S ↵', requires: ['pivot-value-settings'],
+      text: 'Count the days each site reported: “Site” alone in Rows, then “Date” in Values as a Count, and close the list.', keys: 'Home ↓ R Home V S ↵', requires: ['pivot-value-settings'],
       hintStuck: 'pulse the field list · R on Site takes it out of Columns too; S once turns the sum of dates into a count.',
       check: (s, ses) => settled(ses) && !!pivotLike(ses, PIVOTS.S442) },
     { id: 'read', text: 'Go to Summary!G7, Riverside’s days reported: 14 there, 15 rows in the pivot, because one day came in blank.', keys: 'Ctrl+G "Summary!G7" ↵', requires: ['go-to', 'sheet-reference'], convention: 'F4',

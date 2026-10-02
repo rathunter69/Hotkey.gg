@@ -1359,6 +1359,138 @@ export const COPY = {
    "mac_note": "",
    "story_beat": ""
   },
+  "build-and-rearrange": {
+   "id": "build-and-rearrange",
+   "module": "pivot-tables",
+   "order": "4.4.1",
+   "title": "Build and rearrange",
+   "brief": "A PivotTable takes a flat export and summarizes it by whatever fields you drop into Rows, Columns and Values: washes by site, then by site and week, then by week and site, each in a few keystrokes. Alt, N, V, T inserts one on a sheet of its own, and its field list does the rest by keyboard. Build the site by week cut and compare it with the SUMIFS cube on Summary. They agree, and only one of them is live. The key is `Alt N V T`.",
+   "closing": "You built the cube in seconds, on a copy of the data. || The pivot and the SUMIFS cube agree today, and only the cube will agree tomorrow without help, because the pivot keeps its own copy of the export. Best practice: a pivot for the cut and the quick look, SUMIFS for anything a model reads.",
+   "wow": "",
+   "convention_line": "Name the tabs; outputs left, data right; Read the page before anyone else does",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "group-dates-and-value-settings": {
+   "id": "group-dates-and-value-settings",
+   "module": "pivot-tables",
+   "order": "4.4.2",
+   "title": "Group dates and value settings",
+   "brief": "A pivot can put the export’s dates down the side, group them into weeks, and show each figure as a sum, a count, an average or a share of its column, all without a formula. The field list moves the fields; the pivot’s shortcut menu (Shift+F10) opens the list again and changes what the values show. Group the days into weeks, show revenue as a share of each site’s fortnight, average the washes, and count the days each site reported. The key is `Shift+F10`.",
+   "closing": "The pivot grouped the dates and counted, averaged and shared the values, and nothing was written by hand. || Every view was a few keys: the field list for what goes where, the shortcut menu for what the values mean. Best practice: when a pivot and the page disagree, as Riverside’s fifteen and fourteen do, find out why before anyone else does; here a count of rows met a count of days open.",
+   "wow": "",
+   "convention_line": "Read the page before anyone else does",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "refresh-and-getpivotdata": {
+   "id": "refresh-and-getpivotdata",
+   "module": "pivot-tables",
+   "order": "4.4.3",
+   "title": "Refresh and GETPIVOTDATA",
+   "brief": "A pivot holds a snapshot of its source and shows it until you refresh it with Alt+F5, which is why the standard never builds a model on one. When a page has to read a pivot, GETPIVOTDATA fetches a figure by its labels, so the reference survives a rearrangement. The controller has resent Domain’s first day: correct the export and the site tab, refresh the pivot, read it from Summary with a check beside it, and turn the pivot round to prove the reference holds. The key is `Alt+F5`.",
+   "closing": "The pivot refreshes on command, and the page reads it by name. || A pivot is a copy until Alt+F5, so the cut you send is only as fresh as your last refresh. Best practice: cuts from a pivot, models from SUMIFS on the export; when a page must read a pivot, read it with GETPIVOTDATA, check it against the cube, and refresh before you send.",
+   "wow": "",
+   "convention_line": "The check is a live difference → 0; Links green; external links avoided",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "challenge-an-export-summarized-three-ways": {
+   "id": "challenge-an-export-summarized-three-ways",
+   "module": "pivot-tables",
+   "order": "4.4.C",
+   "title": "Challenge: an export summarized three ways",
+   "brief": "A fresh export, with Riverside’s late day parked beside its row. Three pivots, the late day entered and every pivot refreshed, then Domain’s washes on Summary by GETPIVOTDATA.",
+   "closing": "",
+   "wow": "",
+   "convention_line": "Read the page before anyone else does",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "a-case-toggle-with-choose-and-index": {
+   "id": "a-case-toggle-with-choose-and-index",
+   "module": "scenarios-and-sensitivity",
+   "order": "4.5.1",
+   "title": "A case toggle with CHOOSE and INDEX",
+   "brief": "Three cases sit as three columns of inputs on Scenarios: washes a day per site, blended ticket, member share and sites at year end. One cell, the switch, says which column is live: CHOOSE(switch, a, b, c) returns the nth argument, and INDEX(range, switch) does the same from a range. The live column feeds the model, so every output moves when the switch does, and the picker in C10 drives the switch. Build the switch, the live column and the outputs. The key is `CHOOSE`.",
+   "closing": "One switch runs three cases, and there’s no second copy of the file. || The picker sets a word, MATCH turns it into the switch, and CHOOSE and INDEX read the live column, so the outputs never know which case they are in. Best practice: the older desk habit is OFFSET off the switch; it recalculates on every change and hides from trace arrows, so the standard is CHOOSE or INDEX.",
+   "wow": "",
+   "convention_line": "A case toggle, never copies of the file; One input, one cell; formulas reference it",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "one-way-data-table-the-ticket": {
+   "id": "one-way-data-table-the-ticket",
+   "module": "scenarios-and-sensitivity",
+   "order": "4.5.2",
+   "title": "One-way data table: the ticket",
+   "brief": "A sensitivity shows how an output moves when one input moves. A Data Table (Alt, A, W, T) does it for a row of input values at once: EBITDA at a $12, $13, $14, $15 and $16 ticket, in one table, live. The layout is strict (the values across the top, the formula at the left of the row below, the row input cell on the ticket), and the results are one array you can’t edit cell by cell. Build the ticket sensitivity. The key is `Alt A W T`.",
+   "closing": "Five tickets give five EBITDAs in one table that stays live. || Each dollar of ticket is worth washes a year in EBITDA, and the table shows it without a copy of the model. Best practice: type the edge in blue, link the corner to the output, and title the table with the case it ran on, because a sensitivity without its case is a number without a meaning.",
+   "wow": "",
+   "convention_line": "Inputs blue, formulas black; A case toggle, never copies of the file",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "two-way-data-table-ticket-member-share": {
+   "id": "two-way-data-table-ticket-member-share",
+   "module": "scenarios-and-sensitivity",
+   "order": "4.5.3",
+   "title": "Two-way data table: ticket × member share",
+   "brief": "The two-way table moves two inputs at once, tickets across and member shares down with EBITDA in the grid: the table a buyer photographs. The corner holds the output, and the row and column input cells are the two inputs it drives. Calculation set to Automatic except for Data Tables keeps a big model fast, with F9 to bring the tables up to date. Build it and mark the cells where the downside lives. The key is `Alt A W T`.",
+   "closing": "This is the table a buyer photographs: live, with the downside marked. || Twenty-five EBITDAs from one formula, and the red shows at a glance which mixes of ticket and share fall short of the case. Best practice: leave a model in Automatic when you send it, because a grid held by Automatic except for Data Tables looks current and isn’t.",
+   "wow": "",
+   "convention_line": "Inputs blue, formulas black; Set up once: calc mode, iteration, defaults",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "goal-seek-break-even-washes-per-site": {
+   "id": "goal-seek-break-even-washes-per-site",
+   "module": "scenarios-and-sensitivity",
+   "order": "4.5.4",
+   "title": "Goal Seek: break-even washes per site",
+   "brief": "Contribution per wash is the ticket less the cost of a wash, what each wash puts toward the site’s fixed costs, and break-even washes are the daily site costs divided by it. You can solve that by hand, and Goal Seek (Alt, A, W, G) solves it by turning a dial: set this cell to that value by changing this input. It writes its answer over the input, so read it, note it, and put the input back. The key is `Alt A W G`.",
+   "closing": "You found the washes a site needs to break even by hand and by Goal Seek, and they agree. || The formula in C45 stays live; Goal Seek’s answer is a snapshot that went into an input, which is why it is noted, labeled and the input put back. Best practice: Goal Seek overwrites an input and a data table doesn’t, so reach for the table when the answer has to stay live.",
+   "wow": "",
+   "convention_line": "Label the source (\"per utility contract\"); Inputs blue, formulas black",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "when-data-tables-fail-the-pass-through-driver": {
+   "id": "when-data-tables-fail-the-pass-through-driver",
+   "module": "scenarios-and-sensitivity",
+   "order": "4.5.5",
+   "title": "When data tables fail: the pass-through driver",
+   "brief": "A Data Table can only move an input on its own sheet, and a big model keeps its inputs on Inputs. The fix is a pass-through driver: a blank cell on the table’s sheet and, beside it, the cell the model reads, =IF(C13=\"\",Inputs!$C$15,C13). The table drives the blank cell; when no table is running, the input passes straight through. Move the ticket to Inputs, build the driver and rebuild both tables on it. The key is `IF`.",
+   "closing": "The table reaches an input on another sheet, through one honest cell. || The driver is blank on purpose and labeled so nobody fills it. Tip from the desk: a table whose cells all read the same isn’t reaching its input, because the model reads another cell or a switch routes around it, so label each table with the setting it needs.",
+   "wow": "",
+   "convention_line": "One input, one cell; formulas reference it; Links green; external links avoided",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "case-outputs-side-by-side-a-data-table-on-the-switch-and-the-sticky-if": {
+   "id": "case-outputs-side-by-side-a-data-table-on-the-switch-and-the-sticky-if",
+   "module": "scenarios-and-sensitivity",
+   "order": "4.5.6",
+   "title": "Case outputs side by side: a data table on the switch, and the sticky IF",
+   "brief": "The board wants all three cases on one page, and a switch shows one at a time. The clean way to hold them all is a one-way Data Table whose row input is the switch itself: 1, 2 and 3 across the top, the outputs down the side, and the table runs the model three times. The other is the sticky IF, a cell that reads the live output when its case is on and otherwise reads itself, which needs iteration on. Build both; keep the table. The key is `Alt A W T`.",
+   "closing": "Three cases on one page, live from a table, and you know when a sticky IF is the honest exception. || The table runs the model once for each case and stays live; the sticky cell held a figure nobody could check. Best practice: a data table when the outputs are a handful of lines, and a sticky IF only when a table can’t reach the input or the model is too slow to run three times, always labeled, because a sticky cell is a hardcode that looks like a formula.",
+   "wow": "",
+   "convention_line": "A case toggle, never copies of the file; Iterative calc + a circuit breaker; The check is a live difference → 0",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "challenge-a-three-case-model-with-a-sensitivity-table": {
+   "id": "challenge-a-three-case-model-with-a-sensitivity-table",
+   "module": "scenarios-and-sensitivity",
+   "order": "4.5.C",
+   "title": "Challenge: a three-case model with a sensitivity table",
+   "brief": "Fresh case inputs, and the switch, the live column and the tables are gone. Build the switch, both sensitivities on the driver, break-even by Goal Seek, and the cases side by side.",
+   "closing": "",
+   "wow": "",
+   "convention_line": "A case toggle, never copies of the file; Inputs blue, formulas black",
+   "mac_note": "",
+   "story_beat": ""
+  },
   "remix-format-on-the-pnl": {
    "id": "remix-format-on-the-pnl",
    "module": "remixes",
@@ -8824,6 +8956,660 @@ export const COPY = {
     "why": "",
     "hint_stuck": ""
    }
+  ],
+  "build-and-rearrange": [
+   {
+    "lesson_id": "build-and-rearrange",
+    "goal_index": "0",
+    "text": "Go to Export!A4 and press Alt, N, V, T, then Enter: a PivotTable on a new sheet, with its field list open.",
+    "teach": "A PivotTable summarizes a flat table by the fields you drop into Rows, Columns and Values. Start from any cell of the export: Alt, N, V, T reads the whole table as its source and puts the pivot on a new sheet.",
+    "why": "",
+    "hint_stuck": "pulse cell Export!A4 · Any cell of the export will do; the header row is the easiest to find."
+   },
+   {
+    "lesson_id": "build-and-rearrange",
+    "goal_index": "1",
+    "text": "Put Site in Rows and Total washes in Values: six sites down, one column of washes.",
+    "teach": "In the field list, ↓ and ↑ walk the export’s headers. R sends the field under the cursor to Rows, C to Columns and V to Values, where a number field is summed.",
+    "why": "",
+    "hint_stuck": "pulse the field list · Site is the second field and Total washes the fifth."
+   },
+   {
+    "lesson_id": "build-and-rearrange",
+    "goal_index": "2",
+    "text": "Put Week in Columns and press Enter to close the list: the washes cube, built in seconds.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse the field list · Week is three fields below Total washes."
+   },
+   {
+    "lesson_id": "build-and-rearrange",
+    "goal_index": "3",
+    "text": "Name the pivot’s sheet Cuts with Alt, H, O, R, so a reader knows what it holds.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse the sheet tab · Alt, H, O, R selects the tab’s name; type over it."
+   },
+   {
+    "lesson_id": "build-and-rearrange",
+    "goal_index": "4",
+    "text": "On the pivot, reopen the list with Shift+F10, D and swap the fields: Site across, Week down.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse the field list · C on Site moves it across; R on Week moves it down."
+   },
+   {
+    "lesson_id": "build-and-rearrange",
+    "goal_index": "5",
+    "text": "Put Retail revenue ($) in Values in place of the washes, and press Enter to close the list.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse the field list · Retail revenue ($) sits two fields above Week."
+   },
+   {
+    "lesson_id": "build-and-rearrange",
+    "goal_index": "6",
+    "text": "Go to Summary!F31, the revenue cube’s total, and compare it with the pivot’s grand total: they agree.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell Summary!F31 · The revenue cube’s total is the bottom right of its block."
+   },
+   {
+    "lesson_id": "build-and-rearrange",
+    "goal_index": "7",
+    "text": "Does it tie? Watch Domain’s first day on Export change and the pivot keep its old figure: it is a copy until it is refreshed.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell Cuts!D4 · The pivot reads its own copy of the export."
+   }
+  ],
+  "group-dates-and-value-settings": [
+   {
+    "lesson_id": "group-dates-and-value-settings",
+    "goal_index": "0",
+    "text": "Go to the pivot on Cuts and open its field list again with Shift+F10, D.",
+    "teach": "Shift+F10 opens the shortcut menu on the cell under the cursor. On a pivot it offers Show Field List (D), Refresh (R) and Show Values As (A).",
+    "why": "",
+    "hint_stuck": "pulse cell Cuts!A3 · The cursor has to sit inside the pivot for its shortcut menu."
+   },
+   {
+    "lesson_id": "group-dates-and-value-settings",
+    "goal_index": "1",
+    "text": "Put Date in Rows in place of Week: fifteen days down the side, one row each.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse the field list · Date is the first field, so Home lands on it."
+   },
+   {
+    "lesson_id": "group-dates-and-value-settings",
+    "goal_index": "2",
+    "text": "Group the days into weeks: put Week back in Rows, the period key the export already carries.",
+    "teach": "Excel can group a date field into days, months or years itself (Alt, J, T, G). A period key in the export does the same job, and it matches every SUMIFS that reads the same column.",
+    "why": "",
+    "hint_stuck": "pulse the field list · Week sits two fields above the last one."
+   },
+   {
+    "lesson_id": "group-dates-and-value-settings",
+    "goal_index": "3",
+    "text": "Close the list, then press Shift+F10, A, C: each week’s revenue as a % of Column Total.",
+    "teach": "Show Values As changes what a figure means, not the data under it. % of Column Total divides each cell by its column’s total, so each site’s column adds to 100%.",
+    "why": "",
+    "hint_stuck": "pulse cell Cuts!A3 · A opens Show Values As; C picks % of Column Total."
+   },
+   {
+    "lesson_id": "group-dates-and-value-settings",
+    "goal_index": "4",
+    "text": "Reopen the list, put Total washes in Values and press S twice for the average washes per site-day.",
+    "teach": "S in the field list cycles the value field through Sum, Count and Average. A new value field starts at No Calculation, so the share goes with the revenue.",
+    "why": "",
+    "hint_stuck": "pulse the field list · The list opens on the field in Values; Total washes is one above it."
+   },
+   {
+    "lesson_id": "group-dates-and-value-settings",
+    "goal_index": "5",
+    "text": "Count the days each site reported: “Site” alone in Rows, then “Date” in Values as a Count, and close the list.",
+    "teach": "Count counts rows, whatever they hold: a day that came in with no washes still counts as a day.",
+    "why": "",
+    "hint_stuck": "pulse the field list · R on Site takes it out of Columns too; S once turns the sum of dates into a count."
+   },
+   {
+    "lesson_id": "group-dates-and-value-settings",
+    "goal_index": "6",
+    "text": "Go to Summary!G7, Riverside’s days reported: 14 there, 15 rows in the pivot, because one day came in blank.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell Summary!G7 · Summary counts the days with hours open; the pivot counts rows."
+   },
+   {
+    "lesson_id": "group-dates-and-value-settings",
+    "goal_index": "7",
+    "text": "Does it tie? Watch the counts add to 90 in the grand total: one row for each site and day in the export.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell Cuts!B10 · Six sites, fifteen days."
+   }
+  ],
+  "refresh-and-getpivotdata": [
+   {
+    "lesson_id": "refresh-and-getpivotdata",
+    "goal_index": "0",
+    "text": "On Cuts, reopen the field list and lay the pivot out as the cube: Week down, Site across, Total washes in Values.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse the field list · R sends a field down, C across, V into Values."
+   },
+   {
+    "lesson_id": "refresh-and-getpivotdata",
+    "goal_index": "1",
+    "text": "Type the controller’s correction: Domain’s member washes on its first day, Export!D5, are 135.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell Export!D5 · It reads 125 today."
+   },
+   {
+    "lesson_id": "refresh-and-getpivotdata",
+    "goal_index": "2",
+    "text": "The Domain tab keeps its own copy of the week: make its first week of member washes, Domain!C6, 870.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell Domain!C6 · Summary’s roll-up check compares the six tabs with the cube, so it reads -10 until the tab agrees."
+   },
+   {
+    "lesson_id": "refresh-and-getpivotdata",
+    "goal_index": "3",
+    "text": "Go back to the pivot, see Domain’s first week unchanged, and press Alt+F5 to refresh it.",
+    "teach": "A pivot reads its own copy of the source, so an edit to the export does not reach it. Alt+F5 refreshes the pivot under the cursor; Ctrl+Alt+F5 refreshes every pivot in the workbook.",
+    "why": "",
+    "hint_stuck": "pulse cell Cuts!D5 · Domain’s first week should rise by 10."
+   },
+   {
+    "lesson_id": "refresh-and-getpivotdata",
+    "goal_index": "4",
+    "text": "On Summary, read Domain’s washes from the pivot: I14 =GETPIVOTDATA(\"Total washes\",Cuts!$A$3,\"Site\",\"AUS-DOM\").",
+    "teach": "GETPIVOTDATA(data_field, pivot, field, item) finds a figure by its labels, not its address: the data field, any cell of the pivot, then each field and item that narrows it down. In Excel, typing = and pointing at a pivot cell writes one for you.",
+    "why": "",
+    "hint_stuck": "pulse cell Summary!I14 · Each label sits in quotes; the pivot is any cell of it, anchored."
+   },
+   {
+    "lesson_id": "refresh-and-getpivotdata",
+    "goal_index": "5",
+    "text": "Put the check beside it: I15 =I14-F15, the pivot less the SUMIFS cube, which reads 0.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell Summary!I15 · F15 is Domain’s total in the cube."
+   },
+   {
+    "lesson_id": "refresh-and-getpivotdata",
+    "goal_index": "6",
+    "text": "Turn the pivot round, Site down and Week across, and watch I14 still find Domain.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse the field list · R on Site, then C on Week."
+   },
+   {
+    "lesson_id": "refresh-and-getpivotdata",
+    "goal_index": "7",
+    "text": "Does it tie? Watch Domain’s first day change on Export, the pivot refresh, and I14 follow it.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell Summary!I14 · The refresh carries the change to the pivot, and GETPIVOTDATA reads it."
+   }
+  ],
+  "challenge-an-export-summarized-three-ways": [
+   {
+    "lesson_id": "challenge-an-export-summarized-three-ways",
+    "goal_index": "0",
+    "text": "Pivot one, on a sheet of its own: Total washes by Site down and Week across.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-an-export-summarized-three-ways",
+    "goal_index": "1",
+    "text": "Pivot two: Retail revenue ($) by Week down and Site across, shown as a % of Column Total.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-an-export-summarized-three-ways",
+    "goal_index": "2",
+    "text": "Pivot three: the average Total washes by Site.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-an-export-summarized-three-ways",
+    "goal_index": "3",
+    "text": "Enter Riverside’s late day: copy Export!M49:N49 into C49:D49, then refresh every pivot with Ctrl+Alt+F5.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-an-export-summarized-three-ways",
+    "goal_index": "4",
+    "text": "On Summary, read Domain’s washes from pivot one into I14 with GETPIVOTDATA.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "a-case-toggle-with-choose-and-index": [
+   {
+    "lesson_id": "a-case-toggle-with-choose-and-index",
+    "goal_index": "0",
+    "text": "Turn the picker into the switch: C11 =MATCH(C10,Lists!$L$5:$L$7,0), the case’s place in the list.",
+    "teach": "A case switch is one cell that says which case is live, as a number. MATCH turns the picker’s name into that number, so a reader picks a word and the model reads 1, 2 or 3.",
+    "why": "",
+    "hint_stuck": "pulse cell Scenarios!C11 · The case names sit in Lists!L5:L7, in the picker’s order."
+   },
+   {
+    "lesson_id": "a-case-toggle-with-choose-and-index",
+    "goal_index": "1",
+    "text": "Live washes a day: G5 =CHOOSE($C$11,C5,D5,E5).",
+    "teach": "CHOOSE(index, value1, value2, value3) returns the value in the place the index names. Anchor the switch with $ so every line reads the same cell.",
+    "why": "",
+    "hint_stuck": "pulse cell G5 · CHOOSE takes the switch first, then the three cases in order."
+   },
+   {
+    "lesson_id": "a-case-toggle-with-choose-and-index",
+    "goal_index": "2",
+    "text": "Live ticket, share and sites: select G6:G8 and enter =INDEX(C6:E6,$C$11) with Ctrl+Enter.",
+    "teach": "INDEX(C6:E6, n) returns the nth cell of the range: the same answer as CHOOSE, from a range that grows by one column when a fourth case arrives.",
+    "why": "",
+    "hint_stuck": "pulse range G6:G8 · The row is relative, the switch is anchored, so one entry fills three lines."
+   },
+   {
+    "lesson_id": "a-case-toggle-with-choose-and-index",
+    "goal_index": "3",
+    "text": "Feed the model from the live column: C17 =G8*G5*Inputs!$C$10, washes a year, and C18 =C17*G6, revenue.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C17:C18 · Sites times washes a day times days a year; then washes times the ticket."
+   },
+   {
+    "lesson_id": "a-case-toggle-with-choose-and-index",
+    "goal_index": "4",
+    "text": "Close the model: C22 =SUM(C18:C21), site contribution, and C24 =C22+C23, EBITDA.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C22:C24 · The costs between are negative, so a sum nets them."
+   },
+   {
+    "lesson_id": "a-case-toggle-with-choose-and-index",
+    "goal_index": "5",
+    "text": "Light the live case: on C4:E8, a formula rule =C$4=$C$10 with a green fill.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C4:E8 · C$4 reads each column’s case name; the rule holds where it matches the picker."
+   },
+   {
+    "lesson_id": "a-case-toggle-with-choose-and-index",
+    "goal_index": "6",
+    "text": "Name the case on the page: A1 =$C$10&\" case: Clearcoat Express forecast, FY27\".",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell A1 · A printout should say which case it shows without anyone reading the switch."
+   },
+   {
+    "lesson_id": "a-case-toggle-with-choose-and-index",
+    "goal_index": "7",
+    "text": "Does it tie? Watch the picker go to Downside: EBITDA falls, the green moves to column E and the title follows.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C24 · One switch moves every output."
+   }
+  ],
+  "one-way-data-table-the-ticket": [
+   {
+    "lesson_id": "one-way-data-table-the-ticket",
+    "goal_index": "0",
+    "text": "Type the tickets across D28:H28: 12, 13, 14, 15 and 16.",
+    "teach": "A table’s edge is typed, in blue, and never linked to the input cell the table drives. The table writes each value into that input in turn, so a linked edge would move under it and the grid would come out wrong.",
+    "why": "",
+    "hint_stuck": "pulse range D28:H28 · Tab moves right after each entry; the formats are set."
+   },
+   {
+    "lesson_id": "one-way-data-table-the-ticket",
+    "goal_index": "1",
+    "text": "Link the output at the left of the row below: C29 =C24, the live EBITDA.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C29 · The table recalculates this formula once for each ticket."
+   },
+   {
+    "lesson_id": "one-way-data-table-the-ticket",
+    "goal_index": "2",
+    "text": "Select C28:H29, press Alt, A, W, T, set the Row input cell to G6, the live ticket, and press Enter.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C28:H29 · Alt+R jumps to the Row input cell; the values run across a row."
+   },
+   {
+    "lesson_id": "one-way-data-table-the-ticket",
+    "goal_index": "3",
+    "text": "Type a figure over F29 and press Enter: Excel refuses it, so press Esc.",
+    "teach": "Every cell of the results holds {=TABLE(G6,)}, one array for the whole row. Excel refuses an entry in any one of them: change the table by clearing or rebuilding it whole.",
+    "why": "",
+    "hint_stuck": "pulse cell F29 · The cell is part of the table’s array."
+   },
+   {
+    "lesson_id": "one-way-data-table-the-ticket",
+    "goal_index": "4",
+    "text": "Say which case the table ran on: B27 =\"EBITDA by ticket, \"&$C$10&\" case\".",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell B27 · A printed sensitivity has to say which case it is."
+   },
+   {
+    "lesson_id": "one-way-data-table-the-ticket",
+    "goal_index": "5",
+    "text": "Does it tie? Watch the picker go to Downside: the title changes and the whole row recalculates.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range D29:H29 · The table reruns the model for each ticket on every change."
+   }
+  ],
+  "two-way-data-table-ticket-member-share": [
+   {
+    "lesson_id": "two-way-data-table-ticket-member-share",
+    "goal_index": "0",
+    "text": "Start the table at C32: the corner =C24, then the tickets 12 to 16 across D32:H32.",
+    "teach": "A two-way table moves two inputs: one set of values across the top, another down the left, and the output formula in the corner where they meet. Both edges are typed, never linked to the inputs the table drives.",
+    "why": "",
+    "hint_stuck": "pulse range C32:H32 · The corner reads EBITDA; the tickets run across beside it."
+   },
+   {
+    "lesson_id": "two-way-data-table-ticket-member-share",
+    "goal_index": "1",
+    "text": "Type the member shares down C33:C37: 40, 45, 50, 55 and 60, which the percent format reads as 40% to 60%.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C33:C37 · The cells are formatted as percentages already, so 40 goes in as 40.0%."
+   },
+   {
+    "lesson_id": "two-way-data-table-ticket-member-share",
+    "goal_index": "2",
+    "text": "Select C32:H37, press Alt, A, W, T, set the Row input cell to G6 and the Column input cell to G7, and press Enter.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C32:H37 · The values across the top move the ticket; the values down the side move the share."
+   },
+   {
+    "lesson_id": "two-way-data-table-ticket-member-share",
+    "goal_index": "3",
+    "text": "Mark the base case, $14 and 50%, in bold: F35.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell F35 · The third ticket across, the third share down."
+   },
+   {
+    "lesson_id": "two-way-data-table-ticket-member-share",
+    "goal_index": "4",
+    "text": "Turn red every cell below the live EBITDA: on D33:H37, a formula rule =D33<$C$24 with the light red fill.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range D33:H37 · D33 is relative, so each cell compares itself; $C$24 stays put."
+   },
+   {
+    "lesson_id": "two-way-data-table-ticket-member-share",
+    "goal_index": "5",
+    "text": "Set calculation to Automatic except for Data Tables, then make Base washes a day, D5, 230: EBITDA moves and the grid holds.",
+    "teach": "A Data Table reruns the model once for every cell, so a big model with tables slows down. Automatic except for Data Tables (Alt, M, X, E) recalculates everything else at once and leaves the tables until you press F9.",
+    "why": "",
+    "hint_stuck": "pulse cell D5 · Alt, M, X opens Calculation Options; E is Automatic except for Data Tables."
+   },
+   {
+    "lesson_id": "two-way-data-table-ticket-member-share",
+    "goal_index": "6",
+    "text": "Press F9 to bring the grid up to date, put 250 back in D5, and set calculation back to Automatic: Alt, M, X, A.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell D5 · A model sent in Automatic except for Data Tables shows stale grids to whoever opens it."
+   },
+   {
+    "lesson_id": "two-way-data-table-ticket-member-share",
+    "goal_index": "7",
+    "text": "Does it tie? Watch Base sites at year end, D8, go from 44 to 40: every cell of D33:H37 falls and more of it turns red.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range D33:H37 · The grid reruns the model for every pair of ticket and share."
+   }
+  ],
+  "goal-seek-break-even-washes-per-site": [
+   {
+    "lesson_id": "goal-seek-break-even-washes-per-site",
+    "goal_index": "0",
+    "text": "Domain’s daily site costs from Lists: C41 =INDEX(Lists!$H$5:$H$10,MATCH(C40,Lists!$B$5:$B$10,0)).",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C41 · Column H of the site list holds each site’s daily costs; MATCH finds Domain’s row."
+   },
+   {
+    "lesson_id": "goal-seek-break-even-washes-per-site",
+    "goal_index": "1",
+    "text": "Contribution per wash: C42 =G6-Inputs!$C$5-(1-G7)*Inputs!$C$7, the ticket less the wash and the retail costs.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C42 · Retail cost falls only on the retail share, 1 less the member share."
+   },
+   {
+    "lesson_id": "goal-seek-break-even-washes-per-site",
+    "goal_index": "2",
+    "text": "Domain’s daily contribution at 250 washes a day: C44 =C43*C42-C41.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C44 · Washes times what each one contributes, less the day’s site costs."
+   },
+   {
+    "lesson_id": "goal-seek-break-even-washes-per-site",
+    "goal_index": "3",
+    "text": "Break-even by hand: C45 =C41/C42, the site costs over the contribution per wash.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C45 · The washes at which the daily contribution is exactly zero."
+   },
+   {
+    "lesson_id": "goal-seek-break-even-washes-per-site",
+    "goal_index": "4",
+    "text": "Goal Seek: on C44, set it to 0 by changing C43, and keep the answer.",
+    "teach": "Goal Seek (Alt, A, W, G) sets one formula cell to a value by changing one input: Set cell, To value (Alt+V), By changing cell (Alt+C). Enter runs it and Enter again keeps the answer, written over the input.",
+    "why": "",
+    "hint_stuck": "pulse cell C44 · Goal Seek starts on the active cell as its Set cell."
+   },
+   {
+    "lesson_id": "goal-seek-break-even-washes-per-site",
+    "goal_index": "5",
+    "text": "Note the answer in C46 as 121, beside its label, and put 250 back in C43.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C46 · Goal Seek left its answer in the input; the model’s washes go back to 250."
+   },
+   {
+    "lesson_id": "goal-seek-break-even-washes-per-site",
+    "goal_index": "6",
+    "text": "Does it tie? Watch the cost per wash on Inputs go from $1.50 to $2.00 and the break-even in C45 rise.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C45 · The hand formula is live; the noted Goal Seek answer is not, until you run it again."
+   }
+  ],
+  "when-data-tables-fail-the-pass-through-driver": [
+   {
+    "lesson_id": "when-data-tables-fail-the-pass-through-driver",
+    "goal_index": "0",
+    "text": "Move the ticket to Inputs: type it in Inputs!C15, 14, one blended ticket for every case.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell Inputs!C15 · The label and the note beside it are in place."
+   },
+   {
+    "lesson_id": "when-data-tables-fail-the-pass-through-driver",
+    "goal_index": "1",
+    "text": "Point the case tickets on Scenarios at it: C6:E6 =Inputs!$C$15 with Ctrl+Enter, then color them green as links.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C6:E6 · Green says the figure comes from another sheet."
+   },
+   {
+    "lesson_id": "when-data-tables-fail-the-pass-through-driver",
+    "goal_index": "2",
+    "text": "Leave C13 blank and give the model its ticket in C14: =IF(C13=\"\",Inputs!$C$15,C13).",
+    "teach": "A Data Table can only write into a cell on its own sheet, so it cannot reach Inputs!C15. The pass-through gives it one: C13 stays blank, and C14 passes the input through until a table writes into C13.",
+    "why": "",
+    "hint_stuck": "pulse cell C14 · B13 says leave blank, so nobody types into the driver."
+   },
+   {
+    "lesson_id": "when-data-tables-fail-the-pass-through-driver",
+    "goal_index": "3",
+    "text": "Point the model at C14: revenue in C18 =C17*C14, and contribution per wash in C42 reading C14 in place of G6.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C18 · Everything that read the live ticket now reads the driver’s cell."
+   },
+   {
+    "lesson_id": "when-data-tables-fail-the-pass-through-driver",
+    "goal_index": "4",
+    "text": "Rebuild the one-way table on the driver: select C28:H29, Alt, A, W, T, Row input cell C13.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C28:H29 · The table writes each ticket into C13, and C14 passes it to the model."
+   },
+   {
+    "lesson_id": "when-data-tables-fail-the-pass-through-driver",
+    "goal_index": "5",
+    "text": "Rebuild the two-way table too: select C32:H37, Row input cell C13, Column input cell G7.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C32:H37 · Only the row input moves to the driver; the share is still G7."
+   },
+   {
+    "lesson_id": "when-data-tables-fail-the-pass-through-driver",
+    "goal_index": "6",
+    "text": "Does it tie? Watch the ticket on Inputs go from $14 to $15: EBITDA rises and both tables follow it.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C29 · The input on another sheet now reaches the tables through one honest cell."
+   }
+  ],
+  "case-outputs-side-by-side-a-data-table-on-the-switch-and-the-sticky-if": [
+   {
+    "lesson_id": "case-outputs-side-by-side-a-data-table-on-the-switch-and-the-sticky-if",
+    "goal_index": "0",
+    "text": "Type the case numbers across D50:F50: 1, 2 and 3.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range D50:F50 · These are the values the table writes into the switch."
+   },
+   {
+    "lesson_id": "case-outputs-side-by-side-a-data-table-on-the-switch-and-the-sticky-if",
+    "goal_index": "1",
+    "text": "Name each column from the list: D49:F49 =INDEX(Lists!$L$5:$L$7,D50) with Ctrl+Enter.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range D49:F49 · INDEX of the case list by the number below each name."
+   },
+   {
+    "lesson_id": "case-outputs-side-by-side-a-data-table-on-the-switch-and-the-sticky-if",
+    "goal_index": "2",
+    "text": "Link the outputs down the side: C51 =C17, C52 =C18, C53 =C22 and C54 =C24.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C51:C54 · Washes a year, revenue, site contribution and EBITDA, live."
+   },
+   {
+    "lesson_id": "case-outputs-side-by-side-a-data-table-on-the-switch-and-the-sticky-if",
+    "goal_index": "3",
+    "text": "Select C50:F54, press Alt, A, W, T, set the Row input cell to the switch, C11, and press Enter.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C50:F54 · The table writes 1, 2 and 3 into the switch and runs the model each time."
+   },
+   {
+    "lesson_id": "case-outputs-side-by-side-a-data-table-on-the-switch-and-the-sticky-if",
+    "goal_index": "4",
+    "text": "Turn on iterative calculation (Alt, F, T, I, Enter) and write the sticky IF in H54: =IF($C$11=2,$C$24,H54).",
+    "teach": "A sticky IF reads the live output when its case is on and its own cell when it is not, so it holds the last value it saw. A cell that reads itself is a circular reference, so it needs iterative calculation on.",
+    "why": "",
+    "hint_stuck": "pulse cell H54 · On Base, the switch reads 2, so H54 takes the live EBITDA."
+   },
+   {
+    "lesson_id": "case-outputs-side-by-side-a-data-table-on-the-switch-and-the-sticky-if",
+    "goal_index": "5",
+    "text": "Set the picker in C10 to Downside: EBITDA falls, and H54 holds Base’s figure, a hardcode that looks like a formula.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell H54 · With the switch off 2, H54 reads itself and keeps what it had."
+   },
+   {
+    "lesson_id": "case-outputs-side-by-side-a-data-table-on-the-switch-and-the-sticky-if",
+    "goal_index": "6",
+    "text": "Keep the table, not the sticky cell: picker back to Base, H54 cleared, and iterative calculation off again.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell H54 · Nobody can tell from the sheet that a sticky cell is stale, so the table stays and the sticky cell goes."
+   },
+   {
+    "lesson_id": "case-outputs-side-by-side-a-data-table-on-the-switch-and-the-sticky-if",
+    "goal_index": "7",
+    "text": "On Q&A, answer questions 9 and 10: F13 =Scenarios!F54, F14 =Scenarios!C46, and mark both Answered in E13:E14.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range F13:F14 · Downside EBITDA is the table’s third column; break-even is the Goal Seek note."
+   },
+   {
+    "lesson_id": "case-outputs-side-by-side-a-data-table-on-the-switch-and-the-sticky-if",
+    "goal_index": "8",
+    "text": "Does it tie? Watch Downside’s washes a day go from 220 to 200: its column of the table moves while Base is live.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range F51:F54 · The table runs the model for every case on every change."
+   }
+  ],
+  "challenge-a-three-case-model-with-a-sensitivity-table": [
+   {
+    "lesson_id": "challenge-a-three-case-model-with-a-sensitivity-table",
+    "goal_index": "0",
+    "text": "The switch and the live column: C11 =MATCH(C10,Lists!$L$5:$L$7,0), G5 by CHOOSE and G6:G8 by INDEX on $C$11.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-a-three-case-model-with-a-sensitivity-table",
+    "goal_index": "1",
+    "text": "The one-way table: select C28:H29 and run a Data Table with the driver C13 as its Row input cell.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-a-three-case-model-with-a-sensitivity-table",
+    "goal_index": "2",
+    "text": "The two-way table on C32:H37: Row input cell C13, Column input cell G7.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-a-three-case-model-with-a-sensitivity-table",
+    "goal_index": "3",
+    "text": "Goal Seek C44 to 0 by changing C43, note the answer in C46 as 121, and put 250 back in C43.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-a-three-case-model-with-a-sensitivity-table",
+    "goal_index": "4",
+    "text": "The cases side by side: select C50:F54 and run a Data Table with the switch C11 as its Row input cell.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
   ]
  },
  "modules": {
@@ -8994,6 +9780,20 @@ export const COPY = {
    "objective": "Build the San Antonio databook end to end, then prove it against the clock; or test out of the chapter.",
    "story_beat": "The databook, tied out. || A fresh export, a fresh site list, a Summary someone else abandoned. Rebuild it so every number reads the export and the flag reads OK, then value the next site on the list. Build it, then build it again on the clock. The assessment is the test-out.",
    "page_name": "The KPI databook"
+  },
+  "pivot-tables": {
+   "id": "pivot-tables",
+   "name": "Pivot tables",
+   "objective": "Build and rearrange a PivotTable, group and set its values, refresh it, and read it from a page with GETPIVOTDATA.",
+   "story_beat": "The fast cut, and where it stops. || Sponsor B’s analyst wants three cuts of the export by tomorrow, and a PivotTable gives each in a minute: a field down, a field across, a field into values. It’s the fastest way to see a dataset and the wrong thing to build a model on, because it holds a copy of the data and doesn’t refresh on its own. Use it for the cut, and GETPIVOTDATA to read it when a page must.",
+   "page_name": "The export, three ways"
+  },
+  "scenarios-and-sensitivity": {
+   "id": "scenarios-and-sensitivity",
+   "name": "Scenarios and sensitivity",
+   "objective": "A case toggle with CHOOSE and INDEX, one-way and two-way data tables, Goal Seek for break-even, the pass-through driver, and the cases side by side.",
+   "story_beat": "What if the ticket falls? || The management case is the company’s own forecast; a buyer builds a base case from what they think will happen and a downside they can live with, and they want all three in one model with a switch, never three files. Then the questions: what if the blended ticket drops a dollar, what if member share slips, how many washes break even. A case toggle and a data table answer them on one sheet.",
+   "page_name": "The management case, with sensitivities"
   }
  },
  "site": {

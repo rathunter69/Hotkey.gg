@@ -77,7 +77,7 @@ export default {
       hintStuck: 'pulse cell D5 · A model sent in Automatic except for Data Tables shows stale grids to whoever opens it.',
       check: (s, ses) => { const sh = scenarios(ses); return settled(ses) && mode(ses) === 'automatic' && washes(ses) === 250 && pressedSince(ses, 'F9') && fresh(ses, sh); } },
     { id: 'tie', closer: true, demo: { script: 'Ctrl+G "Scenarios!D8" Enter "40" Enter Ctrl+G "Scenarios!F35" Enter', cadence: 320 },
-      text: 'Does it tie? Watch Base sites at year end go from 44 to 40: every cell of the grid falls and more of it turns red.', requires: [],
+      text: 'Does it tie? Watch Base sites at year end, D8, go from 44 to 40: every cell of D33:H37 falls and more of it turns red.', requires: [],
       hintStuck: 'pulse range D33:H37 · The grid reruns the model for every pair of ticket and share.',
       check: (s, ses) => ses.demoDone.has('tie') },
   ],

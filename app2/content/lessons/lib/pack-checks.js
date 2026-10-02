@@ -56,7 +56,7 @@ export function pivotFigure(x, rowItem, colItem) {
   const ci = colItem == null ? p.colItems.length : p.colItems.findIndex(v => same(v, colItem)); if (ci < 0) return null;
   return x.sheet.value(refKey(r0 + 2 + ri, c0 + 1 + ci));
 }
-/** The export's own sum of a column over the rows that meet `pred` (a figure to grade a pivot or a GETPIVOTDATA against). */
+/** The sum on the export of a column over the rows that meet `pred` (a figure to grade a pivot or a GETPIVOTDATA against). */
 export function exportSum(ses, col, pred) {
   const X = exportSheet(ses); let t = 0;
   for (let r = 5; r <= 94; r++) { const v = X.value(col + r); if (isNum(v) && pred(r, X)) t += v; }
