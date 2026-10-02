@@ -37,13 +37,13 @@ export function finishPatch({ platform, experience }) {
 /** The two questions and their options (3.2, Frame 6). The sub-lines are site.csv rows. */
 export const QUESTIONS = [
   { key: 'platform', copy: 'first_run_q_keyboard', fallback: 'Which keyboard?', options: [
-    { v: 'win', copy: 'first_run_keyboard_win', label: 'Windows', sub: 'Ctrl, Alt, the Ribbon KeyTips.' },
-    { v: 'mac', copy: 'first_run_keyboard_mac', label: 'Mac', sub: '⌘ and ⌥ stand in for Ctrl and Alt; KeyTips work the same.' },
+    { v: 'win', copy: 'first_run_keyboard_win', label: 'Windows', labelCopy: 'first_run_keyboard_win_label', sub: 'Ctrl, Alt, the Ribbon KeyTips.' },
+    { v: 'mac', copy: 'first_run_keyboard_mac', label: 'Mac', labelCopy: 'first_run_keyboard_mac_label', sub: '⌘ and ⌥ stand in for Ctrl and Alt; KeyTips work the same.' },
   ] },
   { key: 'experience', copy: 'first_run_q_experience', fallback: 'How much Excel?', options: [
-    { v: 'new', copy: 'first_run_exp_new', label: 'New to Excel', sub: 'Start at the first lesson and take them in order.' },
-    { v: 'sometimes', copy: 'first_run_exp_sometimes', label: 'I use it sometimes', sub: 'The same path, and you’ll move through the parts you know faster.' },
-    { v: 'daily', copy: 'first_run_exp_daily', label: 'I use it daily', sub: 'If Chapter 1 looks familiar, take its assessment from Learn and test out.' },
+    { v: 'new', copy: 'first_run_exp_new', label: 'New to Excel', labelCopy: 'first_run_exp_new_label', sub: 'Start at the first lesson and take them in order.' },
+    { v: 'sometimes', copy: 'first_run_exp_sometimes', label: 'I use it sometimes', labelCopy: 'first_run_exp_sometimes_label', sub: 'The same path, and you’ll move through the parts you know faster.' },
+    { v: 'daily', copy: 'first_run_exp_daily', label: 'I use it daily', labelCopy: 'first_run_exp_daily_label', sub: 'If Chapter 1 looks familiar, take its assessment from Learn and test out.' },
   ] },
 ];
 
@@ -104,7 +104,7 @@ export function mountFirstRun(root, ctx = {}) {
         <div class="fr-mark mono">hotkey<b>.gg</b></div>
         <h1 class="h-title">${esc(t('first_run_title', 'Two questions, then the first job.'))}</h1>
         ${QUESTIONS.map(qq => `<div class="fr-q"><div class="label" id="frq-${qq.key}">${esc(t(qq.copy, qq.fallback))}</div>
-          <div class="fr-options" role="radiogroup" aria-labelledby="frq-${qq.key}" data-q="${qq.key}">${qq.options.map(o => `<button type="button" class="fr-opt" role="radio" aria-checked="false" data-q="${qq.key}" data-v="${esc(o.v)}"><span class="fr-opt-label">${esc(o.label)}</span><span class="fr-opt-sub">${esc(t(o.copy, o.sub))}</span></button>`).join('')}</div></div>`).join('')}
+          <div class="fr-options" role="radiogroup" aria-labelledby="frq-${qq.key}" data-q="${qq.key}">${qq.options.map(o => `<button type="button" class="fr-opt" role="radio" aria-checked="false" data-q="${qq.key}" data-v="${esc(o.v)}"><span class="fr-opt-label">${esc(t(o.labelCopy, o.label))}</span><span class="fr-opt-sub">${esc(t(o.copy, o.sub))}</span></button>`).join('')}</div></div>`).join('')}
         <p class="fine">${esc(t('first_run_fine', 'Instructions and keycaps follow the keyboard choice. Both settings change any time from Settings. Progress is saved on this device.'))}</p>
         <div class="btn-row"><span class="keys-hint"><kbd class="key">↑</kbd><kbd class="key">↓</kbd> ${esc(t('first_run_then', 'then'))} <kbd class="key">Enter</kbd></span><button type="button" class="btn btn-primary" data-act="next">${esc(t('first_run_next', 'Next'))}<kbd class="key key-on-fill">Enter</kbd></button><button type="button" class="btn" data-act="skip">${esc(t('first_run_skip', 'Skip'))}<kbd class="key">Esc</kbd></button></div>
       </section>`;

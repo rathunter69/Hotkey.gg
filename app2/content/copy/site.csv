@@ -1231,3 +1231,290 @@ rapid_cmd_name-manager,Name Manager
 rapid_cmd_define-name,Define Name
 rapid_cmd_pivot-table,PivotTable
 rapid_cmd_calc-except-tables,Automatic Except for Data Tables
+grade_an_input_shown,{cell} is an input shown {color}. Inputs are blue
+grade_formula_shown_blue,{cell} is a formula shown in blue
+grade_green_but_reads,{cell} is green but reads nothing on another sheet
+grade_formula_shown,{cell} is a formula shown in {color}
+grade_has_typed_inside,{cell} has {number} typed inside the formula. Inputs live in their own cell
+grade_breaks_row_s,"{cell} breaks its row's formula. One formula per row, filled right"
+grade_shows_minus_standard,{cell} shows a minus. The standard uses parentheses
+grade_shows_decimals_against,{cell} shows {decimals} decimals against {want} at {first}. Decimals are consistent down a line
+grade_shows_zero_zero,{cell} shows a zero as {shown}. Zero is a dash
+grade_carries_currency_sign,{cell} carries a $. The currency sign sits on the first and total rows only
+grade_has_no_first,{cell} has no $. The first and total rows carry the currency sign
+grade_shows_cost_positive,"{cell} shows a cost as a positive. Costs are negative, stated once up top"
+grade_sign_convention_stated,the sign convention is not stated. Say once in the top rows that costs are shown as negatives
+grade_gridlines_page_someone,gridlines are on. A page someone else reads has them off
+grade_carries_grid_border,"{cell} carries a grid border. A total gets a top border, the block gets none"
+grade_has_no_title,{cell} has no title
+grade_padded_spaces_center,"{cell} is padded with spaces. Center Across Selection, never a merge"
+grade_centered_across_columns,"{cell} is not centered across {span} columns. Center Across Selection, never a merge"
+grade_header_over_numbers,{cell} is a header over numbers that is not right-aligned
+grade_percentage_line_italic,{cell} is a percentage line that is not italic
+grade_sub_item_indented,{cell} is a sub-item that is not indented
+grade_different_font_size,{cell} is a different font size from {first}. One size across the page
+grade_title_smaller_than,"{cell} is a title smaller than the page. One size across, the title may be larger"
+grade_sheet_missing,the sheet is missing
+grade_total_without_top,{cell} is a total without a top border
+grade_no_units_line,"no units line. State the currency once in the top rows (""USD unless stated"")"
+grade_formula_check_live,"{cell} is not a formula. A check is a live difference, not a typed 0"
+grade_does_move_inputs,{cell} does not move with its inputs
+grade_reads_check_does,{cell} reads {value}. The check does not tie
+grade_column_hidden_group,column {col} is hidden. Group it instead
+grade_row_hidden_group,row {row} is hidden. Group it instead
+grade_typed_number_where,{cell} is a typed number where a live formula belongs
+grade_changed_fix_faults,{cell} changed. Fix the faults and nothing else
+grade_has_no_title_2,A1 has no title
+grade_title_bold,A1 is a title that is not bold
+grade_has_no_units,A2 has no units line
+grade_units_line_italic,A2 is the units line and is not italic
+grade_filled_row_spacer,"{cell} is filled, row 3 is the spacer"
+grade_header_bold,{cell} is a header that is not bold
+grade_row_has_no,row 4 has no headers
+grade_holds_label_labels,"{cell} holds a label, labels sit in column B from Chapter 2 on"
+grade_indented_spaces_use,"{cell} is indented with spaces, use the indent button"
+grade_figure_no_number,{cell} is a figure with no number format
+grade_percentage_italic,{cell} is a percentage that is not italic
+grade_carries_vertical_border,{col} carries a vertical border. The A/E divider is the one vertical line a page allows
+grade_total_bold_top,{cell} is a total that is not bold with a top border
+grade_panes_frozen,panes are not frozen at {cell}
+grade_desk_number_format,"{cell} is not in the desk number format: thousands separator, no decimals, negatives in brackets"
+acct_tab_signin,Sign in
+acct_check_email,Check your email.
+acct_magic_go,Email me a link
+acct_unavailable,Sign-in is not configured.
+acct_signup_fine,"You pick a handle right after, and one is suggested. Minimum age 13."
+acct_keep_head,Keep your progress across devices.
+acct_keep_line,"Email and password, a magic link, or Google. No anonymous accounts: as a guest your work stays in this browser."
+acct_carried_head,What is carried over when you sign up
+acct_carried_lessons,"Lesson progress: {n} started, {d} completed"
+acct_carried_bests,Personal bests: {n}
+acct_carried_platform,Platform ({p}) and theme
+acct_carried_skipped,Skipped lessons from placement: {n}
+acct_carried_fine,"Carried once, to the account you create, never from another account. Your handle appears on public boards and your public profile only if you allow it."
+acct_handle,Handle
+acct_handle_fine,Appears on public boards and your public profile if you allow it; change any time (once a day).
+acct_handle_save,Save handle
+acct_public,Public profile
+acct_code,Have a code?
+acct_redeem,Redeem
+acct_stats_empty,"Nothing yet: stats build from your lessons, drills and Dailies as you play."
+acct_stats,Stats
+acct_stat_level,level ({xp} XP)
+acct_stat_time,timed practice
+acct_stat_runs,recorded runs
+acct_stat_keys,keystrokes in runs
+acct_stat_pbs,personal bests
+acct_stat_streak,day streak
+acct_improvement,Improvement:
+acct_most_used,Most-used shortcuts (from your best runs):
+acct_delete_line,"Profile, attempts, bests and board entries go, and it cannot be undone. Type {word} to confirm."
+acct_confirm,Confirm
+acct_delete_go,Delete my account
+acct_delete_keep,Keep my account
+acct_data_line_in,"Your progress lives in your account. Export everything we hold, or delete the account and all of it."
+acct_export,Export data (JSON)
+acct_delete_local,Delete local data
+acct_stored,{n} of {m} lessons have progress.
+acct_err_network,Network error. Check your connection and try again.
+acct_link_sent,The sign-in link is on its way; it works on this device.
+acct_confirm_link,Click the confirmation link to finish creating your account.
+acct_google_off,"Google sign-in isn’t switched on yet, so use email for now."
+acct_handle_saved,Handle saved
+acct_err_network_short,Network error. Try again.
+acct_save_failed,Couldn’t save. Try again.
+acct_public_on,Profile is public
+acct_public_off,Profile is private
+acct_signing_out,Signing out…
+acct_code_empty,Enter the code you were given.
+acct_code_bad,That code isn’t right. Check it and try again.
+acct_code_used,That code has already been used.
+acct_code_expired,That code has expired.
+acct_code_tries,Too many tries. Wait an hour.
+acct_code_failed,Couldn’t redeem. Try again.
+acct_paid_until,Paid access is on until {date}.
+acct_code_redeemed,Code redeemed
+acct_export_failed,Export failed. Try again.
+acct_exported,Exported
+acct_local_confirm,Delete all progress and settings saved on this device? This cannot be undone.
+acct_local_deleted,Local data deleted
+acct_deleting,Deleting…
+acct_delete_failed,Couldn’t delete. Try again or contact support.
+acct_deleted,Account deleted
+acct_delete_network,"Network error, so nothing was deleted. Try again."
+acct_signout_unsaved,{n} runs have not reached your account yet and will be lost from this device. Sign out anyway?
+save_state_device,Saved on this device
+flair_unlocks_at,Unlocks at level {n}
+first_run_exp_new_label,New to Excel
+first_run_exp_sometimes_label,I use it sometimes
+first_run_exp_daily_label,I use it daily
+first_run_keyboard_win_label,Windows
+handle_rule,"3 to 20 letters, digits or underscores."
+handle_banned,That handle is not allowed.
+landing_headline_2,Excel isn’t learned. It’s practiced.
+landing_headline_3,The better way to learn Excel
+lesson_save_blocked,Couldn’t save on this device (storage blocked); the lesson still counts for this visit.
+grade_check_failed,a convention check failed
+demo_poster_note,"The live demo didn’t load, so this still shows the finished sheet. {link} to do it yourself."
+demo_poster_alt,A finished demo: four goals from Chapter 1 done on the weekly report
+fx_sound_off_title,Sound is off. Click to turn it on.
+fx_sound_off,Sound off
+err_mount,"Something broke on our side. Retry, or go to {page}."
+err_cap,Couldn’t load
+err_head,{page} didn’t load.
+err_retry,Retry
+narrow_head,hotkey.gg needs a keyboard and a wider screen.
+err_fetch,{page} couldn’t be fetched. Check your connection and try again.
+narrow_line,"Lessons and drills run on a real spreadsheet with the keyboard. Open this page on a laptop or desktop, at least 900px wide."
+narrow_back,Back to Learn
+page_label_home,Home
+page_label_landing,The front page
+page_label_root,Home
+page_label_start,Getting started
+page_label_learn,Learn
+page_label_lesson,This lesson
+page_label_practice,Practice
+page_label_drill,This drill
+page_label_daily,The Daily
+page_label_rapid,Rapid-fire
+page_label_due,Due today
+page_label_leaderboard,The leaderboard
+page_label_reference,The shortcut reference
+page_label_pricing,Pricing
+page_label_teams,Teams
+page_label_account,Your account
+page_label_checkout,Checkout
+page_label_other,This page
+save_state_pending,Saving to your account…
+save_state_account,Saved to your account
+save_state_retry,"Couldn’t save, will retry"
+save_state_failed,Couldn’t save on this device
+save_line_device,saved on this device
+save_line_pending,being saved to your account
+save_line_account,saved to your account
+save_line_retry,kept on this device until your account can be reached
+save_line_failed,not being saved: this browser is blocking storage
+first_run_keyboard_mac_label,Mac
+learn_plan_1,"The worksheet and the active cell, moving, selecting, entering and editing, the Ribbon and dialog boxes, basic formatting, basic formulas, copy, paste and fill."
+learn_plan_2,"Number formats, fonts, borders and fills, alignment, column widths and cell styles: a report that reads cleanly."
+learn_plan_3,"Relative and absolute references, SUM, AVERAGE, IF, text and date functions, and how to audit a formula."
+learn_plan_4,"Lists, sort and filter, lookups and summaries: the questions a manager asks of a table."
+learn_plan_5,"Schedules, the three statements, linking them together, and auditing a model."
+learn_plan_6,"DCF, comps, LBO and waterfalls, built the way a deal team builds them."
+fx_sound_on_title,Sound is on. Click to mute.
+fx_sound_on,Sound on
+acct_signout_unsaved_one,One run has not reached your account yet and will be lost from this device. Sign out anyway?
+acct_tab_signup,Create account
+acct_tab_magic,Magic link
+acct_delete_head,Delete your account for good.
+acct_data_line_out,"Progress and settings live in this browser’s storage. Export them as a file, or delete them here."
+acct_delete,Delete account
+acct_stored_times,{n} of {m} lessons have progress; best times total {s} s.
+acct_stored_none,Nothing is stored yet.
+acct_delete_fine,"Deleting the account removes your profile, attempts and board entries. It cannot be undone."
+acct_paid_on,Paid access is on.
+demo_poster_link,Open lesson 1.1.1
+demo_title,Alignment and titles
+demo_brief,"The Report’s figures are in. Make the units line a note, right-align the headers over the figures and turn the gridlines off."
+demo_teach_1,"Ctrl+I sets italic, so a note reads as a note."
+demo_goal_1,"Make the units line italic, A2."
+demo_teach_2,Ctrl+Shift+→ selects to the edge in one press.
+demo_goal_2,"Select the headers over the figures, C4:I4."
+demo_teach_3,"Alt walks the Ribbon: H for Home, A for Align, R for Right."
+demo_goal_3,"Right-align the headers, C4:I4."
+demo_teach_4,"Alt walks the Ribbon: W for View, V then G for Gridlines."
+demo_goal_4,Turn the gridlines off.
+conv_A1_name,Set Excel up before you model
+conv_A1_short,"Set up once: calc mode, iteration, defaults"
+conv_A2_name,The QAT holds your formatting commands
+conv_A2_short,Alt+number beats a long Alt chord
+conv_A3_name,Gridlines off on a page someone reads
+conv_A3_short,"Borders carry structure, not gridlines"
+conv_A4_name,"Descriptive tab names, logical order"
+conv_A4_short,"Name the tabs; outputs left, data right"
+conv_A5_name,Keyboard first
+conv_A5_short,"The mouse is for reviewing, not building"
+conv_A6_name,Save versions as you go
+conv_A6_short,Never overwrite the only copy
+conv_B1_name,"Blue inputs, black formulas"
+conv_B1_short,"Inputs blue, formulas black"
+conv_B2_name,Green links to other sheets
+conv_B2_short,Links green; external links avoided
+conv_B3_name,Inputs may carry a light fill
+conv_B3_short,A tint marks the input block
+conv_B4_name,No hardcodes inside formulas
+conv_B4_short,"One input, one cell; formulas reference it"
+conv_B5_name,Actuals and estimates look different
+conv_B5_short,Mark the A/E divider
+conv_B6_name,Document every hardcode
+conv_B6_short,"Label the source (""per utility contract"")"
+conv_C1_name,Inputs → calculations → outputs
+conv_C1_short,"Inputs, calcs, outputs, in that order"
+conv_C2_name,"One timeline row, equal period columns"
+conv_C2_short,"Timeline on top, equal widths"
+conv_C3_name,"One formula per row, filled right"
+conv_C3_short,"Write once, fill right"
+conv_C4_name,"One sign convention, stated"
+conv_C4_short,"Income positive, costs negative"
+conv_C5_name,Units stated once
+conv_C5_short,"A units line: ""USD unless stated"""
+conv_C6_name,Long sheets over many tabs
+conv_C6_short,"Schedules feed statements, never back"
+conv_C7_name,"Group, don’t hide"
+conv_C7_short,Hidden columns get forgotten
+conv_C8_name,Freeze panes on long sheets
+conv_C8_short,Keep the timeline and labels in view
+conv_C9_name,"Named ranges, sparingly"
+conv_C9_short,Name toggles and key inputs only
+conv_D1_name,Negatives in parentheses
+conv_D1_short,"Parentheses, never a leading minus"
+conv_D2_name,Consistent decimals down a line
+conv_D2_short,One decimals setting per line
+conv_D3_name,Zero shown as a dash
+conv_D3_short,"A dash, not 0.0"
+conv_D4_name,Currency symbol first and total rows only
+conv_D4_short,$ on the first and total rows
+conv_D5_name,Totals bold with a top border
+conv_D5_short,"A top border, never an all-borders grid"
+conv_D6_name,"Indent hierarchy, right-aligned headers"
+conv_D6_short,Indent sub-items; headers over numbers
+conv_D7_name,"Center Across Selection, never merge"
+conv_D7_short,Merged cells break everything
+conv_D8_name,"One font, one size"
+conv_D8_short,No color for decoration
+conv_D9_name,Custom formats do the labelling
+conv_D9_short,"Units live in the format, not typed text"
+conv_E1_name,"Point, don’t type"
+conv_E1_short,Build references by pointing; F2 to read back
+conv_E2_name,F4 anchors while typing
+conv_E2_short,Know the four anchor states
+conv_E3_name,"Fill, don’t retype"
+conv_E3_short,"Ctrl+D down, Ctrl+R across"
+conv_E4_name,Paste Special on purpose
+conv_E4_short,"Values to snapshot, never over live formulas"
+conv_E5_name,AutoSum the block plus its edge
+conv_E5_short,"Alt+= once, across the block"
+conv_E6_name,"No nested-IF towers, no volatile functions"
+conv_E6_short,MIN/MAX or a lookup instead
+conv_E7_name,Avoid external workbook links
+conv_E7_short,Check for stray links before sending
+conv_E8_name,Circularity only on purpose
+conv_E8_short,Iterative calc + a circuit breaker
+conv_E9_name,Scenarios in one model
+conv_E9_short,"A case toggle, never copies of the file"
+conv_F1_name,A checks row wherever two things must agree
+conv_F1_short,The check is a live difference → 0
+conv_F2_name,Never plug
+conv_F2_short,Cash balances the sheet; nothing is forced
+conv_F3_name,Hardcode hunt before you send
+conv_F3_short,"Go To Special, show formulas, trace"
+conv_F4_name,Sense-check magnitudes
+conv_F4_short,Read the page before anyone else does
+conv_F5_name,Read what Excel tells you
+conv_F5_short,"The count, the proposal, the error code"
+conv_G1_name,Print set-up is part of the model
+conv_G1_short,"Fit to page, titles, footer"
+conv_G2_name,A page reads like an MD reads
+conv_G2_short,"Title, units, timeline, then the answer"
+conv_G3_name,Consistent labels and footnotes
+conv_G3_short,Attention to detail is judged first

@@ -13,6 +13,7 @@
 //   verifyUrl(credentialId), linkedInAddUrl(cert)
 //   COURSE, CHAPTER_STATUSES, MODULE_STATUSES
 import { modulesOf } from '../content/index.js';
+import { siteCopy } from '../content/copy/apply.js';
 
 /**
  * The course the certificate covers: its six chapters, in order, by the ids the content uses.
@@ -104,7 +105,7 @@ export const VERIFY_BASE = 'https://hotkey.gg/#/verify/';
 export const verifyUrl = id => VERIFY_BASE + encodeURIComponent(String(id || ''));
 
 /** LinkedIn's add-certification link, filled in (3.0, The certificate): name, issuer, date, credential id, verification URL. */
-export function linkedInAddUrl({ name = 'hotkey.gg Certified, Excel for Finance', issuer = COURSE.issuer, issuedAt, credentialId, url } = {}) {
+export function linkedInAddUrl({ name = siteCopy('certificate_linkedin_name', 'hotkey.gg Certified, Excel for Finance'), issuer = COURSE.issuer, issuedAt, credentialId, url } = {}) {
   const d = issuedAt ? new Date(issuedAt) : null;
   const q = new URLSearchParams({ startTask: 'CERTIFICATION_NAME', name, organizationName: issuer });
   if (d && Number.isFinite(d.getTime())) { q.set('issueYear', String(d.getUTCFullYear())); q.set('issueMonth', String(d.getUTCMonth() + 1)); }

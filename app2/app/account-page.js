@@ -93,33 +93,33 @@ export function mountAccountPage(root, ctx = {}) {
     const bests = ids.filter(id => all[id].best != null).length;
     const seg = (id, label) => `<button type="button" class="btn ${tab === id ? 'btn-primary' : 'btn-ghost'}" data-tab="${id}"${unavailable ? ' disabled' : ''}>${label}</button>`;
     const form = notice && notice.kind === 'check' ? `
-        <div class="acct-check" role="status"><b>Check your email.</b> ${esc(notice.text)}</div>
+        <div class="acct-check" role="status"><b>${esc(siteCopy('acct_check_email', 'Check your email.'))}</b> ${esc(notice.text)}</div>
         <button class="btn btn-ghost" type="button" id="backBtn">Back</button>`
       : `
-        <div class="acct-tabs" role="tablist">${seg('signin', 'Sign in')}${seg('signup', 'Create account')}${seg('magic', 'Magic link')}</div>
+        <div class="acct-tabs" role="tablist">${seg('signin', esc(siteCopy('rail_sign_in', 'Sign in')))}${seg('signup', esc(siteCopy('acct_tab_signup', 'Create account')))}${seg('magic', esc(siteCopy('acct_tab_magic', 'Magic link')))}</div>
         <form id="authForm" class="acct-form">
           <label>Email<input id="authEmail" type="email" value="${esc(lastEmail)}" autocomplete="email" required${unavailable ? ' disabled' : ''}></label>
           ${tab === 'magic' ? '' : `<label>Password<input id="authPw" type="password" autocomplete="${tab === 'signup' ? 'new-password' : 'current-password'}" minlength="8" required${unavailable ? ' disabled' : ''}></label>`}
           ${notice && notice.kind === 'error' ? `<p class="form-msg form-err" role="alert">${esc(notice.text)}</p>` : ''}
           <div class="data-actions">
-            <button class="btn btn-primary" type="submit"${unavailable || busy ? ' disabled' : ''}>${busy ? '…' : tab === 'signin' ? 'Sign in' : tab === 'signup' ? 'Create account' : 'Email me a link'}</button>
+            <button class="btn btn-primary" type="submit"${unavailable || busy ? ' disabled' : ''}>${busy ? '…' : esc(tab === 'signin' ? siteCopy('rail_sign_in', 'Sign in') : tab === 'signup' ? siteCopy('acct_tab_signup', 'Create account') : siteCopy('acct_magic_go', 'Email me a link'))}</button>
             <button class="btn btn-ghost" type="button" id="googleBtn"${unavailable || busy ? ' disabled' : ''}>Google</button>
           </div>
-          ${unavailable ? '<p class="form-msg" role="status">Sign-in is not configured.</p>' : ''}
-          ${tab === 'signup' ? '<p class="fine">You pick a handle right after, and one is suggested. Minimum age 13.</p>' : ''}
+          ${unavailable ? `<p class="form-msg" role="status">${esc(siteCopy('acct_unavailable', 'Sign-in is not configured.'))}</p>` : ''}
+          ${tab === 'signup' ? `<p class="fine">${esc(siteCopy('acct_signup_fine', 'You pick a handle right after, and one is suggested. Minimum age 13.'))}</p>` : ''}
         </form>`;
     return `<section class="panel acct-panel" id="sec-profile">
-          <div class="panel-head"><h2 class="panel-h">Keep your progress across devices.</h2></div>
-          <p>Email and password, a magic link, or Google. No anonymous accounts: as a guest your work stays in this browser.</p>
+          <div class="panel-head"><h2 class="panel-h">${esc(siteCopy('acct_keep_head', 'Keep your progress across devices.'))}</h2></div>
+          <p>${esc(siteCopy('acct_keep_line', 'Email and password, a magic link, or Google. No anonymous accounts: as a guest your work stays in this browser.'))}</p>
           ${form}
-          <h3 class="row-name">What is carried over when you sign up</h3>
+          <h3 class="row-name">${esc(siteCopy('acct_carried_head', 'What is carried over when you sign up'))}</h3>
           <ul class="plain-list">
-            <li>Lesson progress: ${ids.length} lesson${ids.length === 1 ? '' : 's'} started, ${done} completed</li>
-            <li>Personal bests: ${bests}</li>
-            <li>Platform (${p.platform === 'mac' ? 'Mac' : 'Windows'}) and theme</li>
-            <li>Skipped lessons from placement: ${p.skipped.length}</li>
+            <li>${esc(fillIn(siteCopy('acct_carried_lessons', 'Lesson progress: {n} started, {d} completed'), { n: ids.length, d: done }))}</li>
+            <li>${esc(fillIn(siteCopy('acct_carried_bests', 'Personal bests: {n}'), { n: bests }))}</li>
+            <li>${esc(fillIn(siteCopy('acct_carried_platform', 'Platform ({p}) and theme'), { p: p.platform === 'mac' ? 'Mac' : 'Windows' }))}</li>
+            <li>${esc(fillIn(siteCopy('acct_carried_skipped', 'Skipped lessons from placement: {n}'), { n: p.skipped.length }))}</li>
           </ul>
-          <p class="fine">Carried once, to the account you create, never from another account. Your handle appears on public boards and your public profile only if you allow it.</p>
+          <p class="fine">${esc(siteCopy('acct_carried_fine', 'Carried once, to the account you create, never from another account. Your handle appears on public boards and your public profile only if you allow it.'))}</p>
       </section>`;
   }
 
@@ -131,18 +131,18 @@ export function mountAccountPage(root, ctx = {}) {
           <div class="panel-head"><h2 class="panel-h">${prof && prof.handle ? esc(prof.handle) : '…'}</h2><span class="panel-facts">${esc(siteCopy('account_level', 'Level {n}').replace('{n}', prof ? prof.level : '…'))}</span></div>
           <p class="fine">${esc(u && u.email || '')}</p><p class="fine">${esc(store.saveText())}</p>
           <form id="handleForm" class="acct-form">
-            <label>Handle<input id="handleInput" type="text" value="${prof ? esc(prof.handle) : ''}" maxlength="20" autocomplete="off" spellcheck="false"></label>
-            <p class="fine">Appears on public boards and your public profile if you allow it; change any time (once a day).</p>
+            <label>${esc(siteCopy('acct_handle', 'Handle'))}<input id="handleInput" type="text" value="${prof ? esc(prof.handle) : ''}" maxlength="20" autocomplete="off" spellcheck="false"></label>
+            <p class="fine">${esc(siteCopy('acct_handle_fine', 'Appears on public boards and your public profile if you allow it; change any time (once a day).'))}</p>
             ${notice && notice.kind === 'error' ? `<p class="form-msg form-err" role="alert">${esc(notice.text)}</p>` : ''}
-            <div class="data-actions"><button class="btn btn-primary" type="submit"${busy ? ' disabled' : ''}>Save handle</button></div>
+            <div class="data-actions"><button class="btn btn-primary" type="submit"${busy ? ' disabled' : ''}>${esc(siteCopy('acct_handle_save', 'Save handle'))}</button></div>
           </form>
-          <label class="set set-check"><input id="pubToggle" type="checkbox"${prof && prof.public_profile ? ' checked' : ''}> Public profile<span class="set-note">${esc(siteCopy('account_public_note', ''))}</span></label>
+          <label class="set set-check"><input id="pubToggle" type="checkbox"${prof && prof.public_profile ? ' checked' : ''}> ${esc(siteCopy('acct_public', 'Public profile'))}<span class="set-note">${esc(siteCopy('account_public_note', ''))}</span></label>
           <form id="redeemForm" class="acct-form">
-            <label>Have a code?<input id="redeemInput" type="text" placeholder="XXXX-XXXX-XXXX" maxlength="32" autocomplete="off" spellcheck="false" style="text-transform:uppercase"></label>
+            <label>${esc(siteCopy('acct_code', 'Have a code?'))}<input id="redeemInput" type="text" placeholder="XXXX-XXXX-XXXX" maxlength="32" autocomplete="off" spellcheck="false" style="text-transform:uppercase"></label>
             <p class="form-msg" id="redeemMsg" role="status" aria-live="polite"></p>
-            <div class="data-actions"><button class="btn btn-ghost" type="submit">Redeem</button></div>
+            <div class="data-actions"><button class="btn btn-ghost" type="submit">${esc(siteCopy('acct_redeem', 'Redeem'))}</button></div>
           </form>
-          <div class="data-actions"><button class="btn btn-ghost" id="signOutBtn" type="button">Sign out</button></div>
+          <div class="data-actions"><button class="btn btn-ghost" id="signOutBtn" type="button">${esc(siteCopy('rail_sign_out', 'Sign out'))}</button></div>
       </section>`;
   }
 
@@ -151,20 +151,20 @@ export function mountAccountPage(root, ctx = {}) {
     const s = statsFor();
     const fmtDur = secs => { const m = Math.floor(secs / 60); return m >= 60 ? Math.floor(m / 60) + 'h ' + (m % 60) + 'm' : m >= 1 ? m + 'm ' + Math.round(secs % 60) + 's' : Math.round(secs) + 's'; };
     if (!s.attempts && !Object.keys(s.ctx.progress).length) {
-      return `<section class="panel acct-panel" id="sec-stats"><div class="panel-head"><h2 class="panel-h">Stats</h2></div><p class="panel-line">Nothing yet: stats build from your lessons, drills and Dailies as you play.</p></section>`;
+      return `<section class="panel acct-panel" id="sec-stats"><div class="panel-head"><h2 class="panel-h">${esc(siteCopy('acct_stats', 'Stats'))}</h2></div><p class="panel-line">${esc(siteCopy('acct_stats_empty', 'Nothing yet: stats build from your lessons, drills and Dailies as you play.'))}</p></section>`;
     }
     const improving = s.improvement.filter(r => r.first > r.best);
-    return `<section class="panel acct-panel" id="sec-stats"><div class="panel-head"><h2 class="panel-h">Stats</h2></div>
+    return `<section class="panel acct-panel" id="sec-stats"><div class="panel-head"><h2 class="panel-h">${esc(siteCopy('acct_stats', 'Stats'))}</h2></div>
       <div class="stats-grid">
-        <div class="stat-cell"><b>${s.ctx.level}</b><span>level (${s.ctx.xp} XP)</span></div>
-        <div class="stat-cell"><b>${fmtDur(s.timePractised)}</b><span>timed practice</span></div>
-        <div class="stat-cell"><b>${s.attempts}</b><span>recorded runs</span></div>
-        <div class="stat-cell"><b>${s.keystrokes}</b><span>keystrokes in runs</span></div>
-        <div class="stat-cell"><b>${Object.keys(s.ctx.pbs).length}</b><span>personal bests</span></div>
-        <div class="stat-cell"><b>${s.streak}</b><span>day streak</span></div>
+        <div class="stat-cell"><b>${s.ctx.level}</b><span>${esc(fillIn(siteCopy('acct_stat_level', 'level ({xp} XP)'), { xp: s.ctx.xp }))}</span></div>
+        <div class="stat-cell"><b>${fmtDur(s.timePractised)}</b><span>${esc(siteCopy('acct_stat_time', 'timed practice'))}</span></div>
+        <div class="stat-cell"><b>${s.attempts}</b><span>${esc(siteCopy('acct_stat_runs', 'recorded runs'))}</span></div>
+        <div class="stat-cell"><b>${s.keystrokes}</b><span>${esc(siteCopy('acct_stat_keys', 'keystrokes in runs'))}</span></div>
+        <div class="stat-cell"><b>${Object.keys(s.ctx.pbs).length}</b><span>${esc(siteCopy('acct_stat_pbs', 'personal bests'))}</span></div>
+        <div class="stat-cell"><b>${s.streak}</b><span>${esc(siteCopy('acct_stat_streak', 'day streak'))}</span></div>
       </div>
-      ${improving.length ? `<p class="stats-improve">Improvement: ${improving.slice(0, 4).map(r => `${esc(r.title)} <b>${r.first.toFixed(1)}s → ${r.best.toFixed(1)}s</b>`).join(', ')}</p>` : ''}
-      ${s.shortcuts.length ? `<p class="stats-keys">Most-used shortcuts (from your best runs): ${s.shortcuts.sort((a, b) => b.count - a.count).slice(0, 6).map(u => `<kbd>${esc(u.keys)}</kbd>${u.count > 1 ? '×' + u.count : ''}`).join(' ')}</p>` : ''}
+      ${improving.length ? `<p class="stats-improve">${esc(siteCopy('acct_improvement', 'Improvement:'))} ${improving.slice(0, 4).map(r => `${esc(r.title)} <b>${r.first.toFixed(1)}s → ${r.best.toFixed(1)}s</b>`).join(', ')}</p>` : ''}
+      ${s.shortcuts.length ? `<p class="stats-keys">${esc(siteCopy('acct_most_used', 'Most-used shortcuts (from your best runs):'))} ${s.shortcuts.sort((a, b) => b.count - a.count).slice(0, 6).map(u => `<kbd>${esc(u.keys)}</kbd>${u.count > 1 ? '×' + u.count : ''}`).join(' ')}</p>` : ''}
       ${s.timeSaved > 5 ? `<p class="fine">${esc(siteCopy('account_time_saved', '').replace('{d}', fmtDur(s.timeSaved)))}</p>` : ''}
       <div class="stats-badges">${badgesHtml(s.ctx)}</div>
     </section>`;
@@ -174,12 +174,12 @@ export function mountAccountPage(root, ctx = {}) {
   function deleteWord() { const prof = store.profile(); return prof && prof.handle ? prof.handle : 'DELETE'; }
   function deleteConfirmHtml() {
     return `<div class="acct-form acct-delete" role="group" aria-labelledby="delTitle">
-        <p id="delTitle"><b>Delete your account for good.</b> Profile, attempts, bests and board entries go, and it cannot be undone. Type <kbd>${esc(deleteWord())}</kbd> to confirm.</p>
-        <label>Confirm<input id="deleteWordInput" type="text" autocomplete="off" spellcheck="false" autocapitalize="off"></label>
+        <p id="delTitle"><b>${esc(siteCopy('acct_delete_head', 'Delete your account for good.'))}</b> ${esc(siteCopy('acct_delete_line', 'Profile, attempts, bests and board entries go, and it cannot be undone. Type {word} to confirm.')).replace('{word}', `<kbd>${esc(deleteWord())}</kbd>`)}</p>
+        <label>${esc(siteCopy('acct_confirm', 'Confirm'))}<input id="deleteWordInput" type="text" autocomplete="off" spellcheck="false" autocapitalize="off"></label>
         <p class="form-msg form-err" id="deleteMsg" role="alert"></p>
         <div class="data-actions">
-          <button class="btn btn-danger" id="deleteConfirmBtn" type="button" disabled>Delete my account</button>
-          <button class="btn btn-ghost" id="deleteCancelBtn" type="button">Keep my account</button>
+          <button class="btn btn-danger" id="deleteConfirmBtn" type="button" disabled>${esc(siteCopy('acct_delete_go', siteCopy('acct_delete_go', '')))}</button>
+          <button class="btn btn-ghost" id="deleteCancelBtn" type="button">${esc(siteCopy('acct_delete_keep', 'Keep my account'))}</button>
         </div>
       </div>`;
   }
@@ -194,13 +194,13 @@ export function mountAccountPage(root, ctx = {}) {
       <div class="pg-side">${statsCard()}
       <section class="panel acct-panel" id="sec-data">
         <div class="panel-head"><h2 class="panel-h">${esc(siteCopy('account_data', 'Your data'))}</h2></div>
-          <p class="panel-line">${signedIn ? 'Your progress lives in your account. Export everything we hold, or delete the account and all of it.' : "Progress and settings live in this browser's storage. Export them as a file, or delete them here."}</p>
+          <p class="panel-line">${esc(signedIn ? siteCopy('acct_data_line_in', 'Your progress lives in your account. Export everything we hold, or delete the account and all of it.') : siteCopy('acct_data_line_out', 'Progress and settings live in this browser’s storage. Export them as a file, or delete them here.'))}</p>
           <div class="data-actions">
-            <button class="btn btn-ghost" id="exportBtn" type="button">Export data (JSON)</button>
-            ${signedIn ? (confirmDelete ? '' : '<button class="btn btn-danger" id="deleteAcctBtn" type="button">Delete account</button>') : '<button class="btn btn-danger" id="deleteBtn" type="button">Delete local data</button>'}
+            <button class="btn btn-ghost" id="exportBtn" type="button">${esc(siteCopy('acct_export', 'Export data (JSON)'))}</button>
+            ${signedIn ? (confirmDelete ? '' : `<button class="btn btn-danger" id="deleteAcctBtn" type="button">${esc(siteCopy('acct_delete', 'Delete account'))}</button>`) : `<button class="btn btn-danger" id="deleteBtn" type="button">${esc(siteCopy('acct_delete_local', 'Delete local data'))}</button>`}
           </div>
           ${signedIn && confirmDelete ? deleteConfirmHtml() : ''}
-          <p class="fine">${ids.length ? `${ids.length} of ${LESSONS.length} lessons have progress${secs ? `; best times total ${secs.toFixed(1)} s` : ''}.` : 'Nothing is stored yet.'}${signedIn ? ' Deleting the account removes your profile, attempts and board entries. It cannot be undone.' : ''}</p>
+          <p class="fine">${esc(ids.length ? fillIn(secs ? siteCopy('acct_stored_times', '{n} of {m} lessons have progress; best times total {s} s.') : siteCopy('acct_stored', '{n} of {m} lessons have progress.'), { n: ids.length, m: LESSONS.length, s: secs.toFixed(1) }) : siteCopy('acct_stored_none', 'Nothing is stored yet.'))}${signedIn ? ' ' + esc(siteCopy('acct_delete_fine', 'Deleting the account removes your profile, attempts and board entries. It cannot be undone.')) : ''}</p>
       </section></div></div>`;
     wire(signedIn);
   }
@@ -223,8 +223,8 @@ export function mountAccountPage(root, ctx = {}) {
       else if (tab === 'signup') res = await auth.signUpPassword(email, pw);
       else res = await auth.magicLink(email);
       busy = false;
-      if (res && res.error) notice = { kind: 'error', text: /Failed to fetch|NetworkError|fetch failed/i.test(res.error) ? 'Network error. Check your connection and try again.' : res.error };
-      else if (res && res.confirm) { notice = { kind: 'check', text: tab === 'magic' ? 'The sign-in link is on its way; it works on this device.' : 'Click the confirmation link to finish creating your account.' }; if (tab === 'signup') track('signup'); }
+      if (res && res.error) notice = { kind: 'error', text: /Failed to fetch|NetworkError|fetch failed/i.test(res.error) ? siteCopy('acct_err_network', 'Network error. Check your connection and try again.') : res.error };
+      else if (res && res.confirm) { notice = { kind: 'check', text: tab === 'magic' ? siteCopy('acct_link_sent', 'The sign-in link is on its way; it works on this device.') : siteCopy('acct_confirm_link', 'Click the confirmation link to finish creating your account.') }; if (tab === 'signup') track('signup'); }
       else { notice = null; track(tab === 'signup' ? 'signup' : 'sign_in'); }   // signed in: onChange re-renders
       render();
     };
@@ -234,7 +234,7 @@ export function mountAccountPage(root, ctx = {}) {
       busy = true; notice = null; render();
       const res = await auth.google();
       busy = false;
-      if (res && res.error) { notice = { kind: 'error', text: /provider is not enabled|validation_failed/i.test(res.error) ? 'Google sign-in isn’t switched on yet, so use email for now.' : res.error }; render(); }
+      if (res && res.error) { notice = { kind: 'error', text: /provider is not enabled|validation_failed/i.test(res.error) ? siteCopy('acct_google_off', 'Google sign-in isn’t switched on yet, so use email for now.') : res.error }; render(); }
     };
 
     // signed-in: handle + public toggle + sign out
@@ -255,9 +255,9 @@ export function mountAccountPage(root, ctx = {}) {
         if (error) { notice = { kind: 'error', text: error.message }; render(); return; }
         notice = null;
         await store.hydrate();
-        showToast('Handle saved');
+        showToast(siteCopy('acct_handle_saved', 'Handle saved'));
         render();
-      } catch (err) { if (auth.current(t)) { busy = false; notice = { kind: 'error', text: 'Network error. Try again.' }; render(); } }
+      } catch (err) { if (auth.current(t)) { busy = false; notice = { kind: 'error', text: siteCopy('acct_err_network_short', 'Network error. Try again.') }; render(); } }
     };
     const pub = el.querySelector('#pubToggle');
     if (pub) pub.onchange = async e => {
@@ -267,20 +267,20 @@ export function mountAccountPage(root, ctx = {}) {
       try {
         const { error } = await sb.rpc('rpc_set_profile', { p: { public_profile: v } });
         if (!auth.current(t)) return;
-        if (error) { showToast('Couldn’t save. Try again'); e.target.checked = !v; return; }
-        showToast(v ? 'Profile is public' : 'Profile is private');
+        if (error) { showToast(siteCopy('acct_save_failed', 'Couldn’t save. Try again.')); e.target.checked = !v; return; }
+        showToast(v ? siteCopy('acct_public_on', 'Profile is public') : siteCopy('acct_public_off', 'Profile is private'));
         store.hydrate();
-      } catch (err) { if (auth.current(t)) { showToast('Couldn’t save. Try again'); e.target.checked = !v; } }
+      } catch (err) { if (auth.current(t)) { showToast(siteCopy('acct_save_failed', 'Couldn’t save. Try again.')); e.target.checked = !v; } }
     };
     const out = el.querySelector('#signOutBtn');
     if (out) out.onclick = async () => {
       if (busy) return;
-      busy = true; out.disabled = true; out.textContent = 'Signing out…';
+      busy = true; out.disabled = true; out.textContent = siteCopy('acct_signing_out', 'Signing out…');
       // give queued runs a moment to reach the account; sign-out then wipes this device
       const clear = await store.drain(3000);
       const left = store.pending();
       busy = false;
-      if (!clear && left && !confirm(`${left} run${left === 1 ? ' has' : 's have'} not reached your account yet and will be lost from this device. Sign out anyway?`)) { render(); return; }
+      if (!clear && left && !confirm(fillIn(left === 1 ? siteCopy('acct_signout_unsaved_one', 'One run has not reached your account yet and will be lost from this device. Sign out anyway?') : siteCopy('acct_signout_unsaved', '{n} runs have not reached your account yet and will be lost from this device. Sign out anyway?'), { n: left }))) { render(); return; }
       auth.signOut();
     };
     const redeem = el.querySelector('#redeemForm');
@@ -288,7 +288,7 @@ export function mountAccountPage(root, ctx = {}) {
       e.preventDefault();
       const code = el.querySelector('#redeemInput').value.trim().toUpperCase();
       const msg = el.querySelector('#redeemMsg');
-      if (!code) { msg.textContent = 'Enter the code you were given.'; return; }
+      if (!code) { msg.textContent = siteCopy('acct_code_empty', 'Enter the code you were given.'); return; }
       const sb = auth.client(); if (!sb) return;
       const t = auth.token();
       try {
@@ -296,18 +296,18 @@ export function mountAccountPage(root, ctx = {}) {
         if (!auth.current(t)) return;
         if (error) {
           const m = String(error.message || '');
-          msg.textContent = m.includes('bad code') ? 'That code isn’t right. Check it and try again.'
-            : m.includes('already used') ? 'That code has already been used.'
-            : m.includes('expired') ? 'That code has expired.'
-            : m.includes('too many tries') ? 'Too many tries. Wait an hour.'
-            : 'Couldn’t redeem. Try again.';
+          msg.textContent = m.includes('bad code') ? siteCopy('acct_code_bad', 'That code isn’t right. Check it and try again.')
+            : m.includes('already used') ? siteCopy('acct_code_used', 'That code has already been used.')
+            : m.includes('expired') ? siteCopy('acct_code_expired', 'That code has expired.')
+            : m.includes('too many tries') ? siteCopy('acct_code_tries', 'Too many tries. Wait an hour.')
+            : siteCopy('acct_code_failed', 'Couldn’t redeem. Try again.');
           return;
         }
         const until = data && data.ends_at ? new Date(data.ends_at).toLocaleDateString() : null;
-        msg.textContent = until ? `Paid access is on until ${until}.` : 'Paid access is on.';
-        showToast('Code redeemed');
+        msg.textContent = until ? fillIn(siteCopy('acct_paid_until', 'Paid access is on until {date}.'), { date: until }) : siteCopy('acct_paid_on', 'Paid access is on.');
+        showToast(siteCopy('acct_code_redeemed', 'Code redeemed'));
         el.querySelector('#redeemInput').value = '';
-      } catch (err) { if (auth.current(t)) msg.textContent = 'Network error. Try again.'; }
+      } catch (err) { if (auth.current(t)) msg.textContent = siteCopy('acct_err_network_short', 'Network error. Try again.'); }
     };
 
     // plan and billing: the portal opens in this tab and returns to #/account
@@ -330,19 +330,19 @@ export function mountAccountPage(root, ctx = {}) {
           const t = auth.token();
           const { data, error } = await sb.rpc('rpc_export_my_data');
           if (!auth.current(t)) return;
-          if (error || !data) { showToast('Export failed. Try again'); return; }
+          if (error || !data) { showToast(siteCopy('acct_export_failed', 'Export failed. Try again.')); return; }
           download('hotkey-account-' + new Date().toISOString().slice(0, 10) + '.json', data);
         } else {
           download('hotkey-progress-' + new Date().toISOString().slice(0, 10) + '.json', exportRecord());
         }
-        showToast('Exported');
-      } catch (e) { showToast('Export failed'); }
+        showToast(siteCopy('acct_exported', 'Exported'));
+      } catch (e) { showToast(siteCopy('acct_export_failed', 'Export failed. Try again.')); }
     };
     const del = el.querySelector('#deleteBtn');
     if (del) del.onclick = () => {
-      if (!confirm('Delete all progress and settings saved on this device? This cannot be undone.')) return;
+      if (!confirm(siteCopy('acct_local_confirm', 'Delete all progress and settings saved on this device? This cannot be undone.'))) return;
       progress.clear(); prefs.clear(); records.clear();
-      showToast('Local data deleted');
+      showToast(siteCopy('acct_local_deleted', 'Local data deleted'));
       render();
     };
     const delAcct = el.querySelector('#deleteAcctBtn');
@@ -361,19 +361,19 @@ export function mountAccountPage(root, ctx = {}) {
         const sb = auth.client(); if (!sb) return;
         const t = auth.token();
         const msg = el.querySelector('#deleteMsg');
-        busy = true; delGo.disabled = true; delGo.textContent = 'Deleting…';
+        busy = true; delGo.disabled = true; delGo.textContent = siteCopy('acct_deleting', 'Deleting…');
         try {
           const { error } = await sb.rpc('rpc_delete_account');
           if (!auth.current(t)) return;
           busy = false;
-          if (error) { delGo.disabled = false; delGo.textContent = 'Delete my account'; msg.textContent = 'Couldn’t delete. Try again or contact support.'; return; }
+          if (error) { delGo.disabled = false; delGo.textContent = siteCopy('acct_delete_go', ''); msg.textContent = siteCopy('acct_delete_failed', 'Couldn’t delete. Try again or contact support.'); return; }
           confirmDelete = false;
           await auth.signOut();
-          showToast('Account deleted');
+          showToast(siteCopy('acct_deleted', 'Account deleted'));
         } catch (e) {
           if (!auth.current(t)) return;
-          busy = false; delGo.disabled = false; delGo.textContent = 'Delete my account';
-          msg.textContent = 'Network error, so nothing was deleted. Try again.';
+          busy = false; delGo.disabled = false; delGo.textContent = siteCopy('acct_delete_go', '');
+          msg.textContent = siteCopy('acct_delete_network', 'Network error, so nothing was deleted. Try again.');
         }
       };
     }

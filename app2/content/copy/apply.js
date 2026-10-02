@@ -60,3 +60,36 @@ export function applyMicroCopy(lesson, id) {
   if (nz(row.teach) && Array.isArray(out.goals) && out.goals[0]) out.goals[0].teach = row.teach;
   return out;
 }
+
+/**
+ * A drill with drills.csv and drill_goals.csv laid over it (R8, M1). Drill modules are singletons
+ * with getters (a fresh plant, a solution built on read), so the words are written onto the drill
+ * in place rather than onto a clone; the checks, keys and states are untouched. A missing row or an
+ * empty cell keeps the drill file's line, which is the fallback (the drill-copy test fails on it).
+ */
+export function applyDrillCopy(drill, copy = COPY) {
+  if (!drill || !copy) return drill;
+  const row = copy.drills && copy.drills[drill.id];
+  const rows = (copy.drillGoals && copy.drillGoals[drill.id]) || [];
+  if (row) {
+    if (nz(row.title)) drill.title = row.title;
+    if (nz(row.task)) drill.task = row.task;
+  }
+  for (const r of rows) {
+    const i = Number(r.index);
+    if (!nz(r.text)) continue;
+    if (r.kind === 'goal' && Array.isArray(drill.goals) && drill.goals[i]) drill.goals[i].text = r.text;
+    else if (r.kind === 'end' && Array.isArray(drill.endState) && drill.endState[i]) drill.endState[i].text = r.text;
+    else if (r.kind === 'why' && drill.whatIf && typeof drill.whatIf === 'object') drill.whatIf.why = r.text;
+  }
+  return drill;
+}
+
+/** Every line a learner reads on a drill, as { kind, index, text } (the drill-copy test and the export walk it). */
+export function drillLines(drill) {
+  const out = [];
+  (drill.goals || []).forEach((g, i) => out.push({ kind: 'goal', index: i, text: g.text }));
+  (drill.endState || []).forEach((g, i) => out.push({ kind: 'end', index: i, text: g.text }));
+  if (drill.whatIf && typeof drill.whatIf.why === 'string') out.push({ kind: 'why', index: 0, text: drill.whatIf.why });
+  return out;
+}

@@ -33,6 +33,7 @@ import { captureInstall } from './install.js';
 import { LEGACY_IDS } from './progress.js';
 import { skeletonHtml } from '../ui/skeleton.js';
 import { itemNumber } from './numbering.js';
+import { siteCopy } from '../content/copy/apply.js';
 // the lesson catalogue and the XP/cosmetics stack load lazily (they are most of the module graph):
 // the nav, the footer and a page skeleton paint first, then the level chip and theme locks catch up
 const lessonsMod = () => import('../content/index.js');
@@ -197,7 +198,8 @@ export function pageLabel(name, params) {
   const L = { home: 'Home', landing: 'The front page', root: 'Home', start: 'Getting started', learn: 'Learn', lesson: 'This lesson',
     practice: 'Practice', drill: params && params.daily ? 'The Daily' : 'This drill', rapid: 'Rapid-fire', due: 'Due today',
     leaderboard: 'The leaderboard', reference: 'The shortcut reference', pricing: 'Pricing', teams: 'Teams', account: 'Your account', checkout: 'Checkout' };
-  return L[name] || 'This page';
+  const key = name === 'drill' && params && params.daily ? 'daily' : L[name] ? name : 'other';
+  return siteCopy('page_label_' + key, L[name] || 'This page');
 }
 
 /**
@@ -209,11 +211,11 @@ function errorCard(root, { name, params, kind }, retry) {
   const label = pageLabel(name, params);
   const onHome = name === 'home' || name === 'root' || name === 'landing';
   const body = kind === 'mount'
-    ? 'Something broke on our side. Retry, or go to ' + (onHome ? 'Learn' : 'Home') + '.'
-    : label + ' couldn’t be fetched. Check your connection and try again.';
-  root.innerHTML = `<div class="err-card" role="alert"><div class="err-cap">Couldn’t load</div>
-    <div class="err-body"><h1>${esc(label)} didn’t load.</h1><p>${esc(body)}</p>
-    <div class="err-actions"><button class="btn btn-primary" id="errRetry" type="button">Retry</button>${onHome ? '<a class="btn btn-ghost" href="#/learn">Learn</a>' : '<a class="btn btn-ghost" href="#/">Home</a>'}</div></div></div>`;
+    ? siteCopy('err_mount', 'Something broke on our side. Retry, or go to {page}.').replace('{page}', onHome ? siteCopy('rail_learn', 'Learn') : siteCopy('rail_home', 'Home'))
+    : siteCopy('err_fetch', '{page} couldn’t be fetched. Check your connection and try again.').replace('{page}', label);
+  root.innerHTML = `<div class="err-card" role="alert"><div class="err-cap">${esc(siteCopy('err_cap', 'Couldn’t load'))}</div>
+    <div class="err-body"><h1>${esc(siteCopy('err_head', '{page} didn’t load.').replace('{page}', label))}</h1><p>${esc(body)}</p>
+    <div class="err-actions"><button class="btn btn-primary" id="errRetry" type="button">${esc(siteCopy('err_retry', 'Retry'))}</button>${onHome ? '<a class="btn btn-ghost" href="#/learn">Learn</a>' : '<a class="btn btn-ghost" href="#/">Home</a>'}</div></div></div>`;
   const b = root.querySelector('#errRetry'); b.onclick = retry; b.focus();
 }
 
@@ -232,9 +234,9 @@ function narrowNotice(root, lesson, content) {
   const crumb = lesson ? narrowCrumb(lesson, content || {}) : '';
   const code = t => esc(t).replace(/`([^`]+)`/g, '<kbd>$1</kbd>');
   el.innerHTML = `<div class="narrow-msg" role="status"><div class="narrow-cap">hotkey.gg</div>
-      <h1>hotkey.gg needs a keyboard and a wider screen.</h1>
-      <p>Lessons and drills run on a real spreadsheet with the keyboard. Open this page on a laptop or desktop, at least 900px wide.</p>
-      <div class="narrow-actions"><a class="btn btn-ghost" href="#/learn">Back to Learn</a></div></div>` +
+      <h1>${esc(siteCopy('narrow_head', 'hotkey.gg needs a keyboard and a wider screen.'))}</h1>
+      <p>${esc(siteCopy('narrow_line', 'Lessons and drills run on a real spreadsheet with the keyboard. Open this page on a laptop or desktop, at least 900px wide.'))}</p>
+      <div class="narrow-actions"><a class="btn btn-ghost" href="#/learn">${esc(siteCopy('narrow_back', 'Back to Learn'))}</a></div></div>` +
     (lesson ? `<article class="narrow-lesson">${crumb ? `<div class="lesson-crumb">${esc(crumb)}</div>` : ''}<h2>${esc(lesson.title)}</h2>` +
       (lesson.brief ? `<p class="narrow-brief">${code(lesson.brief)}</p>` : '') +
       (teach ? `<h3>${esc(teach.title)}</h3>` + teach.body.map(p => `<p>${code(p)}</p>`).join('') : '') +

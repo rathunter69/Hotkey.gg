@@ -624,7 +624,7 @@ export function mountLessonView(root, lesson, { mode = 'guided', seed: seedOpt, 
     }
     // Chapter 6, the last, finished by a subscriber: the course-complete email is due (E-checkout section 6; logged until an email path exists)
     { const ch = chapterOf(lesson); if (ch && CHAPTERS.indexOf(ch) === 5) import('./billing.js').then(b => b.noteCourseComplete(ch.lessons.map(l => l.id), store.all())).catch(() => {}); }
-    saveState = saved ? '' : 'Couldn’t save on this device (storage blocked); the lesson still counts for this visit';
+    saveState = saved ? '' : siteCopy('lesson_save_blocked', 'Couldn’t save on this device (storage blocked); the lesson still counts for this visit.');
     // the quest loop (6.10): the run ticks its quests before the XP is read, so their XP lands in this result
     {
       const newPbQ = timed && lastClean && (!pbBefore || run.elapsed < pbBefore.secs);

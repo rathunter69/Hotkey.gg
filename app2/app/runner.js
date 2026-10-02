@@ -8,6 +8,7 @@ import { stepPath } from '../engine/ribbon.js';
 import { WORKBOOKS, workbookState, applyStatePatch } from '../content/workbooks/index.js';
 import { mulberry32 } from '../engine/rng.js';
 import { SEEDED_KINDS } from '../content/schema.js';
+import { siteCopy } from '../content/copy/apply.js';
 
 export class LessonRun {
   /**
@@ -267,8 +268,8 @@ export class LessonRun {
     // M84: a what-if over the answer block, judged against the reference route under the same change
     if (this.lesson.whatIf && !this.opts.noWhatIf) fns.push(ses => whatIf(ses, this.referenceSession(), this.lesson.whatIf));
     return fns.map(fn => {
-      try { const r = fn(this.session); return { ok: !!(r && r.ok), why: (r && r.why) || 'a convention check failed' }; }
-      catch (e) { return { ok: false, why: 'a convention check failed' }; }
+      try { const r = fn(this.session); return { ok: !!(r && r.ok), why: (r && r.why) || siteCopy('grade_check_failed', 'a convention check failed') }; }
+      catch (e) { return { ok: false, why: siteCopy('grade_check_failed', 'a convention check failed') }; }
     });
   }
   /**

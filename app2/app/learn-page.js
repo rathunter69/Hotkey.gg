@@ -294,7 +294,7 @@ export function mountLearnPage(root, ctx = {}) {
       const to = tab.built.lessons.find(l => l.kind === 'testout');
       if (to) facts = (gate.testout || gate.assessment ? esc(t('learn_verified')) + ',' : `<a href="#/lesson/${esc(to.id)}">${esc(t('learn_testout'))}</a>`) + ' ' + facts;
     }
-    const body = rows.length ? `<div class="mod-list${locked ? ' mod-list-locked' : ''}">${list}</div>` : `<p class="panel-line">${esc(t('learn_coming', { n: tab.n }))}</p>${plan ? `<p class="panel-line">${esc(plan.line)}</p>` : ''}`;
+    const body = rows.length ? `<div class="mod-list${locked ? ' mod-list-locked' : ''}">${list}</div>` : `<p class="panel-line">${esc(t('learn_coming', { n: tab.n }))}</p>${plan ? `<p class="panel-line">${esc(t('learn_plan_' + plan.n, plan.line))}</p>` : ''}`;
     const paywall = locked ? paywallHtml({ heading: t('paywall_chapter', { n: tab.n, name: tab.title }), signedIn: auth.state() === 'in', mode: 'learn', ids: { go: 'learnGoPro', notNow: 'learnNotNow' } }) : '';   // the one paywall panel (M105)
     let side = '';
     if (open && tab.built && !locked) {
