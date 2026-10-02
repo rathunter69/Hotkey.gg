@@ -329,6 +329,22 @@ export const CONCEPTS = {
   'name-manager': 'the Name Manager (Ctrl+F3) lists every name with its value, its reference and its scope; Edit renames or re-points one and the formulas follow, Delete removes a stray',
   'paste-list': 'Paste Name (F3) › Paste List writes every name and what it refers to from the active cell down, so the reviewer can read them on a sheet',
   'name-driven-list': 'a drop-down whose Source is a name (=Cases) reads the named list wherever it sits, so the list can move and the picker keeps working',
+  // Chapter 5 · 5.1 The three statements (the One site and One week pages)
+  'income-statement': 'the income statement runs from revenue through cost of sales, site costs, EBITDA, depreciation, interest and tax to net income, what a period earned',
+  'accrual-gaps': 'profit and cash part by timing: cash paid ahead is deferred revenue, a cost not yet paid is a payable, revenue not yet collected is a receivable',
+  'cash-flow-statement': 'the cash flow statement walks from net income to the change in cash in three parts: operations, investing, financing',
+  'balance-sheet': 'the balance sheet is what the business owns, owes and leaves for its owners on one date; assets equal liabilities plus equity',
+  'statement-links': 'five links join the statements: net income, depreciation, capex, debt and closing cash',
+  'three-statement-events': 'every event lands in at least two statements, and the balance check says whether each one was placed right',
+  'buyer-ratios': 'the ratios a buyer reads first: EBITDA margin, cash conversion, leverage and interest cover',
+  // Chapter 5 · 5.2 Model setup
+  'model-architecture': 'a model reads in the order it calculates: Cover, Inputs, statements, schedules, Checks, DCF; typed numbers live on Inputs only',
+  'timeline-flags': 'a model timeline: year ends by EOMONTH from one typed date, an A/E row, a projection flag that reads the last historical year, and period counters',
+  'columns-counter': '=COLUMNS($C4:C4) counts the columns from the anchor to here, so it reads 1, 2, 3 across with no typed offset',
+  'block-fill': 'a block filled in one motion: the first column written with its anchors, the whole block selected, Ctrl+R',
+  'checks-sheet': 'a Checks sheet built before the model: one row per check, each a ROUND of a live difference, empty and marked pending until its schedule exists',
+  'populate-by-name': 'historicals read from a data tab by name: INDEX on the data, MATCH on the label down and on the year across, SUMIFS where a label repeats',
+  'drivers-block': 'a drivers block: each case typed by year in its own block, and one live block that reads the case the switch names with CHOOSE',
 };
 
 /**

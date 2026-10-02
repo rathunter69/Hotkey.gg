@@ -12,6 +12,7 @@
 // revolver's interest on its average balance is the model's one circle, with Circ as its breaker.
 import { buildPage, FMT } from './page.js';
 import { Sheet } from '../../engine/sheet.js';
+import { diffStates as diffCells, sessionToState as sessionCells } from './clearcoat-weekly.js';
 
 export const CHAPTER = 5;
 export const COLS = ['C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
@@ -179,7 +180,7 @@ function pageCover(extraLinks = []) {
         ['Schedules', 'rollout and revenue, costs, working capital, PP&E, debt, tax'], ['Checks', 'one row per check, the roll-up flag'], ['DCF', 'free cash flow, WACC, terminal value, enterprise value'],
         ['One site', 'Domain for one month, three statements by hand (5.1)'], ['One week', 'Domain for one week, six events (5.1.6)'], ['Data', 'the historical accounts as the accountants sent them'],
         ...extraLinks,
-      ].map(([name, note], i) => ({ key: 'link' + i, label: name, kind: 'text', values: [`=HYPERLINK("#'${name}'!A1","${name}")`, note] })) },
+      ].map(([name, note], i) => ({ key: 'link' + i, label: name, kind: 'text', values: [`=HYPERLINK("#${name.includes(' ') ? `'${name}'` : name}!A1","${name}")`, note] })) },
       { title: 'Cases', rows: CASES.map((c, i) => ({ key: 'c' + (i + 1), label: `Case ${i + 1}`, kind: 'text', values: [c] })) },
       { title: 'Names', rows: [
         { key: 'n1', label: 'Case', kind: 'text', values: ['Cover!$C$6', 'the case number the drivers block reads'] },
@@ -987,12 +988,15 @@ const SITE_BLOCKS = { is: ['rev', 'ni'], accrual: ['cashIn1', 'cfoHand'], cf: ['
 const stripSite = (state, name, blocks) => { for (const b of blocks) strip(state, name, span(name, ...SITE_BLOCKS[b])); };
 const onlyPages = (state, names) => { state.sheets = state.sheets.filter(s => names.includes(s.name)); delete state.names; };
 
+// B518: after 5.1.7, the two pages by hand complete (5.2.1 opens the model itself)
+const B518 = derive(DONE, s => { onlyPages(s, ['One site', 'One week']); });
 // B517: before 5.1.7, One site has everything but the ratios; One week is done
 const B517 = derive(DONE, s => { onlyPages(s, ['One site', 'One week']); stripSite(s, 'One site', ['ratios']); });
 // B516: before 5.1.6, One week holds the events and the opening balance sheet only
 const B516 = derive(B517, s => { strip(s, 'One week', span('One week', 'rev', 'dCheck')); });
-// B515: before 5.1.5 (the links tour), the One week page is not there yet
-const B515 = derive(B516, s => { onlyPages(s, ['One site']); });
+// B515: before 5.1.5 (the links tour, which follows links and builds nothing): the One week page
+// rides along from 5.1.1 with its events and opening balance sheet, since no lesson could type it
+const B515 = derive(B516, () => {});
 // B514: before 5.1.4, the balance sheet block is empty
 const B514 = derive(B515, s => { stripSite(s, 'One site', ['bs']); });
 // B513: before 5.1.3, the cash flow block too
@@ -1241,7 +1245,7 @@ const B5A = derive(DONE, s => {
 });
 
 const BUILDERS = {
-  B511, B512, B513, B514, B515, B516, B517, B51C,
+  B511, B512, B513, B514, B515, B516, B517, B518, B51C,
   B521, B522, B523, B524, B525, B526, B52C,
   B531, B532, B533, B534, B535, B536, B53C,
   B541, B542, B543, B544, B545: B545broken, B54C,
@@ -1255,7 +1259,7 @@ for (const id in BUILDERS) Object.defineProperty(STATES, id, { get: BUILDERS[id]
 export const STATE_ORDER = Object.keys(BUILDERS);
 /** Which lesson each state starts (the state after a lesson is the next lesson's start; DONE closes every module). */
 export const STATE_LESSONS = {
-  B511: '5.1.1', B512: '5.1.2', B513: '5.1.3', B514: '5.1.4', B515: '5.1.5', B516: '5.1.6', B517: '5.1.7', B51C: '5.1.C',
+  B511: '5.1.1', B512: '5.1.2', B513: '5.1.3', B514: '5.1.4', B515: '5.1.5', B516: '5.1.6', B517: '5.1.7', B518: 'after 5.1.7', B51C: '5.1.C',
   B521: '5.2.1', B522: '5.2.2', B523: '5.2.3', B524: '5.2.4', B525: '5.2.5', B526: '5.2.6', B52C: '5.2.C',
   B531: '5.3.1', B532: '5.3.2', B533: '5.3.3', B534: '5.3.4', B535: '5.3.5', B536: '5.3.6', B53C: '5.3.C',
   B541: '5.4.1', B542: '5.4.2', B543: '5.4.3', B544: '5.4.4', B545: '5.4.5', B54C: '5.4.C',
@@ -1278,4 +1282,47 @@ export function stateOf(id) {
   const s = STATES[id];
   if (!s) throw new Error('unknown workbook state ' + id);
   return clone(s);
+}
+
+/* ---------------- the replay's state shape, and the module challenges' seeds ---------------- */
+
+const byName = o => (o ? Object.fromEntries(Object.entries(o).sort(([a], [b]) => a.toUpperCase().localeCompare(b.toUpperCase()))) : o);
+/** The settings a state compares on: the runner sets calculation, iteration, the QAT and Enter; the iteration limits ride along unread. */
+const normState = st => {
+  const { maxIterations, maxChange, ...settings } = st.settings || {}; void maxIterations; void maxChange;
+  return { ...st, settings: byName(settings), ...(st.names ? { names: byName(st.names) } : {}) };
+};
+/** What differs between two states (clearcoat-weekly's diff), with the names and settings compared whatever their key order. */
+export function diffStates(a, b) { return diffCells(normState(a), normState(b)); }
+/** A live session in the authored-state shape (clearcoat-weekly's extraction). */
+export function sessionToState(ses) { return sessionCells(ses); }
+
+/** The module challenges and the states they start from (the seed dresses them; the workload never moves). */
+export const CHALLENGES = {
+  'challenge-one-site-month': { before: 'B51C' },
+  'challenge-model-shell': { before: 'B52C' },
+};
+/**
+ * A module challenge's seed patch: content only, never workload. 5.1.C draws Mueller's month (washes,
+ * ticket, the four site costs and the members) around SITE_CHALLENGE; 5.2.C draws the accountants'
+ * FY26 retail and membership figures on Data, so the historicals the shell pulls differ run to run.
+ */
+export function challengeSeed(id, rng) {
+  if (!CHALLENGES[id]) throw new Error('clearcoat-model: no challenge ' + id);
+  const p = {};
+  const step = (lo, hi, by) => lo + Math.floor(rng() * (Math.round((hi - lo) / by) + 1)) * by;
+  if (id === 'challenge-one-site-month') {
+    const cells = cellsOf(STATES.B51C, 'One site'), S = SITE_CHALLENGE;
+    const draw = { washes: step(S.washes - 600, S.washes + 600, 50), ticket: step(130, 145, 1) / 10, rentIn: step(S.rent - 1000, S.rent + 1000, 250), laborIn: step(S.labor - 1500, S.labor + 1500, 500),
+      utilIn: step(S.utilities - 400, S.utilities + 400, 100), maintIn: step(S.maintenance - 300, S.maintenance + 300, 100), members: step(S.members - 200, S.members + 200, 50) };
+    for (const key in draw) { const ref = 'C' + rowOf('One site', key); p['One site!' + ref] = { ...cells[ref], value: draw[key] }; }
+  }
+  if (id === 'challenge-model-shell') {
+    const cells = sheetOf(STATES.B52C, 'Data').cells;
+    for (const key of ['retail', 'club']) {
+      const r = 5 + DATA_LINES.findIndex(([, k]) => k === key);
+      p['Data!F' + r] = { ...cells['F' + r], value: HIST[key][3] + step(-1000, 1000, 250) };
+    }
+  }
+  return p;
 }
