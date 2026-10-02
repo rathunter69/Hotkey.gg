@@ -183,7 +183,7 @@ export function normFooterText(text) {
   return String(text == null ? '' : text).slice(0, 64).replace(/&\[([a-z]+)\]/gi, (m, w) => (CANON[w.toLowerCase()] ? '&[' + CANON[w.toLowerCase()] + ']' : m));
 }
 /** The tool dialogs' lists a click picks a row of (the field the arrows move). */
-const TOOL_PICK = { watch: 'idx', editlinks: 'idx', removedup: 'idx', pivot: 'idx', dvlist: 'idx', autofilter: 'idx', texttocols: 'col', sortdlg: 'cur', hyperlink: 'place' };
+const TOOL_PICK = { watch: 'idx', editlinks: 'idx', removedup: 'idx', pivot: 'idx', dvlist: 'idx', autofilter: 'idx', texttocols: 'col', sortdlg: 'cur', hyperlink: 'place', namemgr: 'idx', pastenames: 'idx' };
 const DIALOGS_WB = new Set(['goto', 'options', 'pagesetup', 'renamesheet', 'deletesheet', 'movesheet', 'find', 'gotospecial', 'group', 'numfmt', 'condfmt', 'condrules', 'databar', 'colorscale', 'formatcells', 'series', 'zoom', 'definename', 'note', ...TOOL_DIALOGS]);   // the dialogs dialogKey drives
 const TYPED_DIALOGS = new Set(['renamesheet', 'find', 'numfmt', 'definename', 'note', ...TOOL_TYPED]);   // a text field keeps the case typed (a format code's "k" is not "K")
 export const NUMFMT_BAD_NOTE = 'Microsoft Excel cannot use the number format you typed.';
@@ -1195,7 +1195,7 @@ export class Session {
     if (field === 'rule' && d.kind === 'condrules') { const i = value | 0; if (i < 0 || i >= this.sheet.condFmt.length) return false; d.sel = i; return true; }   // a click on a rule row
     if (field === 'tpick' && TOOL_PICK[d.kind]) {   // a click on a tool list's row: the row the arrows would reach
       const n = { watch: (this.watches || []).length, editlinks: (d.list || []).length, removedup: (d.cols || []).length, pivot: (d.fields || []).length, dvlist: (d.items || []).length,
-        autofilter: (d.items || []).length + 1, texttocols: d.kind === 'texttocols' ? this.textToColumnsView().columns : 0, sortdlg: (d.levels || []).length, hyperlink: (d.places || []).length }[d.kind];
+        autofilter: (d.items || []).length + 1, texttocols: d.kind === 'texttocols' ? this.textToColumnsView().columns : 0, sortdlg: (d.levels || []).length, hyperlink: (d.places || []).length, namemgr: d.edit || d.confirm ? 0 : this.definedNames().length, pastenames: this.definedNames().length }[d.kind];
       const i = value | 0; if (!(i >= 0 && i < n)) return false;
       d[TOOL_PICK[d.kind]] = i; if (d.kind === 'autofilter') d.focus = 'list'; if (d.kind === 'hyperlink') d.focus = 'place'; return true;
     }
@@ -1663,6 +1663,8 @@ export class Session {
     if (k === 'F2' && e.shiftKey && !e.ctrlKey && !e.altKey) { this.logKey('Shift+F2'); this.openNote(); return true; }
     if ((k === 'F10' && e.shiftKey && !e.ctrlKey && !e.altKey) || k === 'ContextMenu') { this.logKey(k === 'F10' ? 'Shift+F10' : 'Menu'); this.openContextMenu(); return true; }   // the shortcut menu (its Hyperlink items)
     if (k === 'F5' && !e.ctrlKey && !e.altKey && !e.shiftKey) { this.logKey('F5'); this.openGoTo(); return true; }
+    if (k === 'F3' && e.ctrlKey && !e.altKey && !e.shiftKey) { this.logKey('Ctrl+F3'); this.openNameManager(); return true; }   // Name Manager
+    if (k === 'F3' && !e.ctrlKey && !e.altKey && !e.shiftKey) { this.logKey('F3'); this.openPasteNames(); return true; }   // Paste Name (Paste List)
     if (k === 'F4' && !e.ctrlKey && !e.altKey && !e.shiftKey) {   // repeat the last action on the current selection (Excel's F4 / Ctrl+Y outside Edit mode)
       if (S.lastAction) { this.startClock(); this.logKey('F4'); S.repeatLast(); }
       return true;

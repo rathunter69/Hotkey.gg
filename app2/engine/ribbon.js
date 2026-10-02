@@ -39,7 +39,7 @@ export const MENUS = {
   'PB': [['I', 'Insert Page Break'], ['R', 'Remove Page Break'], ['A', 'Reset All Page Breaks']],
   'PO': [['P', 'Portrait'], ['L', 'Landscape']],
   'PS': [['P', 'Page Setup…'], ['Z', 'Size']],
-  'M': [['U', 'Σ AutoSum'], ['M', 'Define Name'], ['P', 'Trace Precedents'], ['D', 'Trace Dependents'], ['A', 'Remove Arrows'], ['H', 'Show Formulas'], ['K', 'Error Checking'], ['V', 'Evaluate Formula'], ['W', 'Watch Window'], ['X', 'Calculation Options']],
+  'M': [['U', 'Σ AutoSum'], ['M', 'Define Name'], ['N', 'Name Manager'], ['P', 'Trace Precedents'], ['D', 'Trace Dependents'], ['A', 'Remove Arrows'], ['H', 'Show Formulas'], ['K', 'Error Checking'], ['V', 'Evaluate Formula'], ['W', 'Watch Window'], ['X', 'Calculation Options']],
   'MA': [['A', 'Remove Arrows'], ['P', 'Remove Precedent Arrows'], ['D', 'Remove Dependent Arrows']],
   'MX': [['A', 'Automatic'], ['E', 'Automatic Except for Data Tables'], ['M', 'Manual']],
   'MM': [['D', 'Define Name…']],
@@ -197,7 +197,7 @@ export const COMMANDS = {
   'WFF': 'Freeze panes', 'WFR': 'Freeze top row', 'WFC': 'Freeze first column',
   'HLHG': 'Greater Than…', 'HLHL': 'Less Than…', 'HLHB': 'Between…', 'HLHE': 'Equal To…', 'HLHD': 'Duplicate Values…', 'HLN': 'New Formatting Rule…',
   'HLD': 'Data Bars', 'HLS': 'Color Scales', 'HLCS': 'Clear Rules from Selected Cells', 'HLCE': 'Clear Rules from Entire Sheet', 'HLR': 'Manage Rules…',
-  'MAA': 'Remove Arrows', 'MAP': 'Remove Precedent Arrows', 'MAD': 'Remove Dependent Arrows', 'MV': 'Evaluate Formula', 'MW': 'Watch Window', 'MK': 'Error Checking',
+  'MAA': 'Remove Arrows', 'MAP': 'Remove Precedent Arrows', 'MAD': 'Remove Dependent Arrows', 'MV': 'Evaluate Formula', 'MW': 'Watch Window', 'MN': 'Name Manager', 'MK': 'Error Checking',
   'MXA': 'Automatic', 'MXE': 'Automatic Except for Data Tables', 'MXM': 'Manual',
   'AE': 'Text to Columns…', 'AF': 'Flash Fill', 'AM': 'Remove Duplicates…', 'AVV': 'Data Validation…', 'AK': 'Edit Links…', 'AT': 'Filter', 'ASS': 'Sort…', 'AWG': 'Goal Seek…', 'AWT': 'Data Table…', 'NVT': 'PivotTable…',
 };

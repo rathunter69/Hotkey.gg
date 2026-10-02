@@ -247,6 +247,28 @@ function contextMenuBody(ss) {
   return (has ? menuItem('O', 'Open Hyperlink', 'dset:key:O') : '') + menuItem('H', has ? 'Edit Hyperlink…' : 'Link', 'dset:key:H') + (S.get(a.r, a.c).link ? menuItem('R', 'Remove Hyperlink', 'dset:key:R') : '');
 }
 
+/* ---------------- Name Manager and Paste Name ---------------- */
+function nameManagerBody(ss) {
+  const d = ss.dlg;
+  const rows = ss.nameManagerRows();
+  if (d.confirm) return `<div class="ds-msg"><span class="ds-icon" aria-hidden="true">!</span><span>Are you sure you want to delete the name ${esc((rows[d.idx] || {}).name)}?</span></div>`;
+  if (d.edit) {
+    const e = d.edit;
+    return row('Name:', 'n', selField(e.name, e.focus === 'name', e.fresh, 'dset:key:Alt+N')) +
+      `<div class="gt-ref"><label>Scope:</label><span class="od-combo">Workbook</span></div>` +
+      row('Refers to:', 'r', selField(e.refersTo, e.focus === 'refersTo', e.fresh, 'dset:key:Alt+R', 'wide')) + note(ss);
+  }
+  return `<div class="tc-grid4 od-caplbl"><span>Name</span><span>Value</span><span>Refers To</span><span>Scope</span></div>` +
+    list(rows.map((n, i) => item(i === d.idx, 'dset:tpick:' + i, `<span class="tc-grid4"><span>${esc(n.name)}</span><span>${esc(n.value)}</span><span>${esc(n.refersTo)}</span><span>${esc(n.scope)}</span></span>`)), 'foc');
+}
+const nameManagerFoot = ss => {
+  const d = ss.dlg;
+  if (d && (d.confirm || d.edit)) return okCancel('OK');
+  return altBtn('New…', 'n') + altBtn('Edit…', 'e') + altBtn('Delete', 'd') + closeOnly('Close');
+};
+const pasteNamesBody = ss => '<div class="od-caplbl">Paste name</div>' + list(ss.definedNames().map((n, i) => item(i === ss.dlg.idx, 'dset:tpick:' + i, esc(n.name))), 'foc');
+const pasteNamesFoot = () => altBtn('Paste List', 'l') + okCancel('OK');
+
 /* ---------------- the table ---------------- */
 const fixedTitle = t => () => t;
 export const TOOL_CARDS = {
@@ -266,6 +288,8 @@ export const TOOL_CARDS = {
   autofilter: { id: 'autoFilterMenu', title: ss => ss.dlg && ss.dlg.custom ? 'Custom AutoFilter' : 'Filter: ' + ((ss.dlg && ss.dlg.header) || ''), cls: 'pd-narrow', body: autoFilterBody, foot: ss => ss.dlg && ss.dlg.custom ? okCancel('OK') : okCancel('OK') },
   dvlist: { id: 'dvListMenu', title: fixedTitle('List'), cls: 'pd-narrow', body: dvListBody, foot: () => closeOnly('Close') },
   ctxmenu: { id: 'contextMenu', title: fixedTitle('Cell'), cls: 'pd-narrow', body: contextMenuBody, foot: () => closeOnly('Close') },
+  namemgr: { id: 'nameManagerDialog', title: ss => ss.dlg && ss.dlg.confirm ? 'Microsoft Excel' : ss.dlg && ss.dlg.edit ? 'Edit Name' : 'Name Manager', cls: 'pd-wide', body: nameManagerBody, foot: nameManagerFoot },
+  pastenames: { id: 'pasteNameDialog', title: fixedTitle('Paste Name'), cls: 'pd-mid', body: pasteNamesBody, foot: pasteNamesFoot },
 };
 
 /** The card for the open tool dialog as { title, body, foot, pane } (pure: the ribbon view paints it, the tests read it), or null. */
