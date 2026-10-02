@@ -9,6 +9,7 @@ import { spawn } from 'node:child_process';
 import { LESSONS } from '../content/index.js';
 import { parseKeyScript, parseKeySpec } from '../engine/keyboard.js';
 import { textProblems, readableText } from './text-guard.js';
+import { unnamed } from './a11y-guard.js';
 
 const require = createRequire(import.meta.url);
 let chromium;
@@ -80,6 +81,8 @@ const t = label => console.log(`  ${label} at ${((Date.now() - T0) / 1000).toFix
 async function guardText(label) {
   const txt = await page.evaluate(readableText);
   for (const p of textProblems(txt)) fail(`${label}: text: ${p.rule}: ${p.line.slice(0, 140)}`);
+  // every image has an alt and every control has a name (liability checklist, R9)
+  for (const p of await page.evaluate(`(${unnamed.toString()})()`)) fail(`${label}: a11y: ${p.tag} ${p.why}: ${p.html}`);
 }
 
 try {

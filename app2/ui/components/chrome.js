@@ -137,7 +137,7 @@ export function createChrome(host, opts = {}) {
         <button type="button" class="wsc-title" data-act="title" aria-haspopup="menu" aria-expanded="false"><b class="wsc-title-text"></b><span class="wsc-sub"></span>${opts.lessons ? CARET : ''}</button>
         <div class="wsc-right">
           <span class="wsc-progress"></span>
-          <button type="button" class="wsc-icon wsc-sound" data-act="sound" aria-pressed="true"><span class="wsc-sr"></span></button>
+          <button type="button" class="wsc-icon wsc-sound" data-act="sound" aria-pressed="true"><span class="wsc-sr">${esc(siteCopy('ws_sound_on', 'Sound on'))}</span></button>
           <button type="button" class="wsc-icon wsc-more" data-act="more" aria-haspopup="menu" aria-expanded="false">${MORE}<span class="wsc-sr">${esc(siteCopy('ws_more', 'More'))}</span></button>
         </div>
       </div>
