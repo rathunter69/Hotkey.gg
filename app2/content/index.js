@@ -1,5 +1,5 @@
 // app2/content/index.js — the catalogue: chapters in order, each with its lessons in order.
-// Chapter 1 (C2, framework v2): seven modules of lessons on the Project Volt workbook, each ending
+// Chapter 1 (C2, framework v2): seven modules of lessons on the Clearcoat weekly workbook (Project Rinse), each ending
 // in its challenge, then the project, the assessment and the test-out (1.8).
 import inherited_workbook from './lessons/inherited-workbook.js';
 import { applyCopy } from './copy/apply.js';
@@ -116,12 +116,12 @@ export const CHAPTERS = [
     title: 'Formatting and presentation',
     access: 'paid',
     blurb: 'Number formats and the format code, the anatomy of a financial page, conditional formatting, dates and text, and a page that prints: a three-year P&L brought to the standard a buyer reads.',
-    // Chapter 2's sections in order (SITE_SPEC · Chapter 2): modules 2.1 and 2.2 so far; 2.3–2.7 and the project block follow in Run 2.
+    // Chapter 2's sections in order (script-ch2.md): modules 2.1 to 2.7, the project and assessment (2.8), then the remixes.
     sections: [
       { name: 'Number formats', blurb: 'Number formats on a P&L: the desk number format and decimals by line, the sign convention stated once, currency and percent lines, real dates on the timeline.' },
       { name: 'Custom number formats', blurb: 'Custom number formats: the four-section code, units in the format, custom date codes for the timeline, conditions and hidden zeros.' },
-      { name: 'The page a buyer reads', blurb: 'The anatomy of a financial page: title, units, timeline, sections and the answer; the actuals-to-estimates divider; borders that mean something; labels, footnotes and sources; widths and the label column; one page’s formats carried to the next.' },
-      { name: 'Alignment and structure', blurb: 'Alignment and outline at scale: headers and wraps on a long page; grouping; hiding against grouping against a separate sheet; a navigation column.' },
+      { name: 'The page a buyer reads', blurb: 'The anatomy of a financial page: title, units, timeline, sections and the answer; the actuals-to-estimates divider; borders that mean something; labels, footnotes and sources; widths and the label column; one page’s formats carried to the next, the total line as a cell style.' },
+      { name: 'Alignment and structure', blurb: 'Alignment and outline at scale: headers and wraps on a long page; grouping on two levels; hiding against grouping against a separate sheet; a linked navigation column.' },
       { name: 'Conditional formatting', blurb: 'Conditional formatting: highlight rules for negatives and exceptions, formula-driven rules, data bars and scales and when not to use them, managing the rules.' },
       { name: 'Dates and text for presentation', blurb: 'Text and date functions for presentation: TEXT for labels and headers, EOMONTH and EDATE for period ends, dynamic titles with &, cleaning imported labels, a units line that writes itself.' },
       { name: 'Printing and page layout', blurb: 'Printing at pack scale: landscape, fit to one page wide, the title rows repeated, one footer on every page, and the one-page summary linked from the detail.' },

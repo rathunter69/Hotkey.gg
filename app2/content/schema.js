@@ -157,7 +157,7 @@ export const CONCEPTS = {
   'fill-series': 'Fill Series (Alt, H, F, I, S) continues the step your first two cells set',
   'flash-fill': 'Flash Fill (Ctrl+E in Excel) fills a column by the pattern of your examples',
   'qat-run': 'Alt then a number runs that Quick Access Toolbar command from anywhere',
-  // C2 (Project Volt): the module lessons' additions
+  // C2 (Chapter 1): the module lessons' additions
   'enter-tab-direction': 'Tab commits and moves right; Enter after a Tab run returns to the column you started in, one row down',
   'replace-all': 'Replace All (Ctrl+H, then Alt+A) swaps every match on the sheet in one step and reports how many cells changed',
   'group-ungroup': 'Alt+Shift+→ groups the selected whole rows or columns into an outline that folds and unfolds; Alt+Shift+← ungroups',

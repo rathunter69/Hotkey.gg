@@ -1,7 +1,7 @@
 // app2/content/workbooks/clusters.js — the 12-city clothing pool every challenge seed draws from
 // (LESSON_FRAMEWORK §8): a seed picks a cluster, a week label and site names, so the Dallas file
 // never reads like the Austin one — while the workload (goals, faults, row band, pars) never moves.
-// Names are Project Volt fiction: districts and roads of each city, not real businesses.
+// Names are Project Rinse fiction: districts and roads of each city, not real businesses.
 
 export const CLUSTERS = [
   { city: 'Dallas', week: 'w/c 22 Sep 2026', sites: ['Deep Ellum', 'Uptown', 'Oak Lawn', 'Bishop Arts', 'Love Field', 'Knox Park'] },

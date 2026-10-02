@@ -782,19 +782,48 @@ From screenplay 10.3, rows 2.1–2.7: Ctrl+1 and its Number, Alignment, Border a
 - 2.3.3: the planted grid is an all-borders on the lines of C7:E24; the thin bottom under the timeline is dropped, since the standard allows only a total's top border and the double bottom.
 - 2.3.4: the source line sits in B36 and the footnote in B37 (the checks start at B38); the source reads "Source: management accounts; FY24 and FY25 audited; FY26 per the September budget".
 - 2.3.5: B is fitted over B4:B35, and the panes freeze at C5 in the same lesson.
-- 2.3.6: Monthly arrives with the analyst's plain title, labels, sections, margins block, source and two checks (rows 31 to 35), costs already flipped; Paste Formats tiles P&L!C6:C24 across C:O and the full-year formulas go back to black; the Total cell style goal waits on an engine New Cell Style.
+- 2.3.6: Monthly arrives with the analyst's plain title, labels, sections, margins block, source and two checks (rows 31 to 35), costs already flipped; Paste Formats tiles P&L!C6:C24 across C:O and the full-year formulas go back to black; the total line is saved from P&L!B10 as a cell style named Total line (Total is Excel's own) with Number unticked, and applied to Monthly's rows 10, 20 and 22.
 - 2.4.1: the site-cost lines keep one indent (no second level), and the headers go bold as well as right.
-- 2.4.2: one outline level (the engine's outline has no second), so the 7:24 group and the level buttons are out; the groups are 13:19 and 33:35.
+- 2.4.2: the groups are 13:19 and 33:35, then 7:23 as the second level (not 7:24, so EBITDA stays as the summary row); the outline number buttons are a click, so each level folds and opens with Hide Detail and Show Detail.
 - 2.4.3: the stray block is Monthly detail's top eighteen rows (title, headers, the Austin cluster) at P&L rows 41 to 58, cut onto a new sheet at A1.
-- 2.4.4: Monthly detail runs to 75 rows (four clusters, a company block, source, checks); the names cover the company block's revenue, site costs and EBITDA rows; the navigation column is Q4 (Go to) and Q5:Q7 as text, with no hyperlinks until the engine has Ctrl+K.
-- 2.5.1: the duplicate-values rule is not in the engine, so the duplicate label (B18 reads Marketing) is found by reading; the slow-month threshold is 3,800 with a yellow fill.
+- 2.4.4: Monthly detail runs to 75 rows (four clusters, a company block, source, checks); the names cover the company block's revenue, site costs and EBITDA rows; the navigation column is Q4 (Go to) and Q5:Q7, each linked with Ctrl+K to its name.
+- 2.5.1: Duplicate Values goes over B7:B35 and lights the planted duplicate (B18 reads Marketing); the slow-month threshold is 3,800 with a yellow fill.
 - 2.5.2: the checks rule is on C39:C40 (=C39<>0, light red); the row rule reads an x planted in P&L!A8, and its Does it tie clears the x so the page keeps no flag.
-- 2.5.3: the bars stay on Monthly detail's company revenue row. 2.5.4: the row rule is the one deleted (no duplicate-values rule exists).
+- 2.5.3: the bars stay on Monthly detail's company revenue row. 2.5.4: the row rule and the duplicate-values rule are both deleted.
 - 2.6.1: the month names go in Monthly!C5:N5 (row 3 stays blank), the FY labels in Print!C4:E4 rather than a P&L row 3, and the TEXT headline in Inputs!B19.
 - 2.6.2: Monthly!C4 stays typed (1/31/2026, blue); the EDATE is Inputs!B18, the next update three months after the as-of date. 2.6.3: Print's period line is B4, over its labels.
 - 2.6.4: the clean labels are PROPER's Title Case (accepted for a working sheet), with EBITDA retyped by hand. 2.6.5: the units line lives on Inputs!B17, since B12 holds the switch; no P&L period line.
-- 2.7.1: Page Setup is one per workbook in the engine: landscape, one page wide by two tall, rows 1:5 repeating, the footer, centered horizontally; no print area, no portrait Print and no custom header.
-- 2.7.2: the engine has no Page Break Preview or manual breaks, so the lesson leaves the state as 2.7.1 left it and waits on that mechanic.
+- 2.7.1: one Page Setup for the pack, set once from the P&L (a state holds one, and a lesson loads it onto every sheet): landscape, one page wide by two tall, rows 1:5 repeating, the footer, centered horizontally; no print area, no portrait Print and no custom header yet, though the engine now keeps a Page Setup per sheet.
+- 2.7.2 is not built yet: the engine now has Page Break Preview and manual breaks, but the workbook states don't carry breaks, so the lesson waits on that.
 - 2.7.3: Print's six lines are rows 5 to 10, with its own source and one check (EBITDA against the P&L), the divider and the shade.
 - Challenges 2.3.C to 2.7.C: a seeded Texas cluster's figures over S2d, S3f, S4d, S5d and S7C (the finished pack with no print set-up), plus each module's faults: the grid; the hidden margins and the stray block; three stray rules and an x flag; text month heads; nothing printed.
 - Project and assessment: the project is the same export a year on (FY25A, FY26A, FY27E, 46 sites); the assessment lays a seeded sister operator's figures over it. Both solve through one builder, with the navigation names on Monthly, since neither has a Monthly detail sheet.
+- 2.3.1: the A2 confirmation is folded into a teach line.
+- 2.3.2: the divider uses Alt H B R (the Ctrl+1 Border tab has no right edge on its own); the shade comes first, and a goal reads the flag back.
+- 2.3.3: Alt H B N also clears the D divider, so a goal puts it back after No Border.
+- 2.3.4: the footnote marker goal comes straight after the revenue block.
+- 2.3.5: goals reordered.
+- 2.3.6: built with Paste Special Formats (Ctrl+Alt+V), retitled "One page's formats carried to the next": C6:C30 tiled across Monthly C:O, the full year back to Automatic on the Ctrl+1 Font tab. The Total cell style is in as Total line; the engine has no Format Painter, so the title travels by Paste Formats.
+- 2.4.1: the key is Alt H W, with a goal to bold the header row; the right-align goal is dropped as already done.
+- 2.4.2: taught as fold, read, show, then the second level over 7:23 folded and opened again.
+- 2.4.3: no rows deleted, because row 40 holds a check; the cut leaves 41:58 empty; goals added to insert, rename and move the sheet to the end.
+- 2.4.4: Define Name is Alt M M D; the nav list links each entry with Ctrl+K to its name, and Ctrl+G with a name jumps too; jump-to-name and Ctrl+Home goals added; the closer follows the EBITDA link.
+- 2.3.C: 3 minutes, not 4; only B7:B10 are relabelled.
+- 2.4.C: the names and nav column go on Monthly (rows 10, 20 and 24, nav in Q4:Q7, as text); the second outline level rides the grouping goal, so it stays at six goals.
+- 2.5.1: the margin rule's selection is its own goal, Manage Rules opens and closes as two goals, the -1 test is dropped, and the done line says three rules; the duplicate is found with Duplicate Values, then retyped; the closer lifts Monthly!C7 to 2,300.
+- 2.5.2: no =TRUE proof (a rule can't be edited in place yet; the teach line covers it); a second x in A9 proves the anchor, then A8:A9 are cleared.
+- 2.5.3: the scale comes off with Clear Rules from Selected Cells and the bars through Manage Rules, since clearing C10:N10 would also take the slow-month rule.
+- 2.5.4: Manage Rules has no range box, so the margin rule is added again over C27:E30 and the old one deleted.
+- 2.5.C: five goals; the check rule covers C39 only.
+- 2.6.1: N5, then Ctrl+Shift+Left and Ctrl+R fills C5:N5; the closer reads Print!E4.
+- 2.6.2: P&L E4 is typed, not filled, so D4's divider and A code don't spread; B18 gets the code m/d/yyyy.
+- 2.6.3: Print!A1 takes P&L!A1's formats by Paste Special Formats; F2 reads back Print!B4; goal text describes the formulas rather than quoting them.
+- 2.6.4: the helper is column R; the (1) SUBSTITUTE goes over R5:R69 with Ctrl+Enter; the paste stops at B69 so EBITDA keeps its capitals; Title Case is accepted; a goal clears B19, B34, B49 and B64, which the paste fills with empty text.
+- 2.6.5: retitled "A units line that writes itself" with no period line; the learner types millions into B5 and presses Ctrl+Z.
+- 2.6.C: six goals; titles and units line on the P&L and Monthly; label cleaning includes clearing the helper and the gaps.
+- 2.5.4: Manage Rules opens on four rules; the row rule and then the duplicate-values rule are deleted before the margin rule is redone.
+- 2.7.1: five goals, not eight: landscape, fit 1 wide by 2 tall, print titles 1:5, the three-part footer and center horizontally, all on the one pack Page Setup; no print area, no portrait Print, no header with the company name, and no sheet group for the footer.
+- 2.7.3: nine goals, not six: labels, the revenue links, the other five rows, the source and checks block, the check, Paste Formats from the P&L, green, the divider and the layout; the headers C4:E4 are already there from 2.6, and Print keeps the pack's landscape set-up rather than portrait on one page.
+- 2.7.C: five goals, not six, and two and a half minutes: the pack set-up of 2.7.1 on S7C (landscape, fit, titles, footer, centered); no print areas, no orientation by sheet and no break above site costs.
+- 2.8.P: sixteen goals on the export a year on (FY25A, FY26A, FY27E), built to the chapter's standard except that the detail groups on one level (13:19, 26:30, 33:35), the navigation column is text with Monthly's three names, and the print set-up is the one pack Page Setup.
+- 2.8.A: the project's sixteen goals on a seeded sister operator over the same export, ten minutes, graded against the same builder's end; the slow-month threshold follows the sister's figures.

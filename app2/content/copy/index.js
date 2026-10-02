@@ -6146,14 +6146,14 @@ export const COPY = {
   "the-page-a-buyer-reads": {
    "id": "the-page-a-buyer-reads",
    "name": "The page a buyer reads",
-   "objective": "The anatomy of a financial page: title, units, timeline, sections and the answer; the actuals-to-estimates divider; borders that mean something; labels, footnotes and sources; widths and the label column; one page’s formats carried to the next.",
+   "objective": "The anatomy of a financial page: title, units, timeline, sections and the answer; the actuals-to-estimates divider; borders that mean something; labels, footnotes and sources; widths and the label column; one page’s formats carried to the next, the total line as a cell style.",
    "story_beat": "The first page a buyer turns to. || The book, the information memorandum, is the document that describes the company to buyers, and its financials page is the one they turn to first. A page like that has an anatomy: a title that says what it is, a units line, a timeline, sections that add down to the answer, and a source under the table. Build it on the P&L the way the book will print it.",
    "page_name": "The P&L, presentation quality"
   },
   "alignment-and-structure": {
    "id": "alignment-and-structure",
    "name": "Alignment and structure",
-   "objective": "Alignment and outline at scale: headers and wraps on a long page; grouping; hiding against grouping against a separate sheet; a navigation column.",
+   "objective": "Alignment and outline at scale: headers and wraps on a long page; grouping on two levels; hiding against grouping against a separate sheet; a linked navigation column.",
    "story_beat": "Forty lines is too many to read. || By the time the site costs are broken out by line and the memo block is in, the P&L runs to forty rows, and a buyer wants the six that matter with the rest on demand. Groups fold the detail behind a button; indents show what belongs to what; a navigation column jumps a long sheet. The page stays complete and reads short.",
    "page_name": "The P&L, grouped and navigable"
   },
