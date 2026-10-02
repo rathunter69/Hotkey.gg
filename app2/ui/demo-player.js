@@ -118,7 +118,7 @@ export function mountDemo(host, o = {}) {
       <aside class="dp-panel">
         <div class="task-card" id="demoTask"></div>
         <ol class="goals dp-goals" id="demoGoals"></ol>
-        <div class="dp-hand" id="demoHand" hidden><b>Your turn.</b> The sheet is yours — same goals, any route.</div>
+        <div class="dp-hand" id="demoHand" hidden><b>Your turn.</b> The sheet is yours: same goals, any route.</div>
         ${o.compact ? '' : keyband}
       </aside>
     </div>`;

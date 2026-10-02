@@ -290,3 +290,5 @@ html[data-effects="off"] .rp-animate .rp-m, html[data-effects="off"] .rp-animate
 .wsc-btn-primary{background:var(--mode); color:var(--on-fill); border-color:var(--mode)}
 .wsc-btn-primary .wsc-key{color:var(--on-fill); background:transparent; border-color:color-mix(in srgb, var(--on-fill) 55%, transparent)}
 .wsc-btn:focus-visible{outline:var(--cursor-w) solid var(--mode); outline-offset:1px}
+/* the achievement banner keeps to the top right, under the title row, so the goal count, sound and More stay visible */
+body[data-route="lesson"] .fx-banner, body[data-route="drill"] .fx-banner, body[data-route="due"] .fx-banner{top:calc(var(--tabrow-h) + var(--s2))}
