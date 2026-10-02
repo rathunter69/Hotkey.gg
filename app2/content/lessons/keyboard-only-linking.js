@@ -5,19 +5,10 @@
 // are the net change and closing cash. Each link is typed once into a selected row with Ctrl+Enter,
 // the totals likewise, then the green goes on with Font Color and F4. Graded on the figures (the
 // finished model's), a what-if on Inputs that moves each block, and the green on every link.
-import { SPEED_LINKS, ROW } from '../workbooks/clearcoat-model.js';
-import { settled, like, echoes, moves, rowRefs, carries, sheetIn } from './lib/model-checks.js';
+import { SPEED_LINKS } from '../workbooks/clearcoat-model.js';
+import { settled, like, cfLinked as linked, moves, rowRefs, carries, sheetIn } from './lib/model-checks.js';
 
 const S = 'CF';
-// Each link reads its source in the same column, on the learner's own figures: the circle (interest
-// on the cash balance) stays open until the cash rows are in, so the finished figures come only then.
-const R = ROW.Schedules;
-const SRC = {
-  ni: ['IS', ROW.IS.ni], dep: ['Schedules', R.dep], chgRec: ['Schedules', R.chgRec], chgPay: ['Schedules', R.chgPay], chgDef: ['Schedules', R.chgDef],
-  capex: ['Schedules', R.capexTotal, -1], termDrawn: ['Schedules', R.termDrawn], termRepaid: ['Schedules', R.termRepaid], ddDrawn: ['Schedules', R.ddDrawn], ddRepaid: ['Schedules', R.ddRepaid],
-};
-const source = (col, v, key) => (key === 'rev' ? v('Schedules', col + R.revDrawn) + v('Schedules', col + R.revRepaid) : (SRC[key][2] || 1) * v(SRC[key][0], col + SRC[key][1]));
-const linked = (ses, keys) => echoes(ses, S, keys, source);
 const totalled = (ses, keys) => like(ses, S, rowRefs(S, keys));
 const greenOk = ses => carries(sheetIn(ses, S), rowRefs(S, SPEED_LINKS.links), 'fontColor', 'green');
 const GREEN = 'Alt H F C Right Right Right Right Right Right Right Right Enter';

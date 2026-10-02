@@ -1875,6 +1875,18 @@ export const COPY = {
    "mac_note": "",
    "story_beat": ""
   },
+  "challenge-model-speed": {
+   "id": "challenge-model-speed",
+   "module": "model-speed",
+   "order": "5.7.C",
+   "title": "Challenge: the three benchmarks in one run",
+   "brief": "Fresh Base drivers, and a piece of each benchmark cut back: the rollout and total revenue, the cost build and its format, the debt links on the cash flow. Put all three back before the clock runs out.",
+   "closing": "",
+   "wow": "",
+   "convention_line": "Write once, fill right; Links green; external links avoided",
+   "mac_note": "",
+   "story_beat": ""
+  },
   "remix-format-on-the-pnl": {
    "id": "remix-format-on-the-pnl",
    "module": "remixes",
@@ -11873,6 +11885,48 @@ export const COPY = {
     "teach": "",
     "why": "",
     "hint_stuck": "pulse cell J7 · The check is the balance sheet’s cash less the cash flow’s closing cash."
+   }
+  ],
+  "challenge-model-speed": [
+   {
+    "lesson_id": "challenge-model-speed",
+    "goal_index": "0",
+    "text": "Fill the rollout C6:J9 on Schedules right, and total revenue in C26:J26 as =C22+C24+C25.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-model-speed",
+    "goal_index": "1",
+    "text": "Fill the cost build C30:J43 right in one press.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-model-speed",
+    "goal_index": "2",
+    "text": "Give the cost lines C32:J37 the desk number format, #,##0_);(#,##0);\"-\"_).",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-model-speed",
+    "goal_index": "3",
+    "text": "Link the debt on the cash flow: =Schedules!C80 into C18:J19, =Schedules!C90 into C20:J21 and the revolver into C24:J24.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-model-speed",
+    "goal_index": "4",
+    "text": "Color the new links green: C18:J21 through Font Color, then F4 on C24:J24.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
    }
   ]
  },

@@ -1208,3 +1208,8 @@ keyboard-only-linking,4,The revolver nets its draw and repayment: enter =Schedul
 keyboard-only-linking,5,"Net change in cash is =C11+C15+C25 in C28:J28, and closing cash =C29+C28 in C30:J30, each with Ctrl+Enter.",,,"pulse range C28:J28 · The three section totals, operating, investing and financing, add to the change in cash."
 keyboard-only-linking,6,"Color the links green: C6:J10 through Font Color, then F4 on C14:J14, C18:J21 and C24:J24.",,,pulse range C6:J10 · Green marks a figure that comes from another sheet; the totals stay black.
 keyboard-only-linking,7,"Does it tie? Watch FY31 washes per day in Inputs J22 go from 250 to 300: closing cash climbs and the cash check, Checks J7, holds at 0.",,,pulse cell J7 · The check is the balance sheet’s cash less the cash flow’s closing cash.
+challenge-model-speed,0,"Fill the rollout C6:J9 on Schedules right, and total revenue in C26:J26 as =C22+C24+C25.",,,
+challenge-model-speed,1,Fill the cost build C30:J43 right in one press.,,,
+challenge-model-speed,2,"Give the cost lines C32:J37 the desk number format, #,##0_);(#,##0);""-""_).",,,
+challenge-model-speed,3,"Link the debt on the cash flow: =Schedules!C80 into C18:J19, =Schedules!C90 into C20:J21 and the revolver into C24:J24.",,,
+challenge-model-speed,4,"Color the new links green: C18:J21 through Font Color, then F4 on C24:J24.",,,

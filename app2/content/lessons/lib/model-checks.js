@@ -69,6 +69,20 @@ export function echoes(ses, name, keys, want, cols = COLS) {
   }));
 }
 
+// Where each cash flow link reads, by row key: sheet, row, sign. The revolver nets two rows.
+const SR = ROW.Schedules;
+const CF_SOURCE = {
+  ni: ['IS', ROW.IS.ni], dep: ['Schedules', SR.dep], chgRec: ['Schedules', SR.chgRec], chgPay: ['Schedules', SR.chgPay], chgDef: ['Schedules', SR.chgDef],
+  capex: ['Schedules', SR.capexTotal, -1], termDrawn: ['Schedules', SR.termDrawn], termRepaid: ['Schedules', SR.termRepaid], ddDrawn: ['Schedules', SR.ddDrawn], ddRepaid: ['Schedules', SR.ddRepaid],
+};
+const cfSource = (col, v, key) => (key === 'rev' ? v('Schedules', col + SR.revDrawn) + v('Schedules', col + SR.revRepaid) : (CF_SOURCE[key][2] || 1) * v(CF_SOURCE[key][0], col + CF_SOURCE[key][1]));
+/**
+ * The cash flow's link rows `keys` read their sources in the same column, on the learner's own
+ * figures: the circle (interest on the cash balance) stays open until the cash rows are in, so the
+ * finished model's figures are the right ones only then.
+ */
+export const cfLinked = (ses, keys) => echoes(ses, 'CF', keys, cfSource);
+
 /**
  * The what-if (the shared liveness rule, at the model's scale): nudge the typed input `input`
  * ('Inputs!J21'), recalculate the workbook, see `target` ('Schedules!J9') move, then put the input
