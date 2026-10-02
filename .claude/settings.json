@@ -1,14 +1,5 @@
 {
   "permissions": {
-    "allow": [
-      "Bash(git add:*)", "Bash(git commit:*)", "Bash(git push:*)", "Bash(git pull:*)",
-      "Bash(git fetch:*)", "Bash(git merge:*)", "Bash(git rebase:*)", "Bash(git checkout:*)",
-      "Bash(git switch:*)", "Bash(git branch:*)", "Bash(git worktree:*)", "Bash(git stash:*)",
-      "Bash(git cherry-pick:*)", "Bash(git restore:*)", "Bash(git rm:*)", "Bash(git mv:*)",
-      "Bash(node app2/tests/run-checks.js)", "Bash(node --test:*)",
-      "WebFetch", "WebSearch",
-      "mcp__github", "mcp__Supabase", "mcp__Cloudflare_Developer_Platform",
-      "mcp__Google_Drive", "mcp__Claude_Docs", "mcp__claude-code-remote"
-    ]
+    "allow": []
   }
 }
