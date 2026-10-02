@@ -6,7 +6,8 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { DRIFT_LESSONS, driftSkip } from './known-drift.js';
 import { LESSONS, LESSONS_BY_ID } from '../content/index.js';
-import { validateLesson, availableConcepts } from '../content/schema.js';
+import { validateLesson, availableConcepts, SEEDED_KINDS } from '../content/schema.js';
+import { WORKBOOKS, workbookState } from '../content/workbooks/index.js';
 import { LessonRun } from '../app/runner.js';
 import { hintScript } from './hint-rules.js';
 
@@ -33,6 +34,13 @@ export function registerReplays(shard) {
       assert.equal(run.doneCount, lesson.goals.length);
       assert.ok(run.elapsed > 0);
       assert.equal(run.current, null);
+      // a module lesson's solution leaves exactly its after state (the chain is real); checked on
+      // this replay rather than a second one, so each lesson is replayed once for it
+      if (lesson.workbook && lesson.state && lesson.state.after && !SEEDED_KINDS.includes(lesson.kind)) {
+        const wb = WORKBOOKS[lesson.workbook];   // each workbook reads its own session: Clearcoat's carries enterMoves and the defined names
+        const diff = wb.diffStates(wb.sessionToState(run.session), workbookState(lesson.workbook, lesson.state.after));
+        assert.deepEqual(diff, [], `${lesson.id}: the solution leaves exactly ${lesson.state.after} — extra diffs: ${JSON.stringify(diff.slice(0, 4))}`);
+      }
     });
   }
 
