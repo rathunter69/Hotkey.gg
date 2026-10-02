@@ -1547,3 +1547,9 @@ football-field-board-page,6,"Type the recommendation in C32, one sentence: bid A
 football-field-board-page,7,"Title A1 from Inputs, units in A2, the Cover’s flag and the valuation date in C5:C6, the source in B33, gridlines off.","The page has the anatomy every page in the pack has: a title from Inputs, a units line, the model’s checks flag from the Cover, a source line under the table, and no gridlines on a page someone reads.",,"pulse cell A1 · =Inputs!$C$104&"": valuation summary for the board""; Alt, W, V, G turns the gridlines off."
 football-field-board-page,8,"Fill the checks block in C36:C39: sources equal uses from Checks, the Cover’s flag, the ranges in order, the owners’ lines.",,,"pulse range C36:C39 · =Checks!C14, then =IF(Cover!C7=""OK"",0,1); each reads zero when the page ties."
 football-field-board-page,9,"Does it tie? Watch bid B’s earnout odds on Bids go to 90%: bid B’s line on the football field, row 14, answers on the board’s page.",,,"pulse range C14:F14 · Every figure on the page is a link, so a change on Bids reaches it at once."
+challenge-board-page,0,"Link the football field in C9:E15: comps, precedents, the DCF’s range, the LBO ceiling and the three bids.",,,
+challenge-board-page,1,Read each line’s mid against the DCF’s in F9:F15.,,,
+challenge-board-page,2,"Name the bid that leads on expected value in C18, then pull its waterfall into C19:C28 with MATCH and INDEX.",,,
+challenge-board-page,3,Add your options under that bid in C29.,,,
+challenge-board-page,4,"Title A1 from Inputs, a units line in A2, the Cover’s flag in C5, and the gridlines off.",,,
+challenge-board-page,5,"Fill the checks in C36:C39: sources equal uses, the Cover’s flag, the ranges in order, the owners’ lines.",,,

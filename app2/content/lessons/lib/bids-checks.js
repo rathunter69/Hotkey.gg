@@ -83,7 +83,7 @@ export function plantFrom(before, after, { whole = [], drop = {}, leave = [], sh
       const ca = sa.cells[ref], cb = sb.cells[ref], key = sb.name + '!' + ref;
       if (same(ca, cb)) continue;
       if (!cb) { p[key] = null; continue; }
-      if (whole.includes(key)) { p[key] = JSON.parse(JSON.stringify(cb)); continue; }
+      if (whole === true || whole.includes(key)) { p[key] = JSON.parse(JSON.stringify(cb)); continue; }
       const f = formatOnly(cb, drop[key] || []);
       if (f) p[key] = f; else if (ca) p[key] = null;
     }

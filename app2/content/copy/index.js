@@ -2439,6 +2439,18 @@ export const COPY = {
    "mac_note": "",
    "story_beat": ""
   },
+  "challenge-board-page": {
+   "id": "challenge-board-page",
+   "module": "bids-and-waterfall",
+   "order": "6.4.C",
+   "title": "Challenge: a one-page valuation summary assembled",
+   "brief": "Five ranges and three bids sit on other sheets, the odds are fresh, and the Summary holds only its labels. Link the football field, name the bid that leads on expected value and pull its waterfall and your stake, then give the page its anatomy and its checks.",
+   "closing": "",
+   "wow": "",
+   "convention_line": "Links green; external links avoided; Title, units, timeline, then the answer; The check is a live difference → 0",
+   "mac_note": "",
+   "story_beat": ""
+  },
   "remix-format-on-the-pnl": {
    "id": "remix-format-on-the-pnl",
    "module": "remixes",
@@ -15243,6 +15255,56 @@ export const COPY = {
     "teach": "",
     "why": "",
     "hint_stuck": "pulse range C14:F14 · Every figure on the page is a link, so a change on Bids reaches it at once."
+   }
+  ],
+  "challenge-board-page": [
+   {
+    "lesson_id": "challenge-board-page",
+    "goal_index": "0",
+    "text": "Link the football field in C9:E15: comps, precedents, the DCF’s range, the LBO ceiling and the three bids.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-board-page",
+    "goal_index": "1",
+    "text": "Read each line’s mid against the DCF’s in F9:F15.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-board-page",
+    "goal_index": "2",
+    "text": "Name the bid that leads on expected value in C18, then pull its waterfall into C19:C28 with MATCH and INDEX.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-board-page",
+    "goal_index": "3",
+    "text": "Add your options under that bid in C29.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-board-page",
+    "goal_index": "4",
+    "text": "Title A1 from Inputs, a units line in A2, the Cover’s flag in C5, and the gridlines off.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-board-page",
+    "goal_index": "5",
+    "text": "Fill the checks in C36:C39: sources equal uses, the Cover’s flag, the ranges in order, the owners’ lines.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
    }
   ]
  },

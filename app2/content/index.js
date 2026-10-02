@@ -221,6 +221,7 @@ import bids_side_by_side from './lessons/bids-side-by-side.js';
 import the_waterfall from './lessons/the-waterfall.js';
 import your_stake from './lessons/your-stake.js';
 import football_field_board_page from './lessons/football-field-board-page.js';
+import challenge_board_page from './lessons/challenge-board-page.js';
 
 export const CHAPTERS = [
   {
@@ -378,6 +379,7 @@ export const CHAPTERS = [
     ],
     lessons: [
       bids_side_by_side, the_waterfall, your_stake, football_field_board_page,
+      challenge_board_page,
     ],
   },
 ];
