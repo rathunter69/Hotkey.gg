@@ -13,9 +13,10 @@ import { esc } from './format.js';
 
 const DEFAULT_ROWS = 18, DEFAULT_COLS = 9;
 
-/** The sheet of a workbook state a lesson works on: the one with the most cells, else the first. */
+/** The sheet of a workbook state a lesson works on: the first tab when it holds anything (the page the learner opens on), else the one with the most cells. */
 export function sheetOfState(state) {
   if (!state || !Array.isArray(state.sheets) || !state.sheets.length) return null;
+  if (Object.keys(state.sheets[0].cells || {}).length) return state.sheets[0];
   const filled = state.sheets.map(s => ({ s, n: Object.keys(s.cells || {}).length })).sort((a, b) => b.n - a.n);
   return filled[0].n ? filled[0].s : state.sheets[0];
 }
@@ -62,11 +63,20 @@ export function sheetPreviewHtml(sheetState, { rows, cols, title = '' } = {}) {
       const num = typeof cell.value === 'number' || (cell.formula && typeof cell.value === 'number');
       const cls = [num && cell.align !== 'l' && cell.align !== 'c' ? 'num' : '', cell.align === 'r' ? 'num' : '', cell.align === 'c' ? 'mid' : '', cell.bold ? 'b' : '', cell.it ? 'i' : '',
         cell.fontColor ? 'fc-' + cell.fontColor : '', cell.fill ? 'fill-' + cell.fill : '', cell.bb ? 'bb' : '', cell.bt ? 'bt' : '', cell.ca ? 'ca' : ''].filter(Boolean).join(' ');
-      const style = cell.ca ? ` colspan="${Math.min(cell.ca, C - c + 1)}"` : '';
+      // text spills into the empty cells to its right, as Excel draws it; a number never spills
+      let span = cell.ca ? Math.min(cell.ca, C - c + 1) : 1;
+      if (!cell.ca && text && !num && cell.align !== 'r' && cell.align !== 'c') {
+        while (c + span <= C && !sheet.hiddenCols.has(c + span) && !sheet.text(colLetter(c + span) + r) && !sheet.get(r, c + span).fill) span++;
+      }
+      const style = span > 1 ? ` colspan="${span}"` : '';
       tr += `<td class="${cls}"${style}>${esc(text)}</td>`;
-      if (cell.ca) c += Math.min(cell.ca, C - c + 1) - 1;
+      c += span - 1;
     }
     body.push(`<tr>${tr}</tr>`);
   }
-  return `<div class="sheet-preview" aria-label="${esc(title || sheetState.name || 'Sheet')}"><div class="sp-scroll"><table class="sp"><thead>${head}</thead><tbody>${body.join('')}</tbody></table></div>${sheetState.name ? `<div class="sp-tab">${esc(sheetState.name)}</div>` : ''}</div>`;
+  // the columns keep the sheet's own widths, scaled to the preview
+  const shownCols = []; for (let c = 1; c <= C; c++) if (!sheet.hiddenCols.has(c)) shownCols.push(c);
+  const total = shownCols.reduce((n, c) => n + (sheet.colW[c] || 64), 0) || 1;
+  const colgroup = `<colgroup><col class="sp-rowhead">${shownCols.map(c => `<col style="width:${(100 * (sheet.colW[c] || 64) / total).toFixed(2)}%">`).join('')}</colgroup>`;
+  return `<div class="sheet-preview" aria-label="${esc(title || sheetState.name || 'Sheet')}"><div class="sp-scroll"><table class="sp">${colgroup}<thead>${head}</thead><tbody>${body.join('')}</tbody></table></div>${sheetState.name ? `<div class="sp-tab">${esc(sheetState.name)}</div>` : ''}</div>`;
 }

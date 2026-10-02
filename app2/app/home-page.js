@@ -82,7 +82,15 @@ export function achievementsModel(states, { latest = 10 } = {}) {
   return { shown, earned: earned.length, of: states.length, next: open[0] || null };
 }
 
-const badgeTile = s => `<span class="badge-tile${s.done ? ' on' : ''}" title="${esc(s.def.name)}">${renderPixel(GLYPHS[s.def.glyph] || GLYPHS.star, { b: RARITY_COLOURS[s.def.rarity] || RARITY_COLOURS.common }, { size: 28 })}</span>`;
+/** A badge on Home: a keycap in its rarity's color holding the sprite (01-home); a locked one is a blank key with "?". */
+const badgeTile = s => `<span class="badge-tile badge-key r-${esc(s.def.rarity)}${s.done ? ' on' : ''}" title="${esc(s.def.name)}">${renderPixel(GLYPHS[s.def.glyph] || GLYPHS.star, { b: RARITY_COLOURS[s.def.rarity] || RARITY_COLOURS.common }, { size: 28 })}</span>`;
+/** The next level's reward, drawn (3.0, Home): a theme as its swatch, a keycap skin as a brass key, anything else as the level's key. */
+function rewardTileHtml(reward, n) {
+  const kind = reward && reward.kind;
+  if (kind === 'theme' || kind === 'themes_start' || kind === 'crimson') return '<span class="level-tile level-tile-theme" aria-hidden="true"><i></i></span>';
+  if (kind === 'keycap_skin') return '<span class="level-tile level-tile-key" aria-hidden="true">Alt</span>';
+  return `<span class="level-tile level-tile-key" aria-hidden="true">${esc(n)}</span>`;
+}
 
 export function mountHomePage(root, ctx = {}) {
   const el = document.createElement('div');
@@ -114,13 +122,13 @@ export function mountHomePage(root, ctx = {}) {
     </section>`;
   const chapterN = (CHAPTERS.indexOf(chapter) >= 0 ? CHAPTERS.indexOf(chapter) : 0) + 1;
   const columns = [{ key: 'n', label: '', cls: 'n' }, { key: 'title', label: t('col_module') }, { key: 'minutes', label: t('col_minutes'), align: 'right', cls: 'min' }, { key: 'status', label: t('col_status'), cls: 'status' }, { key: 'tier', label: '', align: 'right', cls: 'tier' }];
-  const trs = rows.map(r => ({ cells: { n: esc(r.n), title: esc(r.title), minutes: fmtMinutes(r.minutes), status: esc(r.statusText), tier: tierMarksHtml(r.tier) }, cls: `row-module${r.current ? ' current' : ''}`, href: '#/learn?ch=' + chapter.id + '&doc=' + r.id }));
-  const chapterPanel = panelHtml({ heading: esc(t('chapter_heading', { n: chapterN, name: chapter.title })), facts: esc(t('chapter_modules_done', { d: rows.filter(r => r.status === 'complete').length, m: rows.length })), body: tableHtml({ columns, rows: trs, cls: 'tbl-chapter' }), cls: 'home-chapter', stretch: true });
+  const trs = rows.map(r => ({ cells: { n: esc(r.n), title: esc(r.title), minutes: fmtMinutes(r.minutes), status: `<span class="mstat mstat-${esc(r.status)}">${esc(r.statusText)}</span>`, tier: tierMarksHtml(r.tier) }, cls: `row-module${r.current ? ' current' : ''}`, href: '#/learn?ch=' + chapter.id + '&doc=' + r.id }));
+  const chapterPanel = panelHtml({ heading: esc(t('chapter_heading', { n: chapterN, name: chapter.title })), facts: esc(t('chapter_modules_done', { d: rows.filter(r => r.status === 'complete').length, m: rows.length })), body: tableHtml({ columns, rows: trs, cls: 'tbl-chapter tbl-headless', head: false }), cls: 'home-chapter', stretch: true });
 
   // ---- right: Level, Today, Achievements
   const lv = game.levelInfo;
   const reward = lv.lvl < MAX_LEVEL ? rewardAt(lv.lvl + 1) : null;
-  const levelPanel = panelHtml({ heading: esc(t('home_level', { n: lv.lvl })), facts: esc(t('home_xp', { n: lv.into, next: lv.need })), body: `${barHtml(lv.pct, 'bar-level')}<div class="level-next"><span class="level-tile" aria-hidden="true">${lv.lvl < MAX_LEVEL ? lv.lvl + 1 : lv.lvl}</span><span>${esc(reward ? t('home_next_reward', { n: lv.lvl + 1, reward: reward.label }) : t('home_top_level'))}</span></div>`, cls: 'home-level' });
+  const levelPanel = panelHtml({ heading: esc(t('home_level', { n: lv.lvl })), facts: esc(t('home_xp', { n: lv.into, next: lv.need })), body: `${barHtml(lv.pct, 'bar-level')}<div class="level-next">${rewardTileHtml(reward, lv.lvl < MAX_LEVEL ? lv.lvl + 1 : lv.lvl)}<span class="level-next-words">${reward ? `<span>${esc(t('home_next_reward', { n: lv.lvl + 1 }))} <b>${esc(reward.label)}</b></span><span>${esc(t('home_xp_to_go', { n: Math.max(0, lv.need - lv.into) }))}</span>` : `<span>${esc(t('home_top_level'))}</span>`}</span></div>`, cls: 'home-level' });
 
   const played = store.attempts({ kind: 'daily', day }).filter(a => a.secs != null);
   const clean = played.filter(a => a.clean).sort((a, b) => a.secs - b.secs);

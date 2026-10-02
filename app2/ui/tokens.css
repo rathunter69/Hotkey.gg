@@ -15,6 +15,7 @@
   --ink:#17201B;          /* text */
   --ink-2:#525D57;        /* secondary text */
   --rail:#16201A; --rail-hi:#2B3A31; --rail-text:#C9D3CD; --rail-sub:#AEBBB4;   /* the left rail */
+  --rail-on:#FFFFFF; --rail-accent:#5CC48A;   /* the rail's current item and its green (the wordmark, the bars, the avatar): the rail is dark in every theme */
   --note:#FFF6C7; --note-ink:#17201B; --note-edge:#B9A53C;   /* a note on the sheet: Excel's yellow paper and dark ink, the same in every theme */
   --red:#C23B2A;          /* the reviewer's pen, a note's corner, errors */
   --on-fill:#FFFFFF;      /* text on a mode's fill */
@@ -52,7 +53,7 @@
   --r-plate:12px; /* plates on the landing page */
 
   /* ---------- sizes ---------- */
-  --rail-w:232px; --content-top:30px; --content-side:36px; --side-col:336px;
+  --rail-w:232px; --rail-pad:14px; --rail-indent:28px; --rail-item-h:40px; --rail-sub-h:32px; --rail-acct-h:48px; --rail-avatar:30px; --rail-cell:6px; --rail-streak-w:110px; --content-top:30px; --content-side:36px; --side-col:336px;
   --panel-w:340px; --card-w:330px; --card-gap:16px;
   --tabrow-h:34px; --sbar-h:22px; --ws-foot-h:calc(var(--s8) + var(--s2) + var(--sbar-h) + 1px); --ribbon-h:96px; --ribbon-groups-h:72px; --ribbon-tabs-h:24px; --qat-h:26px;
   --cursor-w:2px; --bw-1-5:1.5px; --bw-2:2px; --bw-3:3px; --tick-check:5px; --cursor-handle:6px; --mode-mark:9px; --mode-rule:3px; --key-edge:3px; --route-bar:3px;

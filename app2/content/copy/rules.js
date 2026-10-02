@@ -10,6 +10,8 @@ export const RIBBON_WORDS = [
 ];
 
 export const SITE_KEYS = [
+  // the interface match (2026-10-02)
+  'home_xp_to_go',
   'briefing_1_eyebrow', 'briefing_1_title', 'briefing_1_body',
   'briefing_2_eyebrow', 'briefing_2_title', 'briefing_2_body',
   'briefing_3_eyebrow', 'briefing_3_title', 'briefing_3_body',

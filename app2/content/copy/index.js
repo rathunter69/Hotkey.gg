@@ -4247,7 +4247,7 @@ export const COPY = {
   "col_lesson": "Lesson",
   "col_minutes": "Minutes",
   "col_status": "Status",
-  "status_complete": "Complete",
+  "status_complete": "Done",
   "status_lessons_done": "Lessons done, challenge open",
   "status_in_progress": "In progress",
   "status_not_started": "Not started",
@@ -4258,7 +4258,7 @@ export const COPY = {
   "status_lesson_of": "Lesson {n} of {m}",
   "home_level": "Level {n}",
   "home_xp": "{n} of {next} XP",
-  "home_next_reward": "At level {n}: {reward}.",
+  "home_next_reward": "Level {n}:",
   "home_top_level": "The top level.",
   "home_today": "Today",
   "home_today_done": "{d} of {n} done",
@@ -4681,7 +4681,8 @@ export const COPY = {
   "account_get": "Get full access",
   "account_cancel_note": "Cancelling keeps your access to the end of the month you paid for.",
   "account_billing_err": "Billing didn’t open. Try again in a minute.",
-  "account_billing_none": "There is no subscription on this account yet."
+  "account_billing_none": "There is no subscription on this account yet.",
+  "home_xp_to_go": "{n} XP to go"
  },
  "micro": {
   "enter-tab-direction": {

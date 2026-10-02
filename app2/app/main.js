@@ -346,6 +346,7 @@ export function startApp({ navEl, rootEl, footEl }) {
     }
     nav.setLanding(name === 'landing');
     nav.setActive(navKeyFor(name, r.params));
+    if (nav.setSection) nav.setSection(name === 'account' ? (['profile', 'settings', 'billing', 'certificate'].includes(r.query.section) ? r.query.section : 'profile') : null);
     document.title = titleFor(name, lesson ? lesson.title : name === 'drill' ? (drill ? drill.title : 'Sandbox') : '');
     document.body.dataset.route = name;
     document.body.dataset.mode = modeOf(name, r.params);

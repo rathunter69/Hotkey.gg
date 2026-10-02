@@ -19,54 +19,57 @@ body[data-route="landing"] #navMount{position:static; width:auto; bottom:auto}
 /* ---------- the rail ---------- */
 .rail{display:flex; flex-direction:column; height:100%; background:var(--rail); color:var(--rail-text); font-family:var(--font); font-size:var(--fs-body); user-select:none}
 .rail a{color:inherit; text-decoration:none}
-.rail-top{display:flex; align-items:center; justify-content:space-between; padding:var(--s6) var(--s6) var(--s5)}
-.rail-mark{font-family:var(--mono); font-weight:var(--fw-bold); font-size:var(--fs-item); color:var(--rail-text)}
-.rail-mark b{color:var(--learn); font-weight:var(--fw-bold)}
+.rail-top{display:flex; align-items:center; justify-content:space-between; padding:var(--s6) var(--rail-pad) var(--s5) var(--rail-indent)}
+.rail .rail-mark{font-family:var(--mono); font-weight:var(--fw-bold); font-size:var(--fs-item); color:var(--rail-on)}
+.rail-mark b{color:var(--rail-accent); font-weight:var(--fw-bold)}
 .rail-landing .rail-mark b{color:var(--learn)}
 .rail-menu{display:none; font:inherit; font-weight:var(--fw-semi); color:var(--rail-text); background:var(--rail-hi); border:0; border-radius:var(--r-btn); padding:var(--s2) var(--s3); cursor:pointer}
-.rail-nav{display:flex; flex-direction:column; gap:var(--s1); padding:0 var(--s4); flex:1 1 auto; min-height:0; overflow-y:auto}
-.rail-item{display:flex; align-items:center; gap:var(--s2); padding:var(--s3) var(--s3); border-radius:var(--r-btn); font-weight:var(--fw-semi); font-size:var(--fs-body); color:var(--rail-text); position:relative; transition:background var(--d-cursor)}
-.rail-item:hover{background:var(--rail-hi)}
-.rail-item.on{background:var(--rail-hi); color:var(--sheet)}
-.rail-item:focus-visible{outline:var(--cursor-w) solid var(--learn); outline-offset:0}
+.rail-nav{display:flex; flex-direction:column; gap:var(--s1); padding:0 var(--rail-pad); flex:1 1 auto; min-height:0; overflow-y:auto}
+.rail-item{display:flex; align-items:center; gap:var(--s2); min-height:var(--rail-item-h); padding:0 var(--rail-pad); border-radius:var(--r-btn); font-weight:var(--fw-semi); font-size:var(--fs-body); color:var(--rail-text); position:relative; transition:background var(--d-cursor)}
+.rail-item:hover{background:var(--rail-hi); color:var(--rail-on)}
+.rail-item.on{background:var(--rail-hi); color:var(--rail-on); font-weight:var(--fw-bold)}
+.rail-item:focus-visible{outline:var(--cursor-w) solid var(--rail-accent); outline-offset:0}
 .rail-word{flex:1 1 auto}
-.rail-children{display:flex; flex-direction:column; gap:var(--s1); padding-left:var(--s6)}
-.rail-mode{font-weight:var(--fw-body); color:var(--rail-sub); padding-top:var(--s2); padding-bottom:var(--s2)}
-.rail-mode.on{color:var(--sheet)}
-.rail-item:has(+ .rail-children .rail-item.on){color:var(--sheet)}   /* Practice reads open while one of its modes is the page */
+.rail-children{display:flex; flex-direction:column; gap:var(--s1); padding-left:var(--s2)}
+.rail-mode{min-height:var(--rail-sub-h); font-weight:var(--fw-body); font-size:var(--fs-name); color:var(--rail-sub); gap:var(--s3)}
+.rail-mode.on{color:var(--rail-on); font-weight:var(--fw-semi)}
+.rail-item:has(+ .rail-children .rail-item.on){color:var(--rail-on); font-weight:var(--fw-bold)}   /* Practice reads open while one of its modes is the page */
 .rail-dot{display:inline-block; width:var(--mode-mark); height:var(--mode-mark); background:var(--mark); flex:none}
 /* the KeyTips letters: small green keys at the right of each item, shown on Alt */
 .kt{display:none; font-family:var(--mono); font-weight:var(--fw-key); font-size:var(--fs-min); line-height:1; color:var(--on-fill); background:var(--learn); border-radius:var(--r-btn); padding:var(--s1) var(--s2); margin-left:auto}
 body.keytips-on .kt{display:inline-block}
 .kt-page{position:absolute; right:var(--s2); top:var(--s2); margin:0; z-index:2}
 /* the foot: the level, the streak, the account row */
-.rail-foot{padding:var(--s4) var(--s4) var(--s5); border-top:1px solid var(--rail-hi); display:flex; flex-direction:column; gap:var(--s4)}
+.rail-foot{margin:0 var(--rail-pad); padding:var(--s4) 0 var(--s4); border-top:1px solid var(--rail-hi); display:flex; flex-direction:column; gap:var(--s3)}
+.rail-level, .rail-streak{padding:0 var(--rail-pad)}
 .rail-row{display:flex; align-items:baseline; justify-content:space-between; gap:var(--s2)}
-.rail-level-word{font-weight:var(--fw-bold); color:var(--sheet)}
+.rail-level-word{font-size:var(--fs-name); font-weight:var(--fw-bold); color:var(--rail-on)}
 .rail-sub-word{font-size:var(--fs-label); color:var(--rail-sub)}
-.rail-level .rail-sub-word{font-variant-numeric:tabular-nums}
-.rail-bar{height:var(--s1); background:var(--rail-hi); margin-top:var(--s2); overflow:hidden}
-.rail-bar i{display:block; height:100%; width:0; background:var(--learn); transition:width var(--d-goal)}
-.rail-pro{display:inline-block; margin-top:var(--s2); font-size:var(--fs-label); font-weight:var(--fw-semi); color:var(--rail-sub)}
-.rail-pro:hover{color:var(--sheet)}
-.rail-streak .rail-row{align-items:center}
-.rail-week{display:inline-flex; gap:calc(var(--s1) / 2); flex:none}
-.rail-week i{display:inline-grid; place-items:center; width:var(--s4); height:var(--s4); font-style:normal; font-family:var(--mono); font-size:var(--fs-min); line-height:1; color:var(--rail-sub); background:var(--rail-hi)}
-.rail-week i.on{background:var(--learn); color:var(--on-fill)}
-.rail-week i.today{outline:1px solid var(--rail-text); outline-offset:-1px}
-.rail-acct{display:flex; align-items:center; gap:var(--s2); width:100%; font:inherit; font-size:var(--fs-name); font-weight:var(--fw-semi); color:var(--rail-text); background:transparent; border:0; border-radius:var(--r-btn); padding:var(--s2); cursor:pointer; text-align:left; position:relative}
+.rail-level .rail-sub-word{font-variant-numeric:tabular-nums; color:var(--rail-text)}
+.rail-bar{height:var(--bar-h); background:var(--rail-hi); margin-top:var(--s2); overflow:hidden; border-radius:var(--bar-h)}
+.rail-bar i{display:block; height:100%; width:0; background:var(--rail-accent); transition:width var(--d-goal)}
+.rail-pro{display:inline-block; margin-top:var(--s2); font-size:var(--fs-label); font-weight:var(--fw-semi); color:var(--rail-sub); text-decoration:underline !important; text-underline-offset:var(--s1)}
+.rail-pro:hover{color:var(--rail-on)}
+.rail-streak .rail-row{align-items:flex-start}
+.rail-streak .rail-sub-word{color:var(--rail-text); max-width:var(--rail-streak-w)}
+.rail-week{display:inline-flex; gap:var(--s1); flex:none; padding-top:var(--s1)}
+.rail-week i{display:block; width:var(--rail-cell); height:var(--rail-cell); font-size:0; background:var(--rail-hi)}
+.rail-week i.on{background:var(--rail-accent)}
+.rail-week i.today:not(.on){outline:1px solid var(--rail-sub); outline-offset:-1px}
+.rail-acct{display:flex; align-items:center; gap:var(--s3); width:100%; min-height:var(--rail-acct-h); font:inherit; font-size:var(--fs-name); font-weight:var(--fw-bold); color:var(--rail-on); background:transparent; border:0; border-radius:var(--r-btn); padding:0 var(--rail-pad); cursor:pointer; text-align:left; position:relative}
 .rail-acct:hover, .rail-acct.open{background:var(--rail-hi)}
-.rail-acct:focus-visible{outline:var(--cursor-w) solid var(--learn)}
-.rail-avatar{display:inline-grid; place-items:center; width:var(--s8); height:var(--s8); border-radius:50%; background:var(--learn); color:var(--on-fill); font-family:var(--mono); font-size:var(--fs-min); font-weight:var(--fw-bold); flex:none}
+.rail-acct:focus-visible{outline:var(--cursor-w) solid var(--rail-accent)}
+.rail-avatar{display:inline-grid; place-items:center; width:var(--rail-avatar); height:var(--rail-avatar); border-radius:50%; background:var(--rail-accent); color:var(--rail); font-family:var(--mono); font-size:var(--fs-min); font-weight:var(--fw-bold); flex:none}
 .rail-avatar.guest{background:var(--rail-hi); color:var(--rail-sub)}
 .rail-handle{flex:1 1 auto; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
-.rail-acct-word{display:inline-flex; align-items:center; gap:var(--s2); font-size:var(--fs-label); font-weight:var(--fw-body); color:var(--rail-sub)}
+.rail-acct-word{display:inline-flex; align-items:center; gap:var(--s2); font-size:var(--fs-min); font-weight:var(--fw-body); color:var(--rail-sub)}
 body.keytips-on .rail-acct-label{display:none}   /* the letter takes the word's place so the handle keeps its room */
-.rail-acct-items{display:flex; flex-direction:column; gap:var(--s1); padding:var(--s2) 0 0 var(--s2)}
+.rail-acct-items{display:flex; flex-direction:column; gap:var(--s1); padding:var(--s1) 0 0}
 .rail-acct-items[hidden]{display:none}   /* closed until the account row opens it */
-.rail-acct-item{display:block; padding:var(--s2) var(--s3); border-radius:var(--r-btn); font-size:var(--fs-name); color:var(--rail-text)}
-.rail-acct-item:hover, .rail-acct-item:focus-visible{background:var(--rail-hi); outline:none; color:var(--sheet)}
-.rail-save{font-size:var(--fs-min); color:var(--rail-sub); padding:var(--s2) var(--s3) var(--s1)}
+.rail-acct-item{display:flex; align-items:center; min-height:var(--rail-sub-h); padding:0 var(--s5); border-radius:var(--r-btn); font-size:var(--fs-name); color:var(--rail-text)}
+.rail-acct-item:hover, .rail-acct-item:focus-visible{background:var(--rail-hi); outline:none; color:var(--rail-on)}
+.rail-acct-item.on{background:var(--rail-hi); color:var(--rail-on); font-weight:var(--fw-bold)}
+.rail-save{font-size:var(--fs-min); color:var(--rail-sub); padding:var(--s2) var(--s5) var(--s1)}
 .rail-acct-auth{color:var(--rail-sub)}
 /* the landing page's top bar in place of the rail */
 .rail-landing{flex-direction:row; align-items:center; justify-content:space-between; height:auto; background:var(--paper); color:var(--ink); padding:0 var(--content-side)}

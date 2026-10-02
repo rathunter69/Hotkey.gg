@@ -133,12 +133,30 @@
 .badge-tile.on{background:var(--sheet); border:1px solid var(--line)}
 .badge-tile.locked{border:1px solid var(--line); background:var(--sheet)}
 .badge-tile .px{display:block}
+/* Home's badges are keys (01-home): the rarity's tint with its fill as the edge; a locked one is a blank key with ? */
+.badge-key{border:1px solid var(--edge); border-bottom-width:var(--key-edge); background:var(--sheet); font-family:var(--mono); font-size:var(--fs-body); color:var(--ink-2)}
+.badge-key.on.r-common{background:var(--learn-tint); border-color:var(--learn)}
+.badge-key.on.r-rare{background:var(--drills-tint); border-color:var(--drills)}
+.badge-key.on.r-epic{background:var(--challenges-tint); border-color:var(--challenges)}
+.badge-key.on.r-legendary{background:var(--clock-tint); border-color:var(--clock)}
+.badge-tile.locked{border:1px solid var(--edge); border-bottom-width:var(--key-edge)}
+/* the chapter table on Home has no header row: the rule sits above its first row */
+.tbl-headless tbody tr:first-child > td{border-top:var(--bw-2) solid var(--ink)}
+.home-chapter .tbl td:nth-child(2){font-weight:var(--fw-semi)}
+.mstat-complete{color:var(--learn-ink); font-weight:var(--fw-semi)}
+.level-next-words{display:flex; flex-direction:column; color:var(--ink); line-height:1.35}
+.level-next-words b{font-weight:var(--fw-bold)}
+.level-next-words span + span{color:var(--ink-2)}
+.level-tile-key{font-family:var(--mono); font-size:var(--fs-key); width:auto; min-width:var(--level-tile); padding:0 var(--s2)}
+.level-tile-theme{background:var(--paper); border-color:var(--edge); align-content:end; justify-items:start; padding:var(--s2)}
+.level-tile-theme i{display:block; width:var(--s4); height:var(--s1); background:var(--learn)}
 .ach-next{margin-top:auto; padding-top:var(--s3); border-top:1px solid var(--line)}
 
 /* ---------- the sheet preview (Home, Learn): a still of the sheet, read-only ---------- */
 .sheet-preview{display:flex; flex-direction:column; border:1px solid var(--line); background:var(--sheet)}
 .sp-scroll{overflow:hidden; max-height:var(--preview-h)}
-.sp{border-collapse:collapse; font-family:var(--cellfont); font-size:var(--fs-key); color:var(--ink); table-layout:auto; width:100%}
+.sp{border-collapse:collapse; font-family:var(--cellfont); font-size:var(--fs-key); color:var(--ink); table-layout:fixed; width:100%}
+.sp col.sp-rowhead{width:var(--s8)}
 .sp th, .sp td{border:1px solid var(--grid); padding:0 var(--s1); height:var(--sp-row); white-space:nowrap; overflow:hidden; text-overflow:clip; text-align:left; max-width:0; position:static; font-weight:var(--fw-body); vertical-align:middle; transition:none}
 .sp th{background:var(--chrome); color:var(--ink-2); text-align:center; font-family:var(--font); font-size:var(--fs-min); max-width:none}
 .sp tbody th{width:1%; padding:0 var(--s2)}
