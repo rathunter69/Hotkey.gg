@@ -1911,6 +1911,18 @@ export const COPY = {
    "mac_note": "",
    "story_beat": ""
   },
+  "read-like-a-buyer": {
+   "id": "read-like-a-buyer",
+   "module": "the-three-statements",
+   "order": "5.1.7",
+   "title": "Reading a set of statements the way a buyer does",
+   "brief": "A buyer reads three ratios before anything else: margin (EBITDA over revenue, how much of a dollar of washes becomes profit), cash conversion (cash from operations over EBITDA, how much of that profit turns into cash) and leverage (net debt over EBITDA, how many years of profit the debt represents). Build them at the foot of Domain’s statements, with interest cover and the return on the site beside them, and read what each says about a car wash. The key is `=`.",
+   "closing": "Margin, cash conversion and leverage are the three numbers a buyer reads first. || Domain turns 38% of its washes into EBITDA, converts all of it to cash, and carries about three years of profit in debt that the earnings cover four and a half times. A buyer reads those before any line above them, so they sit in the same place on every set you build.",
+   "wow": "Margin, cash conversion and leverage: the three numbers a buyer reads first, in one block.",
+   "convention_line": "One decimals setting per line; Title, units, timeline, then the answer",
+   "mac_note": "",
+   "story_beat": ""
+  },
   "remix-format-on-the-pnl": {
    "id": "remix-format-on-the-pnl",
    "module": "remixes",
@@ -12083,6 +12095,56 @@ export const COPY = {
     "teach": "",
     "why": "",
     "hint_stuck": "pulse cell C63 · One wash is $13.90 of revenue, part of it still in receivables."
+   }
+  ],
+  "read-like-a-buyer": [
+   {
+    "lesson_id": "read-like-a-buyer",
+    "goal_index": "0",
+    "text": "EBITDA margin in C94: =IFERROR(C45/C33,\"-\"), which reads 38.3%.",
+    "teach": "EBITDA margin says how much of each dollar of washes becomes profit. Domain’s 38% sits above the company’s 33% on the Chapter 2 P&L, because a mature site carries none of the new sites’ ramp-up.",
+    "why": "",
+    "hint_stuck": "pulse cell C94 · EBITDA is C45 and revenue C33."
+   },
+   {
+    "lesson_id": "read-like-a-buyer",
+    "goal_index": "1",
+    "text": "Cash conversion in C95: =IFERROR((C69-C49-C51)/C45,\"-\"), operations with interest and tax added back, over EBITDA.",
+    "teach": "Cash conversion is cash from operations before interest and tax, over EBITDA: how much of the profit turns into cash. A member business converts well, because members pay on the 1st, before the washes are delivered.",
+    "why": "",
+    "hint_stuck": "pulse cell C95 · Interest in C49 and tax in C51 are negatives, so subtracting them adds them back."
+   },
+   {
+    "lesson_id": "read-like-a-buyer",
+    "goal_index": "2",
+    "text": "Net debt =C85-C79 in C96, and leverage =C96/(C45*12) in C97, on a year of EBITDA.",
+    "teach": "Net debt is the debt less the cash that could repay it. Leverage is net debt over a year of EBITDA, in years, shown as 3.0x (2.2.2): how many years of profit the debt represents.",
+    "why": "",
+    "hint_stuck": "pulse range C96:C97 · The month’s EBITDA times twelve is the year’s."
+   },
+   {
+    "lesson_id": "read-like-a-buyer",
+    "goal_index": "3",
+    "text": "Interest cover in C98: =-C45/C49, a positive multiple because interest is a negative.",
+    "teach": "Interest cover is EBITDA over interest: how many times the profit pays the interest. Leverage says how much debt; cover says whether the earnings can carry it.",
+    "why": "",
+    "hint_stuck": "pulse cell C98 · The minus turns the negative interest into a positive ratio."
+   },
+   {
+    "lesson_id": "read-like-a-buyer",
+    "goal_index": "4",
+    "text": "Return on the site in C99: =C43*12/C16, a year of site contribution over the build.",
+    "teach": "The return on the site is a year of site contribution, which is after rent, over the $2,500,000 Clearcoat spent building it. Best practice: the same ratios on every set of statements, in the same place, in the same formats, so a reader compares sites at a glance.",
+    "why": "",
+    "hint_stuck": "pulse cell C99 · Site contribution is C43 and the build C16."
+   },
+   {
+    "lesson_id": "read-like-a-buyer",
+    "goal_index": "5",
+    "text": "Does it tie? Watch the loan in C18 fall to $1,000,000: leverage drops and cover rises, while the margin doesn’t move.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C97 · Debt sits below EBITDA, so the margin never sees it."
    }
   ]
  },
