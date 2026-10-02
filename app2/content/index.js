@@ -59,7 +59,7 @@ import round_family from './lessons/round-family.js';
 import countif_countifs from './lessons/countif-countifs.js';
 import sumif_sumifs_averageifs from './lessons/sumif-sumifs-averageifs.js';
 import busiest_sites from './lessons/busiest-sites.js';
-// PENDING import sumproduct_blended_ticket from './lessons/sumproduct-blended-ticket.js';
+import sumproduct_blended_ticket from './lessons/sumproduct-blended-ticket.js';
 // PENDING import the_reconciliation from './lessons/the-reconciliation.js';
 // PENDING import challenge_site_package_summary from './lessons/challenge-site-package-summary.js';
 // PENDING import split_the_codes from './lessons/split-the-codes.js';
@@ -128,7 +128,7 @@ export const CHAPTERS = [
       { name: 'Project and assessment', blurb: 'Rebuild the Summary so every number ties, then a fresh export against the clock.' },
     ],
     lessons: [
-      round_family, countif_countifs, sumif_sumifs_averageifs, busiest_sites, /*PENDING1*/
+      round_family, countif_countifs, sumif_sumifs_averageifs, busiest_sites, sumproduct_blended_ticket, /*PENDING1*/
       /*PENDING2*/
     ],
   },
