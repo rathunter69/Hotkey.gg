@@ -180,7 +180,7 @@ function pageCover(extraLinks = []) {
         ['Schedules', 'rollout and revenue, costs, working capital, PP&E, debt, tax'], ['Checks', 'one row per check, the roll-up flag'], ['DCF', 'free cash flow, WACC, terminal value, enterprise value'],
         ['One site', 'Domain for one month, three statements by hand (5.1)'], ['One week', 'Domain for one week, six events (5.1.6)'], ['Data', 'the historical accounts as the accountants sent them'],
         ...extraLinks,
-      ].map(([name, note], i) => ({ key: 'link' + i, label: name, kind: 'text', values: [`=HYPERLINK("#'${name}'!A1","${name}")`, note] })) },
+      ].map(([name, note], i) => ({ key: 'link' + i, label: name, kind: 'text', values: [`=HYPERLINK("#${name.includes(' ') ? `'${name}'` : name}!A1","${name}")`, note] })) },
       { title: 'Cases', rows: CASES.map((c, i) => ({ key: 'c' + (i + 1), label: `Case ${i + 1}`, kind: 'text', values: [c] })) },
       { title: 'Names', rows: [
         { key: 'n1', label: 'Case', kind: 'text', values: ['Cover!$C$6', 'the case number the drivers block reads'] },

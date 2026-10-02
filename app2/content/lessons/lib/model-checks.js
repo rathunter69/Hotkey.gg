@@ -7,6 +7,8 @@
 // liveness rule). Any legitimate route passes.
 import { sheetIn, settled, calls, live, near, isNum, reads } from './databook-checks.js';
 import { ROW, STATES } from '../../workbooks/clearcoat-model.js';
+import { Sheet } from '../../../engine/sheet.js';
+import { Session } from '../../../engine/keyboard.js';
 
 export { sheetIn, settled, calls, live, near, isNum, reads };
 
@@ -109,3 +111,44 @@ export function weekLines(sh, keys, model = sh && weekModel(sh)) {
 export const windowKeys = ses => (ses.keyLog || []).slice(ses.goalMark || 0).map(e => e.k);
 /** The active sheet is `name`. */
 export const onSheet = (ses, name) => !!ses.sheets[ses.sheetIndex] && ses.sheets[ses.sheetIndex].name === name;
+
+/* ---------------- the model (5.2 on): the learner's cells against the state the lesson ends on ---------------- */
+
+const build = sp => new Sheet({ rows: sp.rows, cols: sp.cols, cells: JSON.parse(JSON.stringify(sp.cells || {})), colW: sp.colW, freeze: sp.freeze, gridlines: sp.gridlines, condFmt: sp.condFmt });
+const TARGETS = {};
+/** A state worked out once (a calculated session), so a check can ask what a cell should read. */
+export function target(stateId) {
+  if (TARGETS[stateId]) return TARGETS[stateId];
+  const st = STATES[stateId];
+  const s = new Session(build(st.sheets[0]));
+  s.sheets[0].name = st.sheets[0].name;
+  for (const sp of st.sheets.slice(1)) s.addSheet(sp.name, build(sp), undefined, { recalc: false });
+  if (st.settings && st.settings.iterative !== undefined) s.settings.iterative = !!st.settings.iterative;
+  if (st.names && Object.keys(st.names).length) s.names = st.names; else s.recalcAll();
+  return (TARGETS[stateId] = s);
+}
+/** 'C32:J37' (or one ref) as its cells, row by row. */
+export function cellsOf(range) {
+  const [a, b = a] = range.split(':');
+  const p = r => { const m = /^([A-Z]+)(\d+)$/.exec(r); return { c: m[1].charCodeAt(0), r: +m[2] }; };
+  const A = p(a), B = p(b), out = [];
+  for (let r = A.r; r <= B.r; r++) for (let c = A.c; c <= B.c; c++) out.push(String.fromCharCode(c) + r);
+  return out;
+}
+const sameValue = (v, w) => (isNum(w) ? near(v, w, 1e-6) : typeof w === 'string' && typeof v === 'string' ? v.toLowerCase() === w.toLowerCase() : v === w);
+/**
+ * Every cell of `range` on `sheet` reads what the state `stateId` reads there, and where that state
+ * holds a formula the learner's cell holds one too (a typed figure never passes for a link).
+ */
+export function matches(ses, sheet, range, stateId) {
+  const sh = sheetIn(ses, sheet), want = sheetIn(target(stateId), sheet);
+  if (!sh || !want) return false;
+  return cellsOf(range).every(ref => sameValue(sh.value(ref), want.value(ref)) && (!want.formula(ref) || !!sh.formula(ref)));
+}
+/** A defined name points where it should (any case, with or without the $ signs). */
+export function nameIs(ses, name, ref) {
+  const n = Object.entries(ses.names || {}).find(([k]) => k.toLowerCase() === name.toLowerCase());
+  return !!n && n[1].replace(/\$/g, '').replace(/'/g, '').toLowerCase() === ref.replace(/\$/g, '').toLowerCase();
+}
+/** The tabs read in this order from the first. */
+export const tabsAre = (ses, names) => names.every((n, i) => ses.sheets[i] && ses.sheets[i].name === n);
