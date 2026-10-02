@@ -1899,6 +1899,18 @@ export const COPY = {
    "mac_note": "",
    "story_beat": ""
   },
+  "ch5-assessment": {
+   "id": "ch5-assessment",
+   "module": "ch5-project-and-assessment",
+   "order": "5.8.A",
+   "title": "Assessment: one schedule and the links from it, fifteen minutes",
+   "brief": "The model is built except its debt: the two tranches, the revolver and every link from them are empty, and the lenders have sent fresh terms. Build the schedule with the breaker, link interest to the IS, the draws and repayments to the cash flow and the balances to the BS, until the balance check reads 0 in every year. No help, the keyboard only. Pass, and the chapter is Verified; this is also the test-out. The key is `Ctrl+Enter`.",
+   "closing": "Fresh terms, an empty schedule, and fifteen minutes later the debt ties: three tranches, the circle closed behind the breaker, every link in place and the balance check at 0 in every year. || That is the schedule a lender’s model is checked against, and you built it under a clock.",
+   "wow": "You built the debt and its links on fresh terms, on the clock, and the chapter is Verified.",
+   "convention_line": "Write once, fill right; Links green; external links avoided",
+   "mac_note": "",
+   "story_beat": ""
+  },
   "remix-format-on-the-pnl": {
    "id": "remix-format-on-the-pnl",
    "module": "remixes",
@@ -12066,6 +12078,96 @@ export const COPY = {
     "lesson_id": "ch5-project",
     "goal_index": "15",
     "text": "Does it tie? Watch FY31 washes a day in Inputs J22 go from 250 to 300: every statement moves and the flag on the Cover holds at OK.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "ch5-assessment": [
+   {
+    "lesson_id": "ch5-assessment",
+    "goal_index": "0",
+    "text": "Build the term loan on Schedules, rows 79 to 82: opening, drawn, repaid at the scheduled amortization or the balance if less, closing.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-assessment",
+    "goal_index": "1",
+    "text": "Add the term loan’s average balance, its interest behind the breaker, and the effective rate in Schedules C83:J85.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-assessment",
+    "goal_index": "2",
+    "text": "Build the delayed draw on Schedules, rows 88 to 92: opening, draws to date, drawn, repaid and closing.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-assessment",
+    "goal_index": "3",
+    "text": "Add the delayed draw’s average balance, its interest behind the breaker, and the effective rate in Schedules C93:J95.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-assessment",
+    "goal_index": "4",
+    "text": "Build the revolver in Schedules C98:J103: cash before it, the minimum, a draw to cover a gap and a repayment from a surplus.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-assessment",
+    "goal_index": "5",
+    "text": "Add the revolver’s average balance, its interest behind the breaker, and the effective rate in Schedules C104:J106.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-assessment",
+    "goal_index": "6",
+    "text": "Total the debt and the interest in rows 109 and 110, and net debt against the BS cash in row 111.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-assessment",
+    "goal_index": "7",
+    "text": "Link interest on the IS, row 28, to the total on Schedules, as a cost, through the projection flag.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-assessment",
+    "goal_index": "8",
+    "text": "Link the draws and repayments on CF: the term loan in C18:J19, the delayed draw in C20:J21, the revolver in C24:J24.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-assessment",
+    "goal_index": "9",
+    "text": "Link the three closing balances to the BS, rows 15 to 17, until the balance check reads 0 in every year.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-assessment",
+    "goal_index": "10",
+    "text": "Does it tie? Watch the minimum cash in Inputs C80 go to 8,000: the revolver draws more and the balance check, Checks row 6, holds at 0.",
     "teach": "",
     "why": "",
     "hint_stuck": ""

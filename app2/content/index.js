@@ -172,6 +172,7 @@ import fill_and_format_block from './lessons/fill-and-format-block.js';
 import keyboard_only_linking from './lessons/keyboard-only-linking.js';
 import challenge_model_speed from './lessons/challenge-model-speed.js';
 import ch5_project from './lessons/ch5-project.js';
+import ch5_assessment from './lessons/ch5-assessment.js';
 
 export const CHAPTERS = [
   {
@@ -310,6 +311,7 @@ export const CHAPTERS = [
       keyboard_only_linking,
       challenge_model_speed,
       ch5_project,
+      ch5_assessment,
     ],
   },
 ];
