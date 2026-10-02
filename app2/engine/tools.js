@@ -77,7 +77,7 @@ export function flashFillPattern(examples) {
     sources.forEach((src, si) => {
       if (!src) return;
       for (const [cs, f] of cases) out.push({ text: f(src), read: row => f(row[si] || '') });
-      tokensOf(src).forEach((tok, ti) => { if (/^[A-Za-z\d]+$/.test(tok.t)) for (const [cs, f] of cases) out.push({ text: f(tok.t), read: row => { const ts = tokensOf(row[si] || '').filter(x => /^[A-Za-z\d]+$/.test(x.t)); const k = tokensOf(src).filter(x => /^[A-Za-z\d]+$/.test(x.t)).findIndex(x => x === tok); return ts[k] ? f(ts[k].t) : null; } }); });
+      tokensOf(src).filter(x => /^[A-Za-z\d]+$/.test(x.t)).forEach((tok, k) => { for (const [cs, f] of cases) out.push({ text: f(tok.t), read: row => { const ts = tokensOf(row[si] || '').filter(x => /^[A-Za-z\d]+$/.test(x.t)); return ts[k] ? f(ts[k].t) : null; } }); });   // the k-th word or number of the source
     });
     return out.filter(p => p.text.length > 0).sort((a, b) => b.text.length - a.text.length);
   };
@@ -105,6 +105,13 @@ export function splitForColumns(text, spec) {
   const out = []; let cur = '', lastDelim = false;
   for (const ch of t) { if (delims.includes(ch)) { if (!(spec.consecutive && lastDelim)) out.push(cur); cur = ''; lastDelim = true; } else { cur += ch; lastDelim = false; } }
   out.push(cur);
+  return out;
+}
+
+/** Fixed width: the break positions Excel suggests, where every non-empty text has a space (a column of blanks). */
+export function suggestBreaks(texts) {
+  const len = texts.reduce((m, t) => Math.max(m, t.length), 0); const out = [];
+  for (let i = 1; i < len; i++) if (texts.every(t => t === '' || i >= t.length || t[i - 1] === ' ') && texts.some(t => i < t.length && t[i] !== ' ')) out.push(i);
   return out;
 }
 
@@ -697,6 +704,102 @@ const methods = {
     if (K === 'H') { this.exitRibbon(false); this.openHyperlink(); return; }
     if (K === 'R' && S.get(a.r, a.c).link) { this.exitRibbon(false); S.pushUndo(); const c = S.ensure(a.r, a.c); delete c.link; c.uline = false; c.fontColor = null; S.commit('format'); return; }
     if (key === 'Enter') this.exitRibbon(false);
+  },
+
+  /* ---------------- Text to Columns (Alt A E) ---------------- */
+  /**
+   * The Convert Text to Columns wizard on the selected column. Step 1: Delimited (Alt+D) or Fixed
+   * width (Alt+W). Step 2: the delimiters Tab (Alt+T), Semicolon (Alt+M), Comma (Alt+C), Space
+   * (Alt+S), Other (Alt+O, then the character), Treat consecutive delimiters as one (Alt+R); for
+   * fixed width, the break lines Excel suggests. Step 3: ← → pick a column of the preview, then
+   * General (Alt+G), Text (Alt+T), Date (Alt+D) or Do not import (Alt+I); Destination (Alt+E).
+   * Next (Alt+N, Enter), Back (Alt+B), Finish (Alt+F, Enter on the last step). Writing over data
+   * asks first (Enter replaces it, Esc goes back).
+   */
+  openTextToColumns() {
+    const S = this.sheet; this.startClock(); const sr = S.selRange();
+    this.openDialog('texttocols', []);
+    const rg = sr.r1 === sr.r2 && sr.c1 === sr.c2 ? (() => { const g = S.regionAround(sr.r1, sr.c1); return { r1: g.r1, r2: g.r2, c1: sr.c1, c2: sr.c1 }; })() : { r1: sr.r1, r2: sr.r2, c1: sr.c1, c2: sr.c1 };
+    const texts = []; for (let r = rg.r1; r <= rg.r2; r++) texts.push(dispText(S.get(r, rg.c1)));
+    const comma = texts.some(t => t.includes(',')), tab = texts.some(t => t.includes('\t'));
+    this.dlg = { kind: 'texttocols', range: rg, texts, step: 1, mode: 'delimited', tab: tab || !comma, semicolon: false, comma: false, space: false, other: '', otherOn: false, consecutive: false,
+      breaks: suggestBreaks(texts), col: 0, formats: {}, dest: '$' + colLetter(rg.c1) + '$' + rg.r1, focus: 'mode', confirm: false };
+  },
+  textToColumnsSpec(d) { return { mode: d.mode, tab: d.tab, semicolon: d.semicolon, comma: d.comma, space: d.space, other: d.otherOn ? d.other : '', consecutive: d.consecutive, breaks: d.breaks }; },
+  /** The wizard's preview: every row split as Finish would split it, and the column formats. */
+  textToColumnsView() { const d = this.dlg; if (!d || d.kind !== 'texttocols') return null; const spec = this.textToColumnsSpec(d); const rows = d.texts.map(t => splitForColumns(t, spec)); const n = rows.reduce((m, x) => Math.max(m, x.length), 0); return { step: d.step, mode: d.mode, rows, columns: n, col: d.col, formats: Array.from({ length: n }, (_, i) => d.formats[i] || 'general'), dest: d.dest, confirm: d.confirm }; },
+  textToColumnsKey(key) {
+    const d = this.dlg; const S = this.sheet; if (!d) return;
+    if (d.confirm) { if (key === 'Enter') { d.confirm = false; this.textToColumnsFinish(true); } else if (key === 'Escape') d.confirm = false; return; }
+    if (key === 'Alt+B') { d.step = Math.max(1, d.step - 1); return; }
+    if (key === 'Alt+N' || (key === 'Enter' && d.step < 3)) { d.step = Math.min(3, d.step + 1); d.focus = d.step === 3 ? 'formats' : 'delims'; return; }
+    if (key === 'Alt+F' || key === 'Enter') { this.textToColumnsFinish(false); return; }
+    if (d.step === 1) { if (key === 'Alt+D') d.mode = 'delimited'; else if (key === 'Alt+W') d.mode = 'fixed'; else if (key === 'ArrowDown' || key === 'ArrowUp') d.mode = d.mode === 'fixed' ? 'delimited' : 'fixed'; return; }
+    if (d.step === 2) {
+      if (d.mode === 'delimited') {
+        const T = { 'Alt+T': 'tab', 'Alt+M': 'semicolon', 'Alt+C': 'comma', 'Alt+S': 'space', 'Alt+R': 'consecutive' };
+        if (T[key]) { d[T[key]] = !d[T[key]]; d.focus = T[key]; return; }
+        if (key === 'Alt+O') { d.otherOn = !d.otherOn; d.focus = 'other'; return; }
+        if (d.focus === 'other' && key.length === 1) { d.other = key; d.otherOn = true; return; }
+        if (d.focus === 'other' && key === 'Backspace') { d.other = ''; return; }
+      }
+      return;
+    }
+    // step 3: the column formats and the destination
+    const n = this.textToColumnsView().columns;
+    if (key === 'ArrowRight') { d.col = Math.min(n - 1, d.col + 1); return; } if (key === 'ArrowLeft') { d.col = Math.max(0, d.col - 1); return; }
+    const F = { 'Alt+G': 'general', 'Alt+T': 'text', 'Alt+D': 'date', 'Alt+I': 'skip' };
+    if (F[key]) { d.formats[d.col] = F[key]; return; }
+    if (key === 'Alt+E') { d.focus = 'dest'; d.fresh = true; return; }
+    if (d.focus === 'dest') { if (d.fresh && key.length === 1) d.dest = ''; if (this.toolType(d, key, ['dest'])) d.fresh = false; }
+  },
+  textToColumnsFinish(confirmed) {
+    const d = this.dlg; const S = this.sheet; const rg = d.range;
+    const dest = this.toolRef(d.dest, { sameSheet: true }); if (!dest) { this.toast(GOALSEEK_REF_NOTE); return; }
+    const spec = this.textToColumnsSpec(d); const rows = d.texts.map(t => splitForColumns(t, spec));
+    const keep = []; const n = rows.reduce((m, x) => Math.max(m, x.length), 0); for (let i = 0; i < n; i++) if ((d.formats[i] || 'general') !== 'skip') keep.push(i);
+    if (!confirmed) {   // Excel asks before writing over anything but the source cells
+      for (let i = 0; i < rows.length; i++) for (let j = 0; j < keep.length; j++) { const r = dest.r + i, c = dest.c + j; if (r >= rg.r1 && r <= rg.r2 && c === rg.c1) continue; if (S.nonEmpty(r, c)) { d.confirm = true; this.note = TTC_OVERWRITE_NOTE; return; } }
+    }
+    this.exitRibbon(false); S.pushUndo();
+    for (let i = 0; i < rows.length; i++) keep.forEach((src, j) => {
+      const r = dest.r + i, c = dest.c + j; if (!S.inb(r, c)) return;
+      const piece = rows[i][src] === undefined ? '' : rows[i][src]; const cell = S.ensure(r, c); const fmt = d.formats[src] || 'general';
+      cell.formula = null; cell.apos = false;
+      if (piece === '') { cell.value = null; cell.txt = false; return; }
+      if (fmt === 'text') { cell.value = piece; cell.txt = true; return; }
+      const cls = Sheet.classifyInput(piece, null, S.today);
+      if (cls.kind === 'value') S.applyInput(cell, cls, r, c); else { cell.value = piece; cell.txt = false; }
+    });
+    S.commit('edit');
+  },
+
+  /* ---------------- Flash Fill (Ctrl+E, Alt A F) ---------------- */
+  /**
+   * Fill the empty cells of the active cell's column, down the data beside it, with the pattern of
+   * the example(s) typed above: the texts of the row's other columns, pieces of them, re-cased,
+   * joined by literal characters. A header row that fits no pattern is left out. No pattern:
+   * Excel's note, nothing changes.
+   */
+  flashFill() {
+    const S = this.sheet; this.startClock(); const a = S.dispActive(); const col = a.c;
+    const left = col > 1 ? S.regionAround(a.r, col - 1) : null; const right = col < S.cols ? S.regionAround(a.r, col + 1) : null;
+    const pick = [left, right].filter(g => g && (g.r1 !== g.r2 || g.c1 !== g.c2 || S.nonEmpty(g.r1, g.c1)));
+    if (!pick.length) { this.toast(FLASH_FILL_NONE_NOTE); return false; }
+    const r1 = Math.min(...pick.map(g => g.r1)), r2 = Math.max(...pick.map(g => g.r2));
+    const c1 = Math.min(col, ...pick.map(g => g.c1)), c2 = Math.max(col, ...pick.map(g => g.c2));
+    const srcCols = []; for (let c = c1; c <= c2; c++) if (c !== col) srcCols.push(c);
+    const sourcesOf = r => srcCols.map(c => dispText(S.get(r, c)));
+    let examples = []; const empty = [];
+    for (let r = r1; r <= r2; r++) { const t = dispText(S.get(r, col)); if (t !== '') examples.push({ r, text: t, sources: sourcesOf(r) }); else if (srcCols.some(c => S.nonEmpty(r, c))) empty.push(r); }
+    let fill = examples.length ? flashFillPattern(examples) : null;
+    if (!fill && examples.length > 1) { examples = examples.slice(1); fill = flashFillPattern(examples); }   // the first one was a header
+    if (!fill || !empty.length) { this.toast(FLASH_FILL_NONE_NOTE); return false; }
+    const out = empty.map(r => [r, fill(sourcesOf(r))]).filter(([, v]) => v !== null && v !== '');
+    if (!out.length) { this.toast(FLASH_FILL_NONE_NOTE); return false; }
+    S.pushUndo();
+    for (const [r, v] of out) { const cell = S.ensure(r, col); cell.formula = null; cell.value = v; cell.txt = false; }
+    S.commit('edit'); return true;
   },
 
   /* ---------------- references typed into a tool's box ---------------- */

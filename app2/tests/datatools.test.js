@@ -90,3 +90,31 @@ test('Data Validation: a Warning alert lets the entry in on Yes, No goes back to
   s.run('Enter'); assert.equal(s.dialog, 'dvalert'); s.run('Enter'); assert.equal(S.value('A1'), 50, 'Yes keeps the entry'); assert.equal(s.editing, false);
   const back = new Sheet(JSON.parse(JSON.stringify(S.toJSON()))); assert.equal(back.validation.A1.max, '10');
 });
+
+test('Text to Columns (Alt A E): Delimited by comma, a Text column, Do not import, the overwrite question; Fixed width with the suggested breaks', async () => {
+  const { TTC_OVERWRITE_NOTE } = await import('../engine/tools.js');
+  const s = fresh({ A1: { value: 'AUS-DOM,Austin,0042' }, A2: { value: 'AUS-MUE,Austin,0107' }, A3: { value: 'DAL-ELM,Dallas,0009' }, B1: { value: 'x' } }); const S = s.sheet;
+  S.select('A1:A3'); s.run('Alt A E'); assert.equal(s.dialog, 'texttocols'); assert.equal(s.dlg.step, 1);
+  s.run('Enter Alt+T Alt+C'); assert.deepEqual(s.textToColumnsView().rows[0], ['AUS-DOM', 'Austin', '0042']);
+  s.run('Enter Right Right Alt+T Left Alt+I'); assert.deepEqual(s.textToColumnsView().formats, ['general', 'skip', 'text']);
+  s.run('Enter'); assert.equal(s.dlg.confirm, true, 'B1 holds data: Excel asks'); assert.equal(s.note, TTC_OVERWRITE_NOTE);
+  s.run('Enter'); assert.equal(s.dialog, null);
+  assert.deepEqual(['A1', 'B1', 'A3', 'B3'].map(k => S.value(k)), ['AUS-DOM', '0042', 'DAL-ELM', '0009'], 'the city skipped; the code kept as text, zeros and all');
+  assert.equal(S.cellAt('B2').txt, true);
+  s.run('Ctrl+Z'); assert.equal(S.value('A1'), 'AUS-DOM,Austin,0042', 'one undo step');
+  const t = fresh({ A1: { value: 'AUS 120 4.5' }, A2: { value: 'DAL 95  3.9' } }); const T = t.sheet;
+  T.select('A1:A2'); t.run('Alt A E Alt+W Alt+N'); assert.deepEqual(t.dlg.breaks, [4, 8]); t.run('Alt+F');
+  assert.deepEqual(['A1', 'B1', 'C1', 'A2', 'B2', 'C2'].map(k => T.value(k)), ['AUS', 120, 4.5, 'DAL', 95, 3.9]);
+});
+
+test('Flash Fill (Ctrl+E): one example beside the data fills the column; a header is left out; no pattern is Excel\'s note', async () => {
+  const { FLASH_FILL_NONE_NOTE } = await import('../engine/tools.js');
+  const s = fresh({ A1: { value: 'Site' }, B1: { value: 'Manager' }, C1: { value: 'Code' },
+    A2: { value: 'aus-dom' }, B2: { value: 'Maria Lopez' }, C2: { value: 'AUS-DOM (Lopez)' },
+    A3: { value: 'aus-mue' }, B3: { value: 'Tom Reed' }, A4: { value: 'dal-elm' }, B4: { value: 'Ana Ruiz' } }); const S = s.sheet;
+  S.goTo(3, 3); s.run('Ctrl+E');
+  assert.deepEqual([S.value('C3'), S.value('C4')], ['AUS-MUE (Reed)', 'DAL-ELM (Ruiz)']);
+  s.run('Ctrl+Z'); assert.equal(S.value('C3'), null);
+  S.goTo(3, 3); s.run('Alt A F'); assert.equal(S.value('C4'), 'DAL-ELM (Ruiz)', 'Data › Flash Fill does the same');
+  const t = fresh({ A1: { value: 'abc' }, A2: { value: 'def' } }); t.sheet.goTo(1, 2); t.run('Ctrl+E'); assert.equal(t.toasts.at(-1), FLASH_FILL_NONE_NOTE);
+});
