@@ -18,6 +18,8 @@
 import { mulberry32 } from '../../engine/rng.js';
 import { dateToSerial } from '../../engine/format.js';
 import { buildPage, FMT } from './page.js';
+/** The state diff and the session extract the lesson checker and the done screen read (shared with the Chapter 1 and 2 workbooks). */
+export { diffStates, sessionToState } from './clearcoat-weekly.js';
 
 export const CHAPTER = 3;
 const D = (y, m, d) => dateToSerial(y, m, d);

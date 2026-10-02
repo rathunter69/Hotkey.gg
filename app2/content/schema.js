@@ -197,6 +197,25 @@ export const CONCEPTS = {
   'concatenate-amp': '& joins text and cell values into one string: ="FY"&TEXT(B3,"yy")&"A"',
   'conditional-format-code': 'a section may open with a condition or a color, [>=1000]0,"k" or [Red], and Excel uses the first section whose condition the value meets',
   'hide-zeros': 'an empty section shows nothing: #,##0;(#,##0); hides the zeros of a working block',
+  // Chapter 3 · 3.3 Math and aggregation, 3.4 Text (the KPI databook)
+  'round-function': 'ROUND(number, digits) changes the value itself: 2 rounds to the cent, 0 to the dollar, -3 to the thousand; a number format only changes what shows',
+  'roundup-rounddown': 'ROUNDUP and ROUNDDOWN take the same digits as ROUND but always round one way',
+  'ceiling-floor': 'CEILING(number, step) rounds up to the next multiple of the step and FLOOR rounds down to it: =CEILING(6.95,0.25) is 7',
+  'abs-function': 'ABS returns a number without its sign: how far, not which way',
+  'countif-countifs': 'COUNTIF(range, criteria) counts the cells that meet one condition; COUNTIFS takes as many range and criteria pairs as you need',
+  'criteria-operators': 'a criteria can be a cell, a text, or a comparison in quotes: ">=250", "<20", and "<>" for not blank',
+  'sumif-sumifs': 'SUMIF(range, criteria, sum_range) adds the rows that meet a condition; SUMIFS puts the sum range first, then the pairs',
+  'averageifs': 'AVERAGEIFS(average_range, criteria_range, criteria, …) averages the rows that meet every condition',
+  'maxifs-minifs': 'MAXIFS and MINIFS return the largest and the smallest value among the rows that meet the conditions',
+  'large-small-rank': 'LARGE(range, n) is the nth biggest, SMALL(range, n) the nth smallest, and RANK(number, range) a value\'s place in the list',
+  'sumproduct': 'SUMPRODUCT multiplies two ranges pair by pair and adds the products in one call: washes times price, without a helper column',
+  'reconciliation': 'a reconciliation sets two counts of the same thing side by side, explains the difference line by line, and checks the adjusted figure to zero',
+  'left-right-mid-len': 'LEFT and RIGHT take characters from either end of a text, MID from a position, and LEN counts them',
+  'clean-text': 'TRIM strips stray spaces, PROPER capitalizes each word, SUBSTITUTE swaps one piece of text for another: together they clean an imported label',
+  'find-search': 'FIND(find_text, within_text) returns the position of a character, case and all; SEARCH does the same without caring about case',
+  'substitute-upper': 'SUBSTITUTE(text, old, new) swaps text for text and UPPER capitalizes every letter, so a parsed piece reads one way',
+  'value-datevalue': 'VALUE turns a number stored as text into a number and DATEVALUE turns a text date into a date serial',
+  'text-to-columns': 'Text to Columns (Alt, A, E) splits a column by a delimiter or a fixed width in one pass, and writes values',
 };
 
 /**

@@ -54,6 +54,19 @@ import dynamic_headers_with_text from './lessons/dynamic-headers-with-text.js';
 import conditional_codes_and_hidden_zeros from './lessons/conditional-codes-and-hidden-zeros.js';
 import challenge_house_format_set from './lessons/challenge-house-format-set.js';
 import remix_format_on_the_pnl from './remixes/formatting-on-the-pnl.js';   // Chapter 1's format challenge, re-clothed (content/remix.js)
+// Chapter 3 · Formulas and functions (Run R3): 3.3 Math and aggregation, 3.4 Text
+import round_family from './lessons/round-family.js';
+import countif_countifs from './lessons/countif-countifs.js';
+// PENDING import sumif_sumifs_averageifs from './lessons/sumif-sumifs-averageifs.js';
+// PENDING import busiest_sites from './lessons/busiest-sites.js';
+// PENDING import sumproduct_blended_ticket from './lessons/sumproduct-blended-ticket.js';
+// PENDING import the_reconciliation from './lessons/the-reconciliation.js';
+// PENDING import challenge_site_package_summary from './lessons/challenge-site-package-summary.js';
+// PENDING import split_the_codes from './lessons/split-the-codes.js';
+// PENDING import parse_the_memo from './lessons/parse-the-memo.js';
+// PENDING import text_to_numbers from './lessons/text-to-numbers.js';
+// PENDING import text_to_columns_flash_fill from './lessons/text-to-columns-flash-fill.js';
+// PENDING import challenge_text_dump from './lessons/challenge-text-dump.js';
 
 export const CHAPTERS = [
   {
@@ -97,6 +110,26 @@ export const CHAPTERS = [
       built_in_formats_on_a_pnl, sign_convention_costs_negative, currency_and_percent_lines, dates_on_the_timeline, challenge_format_the_numbers,
       the_four_section_format, units_in_the_format, dynamic_headers_with_text, conditional_codes_and_hidden_zeros, challenge_house_format_set,
       remix_format_on_the_pnl,
+    ],
+  },
+  {
+    id: 'formulas',
+    title: 'Formulas and functions',
+    access: 'paid',
+    blurb: 'Logic, dates, aggregation with conditions, text, the time value of money and auditing: the point-of-sale export rolled up into a KPI databook where every number ties.',
+    // Chapter 3's sections in order (script-ch3.md): modules 3.1 to 3.7.
+    sections: [
+      { name: 'Logic', blurb: 'IF on a threshold, nested IF against IFS against MIN and MAX, AND, OR and NOT, IFERROR and the override pattern.' },
+      { name: 'Dates', blurb: 'Serial numbers, member tenure, period keys, YEARFRAC and fiscal periods, the trading calendar.' },
+      { name: 'Math and aggregation', blurb: 'The ROUND family, COUNTIFS, SUMIFS and AVERAGEIFS, MAXIFS, LARGE and RANK, SUMPRODUCT, and the reconciliation driven to zero.' },
+      { name: 'Text', blurb: 'LEFT, RIGHT and MID to split the codes, FIND and SUBSTITUTE to parse the memo, VALUE for a text export, Text to Columns and Flash Fill.' },
+      { name: 'Time value of money', blurb: 'PV, FV and PMT on the site-build loan, NPV and IRR on a new-site case, and the payment schedule.' },
+      { name: 'Auditing', blurb: 'Trace arrows, F9 and Go To Special at scale, the hardcode and external-link hunt, and the checks block.' },
+      { name: 'Project and assessment', blurb: 'Rebuild the Summary so every number ties, then a fresh export against the clock.' },
+    ],
+    lessons: [
+      round_family, countif_countifs, /*PENDING1*/
+      /*PENDING2*/
     ],
   },
 ];
