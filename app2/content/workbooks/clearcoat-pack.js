@@ -141,7 +141,7 @@ const EXPORT_WORK = {
 /** Lists: the site table, the packages, the weeks; beside them the bonus tiers, the case list and the unique site list the chapter builds. */
 function listsPage(weeks, sites) {
   const page = buildPage({
-    name: 'Lists', chapter: CHAPTER, title: 'Clearcoat Express: lists for the diligence pack', units: UNITS, labelHeader: 'Code',
+    name: 'Lists', chapter: CHAPTER, title: 'Clearcoat Express: lists for the diligence pack', units: UNITS, labelHeader: 'Code', figureW: 100,   // wide enough for a two-digit day's date (15-Mar-19), which 89 shows as ####
     headers: ['Site', 'Cluster', 'Opened', 'Capacity (cars an hour)', 'Hours open', 'Daily site costs ($)'], kinds: ['text', 'text', 'date', 'count', 'count', 'money'],
     blocks: [
       { rows: sites.map(s => ({ key: s.code, label: s.code, dollar: false, values: [s.name, s.cluster || 'Austin', s.opened, s.capacity, s.hours, s.costs] })) },

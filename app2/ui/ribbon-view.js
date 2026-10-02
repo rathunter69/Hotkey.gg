@@ -168,7 +168,9 @@ export class RibbonView {
     this.dropKill();
     if (this.pasteDialog) this.pasteDialog.remove();
     if (this.fmtDialog) this.fmtDialog.remove();
-    for (const d of [this.gotoDialog, this.optionsDialog, this.pagesetupDialog, this.renameDialog, this.deleteDialog, this.moveDialog]) if (d) d.remove();
+    // every card this view drew (a docked pane such as the PivotTable field list included) leaves with it
+    for (const d of [this.gotoDialog, this.optionsDialog, this.pagesetupDialog, this.renameDialog, this.deleteDialog, this.moveDialog, ...(this._cards || [])]) if (d) d.remove();
+    this._cards = null; this._toolCards = null;
     window.removeEventListener('resize', this._onResize); clearTimeout(this._rzT);
     if (this.ro) this.ro.disconnect();
     if (this.slot) this.slot.classList.remove('rib-full');
@@ -300,6 +302,7 @@ export class RibbonView {
       d.addEventListener('click', this._onClick);
       d.addEventListener('mousedown', this._onDown);
     }
+    (this._cards || (this._cards = new Set())).add(d);
     return d;
   }
   /** Show `d` with a body and footer while `on`, else hide it. */
