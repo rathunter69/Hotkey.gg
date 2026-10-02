@@ -544,9 +544,10 @@ export class Session {
       if (k === 'ArrowRight') { this.logKey('→'); cycle('fillColorIdx', FILL_SWATCHES.length, 1); return true; }
     }
     if (this.dialog === 'cellstyle') {
-      if (k === 'ArrowLeft') { this.logKey('←'); cycle('cellStyleIdx', CELL_STYLES.length, -1); return true; }
-      if (k === 'ArrowRight') { this.logKey('→'); cycle('cellStyleIdx', CELL_STYLES.length, 1); return true; }
+      if (k === 'ArrowLeft') { this.logKey('←'); cycle('cellStyleIdx', this.cellStyleList().length, -1); return true; }
+      if (k === 'ArrowRight') { this.logKey('→'); cycle('cellStyleIdx', this.cellStyleList().length, 1); return true; }
       if (k === 'Enter') { this.logKey('↵'); this.applyRibbon('ENTER'); return true; }
+      if (k.toLowerCase() === 'n' && !e.ctrlKey) { this.logKey('N'); this.openNewCellStyle(); return true; }   // New Cell Style… under the gallery
       return true;
     }
     if (this.dialog === 'fontcolor') {
@@ -628,7 +629,7 @@ export class Session {
       if (Object.prototype.hasOwnProperty.call(LETTER, key)) { S.setFill(LETTER[key]); return done(); }
       return;
     }
-    if (this.dialog === 'cellstyle') { if (key === 'ENTER') { S.applyCellStyle(CELL_STYLES[this.cellStyleIdx].k); return done(); } return; }
+    if (this.dialog === 'cellstyle') { if (key === 'ENTER') { this.applyStyleEntry(this.cellStyleList()[this.cellStyleIdx]); return done(); } return; }
 
     // Alt then a digit: the Quick Access Toolbar's numeric KeyTips (Excel shows 1..9 on it)
     if (!this.path.length && /^[1-9]$/.test(key)) {

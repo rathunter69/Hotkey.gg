@@ -24,16 +24,20 @@
 //   PivotTable            Alt N V T: a minimal pivot (one row field, one column field, one value
 //                         field with Sum / Count / Average), Refresh (Alt+F5) and GETPIVOTDATA
 
-import { Sheet } from './sheet.js';
+import { Sheet, CELL_STYLES } from './sheet.js';
 import { evalFormula, formulaRefs, evaluateStepper, valueText, translateFormula, isErrVal, textToNumber, dateTextValue, parses } from './formula.js';
 import { refKey, parseRef, parseRange, rangeText, colLetter } from './refs.js';
 import { dispText } from './format.js';
 const clone = x => JSON.parse(JSON.stringify(x));
+/** The Style dialog's tick boxes and the format fields each one carries (Style Includes, By Example). */
+export const STYLE_PARTS = { number: ['fmtStyle', 'decimals', 'numFmt', 'scale'], alignment: ['align', 'wrap', 'indent', 'ca'], font: ['bold', 'it', 'strike', 'uline', 'fontColor', 'fsz'],
+  border: ['bt', 'bb', 'bl', 'br', 'ball', 'thick', 'bdbl'], fill: ['fill'], protection: [] };
+const STYLE_KEYS = { 'Alt+N': 'number', 'Alt+L': 'alignment', 'Alt+F': 'font', 'Alt+B': 'border', 'Alt+I': 'fill', 'Alt+R': 'protection' };
 
 /** The dialogs this module drives (keyboard.js routes their keys to toolKey). */
-export const TOOL_DIALOGS = new Set(['evalfx', 'errcheck', 'texttocols', 'removedup', 'validation', 'dvlist', 'editlinks', 'autofilter', 'sortdlg', 'goalseek', 'datatable', 'pivot']);
+export const TOOL_DIALOGS = new Set(['evalfx', 'errcheck', 'texttocols', 'removedup', 'validation', 'dvlist', 'editlinks', 'autofilter', 'sortdlg', 'goalseek', 'datatable', 'pivot', 'newstyle']);
 /** The dialogs with a text field that keeps the case typed. */
-export const TOOL_TYPED = new Set(['texttocols', 'validation', 'goalseek', 'datatable', 'sortdlg', 'autofilter']);
+export const TOOL_TYPED = new Set(['newstyle', 'texttocols', 'validation', 'goalseek', 'datatable', 'sortdlg', 'autofilter']);
 /** Excel's messages the tools show verbatim. */
 export const ERRCHECK_DONE_NOTE = 'The error check is complete for the entire sheet.';
 export const FLASH_FILL_NONE_NOTE = "We looked at all the data next to your selection and didn't see a pattern for filling in values for you.";
@@ -217,6 +221,7 @@ const methods = {
       case 'goalseek': return this.goalSeekKey(key);
       case 'datatable': return this.dataTableKey(key);
       case 'pivot': return this.pivotKey(key);
+      case 'newstyle': return this.newCellStyleKey(key);
     }
   },
   /** A typed character into the draft's focused text field (Backspace removes one). */
@@ -582,6 +587,45 @@ const methods = {
     if (key === 'Home') { d.idx = 0; return; } if (key === 'End') { d.idx = d.items.length - 1; return; }
     if (key === 'Enter') { const p = parseRef(d.cell); const text = d.items[d.idx]; this.exitRibbon(false); S.commitInput(text[0] === '=' || text[0] === "'" ? "'" + text : text, p.r, p.c); return; }
     if (key.length === 1) { const K = key.toUpperCase(); for (let n = 1; n <= d.items.length; n++) { const i = (d.idx + n) % d.items.length; if (d.items[i].toUpperCase().startsWith(K)) { d.idx = i; return; } } }
+  },
+
+  /* ---------------- Cell Styles › New Cell Style (Alt H J N) ---------------- */
+  /** The gallery's entries: Excel's built-in styles, then the workbook's own (custom) styles. */
+  cellStyleList() { return CELL_STYLES.map(st => ({ k: st.k, name: st.name, builtin: true })).concat((this.cellStyles || []).map(st => ({ k: 'custom:' + st.name, name: st.name, custom: st }))); },
+  /** Apply a gallery entry to the selection: a built-in through the sheet, a custom style by its ticked parts (the cell remembers the style's name). */
+  applyStyleEntry(entry) {
+    const S = this.sheet; if (!entry) return;
+    if (entry.builtin) { S.applyCellStyle(entry.k); return; }
+    const st = entry.custom; S.formatSel(c => { for (const part in STYLE_PARTS) if (st.includes[part]) for (const f of STYLE_PARTS[part]) c[f] = clone(st.fmt[f] === undefined ? null : st.fmt[f]); c.style = st.name; });
+  },
+  /** Re-apply a saved style by name (what the gallery's Custom row does); false when there is none. */
+  applyCellStyleByName(name) { const e = this.cellStyleList().find(x => x.name.toLowerCase() === String(name).toLowerCase()); if (!e) return false; this.applyStyleEntry(e); return true; },
+  /**
+   * The Style dialog, By Example: Style name (Alt+S; it opens as Style 1, selected), the tick boxes
+   * Number (Alt+N), Alignment (Alt+L), Font (Alt+F), Border (Alt+B), Fill (Alt+I), Protection (Alt+R);
+   * OK (Enter) saves the active cell's formats under the name (a name in use is redefined).
+   */
+  openNewCellStyle() {
+    const n = (this.cellStyles || []).length + 1;
+    this.openDialog('newstyle', []);
+    this.dlg = { kind: 'newstyle', name: 'Style ' + n, fresh: true, focus: 'name', includes: { number: true, alignment: true, font: true, border: true, fill: true, protection: true } };
+  },
+  newCellStyleKey(key) {
+    const d = this.dlg; if (!d) return;
+    if (STYLE_KEYS[key]) { const p = STYLE_KEYS[key]; d.includes[p] = !d.includes[p]; d.focus = p; return; }
+    if (key === 'Alt+S') { d.focus = 'name'; d.fresh = true; return; }
+    if (key === ' ' && d.focus !== 'name') { d.includes[d.focus] = !d.includes[d.focus]; return; }
+    if (key === 'Enter') {
+      const name = d.name.trim(); if (!name) return;
+      const S = this.sheet; const a = S.dispActive(); const cell = S.get(a.r, a.c); const fmt = {};
+      for (const part in STYLE_PARTS) for (const f of STYLE_PARTS[part]) fmt[f] = clone(cell[f] === undefined ? null : cell[f]);
+      if (!this.cellStyles) this.cellStyles = [];
+      const style = { name, includes: { ...d.includes }, fmt };
+      const i = this.cellStyles.findIndex(x => x.name.toLowerCase() === name.toLowerCase());
+      if (i >= 0) this.cellStyles[i] = style; else this.cellStyles.push(style);
+      this.exitRibbon(false); S.pushUndo(); S.ensure(a.r, a.c).style = name; S.commit('format'); return;   // the example cell now carries the style
+    }
+    if (d.focus === 'name') { if (d.fresh && key.length === 1) d.name = ''; if (this.toolType(d, key, ['name'])) d.fresh = false; }
   },
 
   /* ---------------- references typed into a tool's box ---------------- */
