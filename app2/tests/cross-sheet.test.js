@@ -170,3 +170,15 @@ test('3D references: SUM(Jan:Mar!B5) adds the cell on every sheet of the run, in
   assert.equal(S.formula('B1'), '=SUM(Jan:Mar!B5)');
   S.commitInput('=SUM(A1:Apr!B5)', 8, 2); assert.notEqual(S.value('B8'), 100, 'A1:Apr!B5 is not a 3D reference');
 });
+
+test('a block cut onto another sheet keeps its own arithmetic: references inside the block move with it', () => {
+  const s = book(); const S = s.sheet;
+  S.commitInput('10', 8, 2); S.commitInput('20', 9, 2); S.commitInput('=SUM(B8:B9)', 10, 2); S.commitInput('=B10*2', 11, 2);
+  S.select('B8:B11'); S.copy(true);
+  s.switchSheet(1); const T = s.sheet;
+  T.select('D2'); T.paste();
+  assert.equal(T.cellAt('D4').formula, '=SUM(D2:D3)', 'the subtotal adds the lines that moved with it');
+  assert.equal(T.cellAt('D5').formula, '=D4*2');
+  assert.equal(T.value('D4'), 30);
+  assert.equal(S.cellAt('B10').formula, null, 'the source cells are gone');
+});

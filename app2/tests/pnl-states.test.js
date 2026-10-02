@@ -5,7 +5,7 @@
 // cluster clothing is deterministic per seed.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { STATES, STATE_ORDER, stateOf, LINE_ROWS, COST_ROWS, YEAR_COLS, YEAR_ENDS, MONTH_COLS, MONTHLY, FIGURES, CODES, MULTIPLE, clusterPnl, clusterPatch, diffStates } from '../content/workbooks/clearcoat-pnl.js';
+import { STATES, STATE_ORDER, CHAIN, stateOf, LINE_ROWS, COST_ROWS, YEAR_COLS, YEAR_ENDS, MONTH_COLS, MONTHLY, FIGURES, CODES, MULTIPLE, clusterPnl, clusterPatch, diffStates } from '../content/workbooks/clearcoat-pnl.js';
 import { WORKBOOKS, workbookState } from '../content/workbooks/index.js';
 import { Sheet } from '../engine/sheet.js';
 import { Session } from '../engine/keyboard.js';
@@ -22,13 +22,14 @@ function live(st) {
 const sheetIn = (ses, name) => ses.sheets.find(x => x.name === name).sheet;
 const close = (a, b) => Math.abs(a - b) < 1e-6;
 
-test('the workbook is registered and every state builds P&L, Inputs, Monthly and Print inside 26 columns', () => {
+test('the workbook is registered and every state builds P&L, Inputs, Monthly and Print (and Monthly detail from 2.4.3 on) inside 26 columns', () => {
   assert.ok(WORKBOOKS['clearcoat-pnl']);
   for (const id in STATES) {
     const st = workbookState('clearcoat-pnl', id);
-    assert.deepEqual(st.sheets.map(s => s.name), ['P&L', 'Inputs', 'Monthly', 'Print'], id);
+    assert.deepEqual(st.sheets.slice(0, 4).map(s => s.name), ['P&L', 'Inputs', 'Monthly', 'Print'], id);
+    assert.ok(st.sheets.length === 4 || (st.sheets.length === 5 && st.sheets[4].name === 'Monthly detail'), id);
     for (const sh of st.sheets) for (const ref in sh.cells) assert.ok(/^[A-Z]\d+$/.test(ref) && ref.charCodeAt(0) - 64 <= 26 && +ref.slice(1) <= 100, `${id} ${sh.name}!${ref} inside the grid`);
-    assert.equal(live(st).sheets.length, 4);
+    assert.equal(live(st).sheets.length, st.sheets.length);
   }
 });
 
@@ -53,10 +54,11 @@ test('the raw export ties: FY26E is its twelve months, the subtotals are live, t
 });
 
 test('the module states chain S1raw to S2d: each step is a small diff, and the plantings sit where the lessons expect', () => {
-  assert.deepEqual(STATE_ORDER, ['S1raw', 'S1a', 'S1b', 'S1c', 'S1d', 'S2a', 'S2b', 'S2c', 'S2d', 'Pdone']);
-  for (let i = 1; i < STATE_ORDER.length - 1; i++) {
-    const d = diffStates(stateOf(STATE_ORDER[i - 1]), stateOf(STATE_ORDER[i]));
-    assert.ok(d.length > 0, `${STATE_ORDER[i]} differs from ${STATE_ORDER[i - 1]}`);
+  assert.deepEqual(CHAIN.slice(0, 9), ['S1raw', 'S1a', 'S1b', 'S1c', 'S1d', 'S2a', 'S2b', 'S2c', 'S2d']);
+  assert.deepEqual(STATE_ORDER.slice(-3), ['Pdone', 'S8raw', 'S8done']);
+  for (let i = 1; i < CHAIN.length; i++) {
+    const d = diffStates(stateOf(CHAIN[i - 1]), stateOf(CHAIN[i]));
+    assert.ok(d.length > 0, `${CHAIN[i]} differs from ${CHAIN[i - 1]}`);
   }
   const pl = id => stateOf(id).sheets[0].cells;
   const inp = id => stateOf(id).sheets[1].cells;

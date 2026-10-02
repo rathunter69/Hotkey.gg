@@ -1165,6 +1165,8 @@ export class Sheet {
       this.cfMoveRules(cb, r0, c0, from);   // the conditional formats travel with the moved cells
       if (!from && (r0 !== cb.rect.r1 || c0 !== cb.rect.c1)) {   // M68: every formula that read the moved cells (and the moved formulas' references into their own block) follows them
         for (const k in this.cells) { const cell = this.cells[k]; if (cell.formula) cell.formula = relocateRefs(cell.formula, cb.rect, r0 - cb.rect.r1, c0 - cb.rect.c1); }
+      } else if (from) {   // a block cut onto another sheet: the moved formulas' references into their own block follow it, as Excel's do (a subtotal keeps adding its own lines)
+        for (let i = 0; i < cb.h; i++) for (let j = 0; j < cb.w; j++) { const cell = this.cells[refKey(r0 + i, c0 + j)]; if (cell && cell.formula) cell.formula = relocateRefs(cell.formula, cb.rect, r0 - cb.rect.r1, c0 - cb.rect.c1); }
       }
       this.clipboard = null;
       this.lastFlash = { r1: r0, c1: c0, r2: r0 + cb.h - 1, c2: c0 + cb.w - 1 };

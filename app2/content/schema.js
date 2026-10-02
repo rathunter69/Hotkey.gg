@@ -197,6 +197,20 @@ export const CONCEPTS = {
   'concatenate-amp': '& joins text and cell values into one string: ="FY"&TEXT(B3,"yy")&"A"',
   'conditional-format-code': 'a section may open with a condition or a color, [>=1000]0,"k" or [Red], and Excel uses the first section whose condition the value meets',
   'hide-zeros': 'an empty section shows nothing: #,##0;(#,##0); hides the zeros of a working block',
+  // Chapter 2, modules 2.3 and 2.4: the page a buyer reads, alignment and structure
+  'page-anatomy': 'a financial page reads in one order: the title, the units line, the timeline, the sections and the answer they add down to',
+  'indent-levels': 'Increase Indent (Alt, H, 6) moves a label one level in and Decrease Indent (Alt, H, 5) one level out, so a sub-line reads as part of its total',
+  'font-size-step': 'Increase Font Size (Alt, H, F, G) takes the selection one step up the size list; Alt, H, F, K takes it one step down',
+  'clear-all': 'Clear All (Alt, H, E, A) empties the cells and takes their formats with them',
+  'ae-divider': 'the A/E divider: one right border down the last actual column and a shade on the estimate header, so a reader sees where the forecast starts',
+  'border-meaning': 'a top border says the row adds up what is above it, a double bottom marks the final answer, and a grid says nothing at all',
+  'source-line': 'every table carries a source line under it, and a footnote marker where a figure needs a word',
+  'label-column': 'a page has a shape: a narrow margin in A, the labels fitted in B, and one set width across the period columns',
+  'paste-formats-tile': 'Paste Special Formats from one column onto a wider block repeats the column’s formats across every column of the block',
+  'header-alignment': 'headers sit bold and right-aligned over their figures, and a long header wraps inside its column rather than widening it',
+  'outline-detail': 'Hide Detail (Alt, A, H) folds a group to its total and Show Detail (Alt, A, J) opens it again',
+  'group-not-hide': 'hidden rows get forgotten: group detail that belongs on the page, and give a different page its own sheet',
+  'navigation-column': 'a navigation column lists a long sheet’s named blocks at the top, and Go To with a name lands on each one',
 };
 
 /**
@@ -254,7 +268,7 @@ export function validateLesson(l) {
     need(WORKBOOKS[l.workbook], `unknown workbook "${l.workbook}" (content/workbooks)`);
     need(isObject(l.state) && typeof l.state.before === 'string', 'a module lesson needs state.before');
     need(SEEDED_KINDS.includes(kind) || typeof l.state.after === 'string', 'a module lesson needs state.after (a seeded kind is graded by its goals)');
-    if (l.plant !== undefined) need(isObject(l.plant) && Object.keys(l.plant).every(k => /^[A-Za-z0-9 ]+!(#?[A-Za-z]+[0-9]*)$/.test(k)), 'plant is a state patch: { "Sheet!A1": cell | null, "Sheet!#colW": {…} }');
+    if (l.plant !== undefined) need(isObject(l.plant) && Object.keys(l.plant).every(k => /^[A-Za-z0-9 &]+!(#?[A-Za-z]+[0-9]*)$/.test(k)), 'plant is a state patch: { "Sheet!A1": cell | null, "Sheet!#colW": {…} }');
     if (kind !== 'challenge') {
       need(typeof l.headline === 'string' && l.headline.trim(), 'headline (the one concept the lesson exists to teach) missing');
       need(Array.isArray(l.conventions) && l.conventions.length > 0 && l.conventions.every(id => CONVENTIONS[id]), 'every module lesson carries at least one canon convention id');
@@ -364,6 +378,7 @@ function validateStartingSheet(l, goals, ends, need, opts = {}) {
       for (const key in patch || {}) { const shName = key.includes('!') ? key.split('!')[0] : state.sheets[0].name; need(state.sheets.some(x => x.name === shName), `seed patches unknown sheet in "${key}"`); }
       applyStatePatch(state, patch || {});
     }
+    if (isObject(l.plant)) applyStatePatch(state, JSON.parse(JSON.stringify(l.plant)));   // the planting lands before the first key, as the runner lays it
     try {
       session = new Session(build(state.sheets[0]), {}); session.demoDone = new Set();
       session.sheets[0].name = state.sheets[0].name;

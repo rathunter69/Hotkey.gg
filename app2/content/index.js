@@ -53,6 +53,19 @@ import units_in_the_format from './lessons/units-in-the-format.js';
 import dynamic_headers_with_text from './lessons/dynamic-headers-with-text.js';
 import conditional_codes_and_hidden_zeros from './lessons/conditional-codes-and-hidden-zeros.js';
 import challenge_house_format_set from './lessons/challenge-house-format-set.js';
+// 2.3 The page a buyer reads, 2.4 Alignment and structure (run R2)
+import title_units_timeline_answer from './lessons/title-units-timeline-answer.js';
+import actuals_vs_estimates_divider from './lessons/actuals-vs-estimates-divider.js';
+import borders_that_mean_something from './lessons/borders-that-mean-something.js';
+import labels_footnotes_sources from './lessons/labels-footnotes-sources.js';
+import widths_and_the_label_column from './lessons/widths-and-the-label-column.js';
+import cell_styles_format_painter from './lessons/cell-styles-format-painter.js';
+import challenge_pnl_presentation_quality from './lessons/challenge-pnl-presentation-quality.js';
+import alignment_at_scale from './lessons/alignment-at-scale.js';
+import grouping_and_outline_levels from './lessons/grouping-and-outline-levels.js';
+import hide_group_or_separate_sheet from './lessons/hide-group-or-separate-sheet.js';
+import navigation_column from './lessons/navigation-column.js';
+import challenge_grouped_navigable from './lessons/challenge-grouped-navigable.js';
 import remix_format_on_the_pnl from './remixes/formatting-on-the-pnl.js';   // Chapter 1's format challenge, re-clothed (content/remix.js)
 
 export const CHAPTERS = [
@@ -91,11 +104,15 @@ export const CHAPTERS = [
     sections: [
       { name: 'Number formats', blurb: 'Number formats on a P&L: the desk number format and decimals by line, the sign convention stated once, currency and percent lines, real dates on the timeline.' },
       { name: 'Custom number formats', blurb: 'Custom number formats: the four-section code, units in the format, custom date codes for the timeline, conditions and hidden zeros.' },
+      { name: 'The page a buyer reads', blurb: 'The anatomy of a financial page: title, units, timeline, sections and the answer; the actuals-to-estimates divider; borders that mean something; labels, footnotes and sources; widths and the label column; one page’s formats carried to the next.' },
+      { name: 'Alignment and structure', blurb: 'Alignment and outline at scale: headers and wraps on a long page; grouping; hiding against grouping against a separate sheet; a navigation column.' },
       { name: 'Remixes', blurb: 'Chapter 1’s challenges re-clothed in this chapter’s material: the same keys on a new sheet, so old skills stay warm.' },
     ],
     lessons: [
       built_in_formats_on_a_pnl, sign_convention_costs_negative, currency_and_percent_lines, dates_on_the_timeline, challenge_format_the_numbers,
       the_four_section_format, units_in_the_format, dynamic_headers_with_text, conditional_codes_and_hidden_zeros, challenge_house_format_set,
+      title_units_timeline_answer, actuals_vs_estimates_divider, borders_that_mean_something, labels_footnotes_sources, widths_and_the_label_column, cell_styles_format_painter, challenge_pnl_presentation_quality,
+      alignment_at_scale, grouping_and_outline_levels, hide_group_or_separate_sheet, navigation_column, challenge_grouped_navigable,
       remix_format_on_the_pnl,
     ],
   },
