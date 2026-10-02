@@ -16,9 +16,17 @@ createServer(async (req, res) => {
   try {
     let p = decodeURIComponent(new URL(req.url, 'http://x').pathname);
     if (p.endsWith('/')) p += 'index.html';
-    const file = normalize(join(root, p));
+    let file = normalize(join(root, p));
     if (!file.startsWith(root)) { res.writeHead(403); return res.end(); }
-    const body = await readFile(file);
+    // a root-absolute path outside /app2/ (404.html's /ui/fonts, /favicon.ico) is the published site's
+    // root, which is app2/: serve it from there, as Pages does
+    let body;
+    try { body = await readFile(file); } catch (e) {
+      if (p.startsWith('/app2/')) throw e;
+      file = normalize(join(root, 'app2', p));
+      if (!file.startsWith(join(root, 'app2'))) throw e;
+      body = await readFile(file);
+    }
     res.writeHead(200, { ...SITE, 'content-type': TYPES[extname(file)] || 'application/octet-stream', 'cache-control': 'no-store' });
     res.end(body);
   } catch (e) { res.writeHead(404); res.end('not found'); }
