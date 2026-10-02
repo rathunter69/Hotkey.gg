@@ -45,3 +45,13 @@ test('Paste Special with Skip blanks (B) lands only the filled cells of a partia
   assert.equal(S.value('A3'), null, 'without the tick the blanks wipe what was there');
   assert.equal(s.pasteSkip, false, 'the tick does not outlive its paste');
 });
+
+test('Data, Clear (Alt A C) takes every filter off and keeps the arrows', () => {
+  const s = fresh(); const S = s.sheet;
+  S.goTo(1, 1); s.run('Ctrl+Shift+L Alt+Down E "S2" Enter');
+  assert.equal(S.filterRows.size, 4, 'four of the five rows hidden');
+  S.goTo(20, 5); s.run('Alt A C');
+  assert.equal(S.filterRows.size, 0, 'every row shows again');
+  assert.ok(S.filter, 'the arrows stay on');
+  assert.deepEqual(S.filter.crit, {});
+});
