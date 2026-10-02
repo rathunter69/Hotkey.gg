@@ -30,6 +30,7 @@ export const MODULE_NUMBERS = {
   // Chapter 6 · Valuation (script-ch6.md)
   'trading-comps': '6.1',
   'precedent-transactions': '6.2', lbo: '6.3',
+  'bids-and-waterfall': '6.4', 'ch6-project-and-assessment': '6.5',
 };
 /** The catalogue section the chapter's project, assessment and test-out sit in (module 1.8). */
 export const FINAL_SECTION = 'Project and assessment';

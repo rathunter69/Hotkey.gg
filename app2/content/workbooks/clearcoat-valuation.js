@@ -136,6 +136,7 @@ const firstCol = fn => only(['C'], fn);
 function page(spec) {
   if (firstPass) { ROWS[spec.name] = dryRows(spec); return null; }
   const { sheet, at } = buildPage(spec);
+  if (spec.rows) sheet.rows = spec.rows;   // a page taller than the default canvas (the LBO runs to row 148)
   const cells = sheet.cells;
   ROWS[spec.name] = at;
   const colsOf = r => Object.keys(cells).filter(k => /^[A-Z]+\d+$/.test(k) && +k.replace(/^[A-Z]+/, '') === r).map(k => k.replace(/\d+$/, '')).filter(col => col !== 'A' && col !== 'B');
@@ -378,7 +379,7 @@ function pageLBO(T, given = null) {
   const first = col => `COLUMNS($D$4:${col}$4)`;
   const offs = [-1, -0.5, 0, 0.5, 1];
   const sheet = page({
-    name: me, chapter: CHAPTER, read: false, title: `${COMPANY}: the sponsor's LBO`, units: 'USD thousands unless stated; closing at the FY26 year end; EBITDA and free cash flow from the operating model',
+    name: me, chapter: CHAPTER, read: false, rows: 160, title: `${COMPANY}: the sponsor's LBO`, units: 'USD thousands unless stated; closing at the FY26 year end; EBITDA and free cash flow from the operating model',
     headers: LCOLS.map(() => null),
     blocks: [
       { title: 'The term sheet', rows: [
@@ -839,6 +840,8 @@ const B63C = lazy(() => {
   stripHeader(s, 'LBO', rows, 'hurdles'); delete s.sheets[0].condFmt;
   return s;
 });
+/** The paper LBO finished: what 6.3.C's route leaves (the Chapter 6 benchmark drill grades on it). */
+const B63CD = lazy(() => ({ sheets: [clone(PAPER_PAGE().sheet)], settings: { ...clone(M.stateOf('DONE').settings) } }));
 
 // module 6.4: the bids and the waterfall
 const B644 = derive(DONE, s => summaryLabels(s));
@@ -858,13 +861,17 @@ function projectShape(s, rows, data) {
 }
 const B6P = freshState(ALT_PACK, (s, rows) => projectShape(s, rows, ALT));
 const B6A = freshState(ALT2_PACK, (s, rows) => projectShape(s, rows, ALT2));
+/** The project's end: the finished pack on the fresh set (ALT), what 6.P's solution leaves. */
+const B6PD = freshState(ALT_PACK, () => {});
+/** The assessment's end: the finished pack on the second fresh set (ALT2), before the seed's odds. */
+const B6AD = freshState(ALT2_PACK, () => {});
 
 const BUILDERS = {
   B611, B612, B613, B614, B615, B61C,
   B621, B622, B623, B62C,
-  B631, B632, B633, B634, B635, B636, B63C,
+  B631, B632, B633, B634, B635, B636, B63C, B63CD,
   B641, B642, B643, B644, B64C,
-  B6P, B6A, DONE,
+  B6P, B6PD, B6A, B6AD, DONE,
 };
 /** The named states, each built on first read. */
 export const STATES = {};
@@ -874,9 +881,9 @@ export const STATE_ORDER = Object.keys(BUILDERS);
 export const STATE_LESSONS = {
   B611: '6.1.1', B612: '6.1.2', B613: '6.1.3', B614: '6.1.4', B615: '6.1.5', B61C: '6.1.C',
   B621: '6.2.1', B622: '6.2.2', B623: '6.2.3', B62C: '6.2.C',
-  B631: '6.3.1', B632: '6.3.2', B633: '6.3.3', B634: '6.3.4', B635: '6.3.5', B636: '6.3.6', B63C: '6.3.C',
+  B631: '6.3.1', B632: '6.3.2', B633: '6.3.3', B634: '6.3.4', B635: '6.3.5', B636: '6.3.6', B63C: '6.3.C', B63CD: 'after 6.3.C',
   B641: '6.4.1', B642: '6.4.2', B643: '6.4.3', B644: '6.4.4', B64C: '6.4.C',
-  B6P: '6.P', B6A: '6.A', DONE: 'the finished pack',
+  B6P: '6.P', B6PD: 'after 6.P', B6A: '6.A', B6AD: 'after 6.A', DONE: 'the finished pack',
 };
 /** The rows of the fresh sets' pages (tests and lessons on the challenges, the project and the assessment). */
 export const ALT_ROWS = () => ALT_PACK().rows;

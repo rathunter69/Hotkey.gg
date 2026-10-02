@@ -235,6 +235,14 @@ import irr_moic from './lessons/irr-moic.js';
 import returns_bridge from './lessons/returns-bridge.js';
 import what_the_sponsor_can_pay from './lessons/what-the-sponsor-can-pay.js';
 import challenge_paper_lbo from './lessons/challenge-paper-lbo.js';
+// Chapter 6 · 6.4 The bids and the waterfall, 6.5 Project and assessment
+import bids_side_by_side from './lessons/bids-side-by-side.js';
+import the_waterfall from './lessons/the-waterfall.js';
+import your_stake from './lessons/your-stake.js';
+import football_field_board_page from './lessons/football-field-board-page.js';
+import challenge_board_page from './lessons/challenge-board-page.js';
+import ch6_project from './lessons/ch6-project.js';
+import ch6_assessment from './lessons/ch6-assessment.js';
 
 export const CHAPTERS = [
   {
@@ -395,6 +403,9 @@ export const CHAPTERS = [
       deal_multiples_premiums, sort_and_decide, applying_precedents, challenge_precedents,
       sources_and_uses, tranches_and_sweep, sale_leasebacks, irr_moic, returns_bridge, what_the_sponsor_can_pay,
       challenge_paper_lbo,
+      bids_side_by_side, the_waterfall, your_stake, football_field_board_page,
+      challenge_board_page,
+      ch6_project, ch6_assessment,
     ],
   },
 ];

@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 218: Three bids side by side: headline, structure, certainty — Valuation · hotkey.gg</title>
+<meta name="description" content="A bid is a headline price and a structure, and the structure changes what it’s worth. An earnout is paid later if a target is hit, so it’s worth its amount times the odds; a rollover keeps part of the owners’ equity in the new company, so it isn’t cash and it carries that company’s risk; a financing condition is a chance the deal never closes. The three term sheets are on Bids: price each one to an expected value and rank them. The key is =.">
+<meta name="generator" content="app2/tests/public-pages.js — generated from lesson data; do not edit by hand">
+<script>try{var v=JSON.parse(localStorage.getItem('hk2_theme_vars'));if(v&&v.vars){var r=document.documentElement;for(var k in v.vars)r.style.setProperty('--'+k,v.vars[k]);r.setAttribute('data-dark',v.dark?'1':'0');}}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../ui/public.css">
+</head>
+<body>
+<nav class="top"><a class="brand" href="../index.html#/">hotkey<b>.gg</b></a><a href="../index.html#/learn">Learn</a><a href="../index.html#/practice">Practice</a><a href="../index.html#/leaderboard">Leaderboard</a><a href="../index.html#/reference">Reference</a></nav>
+<main>
+<div class="crumb"><a href="../index.html#/learn">Learn</a> › <a href="index.html">Valuation</a> › The bids and the waterfall</div>
+<h1>Lesson 218: Three bids side by side: headline, structure, certainty</h1>
+<div class="meta">Valuation · The bids and the waterfall · hard · <span class="">Paid</span></div>
+<div class="card">
+<p style="margin:0">A bid is a headline price and a structure, and the structure changes what it’s worth. An earnout is paid later if a target is hit, so it’s worth its amount times the odds; a rollover keeps part of the owners’ equity in the new company, so it isn’t cash and it carries that company’s risk; a financing condition is a chance the deal never closes. The three term sheets are on Bids: price each one to an expected value and rank them. The key is <kbd>=</kbd>.</p>
+</div>
+<h2>What you will do</h2>
+<ol class="goals"><li><span class="muted">Equity at the headline is the price less net debt at closing, which is repaid first. The rollover is the share of that equity the owners keep instead of cash, so cash at close is the headline less the earnout and the rollover.</span> On Bids, build rows 11 to 13 across C:E: equity at the headline, the rollover amount, then cash at close.</li><li><span class="muted">An earnout is paid only if the target is hit, so today it is worth its amount times the odds. The odds are an input, typed once in blue, and every bid reads that one cell.</span> Type 50 in C58, the earnout odds, then its expected value in C16:E16 as =C7*$C$58.</li><li><span class="muted">The rolled stake grows with the sponsor’s own return, the LBO’s IRR, for the three years to the exit. A stake that risky is discounted back at the cost of equity, not at a deposit rate.</span> Link C59 to the LBO’s IRR, type 3 years in C60, and link C61 to the cost of equity on DCF.</li><li><span class="muted">The priced value is cash at close plus what the earnout and the rollover are worth today. It is the figure to compare across bids, not the headline.</span> Price the rollover in C17:E17 on C59, C60 and C61, then total the priced value in C18:E18.</li><li><span class="muted">Debt funds nearly half the price, so a fifth of the old equity is about a quarter of the new company’s. The sponsor’s equity is on the LBO’s sources, row 43.</span> Show the rolled stake two ways in C19:E20: as a share of the old equity, then of the new company’s equity.</li><li><span class="muted">A financing condition is a chance the deal never closes. The expected value is the priced value times the odds it closes: the third way to read a bid.</span> Type the odds each bid closes in C21:E21 (95, 85 and 75), then the expected value in C22:E22.</li><li>Rank the bids with RANK in C25:E27: on the headline, on the priced value, then on the expected value.</li><li><span class="muted">Every probability on the page is an input with its reason beside it. The board will argue with the odds, not the arithmetic, so give them the reason to argue with.</span> Type the reason beside the odds in F58: &quot;FY27 Base case EBITDA is below the target; the Management case clears it&quot;.</li><li>Does it tie? Watch the earnout odds in C58 go to 90%: bid B’s priced value overtakes bid C, and its rank in D26 moves to 1.</li></ol>
+<div class="cta"><a class="btn" href="../index.html#/lesson/bids-side-by-side">Start this lesson</a><span class="path">Read → Guided → Try solo → Timed</span></div>
+
+<div class="prevnext"><span>← <a href="challenge-paper-lbo.html">Lesson 217: Challenge: a paper LBO</a></span><span><a href="the-waterfall.html">Lesson 219: From enterprise value to the owners’ proceeds: the waterfall</a> →</span></div>
+</main>
+<footer><a href="../index.html#/pricing">Pricing</a><a href="../index.html#/teams">Teams</a><a href="../index.html#/about">About</a><a href="../index.html#/terms">Terms</a><a href="../index.html#/privacy">Privacy</a><a href="../index.html#/contact">Contact</a><span>© hotkey.gg</span></footer>
+</body>
+</html>

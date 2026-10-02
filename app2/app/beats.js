@@ -114,6 +114,10 @@ const BEATS_DEFAULT = {
     body: 'Trading multiples are what the market pays for a slice; precedents are what a buyer paid for the whole thing, control included, in real deals over the last three years. They’re fewer, older and harder to compare, so the questions are which deals count, how old is too old, and what a control premium looks like when the target was listed.' },
   lbo: { eyebrow: 'Module 6.3 · LBO', title: 'How a sponsor can pay what they’re offering.',
     body: 'The lead sponsor is offering $195m, and the way they can afford it is debt: borrow nearly half the price against Clearcoat’s own cash flow, use every spare dollar to pay it down, sell in five years at the same multiple, and keep what’s left. Rebuild their model to see what return that gives them and, once you can, what the most is they could pay and still hit it.' },
+  'bids-and-waterfall': { eyebrow: 'Module 6.4 · the bids and the waterfall', title: 'Which bid is really highest?',
+    body: 'Three bids: $185m in cash, $200m with $25m of it paid later if next year goes well, $195m with the owners rolling a fifth of their equity into the new company. The headline says one order; the proceeds say another. Price each structure, run the waterfall from enterprise value to what each owner takes home (your own options included), and put every range on one line for the board.' },
+  'ch6-project-and-assessment': { eyebrow: 'Module 6.5 · project and assessment', title: 'The last page of the pack.',
+    body: 'A fresh comp set, fresh precedents, a sponsor’s term sheet and three bids. Spread, apply, rebuild the LBO, price the bids, run the waterfall, assemble the page. Build it, then build it again on the clock. The assessment is the test-out, and passing it Verifies the last chapter, which makes the program certificate yours.' },
   'project-and-assessment': { eyebrow: 'Module 1.8 · project, assessment, test-out', title: 'Management’s next feed is in.',
     body: 'A fresh week, a blank Report, and everything the chapter taught. Build the page start to finish, then prove it against the clock on Monday morning; or test out of the chapter in five minutes.' },
 };

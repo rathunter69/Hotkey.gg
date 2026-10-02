@@ -399,6 +399,11 @@ export const CONCEPTS = {
   'lbo-returns': 'a sponsor’s return: equity at the exit (the exit multiple on EBITDA, less net debt) over equity at entry is the MOIC, and IRR on the cash flows (in at closing, out at the exit) is the annual rate',
   'returns-bridge': 'a returns bridge splits the equity gain into EBITDA growth at the entry multiple, the change in multiple on the exit EBITDA, debt paid down and the fees, and the four sum to the gain',
   'lbo-ceiling': 'what a sponsor can pay: the most equity that still earns the hurdle is the PV of the exit equity at that rate, and adding the debt and taking off the fees turns it into the top price',
+  // Chapter 6 · 6.4 the bids and the waterfall
+  'bid-pricing': 'a bid priced for its structure: cash at close, an earnout at its odds, a rollover at the new company’s return, and the odds the deal closes',
+  'proceeds-waterfall': 'the waterfall from enterprise value to the owners: each claim paid in order as a MIN of the claim and what is left, the rest split by ownership',
+  'option-value': 'an option’s value at a sale: the equity value less the strike, times the share, floored at zero with MAX',
+  'football-field': 'the football field as a table: every method’s low, mid and high on one line each, linked from the page that built it',
 };
 
 /**

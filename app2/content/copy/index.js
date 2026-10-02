@@ -2595,6 +2595,90 @@ export const COPY = {
    "mac_note": "",
    "story_beat": ""
   },
+  "bids-side-by-side": {
+   "id": "bids-side-by-side",
+   "module": "bids-and-waterfall",
+   "order": "6.4.1",
+   "title": "Three bids side by side: headline, structure, certainty",
+   "brief": "A bid is a headline price and a structure, and the structure changes what it’s worth. An earnout is paid later if a target is hit, so it’s worth its amount times the odds; a rollover keeps part of the owners’ equity in the new company, so it isn’t cash and it carries that company’s risk; a financing condition is a chance the deal never closes. The three term sheets are on Bids: price each one to an expected value and rank them. The key is `=`.",
+   "closing": "Each bid has three prices, and the order changes with each one: B leads on the headline, C on the priced value, A on the expected value. || Best practice: every probability is an input with its reason beside it. The board will argue with the odds, not the arithmetic, and a reason is what the argument starts from.",
+   "wow": "",
+   "convention_line": "Write once, fill right; Links green; external links avoided; Label the source (\"per utility contract\")",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "the-waterfall": {
+   "id": "the-waterfall",
+   "module": "bids-and-waterfall",
+   "order": "6.4.2",
+   "title": "From enterprise value to the owners’ proceeds: the waterfall",
+   "brief": "Enterprise value is what the buyer pays for the business; the owners’ proceeds are what is left once everyone ahead of them is paid. Net debt is repaid, the advisers’ and lawyers’ fees come off, the management option pool takes its share of the equity, and the rest is split by ownership: two founders at 35% each, the family office at 30%. That’s the waterfall, one line per claim. Build it for bid A, then fill it across the three. The key is `=`.",
+   "closing": "The waterfall runs from what the buyer pays to what each owner takes home, one claim at a time. || Best practice: the waterfall reads top to bottom in the order the claims are paid. A line out of order is a line a lawyer will move, and every line after it moves too.",
+   "wow": "",
+   "convention_line": "The check is a live difference → 0; Ctrl+D down, Ctrl+R across; Parentheses, never a leading minus; A top border, never an all-borders grid",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "your-stake": {
+   "id": "your-stake",
+   "module": "bids-and-waterfall",
+   "order": "6.4.3",
+   "title": "Your stake: what your options are worth under each bid",
+   "brief": "You hold options over 0.2% of the company, fully diluted, with a strike set when the equity was worth $40m. An option is worth the equity value less the strike, times your share, or nothing if the strike is above the price, and MAX handles that. Three bids, three numbers, and one of them is yours. Build the line under the waterfall. The key is `MAX`.",
+   "closing": "Three bids are priced, and the line at the bottom of the waterfall is yours. || Best practice: a manager’s stake is modeled with the same rigor as the owners’ and shown on the page. It’s the line the board forgets and the manager doesn’t, and the note under it says the pool already pays for it.",
+   "wow": "",
+   "convention_line": "One input, one cell; formulas reference it; Ctrl+D down, Ctrl+R across; $ on the first and total rows",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "football-field-board-page": {
+   "id": "football-field-board-page",
+   "module": "bids-and-waterfall",
+   "order": "6.4.4",
+   "title": "The football-field table and the one-page summary for the board",
+   "brief": "The football field puts every valuation range on one line each: comps, precedents, the DCF, the LBO ceiling and the three bids, low, mid and high, as a table, so the board sees in one look where the bids sit against every method. Under it go the waterfall for the recommended bid and one line of recommendation. Every figure on the page is a link to the sheet that built it, a Ctrl+PgDn away. The key is `Ctrl+PgDn`.",
+   "closing": "Every method and every bid on one page, and the board can see where the money is. || Best practice: green on every link, and one sentence in blue. The board will ask where a number came from, and the answer is always one Ctrl+[ away.",
+   "wow": "",
+   "convention_line": "Links green; external links avoided; Title, units, timeline, then the answer; A units line: \"USD unless stated\"; The check is a live difference → 0; Borders carry structure, not gridlines",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "challenge-board-page": {
+   "id": "challenge-board-page",
+   "module": "bids-and-waterfall",
+   "order": "6.4.C",
+   "title": "Challenge: a one-page valuation summary assembled",
+   "brief": "Five ranges and three bids sit on other sheets, the odds are fresh, and the Summary holds only its labels. Link the football field, name the bid that leads on expected value and pull its waterfall and your stake, then give the page its anatomy and its checks.",
+   "closing": "",
+   "wow": "",
+   "convention_line": "Links green; external links avoided; Title, units, timeline, then the answer; The check is a live difference → 0",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "ch6-project": {
+   "id": "ch6-project",
+   "module": "ch6-project-and-assessment",
+   "order": "6.5.P",
+   "title": "Project: the valuation pack, built again",
+   "brief": "Fresh peers, fresh deals and three bids on a pack with every formula gone. Decide which peers and deals count, build the ranges, the LBO and its ceiling, price the bids and their waterfalls, then the page for the board. No clock, and nothing here is new. The key is `Ctrl+Enter`.",
+   "closing": "Peers and deals in, a pack out: comps and precedents spread, an LBO with its ceiling, three bids priced to the owners’ proceeds, and one page for the board. || This is the pack a sell side team sends before the board meets. Now part of it again, on the clock.",
+   "wow": "Peers and deals in, a valuation pack out: five ranges, a sponsor’s ceiling, three bids priced and a page for the board, and that is Chapter 6.",
+   "convention_line": "Write once, fill right; The check is a live difference → 0",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "ch6-assessment": {
+   "id": "ch6-assessment",
+   "module": "ch6-project-and-assessment",
+   "order": "6.5.A",
+   "title": "Assessment: raw comps and bids in, the board’s page out",
+   "brief": "A fresh set: the precedents and the LBO are done, the comps spread and three bids are raw, and the odds are new. Spread the comps, price the bids and their waterfalls, then build the board’s page with every link live. No help, the keyboard only. Pass, and the last chapter is Verified; this is also the test-out. The key is `Ctrl+Enter`.",
+   "closing": "Fresh peers, fresh odds, and fifteen minutes later the board has its page: the comps spread, three bids priced to the owners’ proceeds, the leading one named, every figure live. || That is the pack a sell side team puts in front of a board, and you built it under a clock.",
+   "wow": "Raw comps and three bids in, the board’s page out, on the clock, and the program is yours.",
+   "convention_line": "Write once, fill right; The check is a live difference → 0",
+   "mac_note": "",
+   "story_beat": ""
+  },
   "remix-format-on-the-pnl": {
    "id": "remix-format-on-the-pnl",
    "module": "remixes",
@@ -16114,6 +16198,556 @@ export const COPY = {
     "why": "",
     "hint_stuck": ""
    }
+  ],
+  "bids-side-by-side": [
+   {
+    "lesson_id": "bids-side-by-side",
+    "goal_index": "0",
+    "text": "On Bids, build rows 11 to 13 across C:E: equity at the headline, the rollover amount, then cash at close.",
+    "teach": "Equity at the headline is the price less net debt at closing, which is repaid first. The rollover is the share of that equity the owners keep instead of cash, so cash at close is the headline less the earnout and the rollover.",
+    "why": "",
+    "hint_stuck": "pulse range C11:E13 · Net debt at closing is C48; anchor it with F4 so it holds as the row fills."
+   },
+   {
+    "lesson_id": "bids-side-by-side",
+    "goal_index": "1",
+    "text": "Type 50 in C58, the earnout odds, then its expected value in C16:E16 as =C7*$C$58.",
+    "teach": "An earnout is paid only if the target is hit, so today it is worth its amount times the odds. The odds are an input, typed once in blue, and every bid reads that one cell.",
+    "why": "",
+    "hint_stuck": "pulse cell C58 · A percent cell takes 50 as 50%; only bid B carries an earnout, so C and E read zero."
+   },
+   {
+    "lesson_id": "bids-side-by-side",
+    "goal_index": "2",
+    "text": "Link C59 to the LBO’s IRR, type 3 years in C60, and link C61 to the cost of equity on DCF.",
+    "teach": "The rolled stake grows with the sponsor’s own return, the LBO’s IRR, for the three years to the exit. A stake that risky is discounted back at the cost of equity, not at a deposit rate.",
+    "why": "",
+    "hint_stuck": "pulse range C59:C61 · The IRR is LBO C108 and the cost of equity DCF C54."
+   },
+   {
+    "lesson_id": "bids-side-by-side",
+    "goal_index": "3",
+    "text": "Price the rollover in C17:E17 on C59, C60 and C61, then total the priced value in C18:E18.",
+    "teach": "The priced value is cash at close plus what the earnout and the rollover are worth today. It is the figure to compare across bids, not the headline.",
+    "why": "",
+    "hint_stuck": "pulse range C17:E18 · The rollover amount times one plus the return to the years, over one plus the cost of equity to the years."
+   },
+   {
+    "lesson_id": "bids-side-by-side",
+    "goal_index": "4",
+    "text": "Show the rolled stake two ways in C19:E20: as a share of the old equity, then of the new company’s equity.",
+    "teach": "Debt funds nearly half the price, so a fifth of the old equity is about a quarter of the new company’s. The sponsor’s equity is on the LBO’s sources, row 43.",
+    "why": "",
+    "hint_stuck": "pulse range C19:E20 · The rollover amount over the sponsor’s equity plus the rollover, and zero where nothing rolls."
+   },
+   {
+    "lesson_id": "bids-side-by-side",
+    "goal_index": "5",
+    "text": "Type the odds each bid closes in C21:E21 (95, 85 and 75), then the expected value in C22:E22.",
+    "teach": "A financing condition is a chance the deal never closes. The expected value is the priced value times the odds it closes: the third way to read a bid.",
+    "why": "",
+    "hint_stuck": "pulse range C21:E22 · Tab moves right after each entry; the expected value is =C18*C21."
+   },
+   {
+    "lesson_id": "bids-side-by-side",
+    "goal_index": "6",
+    "text": "Rank the bids with RANK in C25:E27: on the headline, on the priced value, then on the expected value.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C25:E27 · =RANK(C6,$C$6:$E$6) on the headline; anchor the three bids with F4."
+   },
+   {
+    "lesson_id": "bids-side-by-side",
+    "goal_index": "7",
+    "text": "Type the reason beside the odds in F58: \"FY27 Base case EBITDA is below the target; the Management case clears it\".",
+    "teach": "Every probability on the page is an input with its reason beside it. The board will argue with the odds, not the arithmetic, so give them the reason to argue with.",
+    "why": "",
+    "hint_stuck": "pulse cell F58 · The notes column holds a reason for every input above it."
+   },
+   {
+    "lesson_id": "bids-side-by-side",
+    "goal_index": "8",
+    "text": "Does it tie? Watch the earnout odds in C58 go to 90%: bid B’s priced value overtakes bid C, and its rank in D26 moves to 1.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell D26 · Only bid B carries an earnout, so only its priced value moves."
+   }
+  ],
+  "the-waterfall": [
+   {
+    "lesson_id": "the-waterfall",
+    "goal_index": "0",
+    "text": "Start bid A’s waterfall in C30:C32: enterprise value from the priced value, less net debt as a MIN, then equity value.",
+    "teach": "The waterfall pays claims in the order they rank: net debt first, then the fees, then the option pool, the owners last. Each deduction is a MIN of the claim and what is left above it, so a price below the claims floors the owners at zero instead of showing a negative.",
+    "why": "",
+    "hint_stuck": "pulse range C30:C32 · =C18 takes the priced value; =-MIN($C$48,C30) repays net debt, never more than the price."
+   },
+   {
+    "lesson_id": "the-waterfall",
+    "goal_index": "1",
+    "text": "Take off the fees in C33 and the option pool in C34, each a MIN of the claim and what is left above it.",
+    "teach": "Fees are 2% of enterprise value, the advisers’ and the lawyers’. The option pool takes 5% of the equity above the strike the options were set at, MAX floors that at zero, and MIN stops it taking more than the fees left.",
+    "why": "",
+    "hint_stuck": "pulse range C33:C34 · The fee rate is C49, the pool C50 and the strike C51; anchor each with F4."
+   },
+   {
+    "lesson_id": "the-waterfall",
+    "goal_index": "2",
+    "text": "Total the net proceeds in C35, then split them in C36:C38 by the ownership in C54:C56.",
+    "teach": "What is left is the net proceeds to the owners, pre-tax: the structure changes what each keeps after tax, and that is the tax adviser’s question. Each owner takes their share from the ownership table.",
+    "why": "",
+    "hint_stuck": "pulse range C35:C38 · Each owner is =C35*$C$54, the share’s row anchored with F4."
+   },
+   {
+    "lesson_id": "the-waterfall",
+    "goal_index": "3",
+    "text": "Check the split in C39: =ROUND(SUM(C36:C38)-C35,2), which reads zero.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C39 · The three owners’ lines less the proceeds, rounded to the cent."
+   },
+   {
+    "lesson_id": "the-waterfall",
+    "goal_index": "4",
+    "text": "Select C30:E39 and fill bid A’s waterfall across to bids B and C with Ctrl+R.",
+    "teach": "Every line in bid A’s column reads its own column’s priced value and the anchored inputs, so one Ctrl+R over the block writes bids B and C.",
+    "why": "",
+    "hint_stuck": "pulse range C30:E39 · Ctrl+R copies the left column of the selection into every column to its right."
+   },
+   {
+    "lesson_id": "the-waterfall",
+    "goal_index": "5",
+    "text": "Give the three deductions the desk format #,##0_);(#,##0);\"-\"_): rows 31, 33 and 34, the last two with F4.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C31:E31 · Ctrl+1, N, then type the code into the Custom box; F4 repeats it on the next range."
+   },
+   {
+    "lesson_id": "the-waterfall",
+    "goal_index": "6",
+    "text": "Give the proceeds line, C35:E35, its double bottom border with Alt, H, B, B.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C35:E35 · The double bottom marks the one answer on the block."
+   },
+   {
+    "lesson_id": "the-waterfall",
+    "goal_index": "7",
+    "text": "Does it tie? Watch the fees in C49 go from 2% to 3%: every owner’s line under every bid falls.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C36:E38 · The fees come off before the owners, so each of them pays a share."
+   }
+  ],
+  "your-stake": [
+   {
+    "lesson_id": "your-stake",
+    "goal_index": "0",
+    "text": "Select the option plan’s inputs on Bids, C51:C53: the strike valuation, your 0.2% share and vesting at a sale.",
+    "teach": "The plan’s three inputs are typed once and sourced to the option plan: the strike valuation, your share, fully diluted, and how much vests at a sale. Every bid’s line reads them.",
+    "why": "",
+    "hint_stuck": "pulse range C51:C53 · Ctrl+G takes a range as well as a cell."
+   },
+   {
+    "lesson_id": "your-stake",
+    "goal_index": "1",
+    "text": "Value your options under bid A in C42: =MAX(C32*$C$52-$C$51*$C$52,0)*$C$53.",
+    "teach": "An option pays the equity value times your share less the strike times your share, and never less than nothing: MAX(…, 0) floors it. Vesting at 100% means all of it is yours at a sale.",
+    "why": "",
+    "hint_stuck": "pulse cell C42 · Equity value is row 32 of the waterfall; anchor the plan’s inputs with F4."
+   },
+   {
+    "lesson_id": "your-stake",
+    "goal_index": "2",
+    "text": "Select C42:E42 and fill bid A’s value across to bids B and C with Ctrl+R.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C42:E42 · The equity value moves with the column; the plan’s inputs stay anchored."
+   },
+   {
+    "lesson_id": "your-stake",
+    "goal_index": "3",
+    "text": "Show the earnout’s share of yours, deferred, in C43:E43: =C42*IFERROR(C16/C18,0).",
+    "teach": "Bid B pays part of its price later, so part of your value waits with it: the earnout’s share of the priced value is the share of yours that is deferred.",
+    "why": "",
+    "hint_stuck": "pulse range C43:E43 · IFERROR returns zero where a bid has no priced value to divide by."
+   },
+   {
+    "lesson_id": "your-stake",
+    "goal_index": "4",
+    "text": "Format C42:E42 with the code $#,##0_);($#,##0);\"-\"_), the first line of the block carrying the $.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C42:E42 · Ctrl+1, N, then type the code into the Custom box."
+   },
+   {
+    "lesson_id": "your-stake",
+    "goal_index": "5",
+    "text": "Format C43:E43 with the desk code #,##0_);(#,##0);\"-\"_), no $ on the line under it.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C43:E43 · The same route as the line above, without the $."
+   },
+   {
+    "lesson_id": "your-stake",
+    "goal_index": "6",
+    "text": "Does it tie? Watch your share in C52 go from 0.2% to 0.4%: your line doubles and the owners’ lines hold, since the pool already funds you.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C42:E42 · Your options sit inside the 5% pool, so the owners never pay for them twice."
+   }
+  ],
+  "football-field-board-page": [
+   {
+    "lesson_id": "football-field-board-page",
+    "goal_index": "0",
+    "text": "On Summary, link the comps range to C9:E9 and the precedents range to row 10.",
+    "teach": "A football field is every method’s range on its own line, low, mid and high, all in enterprise value. Each line links the range block of the page that built it, so the board’s page never holds a typed figure.",
+    "why": "",
+    "hint_stuck": "pulse range C9:E10 · Comps row 45 and Precedents row 38 hold each low, median and high."
+   },
+   {
+    "lesson_id": "football-field-board-page",
+    "goal_index": "1",
+    "text": "Row 11: the DCF grid’s MIN, enterprise value and MAX; row 12: the LBO’s top prices from LBO row 146.",
+    "teach": "The DCF’s range is its exit-multiple sensitivity grid, lowest to highest, with the page’s enterprise value as the mid. The LBO line is what the sponsor can pay at three hurdles: a ceiling, not a valuation.",
+    "why": "",
+    "hint_stuck": "pulse range C11:E12 · The exit grid is DCF D77:H81 and the enterprise value DCF C42."
+   },
+   {
+    "lesson_id": "football-field-board-page",
+    "goal_index": "2",
+    "text": "Link each bid’s expected, priced and headline value from Bids into rows 13 to 15, low to high.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C13:E15 · Bid A is Bids column C: row 22, row 18, then row 6."
+   },
+   {
+    "lesson_id": "football-field-board-page",
+    "goal_index": "3",
+    "text": "Show where each line sits in F9:F15: =D9/$D$11, entered with Ctrl+Enter.",
+    "teach": "One ratio says where each line sits: its mid over the DCF’s mid. A bid at 95% of the DCF is a bid below what the cash flows say the business is worth.",
+    "why": "",
+    "hint_stuck": "pulse range F9:F15 · The DCF’s mid, D11, anchored with F4."
+   },
+   {
+    "lesson_id": "football-field-board-page",
+    "goal_index": "4",
+    "text": "Type A in C18 for the recommended bid, then find its column in C19: =MATCH(\"Bid \"&C18,Bids!$C$4:$E$4,0).",
+    "teach": "The waterfall shows one bid, the one recommended. MATCH finds that bid’s column on Bids from its letter, so changing one typed letter changes the whole block.",
+    "why": "",
+    "hint_stuck": "pulse range C18:C19 · The headers on Bids row 4 read Bid A, Bid B and Bid C."
+   },
+   {
+    "lesson_id": "football-field-board-page",
+    "goal_index": "5",
+    "text": "Pull the recommended bid’s waterfall into C20:C29 with INDEX on C19, starting =INDEX(Bids!$C$30:$E$30,$C$19).",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C20:C29 · Each line reads its own row of the Bids waterfall, and your options are Bids row 42."
+   },
+   {
+    "lesson_id": "football-field-board-page",
+    "goal_index": "6",
+    "text": "Type the recommendation in C32, one sentence: bid A, the lowest headline, has the highest expected value and is all cash at close.",
+    "teach": "The recommendation is the one place on the page a person wrote, so it is typed, in blue, in one sentence. Everything above it is a link the board can follow.",
+    "why": "",
+    "hint_stuck": "pulse cell C32 · Say which bid and why, in the words the board uses."
+   },
+   {
+    "lesson_id": "football-field-board-page",
+    "goal_index": "7",
+    "text": "Title A1 from Inputs, units in A2, the Cover’s flag and the valuation date in C5:C6, the source in B33, gridlines off.",
+    "teach": "The page has the anatomy every page in the pack has: a title from Inputs, a units line, the model’s checks flag from the Cover, a source line under the table, and no gridlines on a page someone reads.",
+    "why": "",
+    "hint_stuck": "pulse cell A1 · =Inputs!$C$104&\": valuation summary for the board\"; Alt, W, V, G turns the gridlines off."
+   },
+   {
+    "lesson_id": "football-field-board-page",
+    "goal_index": "8",
+    "text": "Fill the checks block in C36:C39: sources equal uses from Checks, the Cover’s flag, the ranges in order, the owners’ lines.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C36:C39 · =Checks!C14, then =IF(Cover!C7=\"OK\",0,1); each reads zero when the page ties."
+   },
+   {
+    "lesson_id": "football-field-board-page",
+    "goal_index": "9",
+    "text": "Does it tie? Watch bid B’s earnout odds on Bids go to 90%: bid B’s line on the football field, row 14, answers on the board’s page.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C14:F14 · Every figure on the page is a link, so a change on Bids reaches it at once."
+   }
+  ],
+  "challenge-board-page": [
+   {
+    "lesson_id": "challenge-board-page",
+    "goal_index": "0",
+    "text": "Link the football field in C9:E15: comps, precedents, the DCF’s range, the LBO ceiling and the three bids.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-board-page",
+    "goal_index": "1",
+    "text": "Read each line’s mid against the DCF’s in F9:F15.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-board-page",
+    "goal_index": "2",
+    "text": "Name the bid that leads on expected value in C18, then pull its waterfall into C19:C28 with MATCH and INDEX.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-board-page",
+    "goal_index": "3",
+    "text": "Add your options under that bid in C29.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-board-page",
+    "goal_index": "4",
+    "text": "Title A1 from Inputs, a units line in A2, the Cover’s flag in C5, and the gridlines off.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-board-page",
+    "goal_index": "5",
+    "text": "Fill the checks in C36:C39: sources equal uses, the Cover’s flag, the ranges in order, the owners’ lines.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "ch6-project": [
+   {
+    "lesson_id": "ch6-project",
+    "goal_index": "0",
+    "text": "Build each peer’s last twelve months on Comps, rows 17 to 25, and carry LTM EBITDA into J5:J7.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch6-project",
+    "goal_index": "1",
+    "text": "Build each peer’s market value, enterprise value and multiples on Comps, columns E to M.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch6-project",
+    "goal_index": "2",
+    "text": "Mark all three peers in with 1 in N5:N7, then build the included multiples and their median, mean, quartiles, min and max.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch6-project",
+    "goal_index": "3",
+    "text": "Build the operating metrics in V5:Z13 and Clearcoat’s own line in row 14.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch6-project",
+    "goal_index": "4",
+    "text": "Build the comps range on Comps, rows 35 to 44: the multiples low, mid and high, enterprise value and equity value each way.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch6-project",
+    "goal_index": "5",
+    "text": "Read each deal’s reason in column R, type 1 or 0 in Q5:Q9, then build the multiples, the premiums and the included statistics.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch6-project",
+    "goal_index": "6",
+    "text": "Build the control premium reading in Precedents rows 18 to 23 and the precedents range in rows 35 to 41.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch6-project",
+    "goal_index": "7",
+    "text": "Build the sale and leaseback, sources and uses in LBO rows 31 to 48, and the check that they tie on Checks C14.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch6-project",
+    "goal_index": "8",
+    "text": "Build the cash flow, the cash sweep and every tranche in LBO rows 51 to 99, interest on the average balance.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch6-project",
+    "goal_index": "9",
+    "text": "Build the exit, the IRR and MOIC each way, the split between owners and lenders, and the value bridge in LBO rows 102 to 132.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch6-project",
+    "goal_index": "10",
+    "text": "Build the sensitivity in LBO rows 135 to 140 and the highest price each hurdle allows in rows 145 to 148.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch6-project",
+    "goal_index": "11",
+    "text": "Price the three bids on Bids, rows 11 to 27: cash at close, the earnout and the rollover valued, then the expected value and the ranks.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch6-project",
+    "goal_index": "12",
+    "text": "Build each bid’s waterfall in Bids rows 30 to 39 and your own stake in rows 42 and 43.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch6-project",
+    "goal_index": "13",
+    "text": "Build the Summary: units in A2, the field, the leading bid’s letter in C18 and its waterfall, a line in B33, the checks, no gridlines.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch6-project",
+    "goal_index": "14",
+    "text": "Does it hold? Watch bid B’s earnout odds in Bids C58 go from 50% to 90%: its line on the football field moves with them.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "ch6-assessment": [
+   {
+    "lesson_id": "ch6-assessment",
+    "goal_index": "0",
+    "text": "Build each peer’s market value, enterprise value and multiples on Comps, columns E to M.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch6-assessment",
+    "goal_index": "1",
+    "text": "Mark all three peers in with 1 in Comps N5:N7, then build the included multiples and their statistics in rows 8 to 13.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch6-assessment",
+    "goal_index": "2",
+    "text": "Build the comps range on Comps, rows 35 to 44: the multiples low, mid and high, enterprise value and equity value each way.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch6-assessment",
+    "goal_index": "3",
+    "text": "Price the three bids on Bids, rows 11 to 20: cash at close, the earnout and the rollover each valued.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch6-assessment",
+    "goal_index": "4",
+    "text": "Weigh each bid by its certainty in Bids row 22, then rank the bids by headline, priced and expected value in rows 25 to 27.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch6-assessment",
+    "goal_index": "5",
+    "text": "Build each bid’s waterfall in Bids rows 30 to 39, from enterprise value to every owner’s proceeds, with its check.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch6-assessment",
+    "goal_index": "6",
+    "text": "Value your options under each bid in Bids rows 42 and 43.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch6-assessment",
+    "goal_index": "7",
+    "text": "Link the football field on Summary, C9:E15, and read each mid against the DCF’s in F9:F15.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch6-assessment",
+    "goal_index": "8",
+    "text": "Name the bid that leads on expected value in Summary C18, then pull its waterfall and your stake into C19:C29.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch6-assessment",
+    "goal_index": "9",
+    "text": "Give the Summary its title in A1, units in A2, the flag and date in C5:C6, a line in B33, and turn the gridlines off.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch6-assessment",
+    "goal_index": "10",
+    "text": "Fill the checks in Summary C36:C39 until each reads 0.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch6-assessment",
+    "goal_index": "11",
+    "text": "Does it hold? Watch bid B’s earnout odds in Bids C58 go to 95%: its line on the football field moves with them.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
   ]
  },
  "modules": {
@@ -16410,6 +17044,20 @@ export const COPY = {
    "objective": "The LBO: sources and uses; debt tranches and the cash sweep; sale-leasebacks and what they cost later; returns (IRR and MOIC); the returns bridge; sensitivity on entry and exit.",
    "story_beat": "How a sponsor can pay what they’re offering. || The lead sponsor is offering $195m, and the way they can afford it is debt: borrow nearly half the price against Clearcoat’s own cash flow, use every spare dollar to pay it down, sell in five years at the same multiple, and keep what’s left. Rebuild their model to see what return that gives them and, once you can, what the most is they could pay and still hit it.",
    "page_name": "The sponsor’s LBO"
+  },
+  "bids-and-waterfall": {
+   "id": "bids-and-waterfall",
+   "name": "The bids and the waterfall",
+   "objective": "The bids and the waterfall: three bids side by side (headline, structure, certainty); from enterprise value to the owners’ proceeds; your stake under each bid; the football-field table and the one-page summary for the board.",
+   "story_beat": "Which bid is really highest? || Three bids: $185m in cash, $200m with $25m of it paid later if next year goes well, $195m with the owners rolling a fifth of their equity into the new company. The headline says one order; the proceeds say another. Price each structure, run the waterfall from enterprise value to what each owner takes home (your own options included), and put every range on one line for the board.",
+   "page_name": "The valuation summary for the board"
+  },
+  "ch6-project-and-assessment": {
+   "id": "ch6-project-and-assessment",
+   "name": "Project and assessment",
+   "objective": "The one-page valuation summary for the board, the last page of the pack; the assessment is the test-out.",
+   "story_beat": "The last page of the pack. || A fresh comp set, fresh precedents, a sponsor’s term sheet and three bids. Spread, apply, rebuild the LBO, price the bids, run the waterfall, assemble the page. Build it, then build it again on the clock. The assessment is the test-out, and passing it Verifies the last chapter, which makes the program certificate yours.",
+   "page_name": "The valuation summary"
   }
  },
  "site": {
