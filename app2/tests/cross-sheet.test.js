@@ -192,3 +192,28 @@ test('INDEX and OFFSET over another sheet\'s range read that sheet, not the form
   const S = s.sheets[0].sheet;
   assert.deepEqual(['C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7'].map(r => S.value(r)), ['b', 'b', 2, 6, 2, 2, 6]);
 });
+
+test('a structural edit on another sheet moves the references that name it, and only those (Excel)', () => {
+  assert.equal(adjustFormulaStructure('=Costs!B3+B3', 'r', 2, 1, 'Costs'), '=Costs!B4+B3');
+  assert.equal(adjustFormulaStructure('=INDEX(Costs!$F$5:$F$10,MATCH(B5,Costs!$B$5:$B$10,0))', 'c', 6, 1, 'costs'), '=INDEX(Costs!$G$5:$G$10,MATCH(B5,Costs!$B$5:$B$10,0))');
+  assert.equal(adjustFormulaStructure("=VLOOKUP(B5,'My Sheet'!$B$5:$H$10,5,FALSE)", 'c', 6, 1, 'My Sheet'), "=VLOOKUP(B5,'My Sheet'!$B$5:$I$10,5,FALSE)", 'a range across the seam widens');
+  assert.equal(adjustFormulaStructure('=OFFSET(Costs!$B$4,MATCH(B5,Costs!$B$5:$B$10,0),4)', 'r', 5, 1, 'Costs'), '=OFFSET(Costs!$B$4,MATCH(B5,Costs!$B$6:$B$11,0),4)', 'a ref above the seam stays');
+  assert.equal(adjustFormulaStructure('=INDIRECT("Costs!F"&5)+Costs!B3', 'r', 1, 1, 'Costs'), '=INDIRECT("Costs!F"&5)+Costs!B4', 'text is never a reference');
+  assert.equal(adjustFormulaStructure('=Costs!B3+Sales!B3', 'r', 3, -1, 'Costs'), '=#REF!+Sales!B3', 'a deleted cell reads #REF!');
+});
+
+test('a column inserted on one sheet follows into another sheet’s INDEX/MATCH, and Ctrl+Z and Ctrl+Y carry it', () => {
+  const s = book();
+  const sales = s.sheets[0].sheet, costs = s.sheets[1].sheet;
+  sales.commitInput('=INDEX(Costs!$B$3:$B$4,MATCH(200,$B$3:$B$4,0))', 3, 4);
+  assert.equal(sales.value('D3'), 70);
+  costs.select('B1'); costs.selectCol();
+  assert.ok(costs.insertOrDelete(true), 'column B inserted on Costs');
+  assert.equal(sales.formula('D3'), '=INDEX(Costs!$C$3:$C$4,MATCH(200,$B$3:$B$4,0))');
+  assert.equal(sales.value('D3'), 70, 'the lookup still reads the figure it read');
+  costs.undo();
+  assert.equal(sales.formula('D3'), '=INDEX(Costs!$B$3:$B$4,MATCH(200,$B$3:$B$4,0))', 'undo puts the other sheet back');
+  costs.redo();
+  assert.equal(sales.formula('D3'), '=INDEX(Costs!$C$3:$C$4,MATCH(200,$B$3:$B$4,0))', 'redo moves it again');
+  assert.equal(sales.value('D3'), 70);
+});

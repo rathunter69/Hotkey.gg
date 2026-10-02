@@ -1524,8 +1524,12 @@ export function normalizeFormula(str) {
  * #REF!; a range whose corner falls in the band contracts to the seam; a range wholly deleted
  * becomes #REF!. Whole-column / whole-row references shift on their own axis and are untouched on
  * the other. Token-based, so string literals are untouched.
+ * With `sheet` (a sheet name), the edit happened on that other sheet: only references qualified
+ * with it move (Lists!$F$5:$F$10 on Summary, when a column goes into Lists), and this sheet's own
+ * references stay where they are.
  */
-export function adjustFormulaStructure(f, axis, at, delta) {
+export function adjustFormulaStructure(f, axis, at, delta, sheet = null) {
+  const onSheet = sheet ? String(sheet).toUpperCase() : null;
   const src = String(f);
   const eq = src.trimStart()[0] === '=';
   const body = eq ? src.slice(src.indexOf('=') + 1) : src;
@@ -1551,7 +1555,7 @@ export function adjustFormulaStructure(f, axis, at, delta) {
     if (isColonTok(n1) && ((isColTok(t) && isColTok(n2)) || (isRowTok(t) && isRowTok(n2)))) {
       const col = isColTok(t);
       end = n2.end; i += 2;
-      if ((axis === 'c') !== col) continue;   // a column edit leaves 1:1 alone, a row edit leaves A:A alone
+      if (onSheet || (axis === 'c') !== col) continue;   // a column edit leaves 1:1 alone, a row edit leaves A:A alone
       const val = tk => col ? colIndex(tk.v.replace('$', '')) : tk.v;
       const pre = tk => (col ? tk.v[0] === '$' : body[tk.pos] === '$') ? '$' : '';
       const txt = v => col ? colLetter(v) : String(v);
@@ -1559,7 +1563,7 @@ export function adjustFormulaStructure(f, axis, at, delta) {
       const s = seam(Math.min(va, vb), Math.max(va, vb));
       if (!s) rep = '#REF!';
       else { const [x, y] = va <= vb ? s : [s[1], s[0]]; rep = pre(t) + txt(x) + ':' + pre(n2) + txt(y); }
-    } else if (t.t !== 'ref' || t.sheet) { if (t.sheet && isColonTok(n1) && n2 && n2.t === 'ref') i += 2; continue; }
+    } else if (t.t !== 'ref' || (onSheet ? t.sheet !== onSheet : t.sheet)) { if (t.sheet && isColonTok(n1) && n2 && n2.t === 'ref') i += 2; continue; }
     else if (isColonTok(n1) && n2 && n2.t === 'ref') {
       const a = parts(t.v), b = parts(n2.v);
       const s = axis === 'r' ? seam(Math.min(a.r, b.r), Math.max(a.r, b.r)) : seam(Math.min(a.c, b.c), Math.max(a.c, b.c));
@@ -1570,12 +1574,14 @@ export function adjustFormulaStructure(f, axis, at, delta) {
         else { if (a.c <= b.c) { a.c = nlo; b.c = nhi; } else { a.c = nhi; b.c = nlo; } }
         rep = build(a) + ':' + build(b);
       }
+      if (t.sheetTxt && rep !== '#REF!') rep = t.sheetTxt + rep;
       end = n2.end; i += 2;
     } else {
       const a = parts(t.v);
       const n = adj(axis === 'r' ? a.r : a.c);
       if (n === null) rep = '#REF!';
       else { if (axis === 'r') a.r = n; else a.c = n; rep = build(a) + (t.spill ? '#' : ''); }
+      if (t.sheetTxt && rep !== '#REF!') rep = t.sheetTxt + rep;
       end = t.end;
     }
     out += body.slice(last, t.pos) + rep; last = end;

@@ -16,6 +16,7 @@
 import { mulberry32 } from '../../engine/rng.js';
 import { dateToSerial } from '../../engine/format.js';
 import { buildPage, FMT } from './page.js';
+export { diffStates, sessionToState } from './clearcoat-weekly.js';
 
 export const CHAPTER = 4;
 export const UNITS = 'USD unless stated; costs shown as negatives';
@@ -573,10 +574,10 @@ const COLS = s => s.split('');
 export function cutStart({ state: solved, rows, weeks, ex, sites, S, C }) {
   return derive(solved, s => {
     // Export: the misspelling, no key column, no working cells
-    const ex = sheetOf(s, 'Export');
-    ex.cells['B' + exportRow(PLANT.misspelt.day, PLANT.misspelt.site)] = { value: PLANT.misspelt.code };
-    for (const ref in EXPORT_WORK.key) delete ex.cells[ref];
-    for (const ref in EXPORT_WORK.totals) delete ex.cells[ref];
+    const xs = sheetOf(s, 'Export');
+    xs.cells['B' + exportRow(PLANT.misspelt.day, PLANT.misspelt.site)] = { value: PLANT.misspelt.code };
+    for (const ref in EXPORT_WORK.key) delete xs.cells[ref];
+    for (const ref in EXPORT_WORK.totals) delete xs.cells[ref];
     // Lists: no unique list, no check
     drop(s, 'Lists', [...LISTS_UNIQUE, 'B25', 'B26', 'C26']);
     // Q&A: every question open; question 1's answer typed

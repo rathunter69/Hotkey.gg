@@ -332,6 +332,9 @@ export function cellTxtPx(cell) {
   return dispText(cell).length * TXTPX + PAD_TXT;   // the painted text: a custom text section ("Site name: "@) dresses the value
 }
 
+/** Put other sheets' formulas back ('from') or forward ('to') for an undone or redone structural edit. */
+function setXrefs(list, which) { for (const x of list) { const c = x.sheet.cells[x.key]; if (c) c.formula = x[which]; } }
+
 export class Sheet {
   /**
    * @param {object} [opts]
@@ -661,8 +664,28 @@ export class Sheet {
   }
   pushUndo() { this.undoStack.push(this.snapshot()); if (this.undoStack.length > 60) this.undoStack.shift(); this.redoStack = []; }
   /** The frame pushed to the opposite stack keeps the current cells but the undone frame's selection, so redo lands on the same range. */
-  undo() { if (!this.undoStack.length) return false; const prev = this.undoStack.pop(); const cur = this.snapshot(); cur.active = { ...prev.active }; cur.sel = prev.sel && { ...prev.sel }; this.redoStack.push(cur); this.restore(prev); this.commit('undo'); return true; }
-  redo() { if (!this.redoStack.length) return false; const next = this.redoStack.pop(); const cur = this.snapshot(); cur.active = { ...next.active }; cur.sel = next.sel && { ...next.sel }; this.undoStack.push(cur); this.restore(next); this.commit('redo'); return true; }
+  undo() { if (!this.undoStack.length) return false; const prev = this.undoStack.pop(); const cur = this.snapshot(); cur.active = { ...prev.active }; cur.sel = prev.sel && { ...prev.sel }; if (prev.xrefs) { cur.xrefs = prev.xrefs; setXrefs(prev.xrefs, 'from'); } this.redoStack.push(cur); this.restore(prev); this.commit('undo'); return true; }
+  redo() { if (!this.redoStack.length) return false; const next = this.redoStack.pop(); const cur = this.snapshot(); cur.active = { ...next.active }; cur.sel = next.sel && { ...next.sel }; if (next.xrefs) { cur.xrefs = next.xrefs; setXrefs(next.xrefs, 'to'); } this.undoStack.push(cur); this.restore(next); this.commit('redo'); return true; }
+  /**
+   * A structural insert or delete here moves the references other sheets hold to this one, as
+   * Excel does (Summary's =INDEX(Lists!$F$5:$F$10,…) follows capacity when a column goes into
+   * Lists). The rewrites ride on the undo frame just pushed, so Ctrl+Z puts them back too.
+   */
+  shiftOtherSheets(axis, at, delta) {
+    if (!this.allSheets) return;
+    const book = this.workbook(); const me = book.find(e => e.sheet === this); if (!me) return;
+    const name = me.name.toUpperCase(); const changes = [];
+    for (const e of book) {
+      if (e.sheet === this) continue;
+      for (const k in e.sheet.cells) {
+        const c = e.sheet.cells[k];
+        if (!c || !c.formula || !String(c.formula).toUpperCase().includes(name)) continue;
+        const to = adjustFormulaStructure(c.formula, axis, at, delta, name);
+        if (to !== c.formula) { changes.push({ sheet: e.sheet, key: k, from: c.formula, to }); c.formula = to; }
+      }
+    }
+    if (changes.length && this.undoStack.length) this.undoStack[this.undoStack.length - 1].xrefs = changes;
+  }
 
   /* ---------------- recalc ---------------- */
   /**
@@ -1421,12 +1444,12 @@ export class Sheet {
       if (this.filter) { if (this.filter.r1 >= r.r1) this.filter.r1 += count; if (this.filter.r2 >= r.r1) this.filter.r2 += count; }
       if (this.freeze.r >= r.r1) this.freeze.r = Math.min(this.rows - 1, this.freeze.r + count);
       this.groups.rows = this.shiftGroups('r', r.r1, count);
-      this.condFmt = this.shiftCondFmt('r', r.r1, count); this.shiftNames('r', r.r1, count);
+      this.condFmt = this.shiftCondFmt('r', r.r1, count); this.shiftNames('r', r.r1, count); this.shiftOtherSheets('r', r.r1, count);
     }
     else { this.shiftCells('c', r.c1, count);
       this.hiddenCols = new Set([...this.hiddenCols].map(n => n >= r.c1 ? n + count : n).filter(n => n <= this.cols));
       this.groups.cols = this.shiftGroups('c', r.c1, count);
-      this.condFmt = this.shiftCondFmt('c', r.c1, count); this.shiftNames('c', r.c1, count);
+      this.condFmt = this.shiftCondFmt('c', r.c1, count); this.shiftNames('c', r.c1, count); this.shiftOtherSheets('c', r.c1, count);
       if (this.freeze.c >= r.c1) this.freeze.c = Math.min(this.cols - 1, this.freeze.c + count); for (let c = this.cols; c >= r.c1 + count; c--) { this.colW[c] = this.colW[c - count]; this.colSet[c] = this.colSet[c - count]; } const inh = r.c1 > 1 ? this.colW[r.c1 - 1] : COLW_DEFAULT; for (let c = r.c1; c < r.c1 + count && c <= this.cols; c++) { this.colW[c] = inh; this.colSet[c] = r.c1 > 1 ? this.colSet[r.c1 - 1] : false; } }
     this.commit('structure'); return true;
   }
@@ -1439,13 +1462,13 @@ export class Sheet {
       this.filterRows = new Set([...this.filterRows].filter(n => n < r.r1 || n > r.r2).map(n => n > r.r2 ? n - count : n));
       if (this.filter) { const f = this.filter; if (f.r1 >= r.r1 && f.r1 <= r.r2) { this.filter = null; this.filterRows = new Set(); } else { if (f.r1 > r.r2) f.r1 -= count; f.r2 = f.r2 > r.r2 ? f.r2 - count : Math.min(f.r2, r.r1 - 1); } }
       this.groups.rows = this.shiftGroups('r', r.r1, -count);
-      this.condFmt = this.shiftCondFmt('r', r.r1, -count); this.shiftNames('r', r.r1, -count);
+      this.condFmt = this.shiftCondFmt('r', r.r1, -count); this.shiftNames('r', r.r1, -count); this.shiftOtherSheets('r', r.r1, -count);
       if (this.freeze.r > r.r2) this.freeze.r -= count; else if (this.freeze.r >= r.r1) this.freeze.r = Math.max(0, r.r1 - 1);
       this.sel = null; this.selA = null; this.active = this.clamp(r.r1, a.c); }
     else { const count = r.c2 - r.c1 + 1; this.shiftCells('c', r.c1, -count);
       this.hiddenCols = new Set([...this.hiddenCols].filter(n => n < r.c1 || n > r.c2).map(n => n > r.c2 ? n - count : n));
       this.groups.cols = this.shiftGroups('c', r.c1, -count);
-      this.condFmt = this.shiftCondFmt('c', r.c1, -count); this.shiftNames('c', r.c1, -count);
+      this.condFmt = this.shiftCondFmt('c', r.c1, -count); this.shiftNames('c', r.c1, -count); this.shiftOtherSheets('c', r.c1, -count);
       if (this.freeze.c > r.c2) this.freeze.c -= count; else if (this.freeze.c >= r.c1) this.freeze.c = Math.max(0, r.c1 - 1); for (let c = r.c1; c <= this.cols - count; c++) { this.colW[c] = this.colW[c + count]; this.colSet[c] = this.colSet[c + count]; } for (let c = Math.max(r.c1, this.cols - count + 1); c <= this.cols; c++) { this.colW[c] = COLW_DEFAULT; this.colSet[c] = false; } this.sel = null; this.selA = null; this.active = this.clamp(a.r, r.c1); }
     this.commit('structure');
   }
