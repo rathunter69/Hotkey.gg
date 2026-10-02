@@ -12,6 +12,16 @@ import formula_sprint from './drills/formula-sprint.js';
 import combine_two_tabs from './drills/combine-two-tabs.js';
 import before_you_send from './drills/before-you-send.js';
 import weekly_sales_report from './drills/weekly-sales-report.js';
+import ch4_lookup_relay from './drills/ch4-lookup-relay.js';
+import ch4_sort_and_filter from './drills/ch4-sort-and-filter.js';
+import ch4_pivot_in_90 from './drills/ch4-pivot-in-90.js';
+import ch4_data_table from './drills/ch4-data-table.js';
+import ch4_goal_seek from './drills/ch4-goal-seek.js';
+import ch4_name_it from './drills/ch4-name-it.js';
+import ch4_cube_it from './drills/ch4-cube-it.js';
+import ch4_six_tabs from './drills/ch4-six-tabs.js';
+import ch4_two_pickers from './drills/ch4-two-pickers.js';
+import puzzle_ch4 from './drills/puzzle-ch4.js';
 import ch5_statement_link from './drills/ch5-statement-link.js';
 import ch5_schedule_fill from './drills/ch5-schedule-fill.js';
 import ch5_balance_it from './drills/ch5-balance-it.js';
@@ -28,6 +38,12 @@ import ch6_waterfall from './drills/ch6-waterfall.js';
 import ch6_football_field from './drills/ch6-football-field.js';
 import ch6_paper_lbo from './drills/ch6-paper-lbo.js';
 import puzzle_ch6 from './drills/puzzle-ch6.js';
+import ch6_three_ways_to_a_price from './drills/ch6-three-ways-to-a-price.js';
+import ch6_ltm_two_ways from './drills/ch6-ltm-two-ways.js';
+import ch6_napkin from './drills/ch6-napkin.js';
+import ch6_cap_the_amort from './drills/ch6-cap-the-amort.js';
+import ch6_lenders_return from './drills/ch6-lenders-return.js';
+import ch6_ceiling_price from './drills/ch6-ceiling-price.js';
 import { LESSONS } from './index.js';
 
 /**
@@ -46,6 +62,17 @@ export const DRILLS = [
   combine_two_tabs,
   before_you_send,
   weekly_sales_report,
+  // Chapter 4 (screenplay 6.2): the planned set on the diligence pack with sort and filter, the benchmark, the two Wave 1 sketches and the puzzle
+  ch4_lookup_relay,
+  ch4_sort_and_filter,
+  ch4_pivot_in_90,
+  ch4_data_table,
+  ch4_goal_seek,
+  ch4_name_it,
+  ch4_cube_it,
+  ch4_six_tabs,
+  ch4_two_pickers,
+  puzzle_ch4,
   // Chapter 5 (screenplay 6.2): the planned set on the operating model, the benchmark and the puzzle
   ch5_statement_link,
   ch5_schedule_fill,
@@ -63,6 +90,13 @@ export const DRILLS = [
   ch6_waterfall,
   ch6_football_field,
   ch6_paper_lbo,
+  // Chapter 6's Wave 1 sketches (script-drills.md)
+  ch6_three_ways_to_a_price,
+  ch6_ltm_two_ways,
+  ch6_napkin,
+  ch6_cap_the_amort,
+  ch6_lenders_return,
+  ch6_ceiling_price,
   puzzle_ch6,
 ];
 
