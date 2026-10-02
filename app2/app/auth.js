@@ -158,6 +158,21 @@ export const auth = {
     const { error } = await client.auth.signInWithOtp({ email, options: { emailRedirectTo: redirectTo() } });
     return error ? { error: error.message } : { confirm: true };
   },
+  /**
+   * The checkout page's sign-in (E-checkout decision 11): a 6-digit code by email, typed on the same
+   * page, so the buyer never leaves it. Creates the account on first use. Needs the Supabase email
+   * template to carry {{ .Token }}.
+   */
+  async sendCode(email) {
+    if (!client) return { error: 'Sign-in is not configured' };
+    const { error } = await client.auth.signInWithOtp({ email, options: { shouldCreateUser: true } });
+    return error ? { error: error.message } : {};
+  },
+  async verifyCode(email, code) {
+    if (!client) return { error: 'Sign-in is not configured' };
+    const { error } = await client.auth.verifyOtp({ email, token: String(code || '').trim(), type: 'email' });
+    return { error: error ? error.message : null };
+  },
   async google() {
     if (!client) return { error: 'Sign-in is not configured' };
     const { error } = await client.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: redirectTo() } });

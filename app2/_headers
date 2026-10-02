@@ -16,5 +16,20 @@
   Cache-Control: public, max-age=0, must-revalidate
 /*.css
   Cache-Control: public, max-age=0, must-revalidate
+# Phase E checkout (docs/phases/E-checkout.md): the `payments` flag is on only for the preview
+# deployments, so only they let Stripe in: Stripe.js and its iframes from *.stripe.com, and Link (the
+# merchant of record) from *.link.com, in script, frame and connect; payment for Apple Pay in the frame.
+# The "!" lines drop the site-wide header first, so the two policies are never both enforced.
+# hotkey.gg keeps the strict policy above until Wolf says go; then these lines move to /*.
 https://:project.pages.dev/*
   X-Robots-Tag: noindex
+  ! Content-Security-Policy
+  ! Permissions-Policy
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://*.stripe.com https://*.link.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://*.stripe.com https://*.link.com; connect-src 'self' https://wepejasrnskvftgnnecr.supabase.co wss://wepejasrnskvftgnnecr.supabase.co https://*.stripe.com https://*.link.com; frame-src https://*.stripe.com https://*.link.com; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'
+  Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=(self "https://js.stripe.com" "https://*.stripe.com" "https://*.link.com"), usb=()
+https://:version.:project.pages.dev/*
+  X-Robots-Tag: noindex
+  ! Content-Security-Policy
+  ! Permissions-Policy
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://*.stripe.com https://*.link.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://*.stripe.com https://*.link.com; connect-src 'self' https://wepejasrnskvftgnnecr.supabase.co wss://wepejasrnskvftgnnecr.supabase.co https://*.stripe.com https://*.link.com; frame-src https://*.stripe.com https://*.link.com; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'
+  Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=(self "https://js.stripe.com" "https://*.stripe.com" "https://*.link.com"), usb=()

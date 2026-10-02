@@ -78,12 +78,20 @@ const t = label => console.log(`  ${label} at ${((Date.now() - T0) / 1000).toFix
 
 try {
   // every route renders
-  for (const route of ['#/', '#/learn', '#/practice', '#/practice/daily', '#/practice/rapid', '#/practice/challenges', '#/leaderboard', '#/reference', '#/pricing', '#/teams', '#/account', '#/account?section=settings', '#/about', '#/terms', '#/privacy', '#/contact', '#/nope']) {
+  for (const route of ['#/', '#/learn', '#/practice', '#/practice/daily', '#/practice/rapid', '#/practice/challenges', '#/leaderboard', '#/reference', '#/pricing', '#/teams', '#/account', '#/account?section=settings', '#/about', '#/terms', '#/privacy', '#/contact', '#/checkout', '#/checkout/done', '#/nope']) {
     await page.goto(base + route);
     await page.waitForTimeout(250);
     const text = await page.evaluate(() => document.body.innerText.trim().length);
     if (!text) fail(`${route}: empty page`);
   }
+  // checkout (Phase E): the local server is a preview host, so the flag is on: Pricing's Get full
+  // access goes to #/checkout, and a guest there gets the inline code sign-in, never Stripe's form
+  await page.goto(base + '#/pricing');
+  await page.waitForTimeout(250);
+  if ((await page.getAttribute('#goFull', 'href')) !== '#/checkout') fail('#/pricing: Get full access does not open checkout with the flag on');
+  await page.goto(base + '#/checkout');
+  await page.waitForTimeout(400);
+  if (!(await page.$('#coEmailForm'))) fail('#/checkout: the signed-out code sign-in is missing');
   // accounts (phase B): with every non-loopback request blocked, the account page still renders
   // the sign-in form, the user chip reads guest, and the save state stays honest
   await page.goto(base + '#/account');

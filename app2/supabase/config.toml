@@ -8,3 +8,15 @@ project_id = "hotkey-app2"
 # New projects default to Postgres 17; if `supabase link` reports a different major on the
 # real project, fix this number in the same commit.
 major_version = 17
+
+# Phase E payment functions (docs/phases/E-checkout.md, section 5). Deployed by the payments build
+# session after Wolf's go-ahead, never by CI. The webhook is called by Stripe, so it takes no JWT;
+# it verifies Stripe's signature instead. The other two need the signed-in user's token.
+[functions.create-checkout]
+verify_jwt = true
+
+[functions.billing-portal]
+verify_jwt = true
+
+[functions.stripe-webhook]
+verify_jwt = false
