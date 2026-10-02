@@ -19,10 +19,11 @@ import { buildPage, FMT } from './page.js';
 import { diffStates, sessionToState as sessionToStateBase } from './clearcoat-weekly.js';
 
 export { diffStates };
-/** A live session in the authored-state shape (clearcoat-weekly's reader), less the cells a dynamic array spilled into: the state holds the anchor's formula, the engine writes the rest. */
+/** A live session in the authored-state shape (clearcoat-weekly's reader), less the values a dynamic array spilled: the state holds the anchor's formula and the cells' formats, the engine writes the rest. */
 export function sessionToState(ses) {
   const st = sessionToStateBase(ses);
-  st.sheets = st.sheets.map(sh => ({ ...sh, cells: Object.fromEntries(Object.entries(sh.cells).filter(([, c]) => !(c && c.spill))) }));
+  const unspill = c => { const { spill, value, ...rest } = c; return rest; };
+  st.sheets = st.sheets.map(sh => ({ ...sh, cells: Object.fromEntries(Object.entries(sh.cells).map(([k, c]) => [k, c && c.spill ? unspill(c) : c]).filter(([, c]) => c && Object.keys(c).length)) }));
   return st;
 }
 
