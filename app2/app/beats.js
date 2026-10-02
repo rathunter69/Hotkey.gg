@@ -55,6 +55,11 @@ const BEATS_DEFAULT = {
     body: 'The financials section is three pages, and the book is a PDF that gets printed, so each page has to land on one sheet, carry its title rows, and say which file and which page it is. The one-page summary reads from the detail behind it. Set the pack up to print and it’s ready for the data room.' },
   'ch2-project-and-assessment': { eyebrow: 'Module 2.8 · project and assessment', title: 'The financials section, start to finish.',
     body: 'A fresh export has landed: the same accounting system, the same faults, a different three years. Everything the chapter taught goes onto one workbook, until three pages are ready for the data room. Build it, then build it again on the clock, because the assessment is the test-out.' },
+  // Chapter 3 · Formulas and functions (script-ch3.md story cards)
+  logic: { eyebrow: 'Module 3.1 · logic', title: 'Which sites are pulling their weight?',
+    body: 'The buyers’ first question is the CFO’s oldest one: which sites clear their daily target, which don’t, and what the managers earn when they do. The point-of-sale export has every wash; the Sites sheet has every target. A formula that can ask a question and act on the answer turns ninety rows into a page of flags.' },
+  dates: { eyebrow: 'Module 3.2 · dates', title: 'How old is each site, and how long do members stay?',
+    body: 'Two of the buyers’ questions are about time: how old each site is, because new ones ramp for two years, and how long a member stays before cancelling, because that’s what a $30-a-month fee is worth. Excel keeps a date as a number, days since the start of 1900, so dates subtract, add and compare like any figure once you know the functions that build and break them.' },
   'project-and-assessment': { eyebrow: 'Module 1.8 · project, assessment, test-out', title: 'Management’s next feed is in.',
     body: 'A fresh week, a blank Report, and everything the chapter taught. Build the page start to finish, then prove it against the clock on Monday morning; or test out of the chapter in five minutes.' },
 };

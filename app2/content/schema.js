@@ -229,6 +229,24 @@ export const CONCEPTS = {
   'page-numbers-footer': 'Page &[Page] of &[Pages] in the footer numbers every printed page of a pack, beside the file and the date',
   'center-on-page': 'Page Setup › Margins: Center on page Horizontally (Alt+Z) sits a narrow page in the middle of the paper',
   'summary-links': 'a summary page holds no typed figure: every number is a link to the detail behind it, so the two can never disagree',
+  // Chapter 3 (the KPI databook): 3.1 logic and 3.2 dates
+  'if-function': 'IF(test, if true, if false) asks a question and gives one answer when it holds and another when it does not',
+  'nested-if': 'a nested IF puts an IF inside the false answer of another, so the tests run in order; past two levels nobody can read it',
+  'ifs-function': 'IFS(test1, value1, test2, value2, ..., TRUE, else) returns the value beside the first test that holds',
+  'min-max-cap': 'MAX(x,0) floors a figure at zero and MIN(x,cap) caps it: one call where an IF would test',
+  'and-or-not': 'AND is TRUE when every test holds, OR when any does, and NOT flips one; each returns TRUE or FALSE and sits inside IF',
+  'iferror-function': 'IFERROR(value, fallback) shows the fallback where the value is an error; use it only where the error is expected',
+  'isnumber-override': 'the override pattern: =IF(ISNUMBER(R5),R5,C5) reads a typed override when there is one and the link when there is not',
+  'date-serial': 'a date is a serial number of days since January 1, 1900, so dates subtract and compare like figures; Ctrl+Shift+~ shows the number',
+  'year-month-day': 'YEAR, MONTH and DAY take a date apart into its year, month and day',
+  'blank-test': 'a blank cell equals "", the empty text, so IF(F5="", ...) asks whether a date is missing',
+  'paste-formulas': 'Paste Special, Formulas (Ctrl+Alt+V, F) writes the copied formulas and leaves every cell its own format',
+  'fill-to-bottom': 'to fill a long table, Go To its last row, widen across, and Ctrl+Shift+↑ climbs to the formulas in the first row',
+  'period-key': 'a period key is a column that says which month, quarter or week a row belongs to, written by formula from its date',
+  'weekday-function': 'WEEKDAY(date, 2) numbers the day of the week from Monday as 1 to Sunday as 7',
+  'yearfrac': 'YEARFRAC(start, end, basis) is the exact share of a year between two dates; the basis picks the day count',
+  'fiscal-year': 'a fiscal year ends where the company says: with a June 30 year end, a date from July on belongs to the next fiscal year',
+  'networkdays': 'NETWORKDAYS counts the working days between two dates less a holiday list; NETWORKDAYS.INTL takes the weekend as seven digits',
 };
 
 /**

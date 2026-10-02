@@ -75,7 +75,7 @@ export function capsTell(s) {
   for (const w of words) {
     const letters = w.replace(/[^A-Za-z]/g, '');
     if (letters.length < 4 || letters !== letters.toUpperCase()) continue;
-    const base = w.replace(/\.[A-Z]+$/, '');   // QUARTILE.INC → QUARTILE
+    const base = w.replace(/\.[A-Z]+$/, '').replace(/^&+|&+$/g, '');   // QUARTILE.INC → QUARTILE; &YEAR in a joined formula → YEAR
     if (CAPS_OK.has(w) || CAPS_OK.has(base) || FUNCTION_NAMES.test(base)) continue;
     return `"${w}" in capitals`;
   }
@@ -91,7 +91,7 @@ export function arrowLabelTell(s) {
 
 /** Text typed into a cell is exempt: strip quoted cell contents ("…" right after a cell ref or "type"). */
 export function stripCellText(s) {
-  return String(s || '').replace(/(?:type|types|typed|reads|read|enter|entered)\s+[“"][^”"]*[”"]/gi, ' ').replace(/=[^\s,.;]+/g, ' ');
+  return String(s || '').replace(/(?:type|types|typed|reads|read|enter|entered)\s+[“"][^”"]*[”"]/gi, ' ').replace(/=(?:[^\s,.;]|\.(?=[A-Za-z]))+/g, ' ');   // a dot inside a name (NETWORKDAYS.INTL) stays in the formula
 }
 
 /** Every tell in one displayed string, as a list of reasons (empty when clean). */

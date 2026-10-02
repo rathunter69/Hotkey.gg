@@ -83,6 +83,18 @@ import challenge_print_pack from './lessons/challenge-print-pack.js';
 import ch2_project from './lessons/ch2-project.js';
 import ch2_assessment from './lessons/ch2-assessment.js';
 import remix_format_on_the_pnl from './remixes/formatting-on-the-pnl.js';   // Chapter 1's format challenge, re-clothed (content/remix.js)
+// Chapter 3 · Formulas and functions (Run R3, the KPI databook on clearcoat-databook): 3.1 logic, 3.2 dates
+import if_on_a_threshold from './lessons/if-on-a-threshold.js';
+import nested_if_ifs_min_max from './lessons/nested-if-ifs-min-max.js';
+import and_or_not from './lessons/and-or-not.js';
+import iferror_and_the_override from './lessons/iferror-and-the-override.js';
+import challenge_flags_block from './lessons/challenge-flags-block.js';
+import date_serials from './lessons/date-serials.js';
+import member_tenure from './lessons/member-tenure.js';
+import period_keys from './lessons/period-keys.js';
+import yearfrac_and_fiscal_periods from './lessons/yearfrac-and-fiscal-periods.js';
+import trading_calendar from './lessons/trading-calendar.js';
+import challenge_timeline_and_age from './lessons/challenge-timeline-and-age.js';
 
 export const CHAPTERS = [
   {
@@ -138,6 +150,26 @@ export const CHAPTERS = [
       print_areas_titles_footers, one_page_summary, challenge_print_pack,
       ch2_project, ch2_assessment,
       remix_format_on_the_pnl,
+    ],
+  },
+  {
+    id: 'formulas',
+    title: 'Formulas and functions',
+    access: 'paid',
+    blurb: 'Logic, dates, math and aggregation, text, time value of money and auditing: the point-of-sale export rolled up into a KPI databook where every number reconciles.',
+    // Chapter 3's sections in order (script-ch3.md): the six modules and the closing project block.
+    sections: [
+      { name: 'Logic', blurb: 'IF on a threshold; nested IF against IFS against MIN and MAX; AND, OR and NOT for compound flags; IFERROR and the override pattern.' },
+      { name: 'Dates', blurb: 'Serial numbers and DATE, YEAR, MONTH, DAY; member tenure from join and cancel dates; period keys for grouping; YEARFRAC and fiscal periods; NETWORKDAYS and WEEKDAY for the trading calendar.' },
+      { name: 'Math and aggregation', blurb: 'ROUND and its family; COUNTIFS, SUMIFS and AVERAGEIFS; MAXIFS, MINIFS, LARGE, SMALL and RANK; SUMPRODUCT; the reconciliation.' },
+      { name: 'Text', blurb: 'LEN, LEFT, RIGHT and MID; FIND, SEARCH and SUBSTITUTE; VALUE and DATEVALUE; Text to Columns and Flash Fill.' },
+      { name: 'Time value of money', blurb: 'PV, FV and PMT on the site-build loan; NPV and XNPV; IRR and XIRR; a payment schedule with anchors.' },
+      { name: 'Auditing', blurb: 'Trace precedents and dependents; F9 on a part and Go To Special at scale; the hardcode and external-link hunt; the checks block with a roll-up flag.' },
+      { name: 'Project and assessment', blurb: 'Rebuild the Summary so every number ties, then a fresh export against the clock.' },
+    ],
+    lessons: [
+      if_on_a_threshold, nested_if_ifs_min_max, and_or_not, iferror_and_the_override, challenge_flags_block,
+      date_serials, member_tenure, period_keys, yearfrac_and_fiscal_periods, trading_calendar, challenge_timeline_and_age,
     ],
   },
 ];

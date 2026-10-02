@@ -138,8 +138,22 @@ function precedentMap(sheet) {
  */
 function inputsFor(sheet, key, map) {
   const seen = new Set([key]); const queue = [key]; const out = []; let dynamic = false;
+  const maps = new Map();   // another sheet's precedent map, built once when the walk first reaches it
+  /** 'SITES!K5' on a formula cell: its references, each named with its sheet so the probe finds it. */
+  const across = k => {
+    const bang = k.indexOf('!'); if (bang < 0 || typeof sheet.allSheets !== 'function') return null;
+    const name = k.slice(0, bang).toLowerCase();
+    const e = sheet.allSheets().find(x => x.name.toLowerCase() === name); if (!e) return null;
+    if (!maps.has(e.sheet)) maps.set(e.sheet, precedentMap(e.sheet));
+    const ent = maps.get(e.sheet)[k.slice(bang + 1)]; if (!ent) return null;
+    const own = sheet.allSheets().find(x => x.sheet === sheet);
+    const name2 = d => (d.includes('!') ? d : e.name + '!' + d);
+    // a reference back to this sheet is this sheet's own key, so the walk continues here
+    const home = d => (own && d.toLowerCase().startsWith(own.name.toLowerCase() + '!') ? d.slice(own.name.length + 1) : d);
+    return { refs: [...ent.refs].map(d => home(name2(d))), dynamic: ent.dynamic };
+  };
   while (queue.length) {
-    const k = queue.shift(); const ent = map[k];
+    const k = queue.shift(); const ent = map[k] || across(k);
     if (!ent) { out.push(k); continue; }   // a value or a blank: an input
     if (ent.dynamic) dynamic = true;
     for (const d of ent.refs) if (!seen.has(d)) { seen.add(d); queue.push(d); }

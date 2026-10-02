@@ -18,6 +18,8 @@
 import { mulberry32 } from '../../engine/rng.js';
 import { dateToSerial } from '../../engine/format.js';
 import { buildPage, FMT } from './page.js';
+// the chain test and the lessons' replay read states through the shared diff (module-states.test.js)
+export { diffStates, sessionToState } from './clearcoat-weekly.js';
 
 export const CHAPTER = 3;
 const D = (y, m, d) => dateToSerial(y, m, d);
@@ -526,8 +528,8 @@ export const LESSONS = [
   { id: '3.1.2', lesson: 'nested-if-ifs-min-max', strip: (s, M) => { const c = sheetOf(s, 'Summary').cells; empty(c, [...rows('I', 5, 10), 'I4']); for (let r = 5; r <= 10; r++) set(c, 'G' + r, { formula: `=IF(C${r}>=D${r},C${r}-D${r},0)` }); } },
   { id: '3.1.3', lesson: 'and-or-not', strip: (s) => { const c = sheetOf(s, 'Summary').cells; empty(c, span('M', 'P', 5, 10)); } },
   { id: '3.1.4', lesson: 'iferror-and-the-override', strip: (s, M) => { const c = sheetOf(s, 'Summary').cells; if (!M.full) return;
-    for (let r = 5; r <= 10; r++) { set(c, 'Q' + r, { formula: `=H${r}/C${r}` }); set(c, 'E' + r, { formula: `=IF(C${r}>=D${r},"On target","Below")` }); delete c['R' + r]; }
-    delete c.R4; empty(c, rows('S', 5, 10)); } },
+    for (let r = 5; r <= 10; r++) { set(c, 'Q' + r, { formula: `=H${r}/C${r}` }); set(c, 'E' + r, { formula: `=IF(C${r}>=D${r},"On target","Below")` }); }
+    empty(c, ['R4', ...rows('R', 5, 10), ...rows('S', 5, 10)]); } },   // R keeps its header's bold and its number format: the lesson labels it and colors it blue
   { id: '3.2.1', lesson: 'date-serials', strip: (s, M) => { const c = sheetOf(s, 'Sites').cells; empty(c, span('J', M.full ? 'P' : 'K', 5, 10));
     const sm = sheetOf(s, 'Summary').cells; M.data.sites.forEach((site, i) => { sm['L' + (5 + i)] = { ...sm['L' + (5 + i)], value: r1((AS_OF - site.opened) / 365.25), fontColor: 'blue' }; delete sm['L' + (5 + i)].formula; }); } },
   { id: '3.2.2', lesson: 'member-tenure', strip: (s, M) => { const c = sheetOf(s, 'Members').cells; empty(c, [...span('G', 'L', MEM_FIRST, MEM_LAST), 'K' + M.members.total, 'L' + M.members.total, 'L2']); } },
