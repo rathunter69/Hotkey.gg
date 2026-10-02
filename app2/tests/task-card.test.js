@@ -23,7 +23,7 @@ test('placeCard over every registered lesson: inside the box, never over the tar
   for (const lesson of LESSONS) {
     if (!Array.isArray(lesson.goals) || !lesson.goals.length) continue;
     let run;
-    try { run = new LessonRun(lesson, { now: () => 0 }); } catch (e) { continue; }   // a lesson another worker is mid-rewrite on grades itself in lessons.test.js
+    try { run = new LessonRun(lesson, { now: () => 0, calculate: false }); } catch (e) { continue; }   // laid out, not calculated: the layout places the card (a lesson mid-rewrite grades itself in lessons.test.js)
     const names = run.session.sheets.map(x => x.name);
     const sheetBy = n => { const e = run.session.sheets.find(x => x.name === n) || run.session.sheets[0]; return e.sheet; };
     const rectOf = (ref, sheet) => rangeRect(ref, { colW: c => sheet.colW[c] || 64, rowH: r => sheet.rowH[r] || 20, x0: BOX.x0, y0: BOX.y0 });

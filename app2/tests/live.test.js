@@ -169,3 +169,19 @@ test('a named input on another sheet, and a clone that reaches two sheets away: 
   assert.equal(isLiveFormula(stmt, 'C1', { inputs: ['Inputs!B9'] }), false, 'a cell nothing reads moves nothing');
   assert.equal(JSON.stringify(ses.sheets.map(e => e.sheet.cells)), before, 'the workbook is untouched');
 });
+
+test('an iterating workbook: the copy takes on its graph, recalculates only what the target reads, and answers as the whole-recalc reference does', async () => {
+  const { Session } = await import('../engine/keyboard.js');
+  const ses = new Session(new Sheet({ cells: { A1: { value: 100 }, A2: { value: 0.1 }, A3: { value: 7 } } }));
+  ses.renameSheet(0, 'Inputs');
+  // a revolver-style circle (interest on the closing balance), a reader past it, and a line the circle never reads
+  ses.addSheet('Calc', new Sheet({ cells: { B1: { formula: '=Inputs!A1+B2' }, B2: { formula: '=B1*Inputs!A2/2' }, B3: { formula: '=B1*2' }, C1: { formula: '=Inputs!A3*3' }, C2: { formula: '=C1+1' } } }));
+  Object.assign(ses.settings, { iterative: true }); ses.recalcAll();
+  const calc = ses.sheets[1].sheet; const before = JSON.stringify(ses.sheets.map(e => e.sheet.cells));
+  for (const [ref, input] of [['B3', 'Inputs!A1'], ['B3', 'Inputs!A2'], ['B3', 'Inputs!A3'], ['C2', 'Inputs!A3'], ['C2', 'Inputs!A1']]) {
+    assert.equal(isLiveFormula(calc, ref, { inputs: [input] }), isLiveFormulaByClone(calc, ref, { inputs: [input] }), `${ref} from ${input}`);
+  }
+  assert.equal(isLiveFormula(calc, 'B3', { inputs: ['Inputs!A1'] }), true);
+  assert.equal(isLiveFormula(calc, 'B3', { inputs: ['Inputs!A3'] }), false, 'C1 moves, B3 never reads it');
+  assert.equal(JSON.stringify(ses.sheets.map(e => e.sheet.cells)), before, 'the workbook is untouched');
+});

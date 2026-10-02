@@ -22,7 +22,7 @@
 
 import { parseRef, refKey, normRef } from './refs.js';
 import { formulaRefs, formulaFunctions } from './formula.js';
-import { Sheet } from './sheet.js';
+import { Sheet, cloneCells } from './sheet.js';
 import { CalcGraph } from './calc.js';
 
 const clone = o => JSON.parse(JSON.stringify(o));
@@ -80,8 +80,9 @@ export function liveFormulasByClone(sheet) {
 /**
  * Test seams. `liveHooks.onVerdict(sheet, key, opts, verdict)` sees every isLiveFormula answer;
  * `isLiveFormulaByClone` is the rule as it ran before the in-place probe (clone the workbook,
- * recalculate it whole, probe the clone). The equivalence test replays every lesson and checks
- * each in-place verdict against it.
+ * recalculate it whole, every nudge recalculating all it reaches). The equivalence test replays
+ * every lesson and checks each verdict against it: an in-place one, and one on a copy that takes
+ * on the workbook's graph and recalculates only what the target reads.
  */
 export const liveHooks = { onVerdict: null };
 /** An input as the probes name it: 'B3' on the target's sheet, or 'Inputs!C40' on another (the sheet kept as written). */
@@ -96,9 +97,30 @@ export function isLiveFormulaByClone(sheet, ref, opts = {}) {
   const target = sheet.cells[key];
   if (!target || !target.formula) return false;
   const inputs = opts.inputs ? opts.inputs.map(normInput).filter(Boolean) : inputsFor(sheet, key);
-  return inputs.length > 0 && probeCloneOf(sheet, key, inputs);
+  const test = cloneSheet(sheet, { reference: true });   // recalculated whole, every nudge recalculating everything it reaches
+  return inputs.length > 0 && probeClone(test, key, test.value(key), inputs);
 }
-function probeCloneOf(sheet, key, inputs) { const test = cloneSheet(sheet); return probeClone(test, key, test.value(key), inputs); }
+function probeCloneOf(sheet, key, inputs) { const test = cloneSheet(sheet); return probeClone(test, key, test.value(key), inputs, coneOf(test, key)); }
+
+/**
+ * The cells a formula reads, directly or through other formulas (full graph keys, itself
+ * included): on a scratch copy asked about one cell, the only cells a nudge needs to recalculate.
+ * null (recalculate everything the nudge reaches) when that could miss a move: a reference built
+ * as it runs (OFFSET, INDIRECT) may read a cell outside, and a dynamic array anywhere may spill
+ * into one inside.
+ */
+const BUILT_REFS = /\b(OFFSET|INDIRECT)\s*\(/i;
+function coneOf(test, key) {
+  const book = test.book; if (!book || !book.deps) return null;
+  for (const e of test.allSheets ? test.allSheets() : [{ sheet: test }]) for (const k in e.sheet.cells) { const c = e.sheet.cells[k]; if (c && (c.spillTo || c.spillWant || c.spill)) return null; }
+  const start = book.fk(test, key); const cone = new Set([start]); const stack = [start];
+  while (stack.length) {
+    const fk = stack.pop(); const S = book.sheetOf(fk); const c = S && S.cells[fk.slice(fk.indexOf('!') + 1)];
+    if (c && c.formula && BUILT_REFS.test(c.formula)) return null;
+    const d = book.deps.get(fk); if (d) for (const x of d) if (!cone.has(x)) { cone.add(x); stack.push(x); }
+  }
+  return cone;
+}
 
 function sameValue(a, b) {
   if (typeof a === 'number' && typeof b === 'number') return Math.abs(a - b) <= 1e-9 * Math.max(1, Math.abs(a), Math.abs(b));
@@ -179,10 +201,10 @@ function probeInPlace(sheet, key, inputs) {
  * to a resolver over the clones, so cross-sheet formulas keep working and probes on 'COSTS!B3'
  * land on the cloned Costs, never the real one.
  */
-function cloneSheet(sheet) {
+function cloneSheet(sheet, { reference = false } = {}) {
   // the rows SUBTOTAL skips (hidden, filtered out, folded) come along, so a clone answers as the sheet would
   const one = src => {
-    const t = new Sheet({ rows: src.rows, cols: src.cols, today: src.today || undefined, recalc: false }); t.cells = clone(src.cells);
+    const t = new Sheet({ rows: src.rows, cols: src.cols, today: src.today || undefined, recalc: false }); t.cells = cloneCells(src.cells);
     if (src.hiddenRows) t.hiddenRows = new Set(src.hiddenRows);
     if (src.filterRows) t.filterRows = new Set(src.filterRows);
     if (src.groups) t.groups = clone(src.groups);
@@ -194,8 +216,18 @@ function cloneSheet(sheet) {
   // the clones share one calculation graph, the names and the calculation settings, as the workbook's sheets do,
   // so a nudge on one sheet reaches a reader two sheets away and a circle iterates as it does in the workbook
   const book = new CalcGraph(() => entries);
+  // the workbook's own graph covers exactly these sheets: the copies keep their sheets' ids and take
+  // on that graph, so their recalc catches up only what changed since the workbook's last (most
+  // often nothing) instead of evaluating every formula; the values they start from are the workbook's
+  const src = sheet.book;
+  const adopted = !reference && !!src && src instanceof CalcGraph && src.known.size === entries.length && entries.every(e => src.known.get(e.src._cid) === e.src);
+  if (adopted) {
+    for (const e of entries) e.sheet._cid = e.src._cid;
+    book.adopt(src);
+  }
   for (const e of entries) { e.sheet.resolver = lookup; e.sheet.allSheets = () => entries; e.sheet.book = book; e.sheet.names = clone(e.src.names || {}); e.sheet.calc = e.src.calc ? { ...e.src.calc } : null; e.sheet.iterCalc = e.src.iterCalc ? { ...e.src.iterCalc } : null; }
-  for (const e of entries) e.sheet.recalc();
+  if (adopted) { for (const e of entries) e.sheet._cfMap = null; book.recalc(entries[0].sheet); }   // one catch-up diffs every sheet
+  else for (const e of entries) e.sheet.recalc();
   const mine = entries.find(e => e.src === sheet);
   return mine ? mine.sheet : one(sheet);
 }
@@ -205,7 +237,7 @@ function cloneSheet(sheet) {
  * target. Each input is put back before the next, so one scratch sheet serves many targets
  * (formula values are recomputed from the inputs on every recalc).
  */
-function probeClone(test, key, base, inputs) {
+function probeClone(test, key, base, inputs, cone = null) {
   for (const inKey of inputs) {
     const bang = inKey.indexOf('!');
     const host = bang < 0 ? test : (test.resolver ? test.resolver(inKey.slice(0, bang)) : null);
@@ -216,12 +248,12 @@ function probeClone(test, key, base, inputs) {
     const orig = cell.value; let moved = false;
     for (const v of perturbations(orig)) {
       cell.value = v;
-      if (host !== test) host.recalc();
-      test.recalc();
+      if (cone) test.book.recalc(test, undefined, cone);   // a scratch copy asked about one cell: only what it reads runs
+      else { if (host !== test) host.recalc(); test.recalc(); }
       if (!sameValue(test.value(key), base)) { moved = true; break; }
     }
     cell.value = orig;
-    if (host !== test) host.recalc();
+    if (!cone && host !== test) host.recalc();   // (a scratch copy asked about one cell is thrown away after)
     if (moved) return true;
   }
   return false;

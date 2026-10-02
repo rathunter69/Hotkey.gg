@@ -14,6 +14,17 @@ import { LessonRun } from '../app/runner.js';
 import { hintScript } from './hint-rules.js';
 
 export const SHARDS = 8;
+/** Two runs' starting workbooks are the same: every sheet's cells exactly, its circles and names, and the calculation graph's view. */
+function sameStart(a, b, id) {
+  assert.equal(b.sheets.length, a.sheets.length, id);
+  a.sheets.forEach((e, i) => {
+    const f = b.sheets[i];
+    assert.equal(f.name, e.name, id); assert.deepStrictEqual(f.sheet.cells, e.sheet.cells, `${id} ${e.name}: a restarted run starts on the same cells`);
+    assert.deepStrictEqual(f.sheet.circular, e.sheet.circular, `${id} ${e.name}`); assert.deepStrictEqual(f.sheet.names, e.sheet.names, `${id} ${e.name}`);
+  });
+  for (const k of ['deps', 'rdeps', 'stat', 'volatile', 'cyclic']) assert.equal(b.book[k].size, a.book[k].size, `${id}: the graph's ${k}`);
+  assert.deepStrictEqual([...b.book.cyclic].sort(), [...a.book.cyclic].sort(), id);
+}
 const fresh = (lesson, opts = {}) => new LessonRun(lesson, { now: () => 0, ...opts });
 
 /** The measured seconds per lesson (both of its tests), from check-costs.json; {} when there is none. */
@@ -42,7 +53,9 @@ export function registerReplays(shard) {
       for (const g of lesson.goals) for (const c of g.requires || []) assert.ok(avail.has(c), `${lesson.id} goal ${g.id} requires "${c}" which is not taught here or earlier`);
 
       let t = 0;
-      const run = new LessonRun(lesson, { mode: 'guided', now: () => (t += 100) });
+      const run = new LessonRun(lesson, { mode: 'guided', now: () => (t += 100), fresh: true });
+      // the same lesson started again copies the workbook this build left (the hint walk below starts that way): exactly it
+      if (lesson.workbook) sameStart(run.session, new LessonRun(lesson, { mode: 'guided', now: () => 0, seedNo: run.seedNo }).session, lesson.id);
       assert.equal(run.finished, false);
       run.evaluate();
       assert.equal(run.doneCount, 0, 'no goal passes on the starting sheet');
@@ -60,9 +73,7 @@ export function registerReplays(shard) {
         assert.deepEqual(diff, [], `${lesson.id}: the solution leaves exactly ${lesson.state.after} — extra diffs: ${JSON.stringify(diff.slice(0, 4))}`);
       }
     });
-  }
 
-  for (const lesson of mine) {
     test(`${lesson.id}: every guided hint lands exactly its goal from where the previous goal left off`, () => {
       const run = fresh(lesson);
       lesson.goals.forEach((g, i) => {

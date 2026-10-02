@@ -60,6 +60,30 @@ export class CalcGraph {
   /** Forget everything: the next recalc evaluates every formula (a sheet renamed, added or removed; names changed). */
   invalidate() { this.epoch++; this.deps.clear(); this.rdeps.clear(); this.stat.clear(); this.seen.clear(); this.volatile.clear(); this.rowsOnly.clear(); this.rowSig = undefined; this.cyclic.clear(); this.known.clear(); }
 
+  /**
+   * Take on another graph's view of a workbook whose sheets were copied with their ids (a copy of
+   * each sheet whose `_cid` is its original's): the copy's next recalc then diffs against what the
+   * original last saw and evaluates only what changed since, instead of every formula. Edge sets
+   * and reference memos are replaced, never changed in place, so they are shared; the reader sets
+   * and the snapshots are changed in place, so they are copied.
+   */
+  adopt(src) {
+    for (const [fk, set] of src.deps) this.deps.set(fk, set);
+    for (const [fk, set] of src.rdeps) this.rdeps.set(fk, new Set(set));
+    for (const [fk, m] of src.stat) this.stat.set(fk, m);
+    for (const [cid, m] of src.seen) { const out = new Map(); for (const [k, r] of m) out.set(k, { f: r.f, v: r.v }); this.seen.set(cid, out); }
+    for (const fk of src.volatile) this.volatile.add(fk);
+    for (const fk of src.rowsOnly) this.rowsOnly.add(fk);
+    for (const fk of src.cyclic) this.cyclic.add(fk);
+    this.rowSig = src.rowSig; this.calcSig = src.calcSig;
+  }
+
+  /** Back to a view taken earlier with adopt (the same sheets, their cells put back as they were then). */
+  restore(src) {
+    this.deps.clear(); this.rdeps.clear(); this.stat.clear(); this.seen.clear(); this.volatile.clear(); this.rowsOnly.clear(); this.cyclic.clear();
+    this.adopt(src);
+  }
+
   /* ---- keys ---- */
   fk(sheet, key) { let m = sheet._fks; if (!m) m = sheet._fks = new Map(); let f = m.get(key); if (!f) { f = sheetId(sheet) + '!' + key; m.set(key, f); } return f; }   // interned: a recalc reads the same keys thousands of times
   split(fk) { const i = fk.indexOf('!'); return { cid: +fk.slice(0, i), key: fk.slice(i + 1) }; }
@@ -110,12 +134,14 @@ export class CalcGraph {
    * Bring every formula the last changes reach up to date. `trigger` is the sheet whose commit
    * asked (diffed first; every known sheet is diffed, since a workbook operation may have touched
    * several). Sets each sheet's `circular`. `only` ([{ sheet, key }]) narrows the diff to the
-   * cells named, for a caller that knows exactly what it changed since the last recalc.
+   * cells named, for a caller that knows exactly what it changed since the last recalc. `within`
+   * (a Set of full keys) evaluates only those cells, for a scratch copy that needs one cell's
+   * value: the cells it reads, directly or not (whatever lies outside reads nothing inside).
    */
-  recalc(trigger, only) {
+  recalc(trigger, only, within) {
     this.refreshKnown();
     const dirty = new Set(); const touched = new Set();   // touched: cells whose record changed under us (spills), to re-snapshot
-    const push = (fk) => { const stack = [fk]; while (stack.length) { const k = stack.pop(); if (dirty.has(k)) continue; dirty.add(k); const r = this.rdeps.get(k); if (r) for (const x of r) if (!dirty.has(x)) stack.push(x); } };
+    const push = (fk) => { const stack = [fk]; while (stack.length) { const k = stack.pop(); if (dirty.has(k) || (within && !within.has(k))) continue; dirty.add(k); const r = this.rdeps.get(k); if (r) for (const x of r) if (!dirty.has(x)) stack.push(x); } };
     const seenOf = cid => { let m = this.seen.get(cid); if (!m) { m = new Map(); this.seen.set(cid, m); } return m; };
     const markReaders = fk => { const r = this.rdeps.get(fk); if (r) for (const x of r) push(x); };
     // 1. what changed since the last recalc
@@ -260,14 +286,14 @@ export class CalcGraph {
       }
       for (const k of cyclic) { this.cyclic.add(k); stale.delete(k); }
       // 4. what must run again: stale readers, a reader of a spilled block that ran before its anchor, and readers the pass reached beyond the dirty set, each with its own readers
-      const next = new Set(); const add = k => { if (!next.has(k)) next.add(k); };
+      const next = new Set(); const add = k => { if (!next.has(k) && (!within || within.has(k))) next.add(k); };
       for (const k of stale) add(k);
       if (newEdges) { const again = detect(); for (const k of again.cyclic) if (!cyclic.has(k)) add(k); }   // a circle through a dynamic reference (OFFSET, a name): its members run again as a circle
       for (const k of moved) { const r = this.rdeps.get(k); if (r) for (const x of r) if (!dirty.has(x)) add(x); }
       for (const k of touched) { const r = this.rdeps.get(k); if (r) for (const x of r) { if (!dirty.has(x)) add(x); else { const q = pos.get(x); if (q && q.done && !cyclic.has(x)) add(x); } } }
       if (!next.size) break;
       if (pass === CAP - 2) { for (const k of next) { this.cyclic.add(k); zero(k); } break; }   // still moving at the cap: a circle the static references cannot see
-      work = new Set(); for (const k of next) { const stack = [k]; while (stack.length) { const x = stack.pop(); if (work.has(x)) continue; work.add(x); dirty.add(x); const r = this.rdeps.get(x); if (r) for (const y of r) if (!work.has(y)) stack.push(y); } }
+      work = new Set(); for (const k of next) { const stack = [k]; while (stack.length) { const x = stack.pop(); if (work.has(x) || (within && !within.has(x))) continue; work.add(x); dirty.add(x); const r = this.rdeps.get(x); if (r) for (const y of r) if (!work.has(y)) stack.push(y); } }
     }
     this.setCircular();
   }

@@ -56,3 +56,27 @@ test('SUBTOTAL runs again when hidden, filtered or folded rows change, and not o
   S.groups = { rows: [{ r1: 1, r2: 1, collapsed: false }], cols: [] }; S.recalc(); assert.equal(S.value('B1'), 7, 'unfolded again');
   S.cells.A3.value = 10; S.recalc(); assert.equal(S.value('B1'), 13, 'an input still reaches it');
 });
+
+test('a graph taken on by a copy of the workbook (same sheet ids) catches up nothing; `within` evaluates only the cells named; restore puts a view back', async () => {
+  const { CalcGraph } = await import('../engine/calc.js');
+  const s = fresh({ A1: { value: 2 }, B1: { formula: '=A1*2' }, C1: { formula: '=B1+1' }, D1: { formula: '=A1+100' } });
+  s.recalcAll(); const sh = s.sheet; const copy = new Sheet({ recalc: false }); copy.cells = JSON.parse(JSON.stringify(sh.cells)); copy._cid = sh._cid;
+  const g = new CalcGraph(() => [{ name: 'Sheet1', sheet: copy }]); copy.book = g; g.adopt(sh.book);
+  g.recalc(copy); assert.equal(g.evals, 0, 'nothing changed since the original last calculated');
+  copy.cells.A1.value = 5; g.recalc(copy, undefined, new Set([g.fk(copy, 'B1'), g.fk(copy, 'C1')]));
+  assert.equal(copy.value('C1'), 11); assert.equal(copy.value('D1'), 102, 'D1 reads A1 but lies outside: not run'); assert.equal(g.evals, 2);
+  const kept = new CalcGraph(() => []); kept.adopt(sh.book);
+  sh.cells.A1.value = 9; sh.recalc(); assert.equal(sh.value('C1'), 19);
+  sh.cells.A1.value = 2; sh.cells.B1.value = 4; sh.cells.C1.value = 5; sh.cells.D1.value = 102; sh.book.restore(kept);
+  sh.recalc(); assert.equal(sh.book.evals, 0, 'the restored view matches the restored cells');
+});
+
+test('Session.aside: a what-if on the cells, then every record and the graph exactly as they were, an iterated circle included', () => {
+  const s = fresh({ A1: { value: 100 }, A2: { value: 0.1 }, B1: { formula: '=A1+B2' }, B2: { formula: '=B1*A2/2' } });
+  s.settings.iterative = true; s.recalcAll();
+  const before = JSON.stringify(s.sheet.cells); const records = s.sheet.cells;
+  const seen = s.aside(ses => { ses.sheet.cells.A1.value = 200; ses.book.recalc(ses.sheet); return ses.sheet.value('B1'); });
+  assert.ok(seen > 200, 'the what-if reads the moved circle');
+  assert.equal(s.sheet.cells, records, 'the original records are back'); assert.equal(JSON.stringify(s.sheet.cells), before);
+  s.sheet.recalc(); assert.equal(s.book.evals, 0, 'the graph agrees with them');
+});

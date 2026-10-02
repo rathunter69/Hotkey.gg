@@ -276,6 +276,22 @@ export class Session {
     try { this.book.invalidate(); this.book.recalc(this.sheet); }
     finally { this._xr = false; }
   }
+  /**
+   * Run `fn(session)` on a copy of the workbook's cells, with the calculation graph's view of them,
+   * then put the originals back: every cell record, every circle and the graph exactly as they were
+   * (a recalculation afterwards would leave an iterated circle a step from where it stood). For a
+   * check that types a what-if over the inputs and reads the result.
+   */
+  aside(fn) {
+    const kept = this.sheets.map(e => ({ sheet: e.sheet, cells: e.sheet.cells, circular: e.sheet.circular }));
+    const graph = new CalcGraph(() => []); graph.adopt(this.book);
+    for (const k of kept) { k.sheet.cells = exactCopy(k.cells); k.sheet._cfMap = null; }
+    try { return fn(this); }
+    finally {
+      for (const k of kept) { k.sheet.cells = k.cells; k.sheet.circular = k.circular; k.sheet._cfMap = null; }
+      this.book.restore(graph);
+    }
+  }
   resetEdit() {
     this.editing = false; this.editBuf = ''; this.editCaret = 0; this.editMode = 'enter';
     this.editAnchor = null; this.editPointer = null; this.editPointerStart = -1; this.editPointerEnd = -1; this.editPointerBase = null; this.editPointed = false;
@@ -842,6 +858,12 @@ export class Session {
    */
   get names() { const out = {}; for (const n of this.definedNames()) out[n.name] = n.refersTo.slice(1); return out; }
   set names(obj) {
+    this.loadNames(obj);
+    this.forgetValues();
+    this.recalcAll();
+  }
+  /** The names alone, without recalculating (a caller that brings the workbook's values and graph with it: the runner's built workbook). */
+  loadNames(obj) {
     for (const e of this.sheets) e.sheet.names = {};
     for (const [name, where] of Object.entries(obj || {})) {
       const t = String(where).replace(/^=/, ''); const bang = t.lastIndexOf('!');
@@ -851,8 +873,6 @@ export class Session {
       const a = '$' + colLetterOf(rg.c1) + '$' + rg.r1, b = '$' + colLetterOf(rg.c2) + '$' + rg.r2;
       e.sheet.names[String(name).toUpperCase()] = { name: String(name), ref: a === b ? a : a + ':' + b };
     }
-    this.forgetValues();
-    this.recalcAll();
   }
   /** Shift+F11: a new sheet before the active one, made active (Excel). */
   /** Colour the active sheet's tab, or every grouped sheet's (null: No Color). */
@@ -1951,3 +1971,10 @@ export function isFormulaText(t) {
 
 installDialogs(Session);
 installTools(Session);
+
+/** An exact copy of a sheet's cells: a record of plain fields is spread, anything deeper cloned. */
+function exactCopy(cells) {
+  const out = {};
+  for (const k in cells) { const c = cells[k]; out[k] = c && typeof c === 'object' && !Object.values(c).some(v => v && typeof v === 'object') ? { ...c } : structuredClone(c); }
+  return out;
+}

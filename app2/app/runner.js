@@ -2,6 +2,7 @@
 // Headless (the replay test uses it); the lesson view paints from it.
 
 import { Sheet } from '../engine/sheet.js';
+import { CalcGraph, sheetId } from '../engine/calc.js';
 import { Session, parseKeyScript, parseKeySpec } from '../engine/keyboard.js';
 import { stepPath } from '../engine/ribbon.js';
 import { WORKBOOKS, workbookState, applyStatePatch } from '../content/workbooks/index.js';
@@ -30,7 +31,15 @@ export class LessonRun {
     // the case's "today": a module workbook names it (CASE_TODAY, the Monday of its reporting week) so Ctrl+; and TODAY() date the sheet the way its states do
     const wb = this.lesson.workbook ? WORKBOOKS[this.lesson.workbook] : null;
     const today = this.opts.today || (wb && Number.isFinite(wb.CASE_TODAY) ? () => wb.CASE_TODAY : undefined);
-    const build = sp => new Sheet({ rows: sp.rows, cols: sp.cols, cells: sp.cells ? structuredCloneCells(sp.cells) : undefined, colW: sp.colW, active: sp.active, today, rowH: sp.rowH, hiddenRows: sp.hiddenRows, hiddenCols: sp.hiddenCols, freeze: sp.freeze, gridlines: sp.gridlines, groups: sp.groups, condFmt: sp.condFmt, zoom: sp.zoom, validation: sp.validation, pivots: sp.pivots, dataTables: sp.dataTables, recalc: false });   // the workbook is recalculated once, assembled, below
+    // the same starting workbook built before (this lesson, this seed and patch): its calculated cells and calculation graph are copied, not recalculated
+    // (looked up at the first sheet, once the seed is drawn)
+    let tplKey = null, tpl = null, built = 0;
+    const build = sp => {
+      const i = built++;
+      if (i === 0) { tplKey = moduleState && !this.opts.today && this.opts.calculate !== false ? templateKey(this) : null; tpl = tplKey !== null && !this.opts.fresh ? takeTemplate(this.lesson, tplKey) : null; }
+      const calculated = tpl ? tpl.cells[i] : null; const sh = buildSheet(sp, calculated); if (calculated) sh._cid = tpl.cids[i]; return sh;
+    };
+    const buildSheet = (sp, calculated) => new Sheet({ rows: sp.rows, cols: sp.cols, cells: calculated ? undefined : sp.cells ? structuredCloneCells(sp.cells) : undefined, colW: sp.colW, active: sp.active, today, rowH: sp.rowH, hiddenRows: sp.hiddenRows, hiddenCols: sp.hiddenCols, freeze: sp.freeze, gridlines: sp.gridlines, groups: sp.groups, condFmt: sp.condFmt, zoom: sp.zoom, validation: sp.validation, pivots: sp.pivots, dataTables: sp.dataTables, recalc: false });   // the workbook is recalculated once, assembled, below
     // A module lesson (C2): the starting workbook is a named state of the module workbook — the
     // file the previous lesson left — not an inline sheet. The legacy path stays for drills and
     // the old lessons until the rewrite completes.
@@ -71,8 +80,19 @@ export class LessonRun {
     // their sheets once every sheet exists and a chain across sheets settles (no #REF! until the first edit)
     // the workbook's own records beside its sheets: custom cell styles, watches, the values kept with links to other workbooks
     if (moduleState && this.session.loadWorkbookExtras) this.session.loadWorkbookExtras(moduleState);
-    if (moduleState && moduleState.names && typeof moduleState.names === 'object' && Object.keys(moduleState.names).length) this.session.names = moduleState.names;
-    else this.session.recalcAll();
+    const named = moduleState && moduleState.names && typeof moduleState.names === 'object' && Object.keys(moduleState.names).length;
+    if (this.opts.calculate === false) {   // laid out, not calculated: a caller that reads only the layout (formula cells hold no value)
+      if (named) this.session.loadNames(moduleState.names);
+    } else if (tpl && tpl.cids.length === this.session.sheets.length) {
+      this.session.sheets.forEach((e, i) => { e.sheet.cells = exactCells(tpl.cells[i]); });   // after every sheet is added (adding one forgets the formula values)
+      if (named) this.session.loadNames(moduleState.names);
+      this.session.book.adopt(tpl.book);
+      this.session.book.refreshKnown(); this.session.book.setCircular();   // no recalc: a volatile would run again, and a circle settle a step further than the build left it
+    } else {
+      if (named) this.session.names = moduleState.names;
+      else this.session.recalcAll();
+      if (tplKey !== null) keepTemplate(this.lesson, tplKey, this.session);
+    }
     // the circles the file arrives with are known: no warning until a new one appears (the sheets were not recalculated alone)
     if (this.session.circularRefs) this.session._circKnown = new Set(this.session.circularRefs());
     this.landedAt = [];   // when each goal landed (the session clock), for split times
@@ -294,6 +314,37 @@ export function hintToScript(keys) {
 }
 
 function structuredCloneCells(cells) { const out = {}; for (const k in cells) out[k] = { ...cells[k] }; return out; }
+
+/*
+ * Built workbooks. Building a lesson's starting workbook ends in a recalculation of every formula,
+ * which for a large model is most of starting a run; a run started again on the same lesson (a
+ * restart, the next attempt, a test's second pass) copies the calculated cells and the calculation
+ * graph the first build left instead, under the same sheet ids, so it is exactly that build. Kept
+ * for the few lessons last started. LessonRun opts.fresh builds from scratch (and keeps that build).
+ */
+const TEMPLATES = new Map(); const TEMPLATES_MAX = 16;
+function templateKey(run) {
+  const seeded = SEEDED_KINDS.includes(run.lesson.kind) && typeof run.lesson.seed === 'function';
+  try { return (seeded ? run.seedNo : '') + '|' + JSON.stringify(run.opts.statePatch || null); } catch { return null; }
+}
+function takeTemplate(lesson, key) {
+  const t = TEMPLATES.get(lesson);
+  if (!t || t.key !== key) return null;
+  TEMPLATES.delete(lesson); TEMPLATES.set(lesson, t);   // the most recent last
+  return t;
+}
+function keepTemplate(lesson, key, session) {
+  const book = new CalcGraph(() => []); book.adopt(session.book);
+  TEMPLATES.delete(lesson);
+  TEMPLATES.set(lesson, { key, cells: session.sheets.map(e => exactCells(e.sheet.cells)), cids: session.sheets.map(e => sheetId(e.sheet)), book });
+  while (TEMPLATES.size > TEMPLATES_MAX) TEMPLATES.delete(TEMPLATES.keys().next().value);
+}
+/** An exact copy of a sheet's cells (every field as it is: a plain record is spread, anything deeper cloned). */
+function exactCells(cells) {
+  const out = {};
+  for (const k in cells) { const c = cells[k]; out[k] = c && typeof c === 'object' && !Object.values(c).some(v => v && typeof v === 'object') ? { ...c } : structuredClone(c); }
+  return out;
+}
 
 /** How many key presses a keystroke script is: every press counts one, a quoted run counts its characters. */
 export function keyCount(script) {

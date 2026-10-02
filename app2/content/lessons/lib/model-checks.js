@@ -118,7 +118,7 @@ export const windowKeys = ses => (ses.keyLog || []).slice(ses.goalMark || 0).map
 
 /* ---------------- the model (5.2 on): the learner's cells against the state the lesson ends on ---------------- */
 
-const build = sp => new Sheet({ rows: sp.rows, cols: sp.cols, cells: JSON.parse(JSON.stringify(sp.cells || {})), colW: sp.colW, freeze: sp.freeze, gridlines: sp.gridlines, condFmt: sp.condFmt });
+const build = sp => new Sheet({ rows: sp.rows, cols: sp.cols, cells: JSON.parse(JSON.stringify(sp.cells || {})), colW: sp.colW, freeze: sp.freeze, gridlines: sp.gridlines, condFmt: sp.condFmt, recalc: false });   // calculated once, assembled
 const TARGETS = {};
 /** A state worked out once (a calculated session), so a check can ask what a cell should read. */
 export function target(stateId) {
@@ -295,7 +295,7 @@ export const agree = (a, b) => (isNum(a) && isNum(b) ? Math.abs(a - b) <= Math.m
 
 /** A live workbook of a state, assembled as the runner assembles one: the sheets, iteration, the names, one recalculation. */
 export function sessionOf(state) {
-  const build = sp => new Sheet({ rows: sp.rows, cols: sp.cols, cells: JSON.parse(JSON.stringify(sp.cells)), colW: sp.colW, freeze: sp.freeze, gridlines: sp.gridlines, condFmt: sp.condFmt });
+  const build = sp => new Sheet({ rows: sp.rows, cols: sp.cols, cells: JSON.parse(JSON.stringify(sp.cells)), colW: sp.colW, freeze: sp.freeze, gridlines: sp.gridlines, condFmt: sp.condFmt, recalc: false });   // calculated once, assembled
   const s = new Session(build(state.sheets[0]));
   s.sheets[0].name = state.sheets[0].name;
   for (const sp of state.sheets.slice(1)) s.addSheet(sp.name, build(sp), undefined, { recalc: false });
@@ -370,18 +370,19 @@ export function moves(ses, target, input) {
 export const liveFrom = (ses, sheet, key, col, inKey, inCol = 'C') => liveVia(ses, sheet, col + rowOf(sheet, key), [`Inputs!${inCol}${rowOf('Inputs', inKey)}`]);
 
 /**
- * A what-if with a verdict: type `values` ({ 'Inputs!G21': 18 }) over the typed inputs, recalculate,
- * run `fn(ses)`, then put every input back and recalculate, so the sheet ends exactly as it was.
+ * A what-if with a verdict: type `values` ({ 'Inputs!G21': 18 }) over the typed inputs, recalculate
+ * what they reach, run `fn(ses)`, then put the workbook back exactly as it was (Session.aside).
  */
 export function under(ses, values, fn) {
-  const kept = [];
-  for (const [key, v] of Object.entries(values)) {
-    const [name, ref] = key.split('!'); const c = sheetIn(ses, name) && sheetIn(ses, name).cells[ref];
-    if (!c || c.formula) { kept.forEach(([k, old]) => { k.value = old; }); return false; }
-    kept.push([c, c.value]); c.value = v;
-  }
-  try { ses.recalcAll(); return !!fn(ses); }
-  finally { kept.forEach(([c, old]) => { c.value = old; }); ses.recalcAll(); }
+  return ses.aside(() => {
+    for (const [key, v] of Object.entries(values)) {
+      const [name, ref] = key.split('!'); const c = sheetIn(ses, name) && sheetIn(ses, name).cells[ref];
+      if (!c || c.formula) return false;
+      c.value = v;
+    }
+    ses.book.recalc(ses.sheet);
+    return !!fn(ses);
+  });
 }
 
 /** The desk number format, as Format Cells writes the four-section code. */
