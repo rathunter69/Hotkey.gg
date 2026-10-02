@@ -173,6 +173,7 @@ import working_capital_schedule from './lessons/working-capital-schedule.js';
 import ppe_and_depreciation from './lessons/ppe-and-depreciation.js';
 import debt_and_interest_circle from './lessons/debt-and-interest-circle.js';
 import tax_schedule from './lessons/tax-schedule.js';
+import challenge_schedules from './lessons/challenge-schedules.js';
 
 export const CHAPTERS = [
   {
@@ -306,7 +307,7 @@ export const CHAPTERS = [
       { name: 'Project and assessment', blurb: 'The operating model with its DCF page end to end, then one schedule and the links from it against the clock.' },
     ],
     lessons: [
-      revenue_build, cost_build, working_capital_schedule, ppe_and_depreciation, debt_and_interest_circle, tax_schedule,
+      revenue_build, cost_build, working_capital_schedule, ppe_and_depreciation, debt_and_interest_circle, tax_schedule, challenge_schedules,
     ],
   },
 ];
