@@ -33,7 +33,7 @@ export default {
   workbook: 'clearcoat-pnl',
   state: { before: 'S3e', after: 'S3f' },
   plant: PLANT_MONTHLY,
-  title: 'Cell styles and Format Painter at scale',
+  title: 'One page\u2019s formats carried to the next',
   difficulty: 'medium',
   tags: ['presentation', 'paste-special', 'monthly'],
   access: 'paid',

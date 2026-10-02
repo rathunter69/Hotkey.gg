@@ -667,7 +667,7 @@ export const COPY = {
    "id": "cell-styles-format-painter",
    "module": "the-page-a-buyer-reads",
    "order": "2.3.6",
-   "title": "Cell styles and Format Painter at scale",
+   "title": "One page’s formats carried to the next",
    "brief": "Monthly is the P&L twelve columns wide, and formatting it cell by cell would take the morning. Paste Special Formats carries a format from one place to many: copy one formatted column, paste its formats over a wider block, and the column repeats across every month. Dress Monthly from the P&L, then give it the P&L’s title, widths and settings. The key is `Ctrl+Alt+V`.",
    "closing": "One page formatted became the template for the next. || One column of the P&L dressed thirteen on Monthly in a single paste, and the label column, the title and the widths followed. Monthly now reads as the P&L’s sibling, not its cousin.",
    "wow": "",
