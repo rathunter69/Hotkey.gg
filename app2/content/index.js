@@ -61,6 +61,7 @@ import and_or_not from './lessons/and-or-not.js';
 import iferror_and_the_override from './lessons/iferror-and-the-override.js';
 import challenge_flags_block from './lessons/challenge-flags-block.js';
 import date_serials from './lessons/date-serials.js';
+import member_tenure from './lessons/member-tenure.js';
 
 export const CHAPTERS = [
   {
@@ -123,7 +124,7 @@ export const CHAPTERS = [
     ],
     lessons: [
       if_on_a_threshold, nested_if_ifs_min_max, and_or_not, iferror_and_the_override, challenge_flags_block,
-      date_serials,
+      date_serials, member_tenure,
     ],
   },
 ];
