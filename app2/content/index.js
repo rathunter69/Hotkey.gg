@@ -77,6 +77,11 @@ import dynamic_titles from './lessons/dynamic-titles.js';
 import cleaning_imported_labels from './lessons/cleaning-imported-labels.js';
 import units_and_period_line from './lessons/units-and-period-line.js';
 import challenge_dynamic_header_block from './lessons/challenge-dynamic-header-block.js';
+import print_areas_titles_footers from './lessons/print-areas-titles-footers.js';
+import one_page_summary from './lessons/one-page-summary.js';
+import challenge_print_pack from './lessons/challenge-print-pack.js';
+import ch2_project from './lessons/ch2-project.js';
+import ch2_assessment from './lessons/ch2-assessment.js';
 import remix_format_on_the_pnl from './remixes/formatting-on-the-pnl.js';   // Chapter 1's format challenge, re-clothed (content/remix.js)
 
 export const CHAPTERS = [
@@ -119,6 +124,8 @@ export const CHAPTERS = [
       { name: 'Alignment and structure', blurb: 'Alignment and outline at scale: headers and wraps on a long page; grouping; hiding against grouping against a separate sheet; a navigation column.' },
       { name: 'Conditional formatting', blurb: 'Conditional formatting: highlight rules for negatives and exceptions, formula-driven rules, data bars and scales and when not to use them, managing the rules.' },
       { name: 'Dates and text for presentation', blurb: 'Text and date functions for presentation: TEXT for labels and headers, EOMONTH and EDATE for period ends, dynamic titles with &, cleaning imported labels, a units line that writes itself.' },
+      { name: 'Printing and page layout', blurb: 'Printing at pack scale: landscape, fit to one page wide, the title rows repeated, one footer on every page, and the one-page summary linked from the detail.' },
+      { name: 'Project and assessment', blurb: 'Build the historical financials section end to end from a raw export, then build it again on the clock; the assessment is the test-out.' },
       { name: 'Remixes', blurb: 'Chapter 1’s challenges re-clothed in this chapter’s material: the same keys on a new sheet, so old skills stay warm.' },
     ],
     lessons: [
@@ -128,6 +135,8 @@ export const CHAPTERS = [
       alignment_at_scale, grouping_and_outline_levels, hide_group_or_separate_sheet, navigation_column, challenge_grouped_navigable,
       highlight_rules, formula_driven_rules, data_bars_and_scales, managing_rules, challenge_checks_flags,
       text_for_labels, eomonth_edate, dynamic_titles, cleaning_imported_labels, units_and_period_line, challenge_dynamic_header_block,
+      print_areas_titles_footers, one_page_summary, challenge_print_pack,
+      ch2_project, ch2_assessment,
       remix_format_on_the_pnl,
     ],
   },

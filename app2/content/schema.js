@@ -221,6 +221,10 @@ export const CONCEPTS = {
   'clean-text': 'TRIM strips stray spaces, PROPER capitalizes each word, SUBSTITUTE swaps one piece of text for another: together they clean an imported label',
   'dynamic-title': 'a title built with & from the inputs: the company name lives in one cell and every page reads it',
   'single-source-line': 'a line every page shows is built once from the inputs and read everywhere, so one edit changes every page',
+  // Chapter 2 · 2.7 Printing and page layout
+  'page-numbers-footer': 'Page &[Page] of &[Pages] in the footer numbers every printed page of a pack, beside the file and the date',
+  'center-on-page': 'Page Setup › Margins: Center on page Horizontally (Alt+Z) sits a narrow page in the middle of the paper',
+  'summary-links': 'a summary page holds no typed figure: every number is a link to the detail behind it, so the two can never disagree',
 };
 
 /**

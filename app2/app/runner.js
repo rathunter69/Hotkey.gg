@@ -62,7 +62,8 @@ export class LessonRun {
       if (st.calcMode) this.session.settings.calcMode = st.calcMode;
       if (st.iterative !== undefined) this.session.settings.iterative = !!st.iterative;
       if (Array.isArray(st.qat)) this.session.settings.qat = st.qat.slice();
-      if (st.pageSetup && typeof st.pageSetup === 'object') { const p = JSON.parse(JSON.stringify(st.pageSetup)); this.session.settings.pageSetup = { ...this.session.settings.pageSetup, ...p, footer: { ...this.session.settings.pageSetup.footer, ...(p.footer || {}) } }; }
+      // a state's one Page Setup is the pack's: every sheet starts with it (the engine keeps one per sheet; a lesson sets the active one's)
+      if (st.pageSetup && typeof st.pageSetup === 'object') for (const e of this.session.sheets) { const p = JSON.parse(JSON.stringify(st.pageSetup)); e.sheet.pageSetup = { ...e.sheet.pageSetup, ...p, footer: { ...e.sheet.pageSetup.footer, ...(p.footer || {}) } }; }
       if (st.enterMoves === false) this.session.settings.enterMoves = false;   // 1.1.4 on: Enter commits and stays (Options › Advanced)
     }
     // the workbook's defined names ({ CostPerWash: 'Inputs!$B$4' }, from 1.3.5's Define Name)

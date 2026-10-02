@@ -879,6 +879,66 @@ export const COPY = {
    "mac_note": "",
    "story_beat": ""
   },
+  "print-areas-titles-footers": {
+   "id": "print-areas-titles-footers",
+   "module": "printing-and-page-layout",
+   "order": "2.7.1",
+   "title": "Print areas, titles, fit to width, headers and footers",
+   "brief": "Chapter 1 set one page to print; a pack needs the same on every sheet, and Monthly is wider than a page. Fit to one page wide lets a wide sheet run down two pages tall; print titles repeat the header rows on each; the footer carries the file, the page number and the date on every sheet. The key is `Alt P S P`.",
+   "closing": "Three sheets share one footer, so every page knows which file it came from. || Landscape, one page wide, the title rows on every page, and a footer that names the file, the page and the day: the pack prints the way a reader turns it. Monthly runs to two pages tall, and the next lesson decides where the second one starts.",
+   "wow": "",
+   "convention_line": "Fit to page, titles, footer; Title, units, timeline, then the answer",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "one-page-summary": {
+   "id": "one-page-summary",
+   "module": "printing-and-page-layout",
+   "order": "2.7.3",
+   "title": "The one-page summary linked from the detail",
+   "brief": "The first page of the section is the summary: six lines, three years, no detail, and every figure a link to the P&L behind it, so the summary can never disagree with the detail. Build Print from links and format it to the standard. The key is `Ctrl+PgDn`.",
+   "closing": "Every one of the six lines is a link, so the summary can't disagree with the detail. || Six lines and three years, each figure pointed at the P&L, formatted from it and shown green, with a check that reads zero. Change any line on the P&L and the summary answers before anyone can ask. The pack is ready for the data room.",
+   "wow": "",
+   "convention_line": "Links green; external links avoided; Build references by pointing; F2 to read back; The check is a live difference → 0; Title, units, timeline, then the answer",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "challenge-print-pack": {
+   "id": "challenge-print-pack",
+   "module": "printing-and-page-layout",
+   "order": "2.7.C",
+   "title": "Challenge: a three-sheet model prints as a clean pack",
+   "brief": "Three sheets, no print set-up. Orientation, fit, titles, one footer everywhere and the page centered: a pack a reader can print without thinking.",
+   "closing": "",
+   "wow": "",
+   "convention_line": "Fit to page, titles, footer; Title, units, timeline, then the answer",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "ch2-project": {
+   "id": "ch2-project",
+   "module": "ch2-project-and-assessment",
+   "order": "2.8.P",
+   "title": "Project: the historical financials section",
+   "brief": "A fresh export has landed: the same accounting system, the same faults, a year on, FY25A to FY27E. Everything the chapter taught goes onto this one workbook until the P&L, Monthly and Print are ready for the data room. No clock, and nothing here is new. The key is `Ctrl+1`.",
+   "closing": "A raw export in, three pages out: the P&L formatted by line with its signs stated, Monthly built to the same standard, Print reading from both, and the pack set to print. || A buyer’s analyst opens the section and checks what the checks check, then that every figure carries its unit and every page fits the paper. Now the same section on the clock.",
+   "wow": "You took a raw export to a three-page financials section in one sitting, and that is Chapter 2.",
+   "convention_line": "Inputs blue, formulas black; Links green; external links avoided; Timeline on top, equal widths; Income positive, costs negative; Hidden columns get forgotten; Name toggles and key inputs only; One decimals setting per line; A top border, never an all-borders grid; Indent sub-items; headers over numbers; Units live in the format, not typed text; The check is a live difference → 0; Fit to page, titles, footer; Attention to detail is judged first",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "ch2-assessment": {
+   "id": "ch2-assessment",
+   "module": "ch2-project-and-assessment",
+   "order": "2.8.A",
+   "title": "Assessment: the section on fresh figures",
+   "brief": "A sister operator in the same case world has sent its export: the same lines, the same faults and different figures. Make the same three pages, the P&L, Monthly and Print, formatted, checked and set to print, on the clock with no help and the keyboard only. Pass, and the chapter is Verified; this is also the test-out. The key is `Ctrl+1`.",
+   "closing": "A company you had never seen, three pages to the standard: every figure in its format, the signs stated, the heads built from formulas, the checks at zero and the pack set to print. || That is what a buyer’s analyst looks for when the section lands in the data room, and you met it under a clock.",
+   "wow": "You built the financials section on figures you had never seen, on the clock, and the chapter is Verified.",
+   "convention_line": "Inputs blue, formulas black; Links green; external links avoided; Timeline on top, equal widths; Income positive, costs negative; Hidden columns get forgotten; Name toggles and key inputs only; One decimals setting per line; A top border, never an all-borders grid; Indent sub-items; headers over numbers; Units live in the format, not typed text; The check is a live difference → 0; Fit to page, titles, footer; Attention to detail is judged first",
+   "mac_note": "",
+   "story_beat": ""
+  },
   "remix-format-on-the-pnl": {
    "id": "remix-format-on-the-pnl",
    "module": "remixes",
@@ -5455,6 +5515,440 @@ export const COPY = {
     "hint_stuck": ""
    }
   ],
+  "print-areas-titles-footers": [
+   {
+    "lesson_id": "print-areas-titles-footers",
+    "goal_index": "0",
+    "text": "The P&L and Monthly both run wider than they are tall: turn the pack landscape with Alt, P, O, L.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse the Page Layout tab · Orientation sits on Page Layout, and L is landscape."
+   },
+   {
+    "lesson_id": "print-areas-titles-footers",
+    "goal_index": "1",
+    "text": "Open Page Setup with Alt, P, S, P and set Fit to 1 page wide by 2 tall, so Monthly runs down the page and not off it.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse the Page Setup dialog · Alt+F picks Fit to; Tab moves to the tall count."
+   },
+   {
+    "lesson_id": "print-areas-titles-footers",
+    "goal_index": "2",
+    "text": "Repeat the title, units line, timeline and flags on every printed page: Print Titles with Alt, P, I, rows 1:5.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse the Sheet tab of Page Setup · Rows to repeat at top takes 1:5."
+   },
+   {
+    "lesson_id": "print-areas-titles-footers",
+    "goal_index": "3",
+    "text": "In Page Setup's Custom Footer, Alt+U, put &[File] left, Page &[Page] of &[Pages] in the center and &[Date] right.",
+    "teach": "A pack prints many pages, so the footer numbers them: &[Page] is this page and &[Pages] the count, and Page &[Page] of &[Pages] reads Page 2 of 3. Alt+L, Alt+C and Alt+R move between the three sections of Custom Footer.",
+    "why": "",
+    "hint_stuck": "pulse the Header/Footer tab · H reaches the tab, Alt+U opens Custom Footer."
+   },
+   {
+    "lesson_id": "print-areas-titles-footers",
+    "goal_index": "4",
+    "text": "On Page Setup's Margins tab, tick Center on page Horizontally with Alt+Z and keep the margins as they are.",
+    "teach": "Center on page puts the same white space either side of the figures, so a page narrower than the paper sits in the middle. Excel's Normal margins keep the header margin, 0.3 inches, under the top margin, 0.75, so the header never prints over the title row.",
+    "why": "",
+    "hint_stuck": "pulse the Margins tab · M reaches the tab, and Alt+Z ticks Horizontally."
+   },
+   {
+    "lesson_id": "print-areas-titles-footers",
+    "goal_index": "5",
+    "text": "Does it tie? Watch C7 change to 18500 and total revenue in C10 answer: the print set-up changed nothing on the sheet.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C10 · Print settings live beside the sheet, not in it."
+   }
+  ],
+  "one-page-summary": [
+   {
+    "lesson_id": "one-page-summary",
+    "goal_index": "0",
+    "text": "On Print, type the six labels down B5:B10: Revenue, Site contribution, EBITDA, EBITDA margin, Sites (year end), Washes (thousands).",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell B5 · Print is the last of the pack's pages; the labels run down from B5."
+   },
+   {
+    "lesson_id": "one-page-summary",
+    "goal_index": "1",
+    "text": "Select Print!C5:E5, type =, point at P&L!C10 across sheets and press Ctrl+Enter for a row of links to total revenue.",
+    "teach": "A summary holds no typed figure: every number is a link to the detail behind it, so the two can never disagree. With C5:E5 selected, one pointed link and Ctrl+Enter writes all three, each reading its own year.",
+    "why": "",
+    "hint_stuck": "pulse range C5:E5 · Ctrl+PgUp walks back to the P&L while the formula is open."
+   },
+   {
+    "lesson_id": "one-page-summary",
+    "goal_index": "2",
+    "text": "Link rows 6 to 10 the same way, to P&L rows 22, 24, 29, 33 and 34: site contribution, EBITDA, its margin, sites and washes.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C6:E10 · One row at a time: select it, point, Ctrl+Enter."
+   },
+   {
+    "lesson_id": "one-page-summary",
+    "goal_index": "3",
+    "text": "Under the lines, put Source: the P&L sheet in B11 in italic, Checks in B13 in bold and Last year EBITDA less the P&L in B14, indented.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell B11 · The foot reads like the P&L's: the source, then the checks."
+   },
+   {
+    "lesson_id": "one-page-summary",
+    "goal_index": "4",
+    "text": "In C14, point =E7-'P&L'!E24 so the check reads zero, and give it the red check code 0_);[Red](0);-_).",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C14 · Last year's EBITDA on Print less the same figure on the P&L."
+   },
+   {
+    "lesson_id": "one-page-summary",
+    "goal_index": "5",
+    "text": "Bring the P&L's number formats onto C5:E10 with Paste Formats, Ctrl+Alt+V then T: lines from C7:E8, margins from C27:E27, memo from C33:E34.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C5:E10 · Copy on the P&L, Paste Special Formats on Print."
+   },
+   {
+    "lesson_id": "one-page-summary",
+    "goal_index": "6",
+    "text": "Every figure on Print is a link to another sheet: turn C5:E10 green with Alt, H, F, C.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C5:E10 · Green is the ninth swatch along."
+   },
+   {
+    "lesson_id": "one-page-summary",
+    "goal_index": "7",
+    "text": "Draw the A/E divider on Print: a right border down D4:D10 with Alt, H, B, R, and the gray shade on E4 with Alt, H, H.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range D4:D10 · The estimate year is E, so the line runs down the right of D."
+   },
+   {
+    "lesson_id": "one-page-summary",
+    "goal_index": "8",
+    "text": "Lay Print out like the P&L: A at width 2, B fitted over B4:B10, C:E at 12, gridlines off and the panes frozen at C5.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse column B · Alt, H, O, W sets a width and Alt, H, O, I fits one."
+   },
+   {
+    "lesson_id": "one-page-summary",
+    "goal_index": "9",
+    "text": "Does it tie? Watch P&L!E7 change to 27000, and Print's revenue in E5 and EBITDA in E7 answer while the check in C14 stays at zero.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell E5 · Every figure on Print is a link, so it moves with the P&L."
+   }
+  ],
+  "challenge-print-pack": [
+   {
+    "lesson_id": "challenge-print-pack",
+    "goal_index": "0",
+    "text": "Turn the pack landscape with Alt, P, O, L.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-print-pack",
+    "goal_index": "1",
+    "text": "In Page Setup, Alt, P, S, P, fit the pack to 1 page wide by 2 tall.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-print-pack",
+    "goal_index": "2",
+    "text": "Repeat rows 1:5 at the top of every printed page with Print Titles, Alt, P, I.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-print-pack",
+    "goal_index": "3",
+    "text": "In Custom Footer, Alt+U, put &[File] left, Page &[Page] of &[Pages] in the center and &[Date] right.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-print-pack",
+    "goal_index": "4",
+    "text": "On Page Setup's Margins tab, center the page horizontally with Alt+Z.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "ch2-project": [
+   {
+    "lesson_id": "ch2-project",
+    "goal_index": "0",
+    "text": "On the P&L give C7:E24 the desk number format, $ on rows 7, 10 and 24, and the memo rows 33 to 35 their own codes.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-project",
+    "goal_index": "1",
+    "text": "Turn the costs in rows 13 to 19 and 23 negative with Paste Special Multiply, then make C22 and C24 additions filled to E.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-project",
+    "goal_index": "2",
+    "text": "Head the Margins and growth block at B26, four margin lines in C27:E30 in italic percent, and the CAGR in F30.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-project",
+    "goal_index": "3",
+    "text": "Link C4 to Inputs B6 and step D4:E4 a year with EOMONTH, FY codes in green, the A, A and E flags in row 5.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-project",
+    "goal_index": "4",
+    "text": "On Inputs give B12:B16 their unit codes, then the units line in B17, the next update in B18 and the headline in B19.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-project",
+    "goal_index": "5",
+    "text": "Give the P&L its anatomy: clear column A, title and units line from Inputs, sections bold, lines indented, totals ruled, inputs blue.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-project",
+    "goal_index": "6",
+    "text": "Draw the A/E divider down D4:D35, then retype the labels B7:B35 in sentence case with the source and footnote in B36:B37.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-project",
+    "goal_index": "7",
+    "text": "Set the P&L widths, the title row to 24, freeze panes at C5, and group rows 13 to 19, 26 to 30 and 33 to 35.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-project",
+    "goal_index": "8",
+    "text": "Bring Monthly to the P&L: labels into B6:B30, costs negative, rows 22 and 24 as additions, the margins block and Paste Formats.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-project",
+    "goal_index": "9",
+    "text": "Head Monthly: title and units line from Inputs, month ends in D4:N4 by EOMONTH, C4 blue, month names in C5:N5 by TEXT.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-project",
+    "goal_index": "10",
+    "text": "Finish Monthly with its source in B31, two checks against the P&L in C34:C35, the P&L widths, panes at C5 and gridlines off.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-project",
+    "goal_index": "11",
+    "text": "Type the Go to column in Q4:Q7, then name Monthly rows 10, 20 and 24 as Rev, SiteCosts and EBITDA.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-project",
+    "goal_index": "12",
+    "text": "Add the rules: Monthly C10:N10 yellow below 4,500, the P&L checks C39:C40 light red and stopping, negative margins in red text.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-project",
+    "goal_index": "13",
+    "text": "Build Print from links: title, period line and FY heads, six lines pointed at the P&L, formats, its check, divider and layout.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-project",
+    "goal_index": "14",
+    "text": "In Page Setup, Alt, P, S, P, set the pack landscape, one page wide by two tall, rows 1:5 repeated, the three-part footer, centered.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-project",
+    "goal_index": "15",
+    "text": "Does it tie? Change FY25A retail wash revenue on the P&L and watch Print C5 answer while every check stays at zero.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "ch2-assessment": [
+   {
+    "lesson_id": "ch2-assessment",
+    "goal_index": "0",
+    "text": "On the P&L give C7:E24 the desk number format, $ on rows 7, 10 and 24, and the memo rows 33 to 35 their own codes.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-assessment",
+    "goal_index": "1",
+    "text": "Turn the costs in rows 13 to 19 and 23 negative with Paste Special Multiply, then make C22 and C24 additions filled to E.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-assessment",
+    "goal_index": "2",
+    "text": "Head the Margins and growth block at B26, four margin lines in C27:E30 in italic percent, and the CAGR in F30.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-assessment",
+    "goal_index": "3",
+    "text": "Link C4 to Inputs B6 and step D4:E4 a year with EOMONTH, FY codes in green, the A, A and E flags in row 5.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-assessment",
+    "goal_index": "4",
+    "text": "On Inputs give B12:B16 their unit codes, then the units line in B17, the next update in B18 and the headline in B19.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-assessment",
+    "goal_index": "5",
+    "text": "Give the P&L its anatomy: clear column A, title and units line from Inputs, sections bold, lines indented, totals ruled, inputs blue.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-assessment",
+    "goal_index": "6",
+    "text": "Draw the A/E divider down D4:D35, then retype the labels B7:B35 in sentence case with the source and footnote in B36:B37.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-assessment",
+    "goal_index": "7",
+    "text": "Set the P&L widths, the title row to 24, freeze panes at C5, and group rows 13 to 19, 26 to 30 and 33 to 35.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-assessment",
+    "goal_index": "8",
+    "text": "Bring Monthly to the P&L: labels into B6:B30, costs negative, rows 22 and 24 as additions, the margins block and Paste Formats.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-assessment",
+    "goal_index": "9",
+    "text": "Head Monthly: title and units line from Inputs, month ends in D4:N4 by EOMONTH, C4 blue, month names in C5:N5 by TEXT.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-assessment",
+    "goal_index": "10",
+    "text": "Finish Monthly with its source in B31, two checks against the P&L in C34:C35, the P&L widths, panes at C5 and gridlines off.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-assessment",
+    "goal_index": "11",
+    "text": "Type the Go to column in Q4:Q7, then name Monthly rows 10, 20 and 24 as Rev, SiteCosts and EBITDA.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-assessment",
+    "goal_index": "12",
+    "text": "Add the rules: Monthly C10:N10 yellow below 3,000, the P&L checks C39:C40 light red and stopping, negative margins in red text.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-assessment",
+    "goal_index": "13",
+    "text": "Build Print from links: title, period line and FY heads, six lines pointed at the P&L, formats, its check, divider and layout.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-assessment",
+    "goal_index": "14",
+    "text": "In Page Setup, Alt, P, S, P, set the pack landscape, one page wide by two tall, rows 1:5 repeated, the three-part footer, centered.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch2-assessment",
+    "goal_index": "15",
+    "text": "Does it tie? Change FY25A retail wash revenue on the P&L and watch Print C5 answer while every check stays at zero.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
   "remix-format-on-the-pnl": [
    {
     "lesson_id": "remix-format-on-the-pnl",
@@ -5604,6 +6098,20 @@ export const COPY = {
    "objective": "Text and date functions for presentation: TEXT for labels and headers; EOMONTH and EDATE for period ends; dynamic titles with &; cleaning imported labels with TRIM, PROPER and SUBSTITUTE; a units line that writes itself.",
    "story_beat": "The headers should write themselves. || Every quarter the page rolls forward a year, and every time someone retypes the title, the headers and the units line. And one of them is wrong. A title that reads the company name from Inputs, headers that read the dates under them, a units line that reads the currency: change one cell and the whole page updates. The Monthly sheet, with its text dates and capitalized labels, is where to learn it.",
    "page_name": "The header block that writes itself"
+  },
+  "printing-and-page-layout": {
+   "id": "printing-and-page-layout",
+   "name": "Printing and page layout",
+   "objective": "Printing at pack scale: fit to one page wide, print titles, one footer on every page; the one-page summary linked from the detail.",
+   "story_beat": "The book goes to print. || The financials section is three pages, and the book is a PDF that gets printed, so each page has to land on one sheet, carry its title rows, say which file and which page it is, and break where a reader would break. The one-page summary reads from the detail behind it. Set the pack up to print and it's ready for the data room.",
+   "page_name": "The pack, print-ready"
+  },
+  "ch2-project-and-assessment": {
+   "id": "ch2-project-and-assessment",
+   "name": "Project and assessment",
+   "objective": "The historical financials section built end to end from a raw export; the assessment is the test-out.",
+   "story_beat": "The financials section, start to finish. || A fresh export has landed: the same accounting system, the same faults, a different three years. Everything the chapter taught goes onto one workbook, until three pages are ready for the data room. Build it, then build it again on the clock, because the assessment is the test-out.",
+   "page_name": "The historical financials section"
   },
   "remixes": {
    "id": "remixes",

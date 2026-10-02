@@ -551,6 +551,59 @@ challenge-dynamic-header-block,2,"On Monthly, type 1/31/2026 over the text in C4
 challenge-dynamic-header-block,3,"Name each month in C5:N5 from the date above it with =TEXT(C4,""mmmm yyyy"").",,,
 challenge-dynamic-header-block,4,"Build the units line once in Inputs!B17 from B4 and B5, and point A2 on the P&L and Monthly at it.",,,
 challenge-dynamic-header-block,5,"Clean Monthly detail’s labels B5:B69 with PROPER, TRIM and SUBSTITUTE as values, leaving no helper and no empty text behind.",,,
+print-areas-titles-footers,0,"The P&L and Monthly both run wider than they are tall: turn the pack landscape with Alt, P, O, L.",,,"pulse the Page Layout tab · Orientation sits on Page Layout, and L is landscape."
+print-areas-titles-footers,1,"Open Page Setup with Alt, P, S, P and set Fit to 1 page wide by 2 tall, so Monthly runs down the page and not off it.",,,pulse the Page Setup dialog · Alt+F picks Fit to; Tab moves to the tall count.
+print-areas-titles-footers,2,"Repeat the title, units line, timeline and flags on every printed page: Print Titles with Alt, P, I, rows 1:5.",,,pulse the Sheet tab of Page Setup · Rows to repeat at top takes 1:5.
+print-areas-titles-footers,3,"In Page Setup's Custom Footer, Alt+U, put &[File] left, Page &[Page] of &[Pages] in the center and &[Date] right.","A pack prints many pages, so the footer numbers them: &[Page] is this page and &[Pages] the count, and Page &[Page] of &[Pages] reads Page 2 of 3. Alt+L, Alt+C and Alt+R move between the three sections of Custom Footer.",,"pulse the Header/Footer tab · H reaches the tab, Alt+U opens Custom Footer."
+print-areas-titles-footers,4,"On Page Setup's Margins tab, tick Center on page Horizontally with Alt+Z and keep the margins as they are.","Center on page puts the same white space either side of the figures, so a page narrower than the paper sits in the middle. Excel's Normal margins keep the header margin, 0.3 inches, under the top margin, 0.75, so the header never prints over the title row.",,"pulse the Margins tab · M reaches the tab, and Alt+Z ticks Horizontally."
+print-areas-titles-footers,5,Does it tie? Watch C7 change to 18500 and total revenue in C10 answer: the print set-up changed nothing on the sheet.,,,"pulse cell C10 · Print settings live beside the sheet, not in it."
+one-page-summary,0,"On Print, type the six labels down B5:B10: Revenue, Site contribution, EBITDA, EBITDA margin, Sites (year end), Washes (thousands).",,,pulse cell B5 · Print is the last of the pack's pages; the labels run down from B5.
+one-page-summary,1,"Select Print!C5:E5, type =, point at P&L!C10 across sheets and press Ctrl+Enter for a row of links to total revenue.","A summary holds no typed figure: every number is a link to the detail behind it, so the two can never disagree. With C5:E5 selected, one pointed link and Ctrl+Enter writes all three, each reading its own year.",,pulse range C5:E5 · Ctrl+PgUp walks back to the P&L while the formula is open.
+one-page-summary,2,"Link rows 6 to 10 the same way, to P&L rows 22, 24, 29, 33 and 34: site contribution, EBITDA, its margin, sites and washes.",,,"pulse range C6:E10 · One row at a time: select it, point, Ctrl+Enter."
+one-page-summary,3,"Under the lines, put Source: the P&L sheet in B11 in italic, Checks in B13 in bold and Last year EBITDA less the P&L in B14, indented.",,,"pulse cell B11 · The foot reads like the P&L's: the source, then the checks."
+one-page-summary,4,"In C14, point =E7-'P&L'!E24 so the check reads zero, and give it the red check code 0_);[Red](0);-_).",,,pulse cell C14 · Last year's EBITDA on Print less the same figure on the P&L.
+one-page-summary,5,"Bring the P&L's number formats onto C5:E10 with Paste Formats, Ctrl+Alt+V then T: lines from C7:E8, margins from C27:E27, memo from C33:E34.",,,"pulse range C5:E10 · Copy on the P&L, Paste Special Formats on Print."
+one-page-summary,6,"Every figure on Print is a link to another sheet: turn C5:E10 green with Alt, H, F, C.",,,pulse range C5:E10 · Green is the ninth swatch along.
+one-page-summary,7,"Draw the A/E divider on Print: a right border down D4:D10 with Alt, H, B, R, and the gray shade on E4 with Alt, H, H.",,,"pulse range D4:D10 · The estimate year is E, so the line runs down the right of D."
+one-page-summary,8,"Lay Print out like the P&L: A at width 2, B fitted over B4:B10, C:E at 12, gridlines off and the panes frozen at C5.",,,"pulse column B · Alt, H, O, W sets a width and Alt, H, O, I fits one."
+one-page-summary,9,"Does it tie? Watch P&L!E7 change to 27000, and Print's revenue in E5 and EBITDA in E7 answer while the check in C14 stays at zero.",,,"pulse cell E5 · Every figure on Print is a link, so it moves with the P&L."
+challenge-print-pack,0,"Turn the pack landscape with Alt, P, O, L.",,,
+challenge-print-pack,1,"In Page Setup, Alt, P, S, P, fit the pack to 1 page wide by 2 tall.",,,
+challenge-print-pack,2,"Repeat rows 1:5 at the top of every printed page with Print Titles, Alt, P, I.",,,
+challenge-print-pack,3,"In Custom Footer, Alt+U, put &[File] left, Page &[Page] of &[Pages] in the center and &[Date] right.",,,
+challenge-print-pack,4,"On Page Setup's Margins tab, center the page horizontally with Alt+Z.",,,
+ch2-project,0,"On the P&L give C7:E24 the desk number format, $ on rows 7, 10 and 24, and the memo rows 33 to 35 their own codes.",,,
+ch2-project,1,"Turn the costs in rows 13 to 19 and 23 negative with Paste Special Multiply, then make C22 and C24 additions filled to E.",,,
+ch2-project,2,"Head the Margins and growth block at B26, four margin lines in C27:E30 in italic percent, and the CAGR in F30.",,,
+ch2-project,3,"Link C4 to Inputs B6 and step D4:E4 a year with EOMONTH, FY codes in green, the A, A and E flags in row 5.",,,
+ch2-project,4,"On Inputs give B12:B16 their unit codes, then the units line in B17, the next update in B18 and the headline in B19.",,,
+ch2-project,5,"Give the P&L its anatomy: clear column A, title and units line from Inputs, sections bold, lines indented, totals ruled, inputs blue.",,,
+ch2-project,6,"Draw the A/E divider down D4:D35, then retype the labels B7:B35 in sentence case with the source and footnote in B36:B37.",,,
+ch2-project,7,"Set the P&L widths, the title row to 24, freeze panes at C5, and group rows 13 to 19, 26 to 30 and 33 to 35.",,,
+ch2-project,8,"Bring Monthly to the P&L: labels into B6:B30, costs negative, rows 22 and 24 as additions, the margins block and Paste Formats.",,,
+ch2-project,9,"Head Monthly: title and units line from Inputs, month ends in D4:N4 by EOMONTH, C4 blue, month names in C5:N5 by TEXT.",,,
+ch2-project,10,"Finish Monthly with its source in B31, two checks against the P&L in C34:C35, the P&L widths, panes at C5 and gridlines off.",,,
+ch2-project,11,"Type the Go to column in Q4:Q7, then name Monthly rows 10, 20 and 24 as Rev, SiteCosts and EBITDA.",,,
+ch2-project,12,"Add the rules: Monthly C10:N10 yellow below 4,500, the P&L checks C39:C40 light red and stopping, negative margins in red text.",,,
+ch2-project,13,"Build Print from links: title, period line and FY heads, six lines pointed at the P&L, formats, its check, divider and layout.",,,
+ch2-project,14,"In Page Setup, Alt, P, S, P, set the pack landscape, one page wide by two tall, rows 1:5 repeated, the three-part footer, centered.",,,
+ch2-project,15,Does it tie? Change FY25A retail wash revenue on the P&L and watch Print C5 answer while every check stays at zero.,,,
+ch2-assessment,0,"On the P&L give C7:E24 the desk number format, $ on rows 7, 10 and 24, and the memo rows 33 to 35 their own codes.",,,
+ch2-assessment,1,"Turn the costs in rows 13 to 19 and 23 negative with Paste Special Multiply, then make C22 and C24 additions filled to E.",,,
+ch2-assessment,2,"Head the Margins and growth block at B26, four margin lines in C27:E30 in italic percent, and the CAGR in F30.",,,
+ch2-assessment,3,"Link C4 to Inputs B6 and step D4:E4 a year with EOMONTH, FY codes in green, the A, A and E flags in row 5.",,,
+ch2-assessment,4,"On Inputs give B12:B16 their unit codes, then the units line in B17, the next update in B18 and the headline in B19.",,,
+ch2-assessment,5,"Give the P&L its anatomy: clear column A, title and units line from Inputs, sections bold, lines indented, totals ruled, inputs blue.",,,
+ch2-assessment,6,"Draw the A/E divider down D4:D35, then retype the labels B7:B35 in sentence case with the source and footnote in B36:B37.",,,
+ch2-assessment,7,"Set the P&L widths, the title row to 24, freeze panes at C5, and group rows 13 to 19, 26 to 30 and 33 to 35.",,,
+ch2-assessment,8,"Bring Monthly to the P&L: labels into B6:B30, costs negative, rows 22 and 24 as additions, the margins block and Paste Formats.",,,
+ch2-assessment,9,"Head Monthly: title and units line from Inputs, month ends in D4:N4 by EOMONTH, C4 blue, month names in C5:N5 by TEXT.",,,
+ch2-assessment,10,"Finish Monthly with its source in B31, two checks against the P&L in C34:C35, the P&L widths, panes at C5 and gridlines off.",,,
+ch2-assessment,11,"Type the Go to column in Q4:Q7, then name Monthly rows 10, 20 and 24 as Rev, SiteCosts and EBITDA.",,,
+ch2-assessment,12,"Add the rules: Monthly C10:N10 yellow below 3,000, the P&L checks C39:C40 light red and stopping, negative margins in red text.",,,
+ch2-assessment,13,"Build Print from links: title, period line and FY heads, six lines pointed at the P&L, formats, its check, divider and layout.",,,
+ch2-assessment,14,"In Page Setup, Alt, P, S, P, set the pack landscape, one page wide by two tall, rows 1:5 repeated, the three-part footer, centered.",,,
+ch2-assessment,15,Does it tie? Change FY25A retail wash revenue on the P&L and watch Print C5 answer while every check stays at zero.,,,
 remix-format-on-the-pnl,0,"The figures C5:F10 are General with stray decimals: comma style, no decimals, so the new site’s loss reads in parentheses.",,,
 remix-format-on-the-pnl,1,"Margin % in G5:G10 is a fraction: show it as a percentage to one decimal, Total included.",,,
 remix-format-on-the-pnl,2,"A grid of borders sits over the whole block A4:G10: remove every border from it, because a grid is not structure.",,,

@@ -635,8 +635,10 @@ export function solvedPrint(ex) {
   for (let r = 4; r <= PRINT.washes; r++) put(c, 'D' + r, { br: true });
   put(c, 'E4', { fill: DIVIDER_FILL });
   put(c, 'C' + PRINT.check, { fmtStyle: 'custom', numFmt: CODES.check, decimals: null });
-  sh.colW = { 1: MARGIN_W, 2: widthsOf(sh, PRINT.washes), 3: FIGURE_W, 4: FIGURE_W, 5: FIGURE_W };
+  const shown = { ...sh, cells: { ...c, B4: { value: `Fiscal years ${ex.years[0]} to ${ex.years[2]}`, bold: true } } };   // AutoFit reads the period line as it shows, not its formula
+  sh.colW = { 1: MARGIN_W, 2: widthsOf(shown, PRINT.washes), 3: FIGURE_W, 4: FIGURE_W, 5: FIGURE_W };
   sh.rowH = {};
+  sh.condFmt = [CF_NEG_MARGIN(`C${PRINT.margin}:E${PRINT.margin}`)];   // Paste Formats from the P&L's margin line brings its negative-margin rule along (2.7.3)
   return sh;
 }
 
@@ -990,7 +992,7 @@ function summaryPage(s, ex) {
   const solved = solvedPrint(ex);
   const sh = sheetOf(s, 'Print');
   for (const k in solved.cells) if (parseRef(k).r >= 5 || (parseRef(k).r === 4 && parseRef(k).c === 4) || (parseRef(k).r === 4 && parseRef(k).c === 5)) sh.cells[k] = { ...(sh.cells[k] || {}), ...clone(solved.cells[k]) };
-  sh.colW = clone(solved.colW); sh.freeze = clone(solved.freeze); sh.gridlines = false;
+  sh.colW = clone(solved.colW); sh.freeze = clone(solved.freeze); sh.gridlines = false; sh.condFmt = clone(solved.condFmt);
 }
 
 /* ---------------- the chain, the plantings, the project ---------------- */
