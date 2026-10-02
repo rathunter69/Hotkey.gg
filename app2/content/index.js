@@ -131,6 +131,7 @@ import a_case_toggle_with_choose_and_index from './lessons/a-case-toggle-with-ch
 import one_way_data_table_the_ticket from './lessons/one-way-data-table-the-ticket.js';
 import two_way_data_table_ticket_member_share from './lessons/two-way-data-table-ticket-member-share.js';
 import goal_seek_break_even_washes_per_site from './lessons/goal-seek-break-even-washes-per-site.js';
+import when_data_tables_fail_the_pass_through_driver from './lessons/when-data-tables-fail-the-pass-through-driver.js';
 
 export const CHAPTERS = [
   {
@@ -237,6 +238,7 @@ export const CHAPTERS = [
       one_way_data_table_the_ticket,
       two_way_data_table_ticket_member_share,
       goal_seek_break_even_washes_per_site,
+      when_data_tables_fail_the_pass_through_driver,
     ],
   },
 ];

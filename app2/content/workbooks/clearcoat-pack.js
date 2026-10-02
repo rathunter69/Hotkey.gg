@@ -959,7 +959,10 @@ const S454 = derive(S453, s => { take(s, SOLVED, 'Scenarios', ['B' + BE.title, .
 // 4.5.5 The pass-through driver: the ticket moved to Inputs (the case columns read it), the driver and the ticket the model reads, the outputs pointed at it, both tables re-run on the driver
 const S455 = derive(S454, s => {
   take(s, SOLVED, 'Inputs', ['B15', 'C15', 'D15']);
+  const was = clone(sheetOf(s, 'Scenarios').cells);
   take(s, SOLVED, 'Scenarios', [...rowRefs(C.inputs.ticket, COLS('CDE')), ...blockRefs([C.driver, C.ticketModel], COLS('BC')), 'C' + C.outputs.revenue, 'C' + BE.cpw]);
+  // the case tickets keep the format they were typed in and turn green as links
+  for (const ref of rowRefs(C.inputs.ticket, COLS('CDE'))) sheetOf(s, 'Scenarios').cells[ref] = { ...formatOnly(was[ref]), formula: '=Inputs!$C$15', fontColor: 'green' };
   tables(s, 'S455');
 });
 // 4.5.6 Case outputs side by side: a Data Table on the switch, the source line and the checks; questions 9 and 10 answered. The sticky IF is built, watched and taken out again: the table is what stays.
@@ -971,7 +974,7 @@ const S456 = derive(S455, s => {
   take(s, SOLVED, 'Q&A', ['E13', 'F13', 'E14', 'F14']);
 });
 /** A cell with its value or formula taken out and its format kept (a start state the learner fills). */
-export const formatOnly = cell => { if (!cell) return null; const { value, formula, table, ...fmt } = cell; return Object.keys(fmt).length ? fmt : null; };
+export function formatOnly(cell) { if (!cell) return null; const { value, formula, table, ...fmt } = cell; void value; void formula; void table; return Object.keys(fmt).length ? fmt : null; }
 /** 4.5.C's start: the module's model with its switch, live column, tables and Goal Seek note taken out (the edges, corners and labels stay). */
 const S45C = derive(S456, s => {
   const sc = sheetOf(s, 'Scenarios');
