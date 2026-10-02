@@ -2,9 +2,12 @@
 //   1. syntax: every app2/**/*.js parses as an ES module (node --check)
 //   2. isolation: nothing under app2/ imports from outside app2/ (the old build is off-limits)
 //   2b. public pages and content/copy/index.js are generated and must not drift; copy-check's rules hold
-//   3. unit tests: node --test app2/tests/
+//   3. unit tests: node --test app2/tests/, files at once up to the core count
+// The child steps (1, 2b, 2c, 3) start together and are reported in order, so the gate's wall time
+// is its longest step, not their sum. `--full` adds the *.slow.test.js files (the liveness
+// equivalence replay): on demand and in the non-blocking full-check workflow, never in the gate.
 // No dependencies, no framework, no browser.
-import { spawnSync } from 'node:child_process';
+import { spawn } from 'node:child_process';
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, dirname, resolve, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -14,7 +17,17 @@ const here = dirname(fileURLToPath(import.meta.url));
 const app2 = resolve(here, '..');
 const root = resolve(app2, '..');
 const t0 = Date.now();
-const fail = (msg) => { console.error('\nCHECK FAILED: ' + msg); process.exit(1); };
+const kids = new Set();
+const fail = (msg) => { for (const c of kids) c.kill(); console.error('\nCHECK FAILED: ' + msg); process.exit(1); };
+const FULL = process.argv.includes('--full');
+/** A child node process, started now; resolves to { status, stdout, stderr } (inherit: streamed to this terminal instead). */
+const run = (args, { inherit = false } = {}) => new Promise(done => {
+  const c = spawn(process.execPath, args, { stdio: inherit ? 'inherit' : 'pipe' });
+  kids.add(c);
+  let stdout = '', stderr = '';
+  if (!inherit) { c.stdout.setEncoding('utf8').on('data', d => { stdout += d; }); c.stderr.setEncoding('utf8').on('data', d => { stderr += d; }); }
+  c.on('close', status => { kids.delete(c); done({ status, stdout, stderr }); });
+});
 
 function walk(dir, out = []) {
   for (const name of readdirSync(dir)) {
@@ -29,7 +42,15 @@ const files = walk(app2);
 // 1. syntax: every file parses as an ES module, in one child process (a node --check per file cost ~7 s of the budget)
 const PARSE = `import vm from 'node:vm'; import { readFileSync } from 'node:fs';
 for (const f of process.argv.slice(1)) { try { new vm.SourceTextModule(readFileSync(f, 'utf8'), { identifier: f }); } catch (e) { console.error(f + '\\n' + e.message); process.exit(1); } }`;
-const syn = spawnSync(process.execPath, ['--experimental-vm-modules', '--no-warnings', '--input-type=module', '-e', PARSE, ...files], { encoding: 'utf8' });
+const synP = run(['--experimental-vm-modules', '--no-warnings', '--input-type=module', '-e', PARSE, ...files]);
+// 2b and 2c start now too: they only read
+const ppP = run([join(here, 'public-pages.js')]);
+const copyP = ['copy-build.js', 'copy-check.js'].map(script => run([join(here, script)]));
+// 3. unit tests: every file at once up to the core count (node --test's default leaves one core idle)
+const testFiles = files.filter(f => f.endsWith('.test.js') && (FULL || !f.endsWith('.slow.test.js'))).sort();
+const testP = run(['--test', '--test-concurrency=' + availableParallelism(), ...testFiles], { inherit: true });
+
+const syn = await synP;
 if (syn.status !== 0) fail(`syntax error in ${relative(root, (syn.stderr.split('\n')[0] || ''))}\n${syn.stderr.split('\n').slice(1).join('\n')}`);
 console.log(`syntax ok: ${files.length} modules`);
 
@@ -58,22 +79,20 @@ for (const h of htmls) {
 console.log('isolation ok: no imports from outside app2/');
 
 // 2b. the public lesson and shortcut pages are generated from the lesson data and must not drift
-const pp = spawnSync(process.execPath, [join(here, 'public-pages.js')], { encoding: 'utf8' });
+const pp = await ppP;
 if (pp.status !== 0) fail((pp.stderr || pp.stdout).trim());
 console.log(pp.stdout.trim());
 
 // 2c. the copy layer: content/copy/index.js is inlined from the CSVs and must not drift; the copy rules hold
-for (const script of ['copy-build.js', 'copy-check.js']) {
-  const r = spawnSync(process.execPath, [join(here, script)], { encoding: 'utf8' });
+for (const p of copyP) {
+  const r = await p;
   if (r.status !== 0) fail((r.stderr || r.stdout).trim());
   const lines = (r.stdout + r.stderr).trim().split('\n'); console.log(lines[lines.length - 1]);
 }
 
-// 3. unit tests
-const testFiles = files.filter(f => f.endsWith('.test.js')).sort();
-const t = spawnSync(process.execPath, ['--test', '--test-concurrency=' + availableParallelism(), ...testFiles], { stdio: 'inherit' });
+const t = await testP;
 if (t.status !== 0) fail('unit tests failed');
 
 const secs = ((Date.now() - t0) / 1000).toFixed(1);
 console.log(`\nCHECK PASSED in ${secs}s`);
-if (Date.now() - t0 > 30000) fail(`check took ${secs}s — the budget is 30s`);
+if (!FULL && Date.now() - t0 > 30000) fail(`check took ${secs}s — the budget is 30s`);   // --full is not the gate: no budget
