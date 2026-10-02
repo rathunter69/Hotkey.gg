@@ -8,6 +8,9 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { weeklyDigest, healthCheck, renderDigest, safeEqual, bearerOf, delta } from '../supabase/functions/_shared/ops.js';
+import { opsHtml, stateHtml, errorsHtml, alertsHtml, digestsHtml, weekHtml, kindLabel, pageOf, when } from '../app/ops-page.js';
+import { parseRoute, titleFor } from '../app/main.js';
+import { textProblems } from './text-guard.js';
 
 const app2 = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const root = resolve(app2, '..');
@@ -130,4 +133,51 @@ test('the uptime workflow: scheduled, not on pull requests, loud on failure', ()
   assert.match(y, /gh issue (create|comment)/, 'and an issue Wolf is notified of');
   const health = JSON.parse(readFileSync(join(app2, 'health.json'), 'utf8'));
   assert.equal(health.ok, true);
+});
+
+// ---------------------------------------------------------------- the ops page (#/ops)
+const OVERVIEW = {
+  now: REPORT,
+  errors: [{ message: 'TypeError: <b>x</b> is not a function', n: 5, sessions: 2, last_at: '2026-10-05T06:12:00Z', url: 'https://hotkey.gg/#/lesson/active-cell', ua: 'Chrome 140 on Windows', stack: 'at f (https://hotkey.gg/app/main.js:1:1)' }],
+  alerts: [{ id: 7, kind: 'team_subscription_ended', ref: 'sub_T', created_at: '2026-10-01T10:00:00Z' }],
+  digests: [{ id: 1, period_start: REPORT.period_start, period_end: REPORT.period_end, report: REPORT }],
+};
+const textOf = html => html.replace(/<pre[\s\S]*?<\/pre>/g, '').replace(/<[^>]+>/g, '\n').replace(/&[a-z#0-9]+;/g, ' ').split('\n').map(s => s.trim()).filter(Boolean).join('\n');
+
+test('#/ops routes to the ops page; there is no admin route', () => {
+  assert.equal(parseRoute('#/ops').name, 'ops');
+  assert.equal(parseRoute('#/admin').name, 'notfound', 'no default admin route (the liability checklist)');
+  assert.equal(titleFor('ops'), 'Ops · hotkey.gg');
+});
+
+test('the ops page renders the figures, the errors, the alerts and the digests', () => {
+  const html = opsHtml(OVERVIEW);
+  assert.match(html, /New accounts/);
+  assert.match(html, /TypeError: &lt;b&gt;x&lt;\/b&gt; is not a function/, 'messages are escaped');
+  assert.doesNotMatch(html, /<b>x<\/b>/);
+  assert.match(html, /Team subscription ended/);
+  assert.match(html, /data-resolve="7"/);
+  assert.match(html, /2026-10-05/);
+  assert.match(html, /data-copy="0"/);
+  assert.deepEqual(textProblems(textOf(html)), [], 'the text guard is clean');
+  for (const k of ['unavailable', 'out', 'denied', 'failed', 'loading']) assert.deepEqual(textProblems(textOf(stateHtml(k))), [], k);
+  assert.match(stateHtml('out'), /href="#\/account"/, 'signed out, the button opens the sign-in');
+  assert.match(stateHtml('denied'), /people who run hotkey\.gg/);
+});
+
+test('the ops page says so when there is nothing to show', () => {
+  assert.match(errorsHtml([]), /No errors in this window\./);
+  assert.match(alertsHtml(null), /No open alerts\./);
+  assert.match(digestsHtml(undefined), /No digest stored yet/);
+  assert.doesNotThrow(() => weekHtml(null));
+  assert.deepEqual(textProblems(textOf(opsHtml({}))), []);
+});
+
+test('ops page helpers', () => {
+  assert.equal(kindLabel('payment_unmatched'), 'Payment unmatched');
+  assert.equal(kindLabel(''), '');
+  assert.equal(pageOf('https://hotkey.gg/#/lesson/x'), '/#/lesson/x');
+  assert.equal(pageOf('https://hotkey.gg'), '/');
+  assert.equal(when('2026-10-01T14:05:09Z'), '2026-10-01 14:05');
+  assert.equal(when('nope'), '');
 });
