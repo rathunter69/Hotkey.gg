@@ -54,7 +54,7 @@
   /* ---------- sizes ---------- */
   --rail-w:232px; --content-top:30px; --content-side:36px; --side-col:336px;
   --panel-w:340px; --card-w:330px; --card-gap:16px;
-  --tabrow-h:34px; --ribbon-h:96px; --ribbon-groups-h:72px; --ribbon-tabs-h:24px; --qat-h:26px;
+  --tabrow-h:34px; --sbar-h:22px; --ws-foot-h:calc(var(--s8) + var(--s2) + var(--sbar-h) + 1px); --ribbon-h:96px; --ribbon-groups-h:72px; --ribbon-tabs-h:24px; --qat-h:26px;
   --cursor-w:2px; --bw-1-5:1.5px; --bw-2:2px; --bw-3:3px; --tick-check:5px; --cursor-handle:6px; --mode-mark:9px; --mode-rule:3px; --key-edge:3px; --route-bar:3px;
   --theme-tile-w:64px; --theme-tile-h:46px; --demo-w:640px; --demo-h:560px; --narrow:900px;
   /* the site pages' parts (M89, M104): goal segments, the level and field bars, tier marks, badge tiles, the sheet preview, a table row */

@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="./apple-touch-icon.png">
 <!-- the saved palette lands before the first paint: a classic script restores the vars themes.js persisted -->
 <script>try{var v=JSON.parse(localStorage.getItem('hotkey_theme_vars'));if(v&&v.vars){var r=document.documentElement;for(var k in v.vars)r.style.setProperty('--'+k,v.vars[k]);r.setAttribute('data-dark',v.dark?'1':'0');}}catch(e){}
-try{var f=localStorage.getItem('hk2_flow');document.documentElement.setAttribute('data-flow',f==='off'?'live':'next');var p=JSON.parse(localStorage.getItem('hk2_prefs')||'{}');document.documentElement.setAttribute('data-density',p.density==='compact'?'compact':'comfortable');document.documentElement.setAttribute('data-panel',p.panelSide==='left'?'left':p.panelSide==='right'?'right':'overlay');}catch(e){}</script>
+try{var p=JSON.parse(localStorage.getItem('hk2_prefs')||'{}');document.documentElement.setAttribute('data-density',p.density==='compact'?'compact':'comfortable');document.documentElement.setAttribute('data-panel',p.panelSide==='left'?'left':p.panelSide==='right'?'right':'overlay');}catch(e){}</script>
 <script type="module">import { loadTheme } from './ui/themes.js'; loadTheme();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,8 +19,7 @@ try{var f=localStorage.getItem('hk2_flow');document.documentElement.setAttribute
 <link rel="stylesheet" href="./ui/app.css">
 <link rel="stylesheet" href="./ui/shell.css">
 <link rel="stylesheet" href="./ui/site.css">
-<link rel="stylesheet" href="./ui/reference.css">
-<link rel="stylesheet" href="./ui/lesson.css" id="lessonCss">
+<link rel="stylesheet" href="./ui/lesson.css">
 <link rel="stylesheet" href="./ui/workbook.css">
 <link rel="stylesheet" href="./ui/scale.css">
 <link rel="stylesheet" href="./ui/next.css">

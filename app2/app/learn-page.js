@@ -14,6 +14,8 @@ import { siteCopy, moduleCopy } from '../content/copy/apply.js';
 import { esc, fill, fmtMinutes } from '../ui/components/format.js';
 import { panelHtml, tableHtml, tabsHtml, wireTabs, buttonHtml, wireRows } from '../ui/components/table.js';
 import { tierMarksHtml } from '../ui/components/marks.js';
+import { paywallHtml } from '../ui/components/paywall.js';
+import { auth } from './auth.js';
 import { sheetPreviewHtml, previewOfLesson } from '../ui/components/sheet-preview.js';
 
 const t = (key, vars) => fill(siteCopy(key, key), vars);
@@ -240,7 +242,7 @@ export function mountLearnPage(root, ctx = {}) {
       if (to) facts = (gate.testout || gate.assessment ? esc(t('learn_verified')) : `<a href="#/lesson/${esc(to.id)}">${esc(t('learn_testout'))}</a>`) + ' ' + facts;
     }
     const table = rows.length ? tableHtml({ columns, rows: trs, cls: 'tbl-chapter', label: heading }) : `<p class="panel-line">${esc(t('learn_coming', { n: tab.n }))}</p>`;
-    const paywall = locked && tab.built ? panelHtml({ heading: esc(t('learn_pro_chapter', { n: tab.n })), body: `<p class="panel-line">${esc(siteCopy('paywall_line', 'Go Pro for the rest of the content.'))}</p><div class="btn-row">${buttonHtml({ label: t('paywall_go_pro'), key: 'Enter', href: '#/pricing', primary: true, id: 'learnGoPro' })}${buttonHtml({ label: t('paywall_not_now'), key: 'Esc', quiet: true, id: 'learnNotNow' })}</div>`, cls: 'paywall', mode: 'learn', attrs: { 'data-cursor': true, 'data-cursor-enter': '#learnGoPro', tabindex: '-1' } }) : '';
+    const paywall = locked && tab.built ? paywallHtml({ heading: t('paywall_chapter', { n: tab.n, name: tab.title }), signedIn: auth.state() === 'in', mode: 'learn', ids: { go: 'learnGoPro', notNow: 'learnNotNow' } }) : '';   // the one paywall panel (M105)
     let side = '';
     if (open && tab.built && !locked) {
       const delivered = open.status === 'complete' || prefs.get().pagesDelivered.includes(open.id);   // the module's challenge hands the page in (lesson-view.js), so Learn shows it built from then

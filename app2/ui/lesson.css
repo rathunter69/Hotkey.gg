@@ -1,217 +1,29 @@
-/* app2/ui/lesson.css — the lesson workspace (SITE_SPEC §4): sheet and ribbon on the LEFT, the
-   instructions panel on the RIGHT with Lesson | Help | Shortcuts used tabs, a draggable divider
-   between them, and the centered completion overlay (the old build's results card). Loaded after
-   shell.css; the goal, keycap and button rules there are reused. */
+/* app2/ui/lesson.css — legacy: what is left of the old lesson stylesheet once R1b retired its screens:
+   the landing demo's task card (ui/demo-player.js), the click-the-sheet hint and the Rapid-fire round
+   card (app/rapid-fire.js). The workspace itself is workspace.css. */
 
-/* The workspace shares the shell's frame (.app caps at 1180px with 24px gutters), so its edges line
-   up with the top nav, and it takes the vertical room the viewport has: nav 60 + margins ≈ 102px. */
-.lesson{display:flex; gap:0; align-items:stretch; margin:12px auto 16px; padding:0; --panel-w:380px;
-  height:calc(100vh - 104px); min-height:520px}
-.lesson-main{flex:1 1 auto; min-width:0; display:flex; flex-direction:column; height:100%; min-height:0}
-.lesson-main .stage{flex:1 1 auto; height:100%; min-height:0}
-.lesson .stage-row{min-height:0; flex:1 1 auto}
-.lesson .stage-main{min-height:0}
-.lesson-main .stage:focus{outline:none}
-.lesson-main .stage{position:relative}
 .focus-hint{position:absolute; left:50%; bottom:56px; transform:translateX(-50%); z-index:5; pointer-events:none; font-family:var(--mono); font-size:12px; color:var(--on-accent); background:var(--accent); border-radius:99px; padding:6px 14px; box-shadow:0 6px 20px rgba(0,0,0,.18)}
 
-/* ---- the divider: drag with the mouse, arrow keys resize, Home resets (the panel is always visible) ---- */
-.lesson-divider{flex:0 0 16px; position:relative; cursor:col-resize; display:flex; align-items:center; justify-content:center; user-select:none; -webkit-user-select:none; border-radius:6px; touch-action:none}
-.lesson-divider::before{content:''; width:2px; height:56px; border-radius:2px; background:var(--line); transition:background .12s}
-.lesson-divider:hover::before, .lesson-divider:focus-visible::before, .lesson-divider.dragging::before{background:var(--accent)}
-.lesson-divider:focus-visible{outline:2px solid var(--accent); outline-offset:-2px}
-
-/* ---- the panel ---- */
-.lesson-panel{flex:0 0 min(var(--panel-w), 34vw); width:min(var(--panel-w), 34vw); min-width:0; height:100%; display:flex; flex-direction:column; background:var(--surface); border:1px solid var(--line); border-radius:12px; font-family:var(--sans); font-size:15px; line-height:1.55; overflow:hidden}
-.panel-head{padding:14px 18px 6px}
-.panel-head .lesson-meta{margin-bottom:6px; flex-wrap:wrap; row-gap:4px}
-.panel-head .lesson-timer{margin-left:0; white-space:nowrap}
-.lesson-progress{color:var(--faint)}
-/* the module line: a small ring plus "Lesson n of m · Module k of 7" */
-.module-line{display:flex; align-items:center; gap:8px; font-family:var(--mono); font-size:12px; color:var(--muted); margin:2px 0 6px}
-.module-line .ring{color:var(--accent); flex:0 0 auto}
-.module-line .ring.ring-full{color:var(--accent)}
-.lesson-tools{margin-left:auto; display:flex; gap:6px; align-items:center}
-.lesson-tools .btn{padding:3px 8px; font-size:11.5px}
-.panel-tabs{display:flex; gap:2px; padding:0 10px; border-bottom:1px solid var(--line)}
-.panel-tab{font-family:var(--mono); font-size:12.5px; color:var(--muted); background:none; border:0; border-bottom:2px solid transparent; padding:8px 10px; cursor:pointer; margin-bottom:-1px; border-radius:6px 6px 0 0}
-.panel-tab:hover{color:var(--text)}
-.panel-tab[aria-selected="true"]{color:var(--text); border-bottom-color:var(--accent)}
-.panel-tab:focus-visible{outline:2px solid var(--accent); outline-offset:-2px}
-.panel-tab .tab-n{color:var(--faint); margin-left:4px}
-/* ---- the task card: the one thing to do now, pinned above the scrolling body (C2 gap 8) ---- */
+/* ---- the landing demo's task card ---- */
 .task-card{flex:0 0 auto; padding:12px 18px; border-bottom:1px solid var(--line); background:color-mix(in srgb, var(--accent-glow) 55%, transparent)}
 .task-card:empty{display:none}
 .task-label{font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.6px; color:var(--accent); margin-bottom:4px; display:flex; align-items:center; gap:8px}
-.task-label .task-count{margin-left:auto; color:var(--faint); text-transform:none; letter-spacing:0}
+
 .task-goal{font-size:15px; font-weight:600; color:var(--text); line-height:1.5}
 .task-teach{font-size:14px; color:var(--muted); margin-top:3px; line-height:1.5}
 .task-keys{display:flex; flex-wrap:wrap; gap:4px; align-items:center; margin-top:8px}
-.task-extra{font-size:13px; color:var(--muted); margin-top:6px}
-.conv-chip{display:inline-block; font-family:var(--mono); font-size:11px; color:var(--muted); border:1px solid var(--line); border-radius:99px; padding:1px 8px; margin-top:8px}
-.task-card .goal-nudge{grid-column:auto; margin-top:8px}
-/* a challenge pins its whole task list in the card, under the countdown */
-.task-list{list-style:none; margin:6px 0 0; padding:0; font-size:13.5px}
-.task-list li{padding:2px 0; color:var(--text); display:flex; gap:7px}
-.task-list li.done{color:var(--faint); text-decoration:line-through}
-.task-list li::before{content:'›'; color:var(--accent); font-family:var(--mono)}
-.task-list li.done::before{content:'✓'}
 
-.panel-body{flex:1 1 auto; overflow:auto; min-height:0; padding:14px 18px; scrollbar-width:thin; scrollbar-color:var(--line) transparent}
-.panel-body h2{font-size:16px; font-weight:600; margin:0 0 8px}
-.panel-body p{margin:0 0 10px; color:var(--text)}
-.panel-body kbd{font-family:var(--mono); font-size:12px; color:var(--text); background:var(--surface2); border:1px solid var(--line); border-bottom-width:2px; border-radius:5px; padding:1px 6px; white-space:nowrap}
-/* the brief: one line until it is opened */
-.lesson-brief{margin:0 0 12px; padding-bottom:10px; border-bottom:1px solid var(--line); font-size:14px; color:var(--muted)}
-.lesson-brief summary{cursor:pointer; list-style:none; display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
-.lesson-brief summary::-webkit-details-marker{display:none}
-.lesson-brief summary::after{content:' …more'; color:var(--faint); font-family:var(--mono); font-size:11px}
-.lesson-brief[open] summary{white-space:normal}
-.lesson-brief[open] summary::after{content:''}
-.lesson-brief p{margin:8px 0 0; color:var(--muted)}
-.lesson-brief summary:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:4px}
-.panel-actions{padding:10px 18px 14px; border-top:1px solid var(--line); display:flex; gap:8px; align-items:center; flex-wrap:wrap}
-.panel-actions:empty{display:none}
-.btn:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
-
-/* goals: the gentle keyboard nudge after a mouse action, and the tick that the effects module pops */
-.goal-nudge{grid-column:2; margin-top:6px; font-size:12.5px; color:var(--muted); display:flex; gap:6px; align-items:center; flex-wrap:wrap}
-.goal-nudge::before{content:'⌨'; color:var(--accent); font-size:13px}
-.goal-keys .kx{color:var(--muted); font-size:12px}
-.goal-progress{height:4px; background:var(--surface2); border-radius:99px; margin:0 0 12px; overflow:hidden}
-.goal-progress i{display:block; height:100%; width:0; background:var(--accent); border-radius:99px; transition:width .35s cubic-bezier(.2,.7,.2,1)}
-
-/* Help tab */
-.help-goal{font-weight:600; margin-bottom:6px}
-.help-keys{display:flex; flex-wrap:wrap; gap:4px; margin-bottom:8px; align-items:center}
-.help-keys .kx{color:var(--muted); font-size:12px}
-.help-note{color:var(--muted); margin:0 0 10px}
-.help-warn{color:var(--warn, #b7791f); font-size:12.5px; margin:0 0 10px}
-.help-notes{margin-top:14px; border-top:1px solid var(--line); padding-top:10px}
-.help-notes summary{cursor:pointer; color:var(--muted); font-family:var(--mono); font-size:12px}
-.help-notes summary:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:4px}
-.help-notes h2{margin-top:10px}
-.help-links{margin-top:6px; font-size:12.5px; color:var(--muted)}
-.help-links a{color:var(--muted)}
-.help-links a:hover{color:var(--accent)}
-
-/* Shortcuts used tab */
-.used-list{list-style:none; margin:0; padding:0}
-.used-row{display:flex; align-items:center; gap:8px; padding:7px 0; border-bottom:1px solid var(--line)}
-.used-row:last-child{border-bottom:0}
-.used-keys{display:flex; gap:4px; flex-wrap:wrap}
-.used-count{margin-left:auto; font-family:var(--mono); font-size:11.5px; color:var(--faint)}
-.used-empty{color:var(--muted)}
-.used-mouse{margin-top:12px; font-size:12.5px; color:var(--muted)}
-
-/* ---- completion: the centered overlay (the old results card), Enter continues ---- */
-.lesson-done{position:fixed; inset:0; background:rgba(0,0,0,.6); display:flex; align-items:center; justify-content:center; z-index:40}
-.lesson-done[hidden]{display:none}
+/* ---- the Rapid-fire round card ---- */
 .rm-card{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:22px 26px; width:380px; max-width:calc(100vw - 32px); text-align:center; box-shadow:0 20px 60px rgba(0,0,0,.55); max-height:calc(100vh - 48px); overflow-y:auto; font-family:var(--sans)}
 .rm-title{font-family:var(--mono); font-size:12px; color:var(--accent); text-transform:uppercase; letter-spacing:1px; margin-bottom:6px}
-.rm-lesson{font-family:var(--mono); font-size:13px; color:var(--muted); margin-bottom:14px}
+
 .rm-time{font-family:var(--mono); font-size:48px; font-weight:700; color:var(--text); line-height:1; letter-spacing:-1.5px}
 .rm-time span{font-size:18px; color:var(--muted); font-weight:400; margin-left:2px}
 .rm-stats{display:flex; justify-content:center; gap:22px; margin:18px 0 14px; font-family:var(--mono); font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.5px}
 .rm-stats b{display:block; color:var(--text); font-size:17px; font-weight:500; margin-top:4px; letter-spacing:0; text-transform:none}
 .rm-note{font-family:var(--mono); font-size:11.5px; color:var(--muted); margin:0 0 14px}
 .rm-note b{color:var(--text)}
-.rm-save{font-size:13px; color:var(--muted); background:var(--surface2); border:1px solid var(--line); border-radius:10px; padding:10px 12px; margin:0 0 16px; text-align:left; line-height:1.5}
-.rm-save b{color:var(--text)}
-.rm-save a{color:var(--text)}
-.rm-clean{font-family:var(--mono); font-size:12.5px; color:var(--accent); font-weight:700; margin:0 0 12px}
-.rm-next{font-size:13.5px; color:var(--muted); margin:0 0 14px}
-.rm-next kbd{font-family:var(--mono); font-size:11px; background:var(--surface2); border:1px solid var(--line); border-radius:4px; padding:0 5px}
-.rm-stats .rm-xp{color:var(--accent)}
+
 .rm-opts{display:flex; gap:8px; justify-content:center; flex-wrap:wrap}
-.rm-more{margin-top:10px; font-family:var(--mono); font-size:11.5px; color:var(--faint)}
 
-@media(max-width:900px){
-  .lesson{flex-direction:column; padding:0 12px; height:auto; min-height:0}
-  .lesson-divider{display:none}
-  .lesson-panel{width:auto; flex-basis:auto}
-}
-
-/* adaptive goals: the teaching point rides the first use; a race lesson shows split times */
-.lesson-read{font-size:13.5px; line-height:1.55; color:var(--muted); margin:0 0 12px; padding-bottom:10px; border-bottom:1px solid var(--line)}
-.goal.watching{border-style:dashed}
-.goal-demo{font-family:var(--mono); font-size:11px; color:var(--accent); margin-left:6px; white-space:nowrap}
-.race-table{width:100%; border-collapse:collapse; font-family:var(--mono); font-size:12.5px; margin:4px 0 6px}
-.race-table th{font-size:10.5px; text-transform:uppercase; letter-spacing:.5px; color:var(--faint); font-weight:500; text-align:right; padding:2px 6px}
-.race-table th:first-child, .race-table td:first-child{text-align:left; font-family:var(--sans); color:var(--muted)}
-.race-table td{text-align:right; padding:5px 6px; border-top:1px solid var(--line); color:var(--text); font-variant-numeric:tabular-nums}
-.race-table .race-fast{color:var(--accent); font-weight:700}
-.race-table .race-total td{border-top:2px solid var(--line); font-weight:700}
-.race-table .race-total td:first-child{color:var(--text)}
-.goal-teach{color:var(--muted)}
-.goal.current .goal-teach{color:var(--text); font-weight:600}
-.goal-split{font-family:var(--mono); font-size:12px; color:var(--accent); font-weight:700; margin-left:6px; text-decoration:none; display:inline-block}
-.goal-split.live{color:var(--muted); font-weight:500; font-variant-numeric:tabular-nums}
-.help-taught{margin:4px 0 0; padding-left:18px; color:var(--muted)}
-.help-taught li{margin:3px 0}
-.race{margin:8px 0 12px}
-.race-cols{display:flex; gap:18px; justify-content:center}
-.race-col{flex:1 1 0; background:var(--surface2); border:1px solid var(--line); border-radius:10px; padding:10px 12px; text-align:center}
-.race-label{display:block; font-family:var(--mono); font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; margin-bottom:4px}
-.race-time{font-family:var(--mono); font-size:30px; font-weight:700; line-height:1; letter-spacing:-1px; color:var(--text)}
-.race-time span{font-size:14px; color:var(--muted); font-weight:400; margin-left:2px}
-.race-note{margin-top:10px; font-family:var(--mono); font-size:13px; color:var(--accent); font-weight:700; text-align:center}
-.rm-closing{font-size:13.5px; color:var(--text); text-align:left; margin:0 0 10px; line-height:1.55}
-.done-card .race-time{font-size:24px}
-/* the copy layer: a goal's why line (guided), the stuck hint's own words, the lesson's wow line on the overlay */
-.task-why{font-size:13.5px; color:var(--muted); margin-top:4px; line-height:1.5; font-style:italic}
-.task-stuck{font-size:13.5px; color:var(--text); margin-top:6px; line-height:1.5; padding:6px 8px; border-left:3px solid var(--accent); background:var(--surface2); border-radius:0 6px 6px 0}
-.rm-wow{font-size:15px; color:var(--text); text-align:left; margin:2px 0 10px; line-height:1.5; font-weight:600}
-
-/* ---- the chapter's ending: the KPI page as it prints (ui/print-preview.js) ---- */
-.rm-card:has(.rm-preview){width:640px}
-.rm-preview{margin:6px 0 14px}
-.pp-page{background:#fff; color:#111; border:1px solid #cfcfcf; box-shadow:0 6px 24px rgba(0,0,0,.35); padding:14px 16px 10px; margin:0 auto; width:100%; max-width:560px; min-height:300px; display:flex; flex-direction:column; text-align:left; overflow:hidden}
-.pp-page.pp-land{min-height:260px}
-.pp-sheet{border-collapse:collapse; width:100%; font:9px/1.35 Arial, Helvetica, sans-serif; table-layout:fixed}
-.pp-sheet td{padding:1px 4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; vertical-align:bottom}
-.pp-sheet td.pp-title{background:#f4f4f4}
-.pp-sheet td.pp-ok{background:#d9f2df; color:#1e7d34; font-weight:700}
-.pp-sheet td.pp-bad{background:#fbe0e0; color:#b12; font-weight:700}
-.pp-footer{margin-top:auto; padding-top:8px; display:flex; justify-content:space-between; font:8px Arial, Helvetica, sans-serif; color:#555}
-.pp-cap{font-family:var(--mono); font-size:11px; color:var(--muted); margin:6px 0 0}
-.rm-assoc{font-family:var(--sans); font-size:13px; color:var(--text); margin:10px 0 0}
-
-/* ---------- the result card, experience pass C (SITE_SPEC §6a: a medium moment, ~1 s, any key skips) ---------- */
-.rm-card.rm-in{animation:rmIn .2s cubic-bezier(.2,.8,.25,1) both}
-@keyframes rmIn{0%{opacity:0; transform:scale(.96)} 100%{opacity:1; transform:none}}
-.rm-card{position:relative; z-index:1}
-/* the burst: cells and keycaps in the theme's colours, from behind the card; transform and opacity only */
-.rm-burst{position:absolute; left:50%; top:50%; width:0; height:0; pointer-events:none; z-index:0}
-.rm-bit{position:absolute; left:0; top:0; display:block; font-style:normal; opacity:0; animation:rmBit .9s cubic-bezier(.15,.7,.3,1) forwards}
-.rm-bit-cell{width:14px; height:10px; border-radius:2px; background:var(--accent); margin:-5px 0 0 -7px}
-.rm-bit-cell.dim{background:var(--accent-dim); width:10px; height:10px}
-.rm-bit-key{font-family:var(--mono); font-size:11px; font-weight:700; color:var(--text); background:var(--surface2); border:1px solid var(--line); border-bottom-width:2px; border-radius:5px; padding:1px 6px; transform:translate(-50%,-50%)}
-@keyframes rmBit{0%{opacity:0; transform:translate(-50%,-50%) scale(.6)} 15%{opacity:1} 100%{opacity:0; transform:translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) rotate(var(--rot)) scale(1)}}
-@media (prefers-reduced-motion: reduce){ .rm-card.rm-in{animation:rmFade .2s ease both} .rm-burst{display:none} }
-@keyframes rmFade{0%{opacity:0} 100%{opacity:1}}
-/* one stamp for the tier earned; the tiers below it quietly ticked, the ones above it plain */
-.rm-card .tier-stamps{display:flex; gap:8px; justify-content:center; margin:6px 0 2px}
-.rm-card .tstamp{opacity:.55; font-weight:500}
-.rm-card .tstamp.hit{opacity:.8; color:var(--muted); border-color:var(--line); font-weight:500}
-.rm-card .tstamp.got{opacity:1; color:var(--tier-got, var(--accent)); border:2px solid currentColor; font-weight:800; font-size:13px; padding:4px 10px; transform:rotate(-3deg); animation:rmStamp .24s cubic-bezier(.2,.9,.3,1.2) .15s both; background:color-mix(in srgb, var(--accent-glow) 50%, var(--surface))}
-@keyframes rmStamp{0%{opacity:0; transform:rotate(-3deg) scale(1.3)} 100%{opacity:1; transform:rotate(-3deg) scale(1)}}
-@media (prefers-reduced-motion: reduce){ .rm-card .tstamp.got{animation:rmFade .2s ease both} }
-/* calmer hierarchy: accent only for the XP and the clean mark; the rest in text colour */
-.rm-card .race-note{color:var(--text)}
-.rm-closing-block{text-align:left; border-top:1px solid var(--line); padding-top:12px; margin:4px 0 12px}
-.rm-closing-block .rm-closing:last-child{margin-bottom:0}
 .rm-opts .btn kbd{margin-left:6px}
-.rm-foot{display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:6px 16px; margin-top:12px; font-family:var(--mono); font-size:11.5px; color:var(--faint)}
-.rm-link{background:none; border:0; padding:2px 0; font:inherit; color:var(--muted); cursor:pointer; text-decoration:underline; text-decoration-color:var(--line); text-underline-offset:3px}
-.rm-link:hover, .rm-link:focus-visible{color:var(--text); text-decoration-color:currentColor; outline:none}
-.rm-link kbd{font-family:var(--mono); font-size:10.5px; border:1px solid var(--line); border-radius:4px; padding:0 4px; margin-left:4px; text-decoration:none; display:inline-block}
-.rm-foot .rm-more{margin:0}
-/* nothing bright floats over the result: the key echo and the status toast wait until it closes */
-body.hk-result-open .keyflash, body.hk-result-open #hkToast{opacity:0 !important}
-/* after "Look at the sheet": the result as a bar in the card's footer */
-.panel-actions .done-bar-t{font-family:var(--mono); font-size:12px; color:var(--accent); font-weight:700; margin-right:auto}
-.panel-actions .btn{font-size:12.5px}
-.rm-card .tstamp.got.tier-pass{--tier-got:var(--tier-pass, var(--accent))}
-.rm-card .tstamp.got.tier-pro{--tier-got:var(--tier-pro, var(--accent))}
-.rm-card .tstamp.got.tier-legendary{--tier-got:var(--tier-legendary, var(--accent))}

@@ -22,7 +22,7 @@ const app2 = resolve(here, '..');
 /** The stylesheets written to the standard: a finding in one of these fails the check. */
 export const STANDARD_CSS = new Set(['tokens.css', 'components.css', 'screens.css']);
 /** The stylesheets the rebuild is still replacing: findings warn until each is rewritten (R1b and on). */
-export const LEGACY_CSS = new Set(['app.css', 'shell.css', 'site.css', 'next.css', 'lesson.css', 'workbook.css', 'scale.css', 'reference.css', 'public.css']);
+export const LEGACY_CSS = new Set(['app.css', 'shell.css', 'site.css', 'next.css', 'lesson.css', 'workbook.css', 'scale.css', 'public.css']);
 /** A selector the monospace face belongs on: keys, addresses, formulas, times, the clock, the wordmark, the sheet's own cells. */
 export const MONO_OK = /kbd|\bkey|keycap|\.kt\b|cell|addr|\bref\b|formula|\bfx\b|fbar|namebox|name-box|time|clock|\bmark\b|-mark\b|mono|code|wordmark|\bnum\b|digit|figure|chord|combo|-n\b|c-num|grid|stage|sheet|sk-|dp-|rapid|prompt|week|avatar/i;
 export const ICON_SETS = /lucide|heroicons|feather-icons|feathericons|@material|material-icons|material-symbols|fontawesome|font-awesome|tabler-icons|phosphor-icons|ionicons|octicons|bootstrap-icons/i;

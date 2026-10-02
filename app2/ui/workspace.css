@@ -101,7 +101,11 @@ body[data-route="lesson"], body[data-route="drill"], body[data-route="due"]{over
 .wsc .wb-tab{font-family:var(--font); font-size:var(--fs-label); font-weight:var(--fw-semi); color:var(--ink-2); border-color:var(--line); border-top-color:var(--line)}
 .wsc .wb-tab.cur{color:var(--ink); background:var(--sheet); border-top-color:var(--mode); border-color:var(--line)}
 .wsc .wb-lead{display:none}
-.wsc .sbar{font-family:var(--font); font-size:var(--fs-min); background:var(--chrome); color:var(--ink-2)}
+.wsc .sbar{font-family:var(--font); font-size:var(--fs-min); background:var(--chrome); color:var(--ink-2); min-height:var(--sbar-h)}
+/* the key echo and a status toast float over the sheet just above the status bar, never on it or the sheet tabs; the task card (z 20) covers the echo where they meet */
+.wsc-stage > .keyflash.in-frame{position:absolute; right:var(--s4); bottom:calc(var(--ws-foot-h) + var(--s3)); z-index:15; max-width:60%; overflow:hidden; justify-content:flex-end; align-items:center; gap:var(--s1)}
+.wsc-stage > .keyflash.in-frame .kchip{font-size:var(--fs-key); padding:var(--s1) var(--s2); border-radius:var(--r-btn); line-height:1.3}
+body[data-route="lesson"] #hkToast, body[data-route="due"] #hkToast, body[data-route="drill"] #hkToast{bottom:calc(var(--ws-foot-h) + var(--s3))}
 .wsc-side{flex:none; width:0; overflow:hidden; transition:width var(--d-beat)}
 .wsc-side.open{width:var(--panel-w); border-left:1px solid var(--line)}
 .wsc .focus-hint{position:absolute; left:50%; bottom:var(--s12); transform:translateX(-50%); z-index:5; pointer-events:none; font-size:var(--fs-label); font-weight:var(--fw-semi); color:var(--on-fill); background:var(--ink); border-radius:var(--r-btn); padding:var(--s2) var(--s4); box-shadow:var(--shadow-float)}

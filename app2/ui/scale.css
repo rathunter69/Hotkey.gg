@@ -1,66 +1,46 @@
 /* app2/ui/scale.css — the experience pass (2026-09-23, decision 6): one global step up in type,
    keycaps and the ribbon, a two-state density switch, and the page using its width.
 
-   Two attributes on <html>, both set before first paint (index.html) and kept by prefs.reflect():
-     data-flow="next"        the redesigned flow is on for this browser (app/flow.js)
-     data-density            "comfortable" (the step up, the default once the flow ships) | "compact" (today's sizes)
-   Shipped on go (2026-09-23 B): the flag scoping came off; "compact" stays as the smaller setting.
+   One attribute on <html>, set before first paint (index.html) and kept by prefs.reflect():
+     data-density            "comfortable" (the step up, the default) | "compact" (the smaller setting)
 
    The sheet itself stays Excel at 100% (SITE_SPEC §4): the grid is the one thing that must look
    like the real program. What steps up is everything around it. */
 
 /* ---------- 1. the page uses its width: 1180 → 1340, centered — the comfy middle, never edge-to-edge ---------- */
-.app, .topnav-in, .wrap, .sf-in,
-.plist, .page, .home, .drill-page, .ref{max-width:1340px}
+.app, .wrap, .page, .home, .drill-page, .ref{max-width:1340px}
 .app{padding:0 32px}
-.topnav-in, .sf-in{padding:0 32px}
-@media (max-width:1100px){ .app, .topnav-in, .sf-in{padding:0 24px} }
 
-/* ---------- 2. comfortable: the step up ---------- */
-/* nav */
-html[data-density="comfortable"] .topnav-in{height:64px}
-html[data-density="comfortable"] .topnav-brand{font-size:17px}
-html[data-density="comfortable"] .topnav-link{font-size:14px; padding:8px 13px}
-html[data-density="comfortable"] .topnav .tl-label{font-size:13.5px}
-html[data-density="comfortable"] .topnav-theme-name{font-size:13px}
-html[data-density="comfortable"] .user-btn{font-size:14px}
-html[data-density="comfortable"] .nav-level{font-size:13px; padding:4px 9px}
+@media (max-width:1100px){ .app{padding:0 24px} }
+
 /* shared type */
 html[data-density="comfortable"] .btn{font-size:14px; padding:9px 16px; border-radius:9px}
 html[data-density="comfortable"] kbd{font-size:12.5px}
 /* bare paragraphs only, at the lowest specificity: a paragraph with a class (.page-fine, .lb-sub …) keeps its own size */
 :where(html[data-density="comfortable"] .page, html[data-density="comfortable"] .home) p{font-size:15px}
-html[data-density="comfortable"] .page-sub, html[data-density="comfortable"] .plist-sub, html[data-density="comfortable"] .ref-sub{font-size:15.5px}
+html[data-density="comfortable"] .page-sub{font-size:15.5px}
 /* one page title size on every page: Practice, Leaderboard, Pricing, Account, Learn, Reference */
-html[data-density="comfortable"] .page-head h1, html[data-density="comfortable"] .plist-head h1, html[data-density="comfortable"] .home h1,
-html[data-density="comfortable"] .dr-head h1, html[data-density="comfortable"] .ref-head h1{font-size:24px}
+html[data-density="comfortable"] .page-head h1, html[data-density="comfortable"] .home h1{font-size:24px}
 html[data-density="comfortable"] #hkToast{font-size:13.5px; padding:10px 20px}
 html[data-density="comfortable"] .mb-tool{font-size:12px; padding:7px 12px}
 /* the key-flash HUD */
 html[data-density="comfortable"] .keyflash .kchip{font-size:15px; padding:4px 11px; border-radius:6px}
 html[data-density="comfortable"] .keyflash{right:22px; bottom:22px; gap:6px}
 /* the lesson panel */
-html[data-density="comfortable"] .lesson-panel{font-size:16px}
-html[data-density="comfortable"] .lesson-title{font-size:21px}
-html[data-density="comfortable"] .panel-tab{font-size:13.5px; padding:9px 12px}
+
 html[data-density="comfortable"] .task-card{padding:14px 20px}
 html[data-density="comfortable"] .task-label{font-size:11px}
 html[data-density="comfortable"] .task-goal{font-size:16.5px}
 html[data-density="comfortable"] .task-teach{font-size:15px}
-html[data-density="comfortable"] .task-extra{font-size:14px}
-html[data-density="comfortable"] .panel-body{padding:16px 20px}
-html[data-density="comfortable"] .panel-body kbd, html[data-density="comfortable"] .task-keys kbd,
-html[data-density="comfortable"] .lesson-body kbd, html[data-density="comfortable"] .goal-keys kbd,
-html[data-density="comfortable"] .help-keys kbd{font-size:13px; padding:2px 7px}
-html[data-density="comfortable"] .lesson-brief{font-size:15px}
+
+html[data-density="comfortable"] .task-keys kbd{font-size:13px; padding:2px 7px}
+
 html[data-density="comfortable"] .goal{padding:10px 12px}
-html[data-density="comfortable"] .module-line{font-size:12.5px}
-html[data-density="comfortable"] .lesson-meta{font-size:12.5px}
-html[data-density="comfortable"] .conv-chip{font-size:11.5px}
+
 html[data-density="comfortable"] .rm-card{width:420px; padding:24px 28px}
 html[data-density="comfortable"] .rm-time{font-size:54px}
 /* the sheet tabs strip */
-html[data-density="comfortable"] .wb-tabs .wb-tab, html[data-density="comfortable"] .st-tab{font-size:13px}
+html[data-density="comfortable"] .wb-tabs .wb-tab{font-size:13px}
 /* the full ribbon: tabs, groups, buttons and KeyTips all one step up (Wolf: "ribbon text feels small") */
 html[data-density="comfortable"] .ribbon-slot.rib-full{--rib-h:110px}
 html[data-density="comfortable"] .rf-tabs{height:29px; padding:3px 10px 0}
@@ -103,21 +83,9 @@ html[data-density="comfortable"] .fbar{font-size:13.5px}
 /* the workspace frame follows the taller nav */
 html[data-density="comfortable"] .lesson{height:calc(100vh - 110px)}
 /* the Learn / Home / Practice cards */
-html[data-density="comfortable"] .hc-cap, html[data-density="comfortable"] .pcard-cap, html[data-density="comfortable"] .fr-cap,
-html[data-density="comfortable"] .acard-cap, html[data-density="comfortable"] .tcard-cap, html[data-density="comfortable"] .l-tier-cap{font-size:11px; min-height:36px}
-html[data-density="comfortable"] .lb .board-cap, html[data-density="comfortable"] .ref-card h2{min-height:36px}
-html[data-density="comfortable"] .lb .board-cap h2, html[data-density="comfortable"] .ref-card h2{font-size:11px}
-html[data-density="comfortable"] .hc-body, html[data-density="comfortable"] .pcard-body{padding:22px 24px 24px}
-html[data-density="comfortable"] .drill-row .drow{font-size:15px}
-html[data-density="comfortable"] .drill-row .dt-task{font-size:13.5px}
+html[data-density="comfortable"] .acard-cap, html[data-density="comfortable"] .tcard-cap{font-size:11px; min-height:36px}
 
 /* ---------- 3. compact: today's type sizes, and the content pages tighten (never the workspace) ---------- */
 html[data-density="compact"] .page-head{margin-bottom:14px}
-html[data-density="compact"] .practice-grid, html[data-density="compact"] .practice-main, html[data-density="compact"] .practice-rail{gap:12px}
-html[data-density="compact"] .pcard-body, html[data-density="compact"] .acard-body, html[data-density="compact"] .tcard-body,
-html[data-density="compact"] .hc-body{padding:14px 16px 16px}
-/* a drill row on one line where it fits: the task runs on after the title */
-html[data-density="compact"] .drill-list{gap:5px}
-html[data-density="compact"] .drill-row{padding:6px 12px}
-html[data-density="compact"] .dt-line, html[data-density="compact"] .dt-task{display:inline}
-html[data-density="compact"] .dt-task{margin:0}
+
+html[data-density="compact"] .acard-body, html[data-density="compact"] .tcard-body{padding:14px 16px 16px}

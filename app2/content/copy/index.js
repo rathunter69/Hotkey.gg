@@ -4277,7 +4277,6 @@ export const COPY = {
   "learn_tab": "Chapter {n}",
   "learn_page_fill": "Pass the challenge to fill this in.",
   "learn_page_built": "{page}, built",
-  "learn_pro_chapter": "Chapter {n} is Pro.",
   "learn_coming": "Chapter {n} is being written. Its modules land here.",
   "practice_drills": "Drills",
   "practice_set_line": "{count} drills picked for you, about {minutes}.",

@@ -5,7 +5,6 @@
    palette so the sheet flips to light paper while the chrome stays dark. Class names are the old
    build's, so the old CSS applies unchanged to the new painter. */
 
-/* ---------- 1. tokens, reset, body, .app (index.html 75–95) ---------- */
 /* the tokens (every color, size, radius, space and duration) live in ui/tokens.css (M87); the
    names this file was written against (--bg, --surface, --text, --accent …) are aliases there */
 *{box-sizing:border-box;margin:0;padding:0}
@@ -23,88 +22,6 @@ body{
 html{scrollbar-gutter:stable}
 body{padding-top:14px}
 .wrap{max-width:1180px; margin:0 auto; padding:0 24px}
-
-/* ---------- TOP NAV (three sections: brand · pages · tools) ---------- */
-.topnav{width:100%; background:var(--bg); margin-bottom:30px; position:relative}
-.topnav-in{max-width:1180px; margin:0 auto; padding:0 24px; height:60px; display:flex; align-items:center; gap:18px}
-.topnav-brand{font-family:var(--mono); font-weight:700; font-size:16px; letter-spacing:-.5px; color:var(--text); text-decoration:none}
-.topnav-brand b{color:var(--accent); font-weight:700}
-.topnav-pages{display:flex; align-items:center; gap:4px; margin-left:14px}
-
-.topnav-link{font-family:var(--mono); font-size:13px; color:var(--text); text-decoration:none;
-  padding:7px 12px; border-radius:7px; transition:all .15s; letter-spacing:.2px;
-  display:inline-flex; align-items:center; gap:8px}
-.topnav .topnav-link svg{width:19px !important; height:19px !important; display:block; flex:none}
-.tl-label{display:none}
-@media (min-width: 1120px){ .topnav .tl-label{display:inline; font-size:12.5px} }
-.topnav-link:hover{color:var(--text); background:var(--surface)}
-.topnav-link.active{color:var(--accent); background:var(--surface)}
-.topnav-tools{display:flex; align-items:center; gap:2px; margin-left:auto}
-.topnav-icon{background:none; border:none; color:var(--muted); cursor:pointer; padding:8px;
-  border-radius:6px; transition:all .15s; display:inline-flex; align-items:center; justify-content:center}
-.topnav-icon:hover{color:var(--text); background:var(--surface)}
-.topnav-icon svg{display:block}
-.topnav-theme-name{font-family:var(--mono); font-size:12px; color:var(--muted); cursor:pointer; letter-spacing:.3px; text-transform:lowercase; white-space:nowrap; padding:0 4px; transition:color .15s}
-.topnav-theme-name:hover{color:var(--accent)}
-.topnav-tools .auth-slot{margin-left:8px; padding-left:14px; border-left:1px solid var(--line)}
-.topnav-burger{display:none; background:none; border:none; color:var(--text); font-family:var(--mono); font-size:22px; cursor:pointer; padding:4px 10px}
-@media (max-width:760px){
-  .topnav-in{padding:0 16px; gap:10px}
-  .topnav-pages{display:none; position:absolute; top:60px; left:0; right:0; flex-direction:column;
-    gap:0; background:var(--bg); border-bottom:1px solid var(--line); padding:6px 0; margin:0;
-    z-index:120; box-shadow:0 18px 40px -18px rgba(0,0,0,.35)}
-  .topnav-pages.open{display:flex}
-  .topnav-link{padding:12px 22px; border-radius:0; width:100%}
-  .tl-label{display:inline}
-  .topnav-tools .auth-slot{display:none}
-  .topnav-theme-name{display:none}
-  .topnav-burger{display:block; margin-left:auto}
-}
-#navMount .topnav{margin-bottom:20px}   /* the trainer's tighter nav gap (index.html 1294) */
-
-/* the trainer's card cap (index.html 1708–1710, loaded BEFORE nav.css): the card caps at the viewport and
-   scrolls INSIDE its own backer — a card that fits shows no scrollbar, a tall one never spawns a page scrollbar */
-.pc-card{background:var(--surface); border:1px solid var(--line); border-radius:16px;
-  width:640px; max-width:96vw; padding:26px 30px 22px; box-shadow:0 28px 80px rgba(0,0,0,.65); margin:auto;
-  max-height:calc(100vh - 80px); overflow-y:auto}
-/* ---------- MODAL BASE (used by the theme picker) ---------- */
-.profile-modal{position:fixed; inset:0; background:rgba(0,0,0,.66); display:none;
-  align-items:flex-start; justify-content:center; z-index:62; padding:38px 22px; overflow:auto}
-.profile-modal.show{display:flex}
-.pc-card{background:var(--surface); border:1px solid var(--line); border-radius:16px;
-  width:640px; max-width:96vw; padding:26px 30px 22px; box-shadow:0 28px 80px rgba(0,0,0,.65); margin:auto}
-.pc-head{display:flex; align-items:center; justify-content:space-between; gap:16px}
-.pc-name{font-family:var(--mono); font-size:22px; font-weight:700; color:var(--text); letter-spacing:-.5px}
-.pc-sub{font-family:var(--mono); font-size:11.5px; color:var(--muted); margin:6px 0 18px}
-.pc-foot{display:flex; gap:8px 16px; justify-content:space-between; align-items:center; margin-top:20px;
-  flex-wrap:wrap}
-.pc-foot a{font-family:var(--mono); font-size:12px; color:var(--muted); cursor:pointer; text-decoration:none}
-.pc-foot a:hover{color:var(--accent)}
-.pc-msg{font-family:var(--mono); font-size:13px; color:var(--muted); text-align:center; padding:30px 10px; line-height:1.6}
-
-/* ---------- THEMES MODAL ---------- */
-.th-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:12px 0 4px}
-.th-card{border:1px solid var(--line); border-radius:10px; padding:14px 14px 12px; cursor:pointer;
-  text-align:left; transition:all .15s; position:relative; font-family:var(--mono)}
-.th-card:hover{transform:translateY(-2px); box-shadow:0 8px 20px rgba(0,0,0,.35)}
-.th-card.sel{box-shadow:0 0 0 2px var(--accent), 0 8px 20px rgba(0,0,0,.35)}
-.th-card.sel::after{content:'\2713'; position:absolute; top:6px; right:9px; font-size:12px; color:var(--accent); font-weight:700}
-.th-name{font-size:13px; font-weight:600; margin-bottom:8px}
-.th-bars{display:flex; gap:4px}
-.th-bars span{display:block; width:18px; height:8px; border-radius:2px}
-@media(max-width:560px){ .th-grid{grid-template-columns:repeat(2,1fr)} }
-
-/* ---- player card v3: fixed-height card, pinned close, inner scroll ---- */
-.pc-card{position:relative; max-height:82vh; display:flex; flex-direction:column}
-.pc-x{position:absolute; top:12px; right:16px; font-family:var(--mono); font-size:20px; color:var(--muted);
-  cursor:pointer; line-height:1; padding:4px 8px; border-radius:8px; z-index:3}
-.pc-x:hover{color:var(--text); background:var(--surface2)}
-.pc-scroll{overflow-y:auto; margin-top:4px; padding-right:8px; flex:1; min-height:0}
-/* ---- modal × (shared) ---- */
-.modal-x{position:absolute; top:10px; right:14px; font-family:var(--mono); font-size:20px;
-  color:var(--muted); cursor:pointer; line-height:1; padding:4px 8px; border-radius:8px; z-index:5}
-.modal-x:hover{color:var(--text); background:var(--surface2)}
-.pc-card{position:relative}
 
 /* ---------- 3. formula bar (index.html 126–149) + .ftimer (761–763) ---------- */
 .fbar{display:flex; align-items:stretch; margin-bottom:0; border:0!important; border-bottom:1px solid var(--line)!important; border-radius:0!important; font-family:var(--mono);
@@ -130,11 +47,7 @@ body{padding-top:14px}
   text-overflow:ellipsis; display:flex; align-items:center; min-width:0}
 .fcontent.isfx{color:var(--accent)}
 .fcontent.empty{color:var(--faint); font-style:italic; font-family:var(--sans); font-size:12px}
-.ftimer{font-family:var(--mono); font-size:16px; font-weight:700; letter-spacing:-.3px; color:var(--muted);
-  padding:7px 13px; border-right:1px solid var(--line); display:flex; align-items:center; justify-content:flex-start; min-width:58px}
-.ftimer.run{color:var(--accent)}
 
-/* ---------- 4. grid wrap, table, cells, spill, fills (index.html 151–260) ---------- */
 /* The sheet is Excel at 100% (SITE_SPEC §4). The wrap is a SCROLL BOX: the frame's flex chain (section
    11) gives it its height and width, and its own content adds nothing to either (the table is absolutely
    positioned inside it), so a 100-row sheet never grows the page or pushes the panel. The table paints
@@ -143,10 +56,10 @@ body{padding-top:14px}
    fall back to. r79: sheet flush to the frame's top-left, like the real thing. */
 .gridwrap{background:transparent; border:0; border-radius:0; padding:0; margin:0;
   overflow:auto; position:relative; min-width:0; min-height:0; align-self:stretch; display:block;
-  --cellh:20px; --cellpad:3px; --cellfs:14.67px; --rowhdrw:36px}   /* Excel's defaults: 20px rows, 11pt cells, a 36px row-number column */
+  --cellh:20px; --cellpad:3px; --cellfs:14.67px; --rowhdrw:36px}
 /* r304: the sheet background paints on the TABLE, not the wrap */
 .gridwrap table{position:absolute; top:0; left:0; table-layout:fixed; background:var(--surface); font-size:var(--cellfs,14.67px)}
-table{border-collapse:collapse; font-family:var(--cellfont); font-size:13.5px}   /* r65: Calibri renders smaller — sized up (tables outside the grid; the grid sets its own size above) */
+table{border-collapse:collapse; font-family:var(--cellfont); font-size:13.5px}
 /* r216: the edit caret is a zero-width CSS bar constrained inside the text's line box, so entering
    edit mode never reflows the row. */
 .edcaret{display:inline-block; width:0; height:.92em; border-right:1.6px solid var(--accent);
@@ -170,7 +83,7 @@ td.sel.spill .sphi{background:var(--sel-grey)}
 td.wrap{white-space:pre-line; line-height:1.18; font-size:12px}   /* Alt+Enter line breaks show (M41) */
 td.bold{font-weight:700}
 td.fill-blue{background:#9cc3e8 !important; color:#153c7a}   /* r160: #dbeafe was 1.05:1 vs paper sheets — invisible fill */
-html[data-dark="1"] td.fill-blue{background:#1d5080 !important; color:#cfe8ff}   /* r160: #16344e was 1.03:1 vs everforest/onedark sheets */
+html[data-dark="1"] td.fill-blue{background:#1d5080 !important; color:#cfe8ff}
 /* r231: the FILL PALETTE — Alt H H picker. Banker shades: grey headers, yellow flags, green, red. Three theme layers each (light / dark chrome / dark-chrome-light-sheet). */
 td.fill-gray{background:#d4d4d4 !important; color:#2a2a2a}
 td.fill-yellow{background:#ffe699 !important; color:#6b5300}
@@ -193,7 +106,7 @@ html[data-dark="1"] .gridwrap{
   --bg:#f7f6f1; --surface:#f0efe8; --surface2:#e4e2da; --line:#c9c7bf;
   --text:#22262b; --muted:#66696e; --faint:#9a9da2;
   --warn:#9a6700; --bad:#b3261e;
-  --accent:#1f8a55; --accent-dim:#14663d; --accent-glow:rgba(31,138,85,.14);   /* Excel-green selection on the light sheet */
+  --accent:#1f8a55; --accent-dim:#14663d; --accent-glow:rgba(31,138,85,.14);
 }
 /* the sheet is light now → font swatches + blue fill use their LIGHT base values */
 html[data-dark="1"] .gridwrap td.fc-black    {color:var(--text) !important}
@@ -232,11 +145,11 @@ html[data-dark="1"] td.fc-red      {color:#ff7b66 !important}
 html[data-dark="1"] td.fc-green    {color:#5fd68a !important}
 html[data-dark="1"] td.fc-purple   {color:#c08bff !important}
 html[data-dark="1"] td.fc-yellow   {color:#ffd75e !important}
-html[data-dark="1"] td.fc-orange   {color:#ed7d31 !important}   /* r160: darker base needs the bright dark variant back */
+html[data-dark="1"] td.fc-orange   {color:#ed7d31 !important}
 /* r204: on LIGHT sheets, black-formatted cells read as the softened graphite --text, not pure #000. */
 html[data-dark="0"] td.fc-black    {color:var(--text) !important}
 td.over{color:var(--warn); letter-spacing:1px}
-td .padx{visibility:hidden}   /* an _x pad in a number format: a gap the width of x (_) is a closing bracket), M64 */
+td .padx{visibility:hidden}
 /* r253: the edit box POPS OUT beyond the column so a long formula reads in-cell (Excel behavior).
    The cell stops clipping; an absolute overlay grows to the formula's width and paints over the
    empty neighbors to the right. */
@@ -246,7 +159,6 @@ td.editing .edbox{position:absolute; left:0; top:0; bottom:0; min-width:100%; wi
   box-shadow:inset 0 0 0 2px var(--accent); z-index:6}
 td.editing .edin{white-space:nowrap}
 
-/* ---------- 5. gridline softener + gridlines toggle (index.html 286, 289) ---------- */
 /* The softened gridline is computed ONCE, on the table, and reaches the 2,600 cells by inheritance as a plain
    colour: a var()/color-mix() written on the td itself is substituted and re-parsed per cell and was 40% of a
    full paint's style time. (Selection edges td.sel-* keep the precedence they always had against this rule.) */
@@ -272,7 +184,7 @@ td.sel-r{border-right:1.5px solid var(--cell-cursor)}
 /* r312/r313: the fill-handle square at the current cell's bottom-right, just inside the corner. */
 td.fh::after{content:''; position:absolute; right:0; bottom:0; width:6px; height:6px;
   background:var(--cell-cursor); z-index:6}   /* r317: flush + tight in the corner, Excel-style */
-td.editing.fh::after, td.point.fh::after{display:none}   /* no handle mid-edit / while pointing */
+td.editing.fh::after, td.point.fh::after{display:none}
 /* the paste flash (§6a: opacity only): an accent veil over each pasted cell fades out. It rides
    ::before, which stays rendered for as long as the cell is .pasted (even as the active cell or a
    spill), so moving the selection never restarts it; multiply keeps the cell's text dark under it.
@@ -283,9 +195,7 @@ td.pasted::before{content:''; display:block; position:absolute; inset:0; backgro
 td.pasted.active::before, td.pasted.spill::before{display:block}
 td.pasted.sel:not(.spill){background-image:linear-gradient(var(--sel-grey),var(--sel-grey))}
 td.pasted.sel.active{background-image:none}
-.pastedest{position:absolute; display:none; pointer-events:none; z-index:5;
-  border:2px solid var(--cell-cursor); opacity:.95; border-radius:2px;
-  box-shadow:0 0 0 2px color-mix(in srgb, var(--cell-cursor) 22%, transparent)}
+
 .marquee{position:absolute; display:none; pointer-events:none; z-index:6;
   background-image:
     linear-gradient(90deg,var(--accent) 50%,transparent 50%),
@@ -324,7 +234,6 @@ td.thick.bl::after{border-left-width:3px}
 td.thick.br::after{border-right-width:3px}
 td.thick.ball::after{border-width:3px}
 
-/* ---------- 8. ribbon slot, strip, tiles, dropdown, pin (index.html 664–757) ---------- */
 /* r426: the strip floats inside a FIXED-HEIGHT SLOT: a menu that needs a second line grows the
    ribbon DOWNWARD as an overlay over the sheet, so the grid top is a constant in every state. */
 .ribbon-slot{position:relative; flex:0 0 var(--rib-h,34px); height:var(--rib-h,34px); z-index:12}   /* above the sheet's own layers (td 2-6, marquee 6); BELOW the floating dialogs (30) */
@@ -349,13 +258,13 @@ td.thick.ball::after{border-width:3px}
 .ribbon .opt.on k{border-color:var(--accent); color:var(--accent)}
 .ribbon .rtab k, .ribbon .opt k{display:inline-grid; place-items:center; min-width:20px; height:20px;
   color:var(--on-accent); background:var(--accent); border:none; border-radius:4px; padding:0 5px;
-  font-weight:700; font-size:12.5px}   /* r426: KeyTip badges up a half-step — they are the thing you READ off the strip */
+  font-weight:700; font-size:12.5px}
 /* r315: the Alt+H flyout, grouped like Excel's real Home tab — chips in clusters with a thin divider. */
 .ribbon .rgrp{display:inline-flex; flex-direction:column; align-items:center; gap:3px;
   padding:1px 10px; border-left:1px solid var(--line)}
 .ribbon .rgrp:first-of-type{border-left:0; padding-left:2px}
 .ribbon .rgrp-chips{display:inline-flex; gap:5px; flex-wrap:nowrap}
-.ribbon .rgrp-l{font-size:10px; letter-spacing:.6px; text-transform:uppercase; color:var(--faint); font-weight:600}
+
 /* r327: ICON-ribbon tiles — icon over name, a KeyTip badge in the corner (Excel-real). */
 .ribbon .rgrp-ico{padding:1px 8px}
 .ribbon .rgrp-ico .rgrp-chips{gap:2px; align-items:flex-start}
@@ -414,11 +323,10 @@ td.thick.ball::after{border-width:3px}
 .ribbon .ri-ico{height:19px; display:flex; align-items:center; justify-content:center; color:var(--text)}
 .ribbon .ri-ico svg{width:18px; height:18px}
 .ribbon .ri-g{font-family:var(--mono); font-size:15px; line-height:1; color:var(--text)}
-.ribbon .ri-name{font-size:10px; line-height:1.15; color:var(--muted); text-align:center; max-width:56px}
+
 .ribbon .ri-key{position:absolute; top:1px; right:2px; font-family:var(--mono); font-size:10px; font-weight:700;
   color:var(--on-accent,#0c0d0e); background:var(--accent); border-radius:3px; padding:0 3px; line-height:1.5}
 
-/* ---------- 9. solved flash (778–779), dead tabs / note / swatches / filter chips (781–793), paste-special + format-cells card (799–822) ---------- */
 /* (the old whole-sheet "solved" background flash is gone: nothing sets .solved in the rebuild, and
    the finish ring in 12b is the one completion cue) */
 .ribbon .rtab.dim{color:var(--faint); background:transparent; border-color:transparent}
@@ -429,11 +337,7 @@ td.thick.ball::after{border-width:3px}
   vertical-align:middle; margin:0 1px; transition:.1s; cursor:pointer}
 .ribbon .fc-swatch.on, .rdrop .fc-swatch.on{border-color:var(--accent); outline:2px solid var(--accent-glow); transform:scale(1.18)}
 .ribbon .fc-name{color:var(--accent); font-family:var(--mono); font-size:12.5px; margin:0 8px 0 4px; min-width:54px}
-/* AutoFilter value chips in the ribbon picker */
-.ribbon .fl-chip{display:inline-block; padding:1px 7px; margin:0 2px; border-radius:4px; border:1px solid var(--line);
-  font-family:var(--mono); font-size:12px; vertical-align:middle}
-.ribbon .fl-chip.cur{border-color:var(--accent); outline:2px solid var(--accent-glow)}
-.ribbon .fl-chip.drop{opacity:.45; text-decoration:line-through}
+
 /* r191: Excel parity — Paste Special / Format Cells float OVER the sheet as a compact card;
    the page never dims and the card is exactly content-sized (no inset stretch) */
 .pd-backdrop{display:none; z-index:50}
@@ -468,7 +372,7 @@ td.thick.ball::after{border-width:3px}
 #hkToast kbd{display:inline-block; font-family:inherit; font-size:11px; color:var(--text);
   background:var(--surface); border:1px solid var(--line); border-bottom-width:2px;
   border-radius:4px; padding:0 6px; margin:0 2px}
-#hkToast .tip-dot{color:var(--accent); margin-right:7px}
+
 .kchip{font-family:var(--mono); font-size:11.5px; color:var(--text); background:var(--surface2);
   border:1px solid var(--line); border-radius:5px; padding:2px 7px}
 .kchip.empty{color:var(--faint); background:transparent; border:none}
@@ -483,10 +387,9 @@ td.thick.ball::after{border-width:3px}
 .keyflash.demo .kchip{font-size:21px; padding:9px 16px; border-radius:10px; font-weight:700}
 .keyflash.demo .kchip.new{background:var(--accent); color:var(--on-accent); border-color:var(--accent); box-shadow:0 8px 30px var(--accent-glow)}
 .rowhdr.grp{box-shadow:inset 3px 0 0 var(--accent)}
-.rowhdr.hidcut{border-top:3px double var(--accent)}   /* r299: hidden rows above — Excel's break-line cue */
 
 /* ---------- 11. stage flex chain (index.html 1305, 1406–1408, 1445–1447) ---------- */
-html.hk-fs .stage-row{min-height:clamp(400px, calc(100vh - 262px), 900px)}
+
 .stage{display:flex; flex-direction:column; gap:0; background:var(--surface);
   border:1px solid var(--line); border-radius:12px; overflow:hidden}
 .stage-row{display:flex; align-items:stretch; gap:0; flex:1; min-height:clamp(400px, calc(100vh - 330px), 800px)}   /* r60/r398: the frame fills the screen; the sheet grows DOWN into the page's bottom whitespace */
@@ -539,7 +442,6 @@ td.cmt::after{content:''; position:absolute; top:0; right:0; width:0; height:0;
 @keyframes fxRingFade{0%{opacity:0}35%{opacity:1}100%{opacity:0}}
 @media (prefers-reduced-motion: reduce){ .fx-tick{transform:translateY(-50%); animation:fxTickFade .2s ease-out forwards} .fx-tick.out{animation:fxTickFadeOut .25s ease-in forwards} .fx-ring{animation-name:fxRingFade} }
 
-/* ---------- 12c. the FULL RIBBON (SITE_SPEC §4): tab row, groups, labelled buttons, KeyTips ---------- */
 /* the slot stays a constant height in each mode, so the sheet never moves when a menu opens */
 .ribbon-slot.rib-full{--rib-h:96px}
 .ribbon.ribbon-full{height:var(--rib-h,96px); min-height:0; padding:0; gap:0; flex-direction:column; align-items:stretch; flex-wrap:nowrap; overflow:hidden}
@@ -567,7 +469,7 @@ td.cmt::after{content:''; position:absolute; top:0; right:0; width:0; height:0;
    icon button, so the buttons fit their glyphs and keep 2px apart instead of running together */
 .rf-row:has(> [data-tip="H0"]){gap:2px}
 .rf-row:has(> [data-tip="H0"]) > .rf-btn.ico{width:auto; min-width:22px; padding:0 3px}
-.rf-gname{font-family:var(--mono); font-size:10px; letter-spacing:.06em; text-transform:uppercase; color:var(--faint); font-weight:600; line-height:1; padding-top:2px; white-space:nowrap; flex:none}   /* its row is reserved: nothing above ever prints on it */
+.rf-gname{font-family:var(--mono); font-size:10px; letter-spacing:.06em; text-transform:uppercase; color:var(--faint); font-weight:600; line-height:1; padding-top:2px; white-space:nowrap; flex:none}
 /* buttons: small (icon + label in a row) and big (icon over label); both carry a KeyTip badge in the corner */
 .rf-btn{position:relative; display:inline-flex; align-items:center; gap:4px; height:17px; padding:0 4px; border:1px solid transparent; border-radius:5px;
   background:transparent; color:var(--text); font-family:var(--mono); font-size:10px; line-height:1; cursor:pointer; white-space:nowrap; transition:background .1s, border-color .1s}
@@ -619,14 +521,14 @@ td.cmt::after{content:''; position:absolute; top:0; right:0; width:0; height:0;
 .rf-box{position:relative; display:inline-flex; align-items:center; justify-content:space-between; height:17px; padding:0 5px; border:1px solid var(--line); border-radius:4px;
   background:var(--surface); font-family:var(--mono); font-size:10px; color:var(--text); white-space:nowrap; overflow:hidden}
 .rf-row > .rf-box:only-child{flex:1 0 auto}   /* the Excel width is a floor (inline min-width): a box grows to its text, and a column's boxes share one width */
-.rf-box > .rf-caret{margin-left:6px}   /* a box sized to its text keeps its arrow clear of the last letter */
+.rf-box > .rf-caret{margin-left:6px}
 /* the KeyTip badge on a full-bar control: hangs under a small control and sits on a big one's icon, never in the layout flow;
    sized to its letters (right:auto: the base .ribbon .ri-key's right:2px plus a left stretched it over the whole button, hiding the label) */
 .ribbon-full .ri-key, .rdrop-menu .ri-key, .rdrop-dialog .ri-key{position:absolute; top:auto; left:50%; right:auto; bottom:-6px; width:max-content; transform:translateX(-50%); font-family:var(--mono); font-size:10px; font-weight:800; line-height:1.3;
   color:var(--on-accent); background:var(--accent); border:1px solid color-mix(in srgb, var(--accent-dim) 60%, transparent); border-radius:3px; padding:0 3px; z-index:3; box-shadow:0 1px 3px rgba(0,0,0,.3); pointer-events:none; white-space:nowrap}
 .rf-btn.big > .ri-key, .rf-split.big > .ri-key{top:1.4em; bottom:auto}   /* on the icon's lower half: the label under it stays readable at either density */
 .rf-btn.ico > .ri-key{left:auto; right:-4px; transform:none}
-.rf-btn:not(.ico):not(.big) > .ri-key, .rf-box > .ri-key{left:-2px; transform:none}   /* a labelled small button: under its icon, the label stays readable */
+.rf-btn:not(.ico):not(.big) > .ri-key, .rf-box > .ri-key{left:-2px; transform:none}
 /* menus and small dialogs as anchored dropdowns */
 .rdrop.rdrop-menu, .rdrop.rdrop-dialog{padding:8px 6px 6px; min-width:200px}
 .rdrop-menu .rdrop-hint{white-space:nowrap; padding:5px 8px 3px 10px; margin-top:4px; border-top:1px solid var(--line)}   /* the footer hint: one line, lined up with the items, off the menu's edge */
@@ -663,14 +565,13 @@ td.cmt::after{content:''; position:absolute; top:0; right:0; width:0; height:0;
 .ribbon.ribbon-lean .rpin{position:sticky; right:0; background:var(--surface2); box-shadow:-6px 0 8px var(--surface2)}
 .rf-tools .rpin{margin-left:0}
 
-/* ---------- 13. density pass (index.html 2296–2298) — MUST stay LAST: the ID-scoped rule beats the base td rule ---------- */
 /* ---- Excel at 100% (SITE_SPEC §4): 20px rows, 11pt Arial/Calibri-class cells, 11px headers that stick ---- */
 #grid td, #grid th{font-size:var(--cellfs,14.67px); height:var(--cellh,20px); padding:0 var(--cellpad,3px); line-height:1.15}   /* 11pt sits in a 20px row with 1.5px to spare, like Calibri 11 in Excel's 15pt row */
 #grid td{transition:none}   /* no 80ms background fade on 2,600 cells: it cost a fifth of a full paint and was never visible */
 #grid th{font-size:11px; padding:0 2px; position:sticky; z-index:7; background:var(--surface2)}   /* above every cell layer (active 4, editing 6, marquee 6); the ribbon slot (12) and dialogs (30) stay above */
 #grid tr:first-child th{top:0}               /* the column letters ride the top edge of the scroll box */
 #grid th.rowhdr{left:0}                      /* the row numbers ride the left edge */
-#grid tr:first-child th.rowhdr{z-index:8}    /* the corner sits over both */
+#grid tr:first-child th.rowhdr{z-index:8}
 /* r353: the Paste Special / Format Cells wrapper is positioning-only; .pd-box carries the one tight card look. */
 #pasteDialog,#fmtDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
 
@@ -690,7 +591,7 @@ td.cmt::after{content:''; position:absolute; top:0; right:0; width:0; height:0;
 #grid th .ol-btn:hover{background:var(--accent); color:var(--on-accent)}
 #grid tr:first-child th .ol-btn{left:auto; right:1px; top:auto; bottom:1px}
 /* ---- C2 gap 5: show formulas (Ctrl+`) — formula text sits left like text, never a #### verdict ---- */
-#grid td.fxshow{font-family:var(--mono); font-size:12px; text-align:left !important}   /* formula text reads left whatever the cell's alignment */
+#grid td.fxshow{font-family:var(--mono); font-size:12px; text-align:left !important}
 
 /* run R1 engine work: the status bar, the Name Box list, Formula AutoComplete, the expanded formula bar, a collapsed ribbon */
 .sbar{display:flex; align-items:center; gap:14px; flex:0 0 auto; min-height:22px; padding:0 10px; border-top:1px solid var(--line); background:var(--surface2);

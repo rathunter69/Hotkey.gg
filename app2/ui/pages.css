@@ -159,6 +159,9 @@
 .sp-tab{align-self:flex-start; font-family:var(--font); font-size:var(--fs-min); color:var(--ink-2); background:var(--chrome); padding:var(--bw-2) var(--s3); border-top:1px solid var(--line); border-right:1px solid var(--line)}
 
 /* ---------- the Practice pages' header block ---------- */
+/* the header block is the page's selected item (Enter presses its primary button), but its Enter keycap already says so: no cursor ring round the block */
+.hdr.cursor-on{outline-color:transparent}
+.hdr.cursor-on::after{content:none}
 .hdr{flex-direction:row; align-items:center; justify-content:space-between; gap:var(--s6); padding:var(--s6) var(--s6)}
 .hdr-main{display:flex; flex-direction:column; gap:var(--s1); min-width:0}
 .hdr-row{display:flex; align-items:baseline; gap:var(--s4)}

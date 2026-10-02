@@ -8,6 +8,7 @@
 //   paywallHtml({ heading, line, signedIn })             → the panel's markup
 //   const pw = mountPaywall(el, { heading, signedIn, onNotNow, goHref }); pw.destroy();
 import { siteCopy } from '../../content/copy/apply.js';
+import { panelHtml, buttonHtml } from './table.js';
 
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const t = (key, fb) => siteCopy(key, fb);
@@ -15,16 +16,17 @@ const t = (key, fb) => siteCopy(key, fb);
 /** The paid line the catalog shows on a locked chapter; one source for the lock page and the lists. */
 export const PAID_LINE = () => t('paywall_line', 'Go Pro for the rest of the content.');
 
-export function paywallHtml({ heading = '', signedIn = false, goHref = '#/pricing' } = {}) {
-  return `<section class="panel panel-mode paywall" data-mode="learn" aria-label="${esc(t('paywall_pro', 'Pro'))}">
-    <div class="h-row"><h2 class="h-panel">${esc(heading)}</h2><span class="label paywall-mark">${esc(t('paywall_pro', 'Pro'))}</span></div>
-    <p class="body">${esc(PAID_LINE())}</p>
-    ${signedIn ? `<p class="body ink-2">${esc(t('paywall_signed_in', 'This account isn’t Pro yet. Go Pro, or redeem a code in Plan and billing.'))}</p>` : ''}
-    <div class="btn-row">
-      <a class="btn btn-primary" data-act="go" href="${esc(goHref)}">${esc(t('paywall_go', 'Go Pro'))}<kbd class="key key-on-fill">Enter</kbd></a>
-      <button type="button" class="btn" data-act="not-now">${esc(t('paywall_not_now', 'Not now'))}<kbd class="key">Esc</kbd></button>
-    </div>
-  </section>`;
+/**
+ * The panel: the heading with Pro at its right, the line, Go Pro (Enter) and Not now (Esc). `mode` is
+ * the page's color (learn on Learn and a lesson's door, drills in the catalog); `ids` names the two
+ * buttons for a page that wires them itself. The panel is the page's selected item (the cell cursor).
+ */
+export function paywallHtml({ heading = '', signedIn = false, goHref = '#/pricing', mode = 'learn', ids = {} } = {}) {
+  const body = `<p class="panel-line">${esc(PAID_LINE())}</p>` +
+    (signedIn ? `<p class="panel-line ink-2">${esc(t('paywall_signed_in', 'This account isn’t Pro yet. Go Pro, or redeem a code in Plan and billing.'))}</p>` : '') +
+    `<div class="btn-row">${buttonHtml({ label: t('paywall_go', 'Go Pro'), key: 'Enter', href: goHref, primary: true, id: ids.go || '', attrs: { 'data-act': 'go' } })}${buttonHtml({ label: t('paywall_not_now', 'Not now'), key: 'Esc', quiet: true, id: ids.notNow || '', attrs: { 'data-act': 'not-now' } })}</div>`;
+  return panelHtml({ heading: esc(heading), facts: `<span class="paywall-mark">${esc(t('paywall_pro', 'Pro'))}</span>`, body, mode, cls: 'paywall',
+    attrs: { 'aria-label': t('paywall_pro', 'Pro'), 'data-cursor': true, 'data-cursor-enter': '[data-act="go"]', tabindex: '-1' } });
 }
 
 /**
