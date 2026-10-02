@@ -16,7 +16,7 @@ export default {
   section: 'Pivot tables',
   module: 'pivot-tables',
   workbook: 'clearcoat-pack',
-  state: { before: 'S44', after: 'S441' },
+  state: { before: 'S436', after: 'S441' },   // S44 in the workbook's map: 4.4 starts where 4.3.6 ended
   title: 'Build and rearrange',
   difficulty: 'medium',
   tags: ['pivot tables', 'summaries'],

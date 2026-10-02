@@ -37,7 +37,7 @@ export default {
   section: 'Scenarios and sensitivity',
   module: 'scenarios-and-sensitivity',
   workbook: 'clearcoat-pack',
-  state: { before: 'S45', after: 'S451' },
+  state: { before: 'S443', after: 'S451' },   // S45 in the workbook's map: 4.5 starts where 4.4.3 ended
   plant: PLANT,
   title: 'A case toggle with CHOOSE and INDEX',
   difficulty: 'medium',
