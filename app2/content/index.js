@@ -62,7 +62,7 @@ import busiest_sites from './lessons/busiest-sites.js';
 import sumproduct_blended_ticket from './lessons/sumproduct-blended-ticket.js';
 import the_reconciliation from './lessons/the-reconciliation.js';
 import challenge_site_package_summary from './lessons/challenge-site-package-summary.js';
-// PENDING import split_the_codes from './lessons/split-the-codes.js';
+import split_the_codes from './lessons/split-the-codes.js';
 // PENDING import parse_the_memo from './lessons/parse-the-memo.js';
 // PENDING import text_to_numbers from './lessons/text-to-numbers.js';
 // PENDING import text_to_columns_flash_fill from './lessons/text-to-columns-flash-fill.js';
@@ -129,7 +129,7 @@ export const CHAPTERS = [
     ],
     lessons: [
       round_family, countif_countifs, sumif_sumifs_averageifs, busiest_sites, sumproduct_blended_ticket, the_reconciliation, challenge_site_package_summary,
-      /*PENDING2*/
+      split_the_codes, /*PENDING2*/
     ],
   },
 ];
