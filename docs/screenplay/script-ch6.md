@@ -477,3 +477,45 @@ QUARTILE.INC; MEDIAN over a conditional set (array evaluation of MEDIAN(IF()) or
   - Charts stay out: the football field is a table (screenplay section 5). Confirm for the board page, where a chart is most tempting.
   - Source pass (2026-09-30): the fold-back plan in claude/source-checklist.md (section H) is applied to this chapter as DRAFT: 36 edits, plus eight held items pulled back on Wolf's depth call (G193, G162, G137, G140, G156, G155, G146, G163). Wolf's calls of that day are in the decision log (screenplay 11); what was held back stays listed in the checklist's section B.
   - Scope (Wolf, 2026-09-30): merger math and the deeper public-company comps work (share counts and dilution, EPS and P/E, premiums on one-day and one-month unaffected prices) stay out of the chapter as too finance-heavy; they're parked as add-ons (screenplay 4.10). Module 6.1 stays as written: six fictional listed operators, enterprise-value multiples only.
+
+## Built differently
+
+### The workbook (r6-ch6-workbook)
+- Chapter 6 is its own workbook, clearcoat-valuation, built on Chapter 5's finished model plus five pages (Comps, Precedents, LBO, Bids, Summary); the learner sees one workbook.
+- 6.3.1: the $195,000k bid is the blue input and the entry multiple is a formula (11.75x, not 11.7x), per checklist H.
+- 6.4.2: the option pool is 5% of equity value above the $40,000k strike, floored at zero; every waterfall deduction is a MIN against what is left.
+- Summary is labelled USD millions and holds thousands shown in millions by number format.
+- The sponsor return as built: IRR 12.1% (MOIC 1.77x) at the $195,000k bid, not about 18%; the 20% price is about $164,500k and the LBO range on the football field ($151m to $173m) sits below all three bids, so the hurdle reads Short. Cause: the rollout capex leaves little cash for debt paydown (checklist H line 251). 6.3.2, 6.3.5, 6.3.6 and the board story use these real figures; raising the return would mean changing the Chapter 5 case, left for Wolf's playtest.
+- Built figures: comps $165.9m / $174.4m / $189.4m (median 10.5x); precedents $198.2m / $203.2m / $208.0m (median 12.2x); priced bids A $185.0m, B $187.5m, C $194.2m; on expected value the page recommends bid A.
+
+### 6.1 (r6-lessons-a)
+- 6.1.1: E and H fill with Ctrl+Enter, not Ctrl+D, so the $ format stays on the first row. The source-and-date practice is a goal that lands on AA5.
+- 6.1.2: the LTM date input is built second, because SUMIFS reads it. A prior-year LTM goal in column Q is added for 6.1.3's growth. The headers arrive written.
+- 6.1.3: Clearcoat's row is built here. The values copy arrives unsorted and is sorted with Alt A S D. Flipping Harbor's outlier flag is a learner goal.
+- 6.1.4: sites, washes, owns or rents, and rent arrive typed and sourced.
+- 6.1.5: goal 1 builds the EV/EBITDA row. The $m format arrives planted, and the learner bolds the median column.
+- 6.1.C runs for 180 seconds, not five minutes. Any formula that sums the last four quarters passes. The site counts arrive typed.
+
+### 6.2 and 6.3 (r6-lessons-b)
+- 6.2.1 builds the as-of date and the deal ages. In 6.2.2 the copy goes in as values, and the date sort changes nothing because the deals are already in date order.
+- 6.3.1 runs off the typed $195,000k bid, and the rest of the term sheet is supplied.
+- 6.3.2: the sweep never runs at these figures. The revolver draws every year and net debt rises over the hold.
+- 6.3.3 drops the exit-value reading; the returns are read in 6.3.4.
+- 6.3.4 has one closing, an exit at 12x. The returns are an IRR of 12.1% and a MOIC of 1.77x, and the hurdle reads Short.
+- 6.3.5: growth is 155% of the gain, while the multiple and paydown effects are negative.
+- 6.3.6 uses the workbook's formula grid, not a Data Table. The Downside reading is only in the closing.
+- Both challenges run for 3 minutes, the schema's cap, not the script's 4 and 5. 6.3.C grades against the paper LBO re-solved on the learner's own inputs.
+
+### 6.4, project, assessment and drills (r6-lessons-c)
+- 6.4.1: the term sheets and notes arrive filled in, and the learner prices them.
+- 6.4.3: the stake inputs already sit on Bids. The closing changes the option share instead of the strike.
+- 6.4.4: the print setup goal is dropped, because the pack's end state has no page setup.
+- 6.4.C: the Summary labels and formats are planted.
+- 6.P: everything arrives filled in except the decisions: the include flags, the units line, the leading bid and the board's line.
+- 6.A: the precedents, the LBO, each peer's LTM and the operating metrics arrive finished. The learner builds the comps spread and range, the bids, the waterfall, the stake and the Summary, because the whole pack would not fit in 15 minutes. The seed sets fresh bid odds, so the leading bid changes from run to run.
+- Drills: median-and-range has no sort step. paper-lbo comes with the tranches filled in, so it fits 3 minutes. spread-a-comp has no CAGR or Net cash column.
+
+### Integration (r6-int)
+- The pack sizes each page to its used range (rows past 90, columns past X), and a page may ask for more rows itself; the LBO asks for 160.
+- 6.4.C draws its fresh odds in the lesson's own seed; the other three challenges take theirs from the workbook's challengeSeed.
+- A node test ties the board page to the Chapter 5 model: FY26E EBITDA of $16,600k and the model's net debt at closing run through Comps, the LBO, Bids and the Summary, the LBO returns 12.1% and 1.77x at the $195,000k bid, and a change to the model's EBITDA moves the comps line on the Summary.

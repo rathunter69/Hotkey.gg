@@ -13,9 +13,8 @@ import * as WB from '../content/workbooks/clearcoat-valuation.js';
 import * as M from '../content/workbooks/clearcoat-model.js';
 
 const build = sp => new Sheet({ rows: sp.rows, cells: JSON.parse(JSON.stringify(sp.cells)), colW: sp.colW, freeze: sp.freeze, gridlines: sp.gridlines, condFmt: sp.condFmt });
-/** A live workbook from a state, as the runner assembles one. */
-function session(id) {
-  const st = WB.stateOf(id);
+/** A live workbook from a state, as the runner assembles one (the pack's by id, or any state given). */
+function session(id, st = WB.stateOf(id)) {
   const s = new Session(build(st.sheets[0]));
   s.renameSheet(0, st.sheets[0].name);
   for (const sh of st.sheets.slice(1)) s.addSheet(sh.name, build(sh), undefined, { recalc: false });
@@ -160,6 +159,35 @@ test('the finished pack ties: the model still balances, sources equal uses, ever
   // zero leverage: only the LBO page moves (nothing it reads changes), so it alone recalculates; no error anywhere on it
   sh(s, 'LBO').cells['C' + R.LBO.senLev].value = 0; sh(s, 'LBO').cells['C' + R.LBO.mezLev].value = 0; sh(s, 'LBO').recalc();
   assert.deepEqual(errors({ sheets: s.sheets.filter(e => e.name === 'LBO') }), []); assert.equal(one(s, 'LBO', 'lenderIrr'), 'n/a'); assert.equal(typeof one(s, 'LBO', 'irr'), 'number');
+});
+
+test('the board page ties to the model: EBITDA and net debt are Chapter 5\'s, the LBO returns 12.1% and 1.77x at the $195,000k bid, and a change to the model reaches the Summary', () => {
+  const s = session('DONE');
+  // the Chapter 5 model on its own, finished: the figures the pack imports
+  const ms = session(null, M.stateOf('DONE'));
+  const ebitda = sh(ms, 'IS').value('E' + M.ROW.IS.ebitda), netDebt = sh(ms, 'Schedules').value('E' + M.ROW.Schedules.netDebt);
+  assert.equal(ebitda, 16600, 'FY26E EBITDA in the Chapter 5 model'); assert.ok(netDebt > 0, 'net debt at closing in the Chapter 5 model');
+  assert.equal(sh(s, 'IS').value('E' + M.ROW.IS.ebitda), ebitda, 'the pack carries the model unchanged');
+  // EBITDA: Comps' Clearcoat line and the LBO's entry EBITDA read the model's FY26E
+  assert.equal(one(s, 'Comps', 'cc', C6.ebitda), ebitda); assert.equal(one(s, 'LBO', 'ebitda26'), ebitda);
+  // net debt: the LBO, the Bids page and the Summary's waterfall all take the model's
+  assert.equal(one(s, 'LBO', 'netDebtClose'), netDebt); assert.equal(one(s, 'Bids', 'netDebtClose'), netDebt);
+  assert.equal(one(s, 'Summary', 'wND'), -netDebt, 'the board page repays the model\'s net debt');
+  assert.equal(one(s, 'Summary', 'wEq'), one(s, 'Summary', 'wEV') - netDebt);
+  // the returns at the bid, as built (built differently: about 12%, not 18%), and the hurdle reads Short
+  assert.equal(one(s, 'LBO', 'entryEV'), 195000); near(one(s, 'LBO', 'entryMult'), 195000 / ebitda, 1e-9, '11.75x');
+  assert.equal(Math.round(one(s, 'LBO', 'irr') * 1000) / 10, 12.1, 'IRR 12.1%'); assert.equal(Math.round(one(s, 'LBO', 'moic') * 100) / 100, 1.77, 'MOIC 1.77x');
+  assert.equal(one(s, 'LBO', 'hurdleFlag'), 'Short');
+  // the football field reads the pages that read the model: comps on the model's EBITDA, the LBO ceiling
+  const med = one(s, 'Comps', 'stMed', C6.helper);
+  near(one(s, 'Summary', 'ffComps', 'D'), med * ebitda, 1e-6, 'the comps mid is the median times the model\'s EBITDA');
+  assert.deepEqual(row(s, 'Summary', 'ffLbo', ['C', 'D', 'E']), row(s, 'LBO', 'topEV', ['C', 'D', 'E']));
+  near(one(s, 'Summary', 'ffDcf', 'D'), sh(ms, 'DCF').value('C' + M.ROW.DCF.ev), 1e-6, 'the DCF mid is the Chapter 5 model\'s enterprise value');
+  // live: a change on the model reaches the board page (the comps line moves with FY26E EBITDA)
+  const isE = sh(s, 'IS').cells['E' + M.ROW.IS.ebitda]; const before = one(s, 'Summary', 'ffComps', 'D');
+  const saved = { ...isE }; delete isE.formula; isE.value = ebitda + 1000; s.recalcAll();
+  near(one(s, 'Summary', 'ffComps', 'D'), med * (ebitda + 1000), 1e-6, 'the comps mid answers the model'); assert.notEqual(one(s, 'Summary', 'ffComps', 'D'), before);
+  Object.keys(isE).forEach(k => delete isE[k]); Object.assign(isE, saved);
 });
 
 test('the start states: each lesson finds its inputs, the empty cells it fills and the plantings it reads', () => {
