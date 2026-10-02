@@ -73,7 +73,8 @@ body.keytips-on .rail-acct-label{display:none}   /* the letter takes the word's 
 .rail-landing .rail-top{padding:var(--s4) 0}
 .rail-landing .rail-mark{color:var(--ink)}
 .rail-landing-items{display:flex; gap:var(--s2)}
-.rail-landing-item{padding:var(--s2) var(--s3); border-radius:var(--r-btn); font-weight:var(--fw-semi); color:var(--ink)}
+.rail-landing-item{padding:var(--s2) var(--s3); border-radius:var(--r-btn); font-weight:var(--fw-semi); color:var(--ink); white-space:nowrap}
+@media (max-width:600px){ .rail-landing{padding:0 var(--s4)} .rail-landing-items{gap:0} .rail-landing-item{padding:var(--s2)} }
 .rail-landing-item:hover{background:var(--chrome)}
 .rail-landing-item:last-child{background:var(--learn); color:var(--on-fill)}
 .rail-landing-item:last-child:hover{background:var(--learn-ink)}

@@ -138,7 +138,7 @@
 /* ---------- the sheet preview (Home, Learn): a still of the sheet, read-only ---------- */
 .sheet-preview{display:flex; flex-direction:column; border:1px solid var(--line); background:var(--sheet)}
 .sp-scroll{overflow:hidden; max-height:var(--preview-h)}
-.sp{border-collapse:collapse; font-family:var(--cellfont); font-size:var(--fs-key); color:var(--ink); table-layout:auto; width:100%}
+table.sp{border-collapse:collapse; font-family:var(--cellfont); font-size:var(--fs-key); color:var(--ink); table-layout:auto; width:100%}
 .sp th, .sp td{border:1px solid var(--grid); padding:0 var(--s1); height:var(--sp-row); white-space:nowrap; overflow:hidden; text-overflow:clip; text-align:left; max-width:0; position:static; font-weight:var(--fw-body); vertical-align:middle; transition:none}
 .sp th{background:var(--chrome); color:var(--ink-2); text-align:center; font-family:var(--font); font-size:var(--fs-min); max-width:none}
 .sp tbody th{width:1%; padding:0 var(--s2)}

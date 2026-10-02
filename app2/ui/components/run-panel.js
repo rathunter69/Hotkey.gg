@@ -12,6 +12,7 @@
 //   tierLabel(tier), tierMarks(tier)        "Expert", 2                                         pure
 //   boardLine(place, of, move)              "31st of 212, up 9"                                 pure
 //   factsLine(parts)                        the facts row (each fact its own place)             pure
+//   marksHtml(tier, pop), trackHtml(model)  the result's tier marks and its time track (the landing's drill plate draws them too)
 //   createRunPanel(host, opts)              → panel.ready(d) .run(d) .result(d) .complete(d) .story(d) .timesUp(d) .hide() .keyFor(key)
 import { siteCopy } from '../../content/copy/apply.js';
 import { keyLabel } from '../../app/prefs.js';
@@ -58,7 +59,7 @@ export function tierLabel(tier) {
 }
 /** How many of the three marks a tier fills. */
 export const tierMarks = tier => Math.max(0, TIER_ORDER.indexOf(tier) + 1);
-const marksHtml = (tier, pop) => `<span class="rp-marks${pop ? ' rp-pop' : ''}" aria-hidden="true">${[1, 2, 3].map(i => `<i class="${i <= tierMarks(tier) ? 'on' : ''}"></i>`).join('')}</span>`;
+export const marksHtml = (tier, pop) => `<span class="rp-marks${pop ? ' rp-pop' : ''}" aria-hidden="true">${[1, 2, 3].map(i => `<i class="${i <= tierMarks(tier) ? 'on' : ''}"></i>`).join('')}</span>`;
 
 /** The pace line: "{tier} pace", "Behind Pass pace" when no tier is in reach, nothing before the first goal lands. */
 export function paceLabel(tier) {
@@ -100,7 +101,7 @@ export function boardLine(place, of, move) {
 /* ---------------- html pieces ---------------- */
 const kbd = (k, platform) => `<kbd class="rp-key">${esc(keyLabel(k, platform))}</kbd>`;
 const factsHtml = parts => `<div class="rp-facts">${parts.filter(Boolean).map(f => `<span>${esc(f)}</span>`).join('')}</div>`;
-function trackHtml(model, { animate } = {}) {
+export function trackHtml(model, { animate } = {}) {
   const band = b => `<i class="rp-band rp-band-${b.tier}" style="left:${b.from}%;width:${Math.max(0, b.to - b.from)}%"></i>`;
   return `<div class="rp-track${animate ? ' rp-anim' : ''}" aria-hidden="true">${model.bands.map(band).join('')}` +
     (model.best != null ? `<s class="rp-best" style="left:${model.best}%"></s>` : '') +

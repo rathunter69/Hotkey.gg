@@ -3,7 +3,7 @@
 // the hero's small print, and what the first run's picker and hand-off do.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { teachTokens, teachHtml, fitDemoColumns, DEMO_LESSON } from '../ui/demo-player.js';
+import { teachTokens, teachHtml, fitDemoColumns, demoZoom, DEMO_ZOOM, DEMO_LESSON } from '../ui/demo-player.js';
 import { LessonRun } from '../app/runner.js';
 import { landingKeyRoute, landingHtml } from '../app/landing-page.js';
 import { finishPatch, pickerMove, answersAt, QUESTIONS, FIRST_MODULE, FIRST_LESSON } from '../app/first-run.js';
@@ -38,24 +38,33 @@ test('demo teach line: every key is boxed whole, an arrow or punctuation after i
 });
 
 test('demo columns: a label cut off by a filled neighbour is widened; lone labels spill; never narrower', () => {
-  const run = new LessonRun(DEMO_LESSON, { mode: 'guided' });
+  // the feed at S0, where the header row's labels sit side by side
+  const feed = { ...DEMO_LESSON, state: { before: 'S0', after: 'S0' }, goals: [{ id: 'x', text: 'x', keys: '', check: () => false }] };
+  const run = new LessonRun(feed, { mode: 'guided' });
   const S = run.session.sheet;
   const before = S.colW.slice();
   fitDemoColumns(S);
   for (let c = 1; c <= S.cols; c++) assert.ok(S.colW[c] >= before[c], 'never narrower: column ' + c);
-  // the header row: Washes (C), Avg ticket ($) (D), Revenue ($) (E), Wash cost ($) (F) now fit their labels
   const need = (c, r = 1) => S.get(r, c).value.length * 6.9 + 20 + 4;
   for (const c of [3, 4, 5, 6]) assert.ok(S.colW[c] >= Math.floor(need(c)), 'header fits: column ' + c);
   assert.ok(S.colW[4] > before[4], 'Avg ticket ($) was cut off by Revenue and is widened');
-  // H6 'Site totals (feed)' is a lone title over empty cells: it spills, and H is sized for the table below it
-  assert.ok(S.colW[8] < need(8, 6), 'the title is not what sizes H');
-  // a measurer can stand in for the engine's estimate; widths are capped the way AutoFit is
-  const S2 = new LessonRun(DEMO_LESSON, { mode: 'guided' }).session.sheet;
+  assert.ok(S.colW[8] < need(8, 6), 'a lone title over empty cells spills and does not size its column');
+  const S2 = new LessonRun(feed, { mode: 'guided' }).session.sheet;
   fitDemoColumns(S2, () => 1000);
   assert.ok(S2.colW.slice(1).every(w => w <= 220));
-  // the fit changes no cell: the demo still finishes on its own solution
-  run.run(DEMO_LESSON.solution);
-  assert.ok(run.finished);
+  // the demo's own Report: the fit changes no cell, so the demo still finishes on its solution
+  const demo = new LessonRun(DEMO_LESSON, { mode: 'guided' });
+  fitDemoColumns(demo.session.sheet);
+  demo.run(DEMO_LESSON.solution);
+  assert.ok(demo.finished);
+});
+
+test('demo zoom: as much of the Report as fits the frame, held between the floor and 100%', () => {
+  const S = new LessonRun(DEMO_LESSON, { mode: 'guided' }).session.sheet;
+  assert.equal(demoZoom(S, 5000), DEMO_ZOOM.max, 'a wide frame never zooms in past 100%');
+  assert.equal(demoZoom(S, 100), DEMO_ZOOM.floor, 'a narrow frame never goes under the floor');
+  let need = DEMO_ZOOM.rowHdr; for (let c = 1; c <= 9; c++) need += S.colW[c];   // A to I, the Report's columns; the bold rows run to Z and do not count
+  assert.equal(demoZoom(S, Math.ceil(need * 0.9)), 90);
 });
 
 test('landing keys: the demo gets keys only while it has focus; Tab, Space and paging stay the page\'s', () => {
@@ -79,8 +88,8 @@ test('landing: the hero has one call to action and the facts each in their own p
   assert.equal((hero.match(/id="startLearning"/g) || []).length, 1);
   assert.doesNotMatch(hero, /#\/account/, 'the top bar carries Sign in; the hero does not repeat it');
   assert.doesNotMatch(html.replace(/<[^>]+>/g, ' '), /\s·\s/, 'no facts joined by middle dots');
-  assert.equal((html.match(/class="lp-facts"/g) || []).length, 1, 'the course in three facts under the start cell');
-  assert.ok(html.includes('class="plate"'), 'a proof plate per section');
+  assert.equal((html.match(/class="lp-facts"/g) || []).length, 1, 'the course in three facts, at the right of its heading');
+  assert.equal((html.match(/class="lp-plate"/g) || []).length, 3, 'a proof plate per proof');
 });
 
 test('first run: ↑ ↓ move the highlight down one list across both questions, and the highlight is the answer', () => {

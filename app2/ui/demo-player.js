@@ -8,8 +8,8 @@
 //   const demo = mountDemo(hostEl, { loop, autoplay, focusable, onDone, onPlay, onChange, onTakeover });
 //   demo.play(); demo.skip(); demo.destroy();
 //
-// The sheet opens at the zoom that fits the whole Report across the frame (demoZoom, held between
-// 55% and 100%), and the grid ends on a column boundary, so no label is cut off.
+// The sheet opens at the zoom that fits the Report across the frame (demoZoom, held between 85%
+// and 100% so the cells stay readable), and the grid ends on a column boundary, so no label is cut off.
 //
 // No sound (the learner has not pressed a key yet), no records, no XP: nothing here counts.
 import { LessonRun, hintToScript } from '../app/runner.js';
@@ -95,8 +95,8 @@ export function demoScript(lesson = DEMO_LESSON, cadence = 560, goalPause = 2000
   return out;
 }
 
-/** The zoom the demo opens at: the whole Report across the frame, never past 100% nor under 55%. */
-export const DEMO_ZOOM = { floor: 55, max: 100, rowHdr: 36 };
+/** The zoom the demo opens at: as much of the Report as fits across the frame, never past 100% nor under 85% (so the cells stay readable). */
+export const DEMO_ZOOM = { floor: 85, max: 100, rowHdr: 36 };
 
 /**
  * The zoom (%) at which every filled column of the sheet (the row numbers included) fits `width`
@@ -167,7 +167,7 @@ export function mountDemo(host, o = {}) {
     card.place(placeCard(box, target, size, { avoid }), { left: g.left - st.left, top: g.top - st.top });
   }
   function paint() {
-    if (destroyed) return;
+    if (destroyed || !sheetView || !ribbonView) return;   // a change while the views mount (the zoom) paints once they are up
     ribbonView.render(); sheetView.render();
     $('demoCount').textContent = `${run.doneCount} / ${run.goals.length}`;
     $('demoTab').textContent = sheetName();
@@ -208,7 +208,8 @@ export function mountDemo(host, o = {}) {
     $('demoSheet').innerHTML = ''; $('demoRibbonSlot').innerHTML = '<div class="ribbon" id="demoRibbon"></div>';
     const ss = run.session;
     ss.settings.ribbonCollapsed = true;   // the Ribbon's tab row; a KeyTip walk opens the groups over the sheet, as Ctrl+F1 does in Excel
-    for (const e of ss.sheets || []) if (e.sheet) e.sheet.groups = { rows: [], cols: [] };   // no outline bar over the column letters in so small a frame
+    // so small a frame shows the page whole: no outline bar over the column letters, no frozen column holding the title in A
+    for (const e of ss.sheets || []) if (e.sheet) { e.sheet.groups = { rows: [], cols: [] }; e.sheet.freeze = { r: 0, c: 0 }; }
     sheetView = new SheetView($('demoSheet'), ss);
     fitDemoColumns(ss.sheet, textMeasurer($('demoSheet')) || undefined);
     fitZoom();
