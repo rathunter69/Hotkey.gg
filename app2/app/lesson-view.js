@@ -699,7 +699,7 @@ export function mountLessonView(root, lesson, { mode = 'guided', seed: seedOpt, 
     if (demo) { if (e.key === 'Escape') skipDemo(); if (!e.ctrlKey && !e.metaKey && !e.altKey && e.key.length > 1) e.preventDefault(); return; }
     if (e.key === 'Escape') {
       const ss = run.session;
-      const engineOwns = ss.editing || ss.mode === 'ribbon' || !!ss.dialog || !!ss.note;
+      const engineOwns = ss.editing || ss.mode === 'ribbon' || !!ss.dialog || !!ss.note || !!(ss.sheet && ss.sheet.clipboard);   // Esc clears copy mode's marching ants first, as Excel's does
       if (engineOwns) { if (run.key(e)) e.preventDefault(); return; }
       e.preventDefault();
       if (noteRect) { clearNote(); return; }
