@@ -9,6 +9,8 @@
 //
 // The still is the demo's own last frame (4 / 4), the whole frame taken from the live player on the
 // landing at its real size: clips/demo-compact.jpg. Re-take it when the demo changes (node app2/tests/record-clips.mjs).
+import { siteCopy } from '../content/copy/apply.js';
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 const POSTER = './clips/demo-compact.jpg';
 
@@ -16,8 +18,8 @@ const POSTER = './clips/demo-compact.jpg';
 export function mountDemoPoster(host, o = {}) {
   const el = document.createElement('div');
   el.className = 'dp dp-poster';
-  el.innerHTML = `<div class="dp-poster-img"><img src="${POSTER}" alt="A finished demo: four goals from Chapter 1 done on the weekly report" decoding="async"></div>
-    <div class="dp-poster-note" hidden>The live demo didn’t load, so this still shows the finished sheet. <a href="#/lesson/inherited-workbook">Open lesson 1.1.1</a> to do it yourself.</div>`;
+  el.innerHTML = `<div class="dp-poster-img"><img src="${POSTER}" alt="${esc(siteCopy('demo_poster_alt', 'A finished demo: four goals from Chapter 1 done on the weekly report'))}" decoding="async"></div>
+    <div class="dp-poster-note" hidden>${esc(siteCopy('demo_poster_note', 'The live demo didn’t load, so this still shows the finished sheet. {link} to do it yourself.')).replace('{link}', `<a href="#/lesson/inherited-workbook">${esc(siteCopy('demo_poster_link', 'Open lesson 1.1.1'))}</a>`)}</div>`;
   if (host) host.appendChild(el);
   return {
     el, run: null, poster: true,

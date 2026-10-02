@@ -10,6 +10,8 @@ export const RIBBON_WORDS = [
 ];
 
 export const SITE_KEYS = [
+  // R8: Teams desks and the join page (Phase F desks v1)
+  'boards_desk_open', 'boards_desk_code', 'teams_desk_head', 'teams_by_hand', 'teams_row_1', 'teams_row_2', 'teams_row_3', 'teams_row_4', 'teams_talk_line', 'teams_how_head', 'teams_how_1_k', 'teams_how_1', 'teams_how_2_k', 'teams_how_2', 'teams_how_3_k', 'teams_how_3', 'teams_how_4_k', 'teams_how_4', 'teams_your_desk', 'teams_code_signin', 'desk_title', 'desk_mark', 'desk_signed_out', 'desk_none', 'desk_failed', 'desk_teams_head', 'desk_teams_line', 'desk_teams_link', 'desk_code_head', 'desk_code_label', 'desk_code_go', 'desk_join_title', 'desk_join_owner_k', 'desk_join_seats_k', 'desk_join_until_k', 'desk_join_line', 'desk_join_go', 'desk_join_signin', 'desk_join_signin_line', 'desk_joined', 'desk_sees_head', 'desk_sees_1', 'desk_sees_2', 'desk_sees_3', 'desk_sees_4', 'desk_sees_not', 'desk_seats_used', 'desk_until', 'desk_seats_head', 'desk_col_lessons', 'desk_col_verified', 'desk_col_active', 'desk_role_owner', 'desk_you', 'desk_free_seat', 'desk_free_confirm', 'desk_freed', 'desk_seat_left', 'desk_seats_left', 'desk_seats_full', 'desk_seats_line', 'desk_invite_head', 'desk_invite_line', 'desk_copy_link', 'desk_copied', 'desk_copy_blocked', 'desk_new_code', 'desk_new_code_line', 'desk_new_code_done', 'desk_members_head', 'desk_leave', 'desk_leave_confirm', 'desk_leave_line', 'desk_left', 'desk_board_head', 'desk_active_today', 'desk_active_yesterday', 'desk_active_days', 'desk_active_never', 'desk_err_bad_code', 'desk_err_tries', 'desk_err_ended', 'desk_err_on_desk', 'desk_err_full', 'desk_err_signin', 'desk_err_not_on', 'desk_err_not_owner', 'desk_err_owner_stays', 'desk_err_no_member', 'desk_err_failed', 'teams_title', 'teams_sub', 'teams_code_head',
   // the interface match (2026-10-02)
   'certificate_name', 'certificate_course', 'certificate_progress',
   // the interface match (2026-10-02)
@@ -28,6 +30,8 @@ export const SITE_KEYS = [
   'home_tour',
   // the interface match (2026-10-02)
   'coach_done', 'signin_head', 'signin_line', 'signin_google', 'signin_fine',
+  // R9: form consents and the age statement
+  'consent_account', 'consent_terms_link', 'consent_privacy_link', 'consent_email_use', 'consent_age', 'consent_teams',
   // the interface match (2026-10-02)
   'first_run_free_k', 'first_run_free', 'first_run_full', 'first_run_save', 'first_run_tour', 'orientation_pro', 'orientation_account',
   // the interface match (2026-10-02)
@@ -65,7 +69,7 @@ export const SITE_KEYS = [
   'times_up', 'times_up_note', 'over_limit', 'over_limit_assessment', 'review_clean', 'review_flag',
   'learn_testout', 'learn_verified', 'learn_replay',
   'drill_finished_assisted', 'drill_help_used', 'drill_mouse_used', 'drill_daily_attempt', 'rapid_intro', 'rapid_fine',
-  'boards_closed', 'boards_desk_prompt', 'account_guest', 'paywall_line', 'paywall_signed_in', 'teams_desk_signin',
+  'boards_closed', 'boards_desk_prompt', 'account_guest', 'paywall_line', 'paywall_signed_in',
   // the rail, the level table and the settings table (R1b: M88, M101, M103)
   'rail_home', 'rail_learn', 'rail_practice', 'rail_daily', 'rail_drills', 'rail_rapid', 'rail_challenges', 'rail_boards', 'rail_reference',
   'rail_level', 'rail_xp', 'rail_streak', 'rail_streak_none', 'rail_go_pro', 'rail_account', 'rail_sign_in', 'rail_guest', 'rail_profile',
@@ -114,7 +118,7 @@ export const SITE_KEYS = [
   'landing_path_title', 'landing_hours', 'landing_free', 'landing_pro', 'landing_path_1_title', 'landing_path_1', 'landing_path_2_title', 'landing_path_2', 'landing_path_3_title', 'landing_path_3', 'landing_path_4_title', 'landing_path_4', 'landing_path_5_title', 'landing_path_5', 'landing_path_6_title', 'landing_path_6',
   'landing_pricing', 'landing_see_pricing', 'landing_return', 'landing_return_tail',
   'landing_demo_idle', 'landing_demo_still', 'landing_demo_focus', 'landing_demo_taken', 'landing_demo_failed',
-  'landing_plate_drills_title', 'landing_plate_boards_title', 'landing_plate_boards_facts', 'landing_plate_lesson_goal',
+  'landing_plate_drills_title', 'landing_plate_boards_title', 'landing_plate_boards_facts', 'landing_plate_boards_example', 'landing_plate_lesson_goal',
   'landing_show_label', 'landing_show_lesson_title', 'landing_show_lesson', 'landing_show_drills_title', 'landing_show_drills', 'landing_show_daily_title', 'landing_show_daily',
   'landing_strip_label', 'landing_ch_modules', 'landing_ch_lessons', 'landing_legend_lesson', 'landing_legend_challenge',
   'footer_pricing', 'footer_teams', 'footer_about', 'footer_contact', 'footer_privacy', 'footer_terms', 'footer_eula', 'footer_trademarks',
@@ -123,8 +127,48 @@ export const SITE_KEYS = [
   'pricing_free_1', 'pricing_free_2', 'pricing_free_3', 'pricing_free_4', 'pricing_checkout_soon', 'pricing_money_back',
   'pricing_terms_title', 'pricing_term_1_name', 'pricing_term_1', 'pricing_term_2_name', 'pricing_term_2', 'pricing_term_3_name', 'pricing_term_3', 'pricing_term_4_name', 'pricing_term_4',
   'pricing_full', 'pricing_teams_col', 'pricing_recommended', 'pricing_full_figure', 'pricing_full_unit', 'pricing_full_student', 'pricing_teams_figure', 'pricing_teams_unit', 'pricing_teams_seats', 'pricing_full_1', 'pricing_full_2', 'pricing_full_3', 'pricing_full_4', 'pricing_teams_1', 'pricing_teams_2', 'pricing_teams_3', 'pricing_full_go', 'pricing_teams_go', 'pricing_teams_note', 'pricing_teams_subject', 'pricing_trust_cancel', 'pricing_trust_refund', 'pricing_trust_stripe', 'pricing_signed_in_note', 'paywall_price',
-  'checkout_title', 'checkout_signin_head', 'checkout_signin_line', 'checkout_email', 'checkout_send_code', 'checkout_code', 'checkout_code_sent', 'checkout_verify', 'checkout_other_email', 'checkout_err_email', 'checkout_err_code', 'checkout_err_network', 'checkout_err_failed', 'checkout_retry', 'checkout_unavailable', 'checkout_see_pricing', 'checkout_loading', 'checkout_form_label', 'checkout_summary', 'checkout_price', 'checkout_price_student', 'checkout_inc_1', 'checkout_inc_2', 'checkout_inc_3', 'checkout_cancel', 'checkout_guarantee', 'checkout_stripe', 'checkout_have_head', 'checkout_have_line', 'checkout_done_title', 'checkout_done_wait', 'checkout_done_ok', 'checkout_done_go', 'checkout_done_timeout', 'checkout_done_support', 'checkout_done_refresh', 'checkout_done_signin', 'checkout_done_chapters', 'account_plan', 'account_plan_free', 'account_plan_full', 'account_plan_student', 'account_plan_renews', 'account_plan_ends', 'account_plan_granted', 'account_plan_granted_until', 'account_plan_free_line', 'account_cancel', 'account_manage', 'account_get', 'account_cancel_note', 'account_billing_err', 'account_billing_none',
+  'checkout_title', 'checkout_signin_head', 'checkout_signin_line', 'checkout_email', 'checkout_send_code', 'checkout_code', 'checkout_code_sent', 'checkout_verify', 'checkout_other_email', 'checkout_err_email', 'checkout_err_code', 'checkout_err_network', 'checkout_err_failed', 'checkout_retry', 'checkout_unavailable', 'checkout_see_pricing', 'checkout_loading', 'checkout_form_label', 'checkout_summary', 'checkout_price', 'checkout_price_student', 'checkout_inc_1', 'checkout_inc_2', 'checkout_inc_3', 'checkout_cancel', 'checkout_guarantee', 'checkout_stripe', 'checkout_have_head', 'checkout_have_line', 'checkout_done_title', 'checkout_done_wait', 'checkout_done_ok', 'checkout_done_go', 'checkout_done_timeout', 'checkout_done_support', 'checkout_done_refresh', 'checkout_done_signin', 'checkout_done_chapters', 'account_plan', 'account_plan_free', 'account_plan_full', 'account_plan_student', 'account_plan_renews', 'account_plan_ends', 'account_plan_granted', 'account_plan_granted_until', 'account_plan_free_line', 'account_cancel', 'account_manage', 'account_get', 'account_cancel_note', 'account_billing_err', 'account_billing_none', 'account_delete_sub',
   'ref_title', 'ref_loading', 'ref_failed', 'retry', 'ref_search', 'ref_group_move', 'ref_group_select', 'ref_group_edit', 'ref_group_format', 'ref_group_formulas', 'ref_group_ribbon', 'ref_group_data', 'ref_group_count',
   'ref_col_key', 'ref_col_what', 'ref_col_taught', 'ref_col_state', 'ref_state_not_yet', 'ref_state_taught', 'ref_state_practiced', 'ref_state_under_par', 'ref_drill_it', 'ref_or', 'ref_no_match', 'ref_collected', 'ref_drill_note',
   'settings_title', 'settings_saved_line', 'settings_not_saved', 'setting_handle_open', 'setting_signIn_open', 'setting_exportData_do', 'setting_deleteAccount_do',
+  // the ops page (R8, 0015_ops.sql)
+  'ops_title', 'ops_line', 'ops_refresh', 'ops_week', 'ops_days', 'ops_week_accounts', 'ops_week_lessons', 'ops_week_runs', 'ops_week_errors', 'ops_week_alerts', 'ops_col_what', 'ops_col_now', 'ops_col_before', 'ops_errors', 'ops_errors_facts', 'ops_errors_none', 'ops_col_message', 'ops_col_reports', 'ops_col_sessions', 'ops_col_last', 'ops_col_page', 'ops_col_browser', 'ops_unknown', 'ops_alerts', 'ops_alerts_facts', 'ops_alerts_none', 'ops_col_kind', 'ops_resolve', 'ops_digests', 'ops_digests_none', 'ops_col_week', 'ops_col_accounts', 'ops_col_lessons', 'ops_col_errors', 'ops_col_alerts', 'ops_copy', 'ops_copied', 'ops_unavailable', 'ops_signed_out', 'ops_not_member', 'ops_failed', 'ops_loading',
+  // the hardcoded-strings pass (R8, M1): the lines the screens carried in code
+  'grade_an_input_shown', 'grade_formula_shown_blue', 'grade_green_but_reads', 'grade_formula_shown', 'grade_has_typed_inside', 'grade_breaks_row_s', 'grade_shows_minus_standard', 'grade_shows_decimals_against',
+  'grade_shows_zero_zero', 'grade_carries_currency_sign', 'grade_has_no_first', 'grade_shows_cost_positive', 'grade_sign_convention_stated', 'grade_gridlines_page_someone', 'grade_carries_grid_border', 'grade_has_no_title',
+  'grade_padded_spaces_center', 'grade_centered_across_columns', 'grade_header_over_numbers', 'grade_percentage_line_italic', 'grade_sub_item_indented', 'grade_different_font_size', 'grade_title_smaller_than', 'grade_sheet_missing',
+  'grade_total_without_top', 'grade_no_units_line', 'grade_formula_check_live', 'grade_does_move_inputs', 'grade_reads_check_does', 'grade_column_hidden_group', 'grade_row_hidden_group', 'grade_typed_number_where',
+  'grade_changed_fix_faults', 'grade_has_no_title_2', 'grade_title_bold', 'grade_has_no_units', 'grade_units_line_italic', 'grade_filled_row_spacer', 'grade_header_bold', 'grade_row_has_no',
+  'grade_holds_label_labels', 'grade_indented_spaces_use', 'grade_figure_no_number', 'grade_percentage_italic', 'grade_carries_vertical_border', 'grade_total_bold_top', 'grade_panes_frozen', 'grade_desk_number_format',
+  'acct_tab_signin', 'acct_check_email', 'acct_magic_go', 'acct_unavailable', 'acct_signup_fine', 'acct_keep_head', 'acct_keep_line', 'acct_carried_head',
+  'acct_carried_lessons', 'acct_carried_bests', 'acct_carried_platform', 'acct_carried_skipped', 'acct_carried_fine', 'acct_handle', 'acct_handle_fine', 'acct_handle_save',
+  'acct_public', 'acct_code', 'acct_redeem', 'acct_stats_empty', 'acct_stats', 'acct_stat_level', 'acct_stat_time', 'acct_stat_runs',
+  'acct_stat_keys', 'acct_stat_pbs', 'acct_stat_streak', 'acct_improvement', 'acct_most_used', 'acct_delete_line', 'acct_confirm', 'acct_delete_go',
+  'acct_delete_keep', 'acct_data_line_in', 'acct_export', 'acct_delete_local', 'acct_stored', 'acct_err_network', 'acct_link_sent', 'acct_confirm_link',
+  'acct_google_off', 'acct_handle_saved', 'acct_err_network_short', 'acct_save_failed', 'acct_public_on', 'acct_public_off', 'acct_signing_out', 'acct_code_empty',
+  'acct_code_bad', 'acct_code_used', 'acct_code_expired', 'acct_code_tries', 'acct_code_failed', 'acct_paid_until', 'acct_code_redeemed', 'acct_export_failed',
+  'acct_exported', 'acct_local_confirm', 'acct_local_deleted', 'acct_deleting', 'acct_delete_failed', 'acct_deleted', 'acct_delete_network', 'acct_signout_unsaved',
+  'save_state_device', 'flair_unlocks_at', 'first_run_exp_new_label', 'first_run_exp_sometimes_label', 'first_run_exp_daily_label', 'first_run_keyboard_win_label', 'handle_rule', 'handle_banned',
+  'landing_headline_2', 'landing_headline_3', 'lesson_save_blocked', 'grade_check_failed', 'demo_poster_note', 'demo_poster_alt', 'fx_sound_off_title', 'fx_sound_off',
+  'err_mount', 'err_cap', 'err_head', 'err_retry', 'narrow_head', 'err_fetch', 'narrow_line', 'narrow_back',
+  'page_label_home', 'page_label_landing', 'page_label_root', 'page_label_start', 'page_label_learn', 'page_label_lesson', 'page_label_practice', 'page_label_drill', 'page_label_daily',
+  'page_label_rapid', 'page_label_due', 'page_label_leaderboard', 'page_label_reference', 'page_label_pricing', 'page_label_teams', 'page_label_account', 'page_label_checkout',
+  'page_label_desk', 'page_label_other', 'auth_bad_credentials', 'save_state_pending', 'save_state_account', 'save_state_retry', 'save_state_failed', 'save_line_device', 'save_line_pending', 'save_line_account',
+  'save_line_retry', 'save_line_failed', 'first_run_keyboard_mac_label', 'learn_plan_1', 'learn_plan_2', 'learn_plan_3', 'learn_plan_4', 'learn_plan_5',
+  'learn_plan_6', 'fx_sound_on_title', 'fx_sound_on', 'acct_signout_unsaved_one', 'acct_tab_signup', 'acct_tab_magic', 'acct_delete_head', 'acct_data_line_out',
+  'acct_delete', 'acct_stored_times', 'acct_stored_none', 'acct_delete_fine', 'acct_paid_on', 'demo_poster_link', 'demo_title', 'demo_brief',
+  'demo_teach_1', 'demo_goal_1', 'demo_teach_2', 'demo_goal_2', 'demo_teach_3', 'demo_goal_3', 'demo_teach_4', 'demo_goal_4',
+  // the hardcoded-strings pass (R8, M1): the lines the screens carried in code
+  'conv_A1_name', 'conv_A1_short', 'conv_A2_name', 'conv_A2_short', 'conv_A3_name', 'conv_A3_short', 'conv_A4_name', 'conv_A4_short',
+  'conv_A5_name', 'conv_A5_short', 'conv_A6_name', 'conv_A6_short', 'conv_B1_name', 'conv_B1_short', 'conv_B2_name', 'conv_B2_short',
+  'conv_B3_name', 'conv_B3_short', 'conv_B4_name', 'conv_B4_short', 'conv_B5_name', 'conv_B5_short', 'conv_B6_name', 'conv_B6_short',
+  'conv_C1_name', 'conv_C1_short', 'conv_C2_name', 'conv_C2_short', 'conv_C3_name', 'conv_C3_short', 'conv_C4_name', 'conv_C4_short',
+  'conv_C5_name', 'conv_C5_short', 'conv_C6_name', 'conv_C6_short', 'conv_C7_name', 'conv_C7_short', 'conv_C8_name', 'conv_C8_short',
+  'conv_C9_name', 'conv_C9_short', 'conv_D1_name', 'conv_D1_short', 'conv_D2_name', 'conv_D2_short', 'conv_D3_name', 'conv_D3_short',
+  'conv_D4_name', 'conv_D4_short', 'conv_D5_name', 'conv_D5_short', 'conv_D6_name', 'conv_D6_short', 'conv_D7_name', 'conv_D7_short',
+  'conv_D8_name', 'conv_D8_short', 'conv_D9_name', 'conv_D9_short', 'conv_E1_name', 'conv_E1_short', 'conv_E2_name', 'conv_E2_short',
+  'conv_E3_name', 'conv_E3_short', 'conv_E4_name', 'conv_E4_short', 'conv_E5_name', 'conv_E5_short', 'conv_E6_name', 'conv_E6_short',
+  'conv_E7_name', 'conv_E7_short', 'conv_E8_name', 'conv_E8_short', 'conv_E9_name', 'conv_E9_short', 'conv_F1_name', 'conv_F1_short',
+  'conv_F2_name', 'conv_F2_short', 'conv_F3_name', 'conv_F3_short', 'conv_F4_name', 'conv_F4_short', 'conv_F5_name', 'conv_F5_short',
+  'conv_G1_name', 'conv_G1_short', 'conv_G2_name', 'conv_G2_short', 'conv_G3_name', 'conv_G3_short',
 ];

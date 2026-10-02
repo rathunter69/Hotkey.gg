@@ -50,7 +50,7 @@ export const LANDING_ITEMS = [
 export const ACCOUNT_TIP = 'A';
 const FALLBACK = { rail_home: 'Home', rail_learn: 'Learn', rail_practice: 'Practice', rail_daily: 'The Daily', rail_drills: 'Drills', rail_rapid: 'Rapid-fire', rail_challenges: 'Challenges',
   rail_boards: 'Leaderboards', rail_reference: 'Reference', rail_profile: 'Profile', rail_settings: 'Settings', rail_billing: 'Plan and billing', rail_certificate: 'Your certificate',
-  rail_sign_in: 'Sign in', rail_sign_out: 'Sign out', rail_guest: 'Guest', rail_account: 'Account', rail_go_pro: 'Get full access', rail_menu: 'Menu', rail_level: 'Level {n}', rail_xp: '{n} of {next} XP',
+  rail_sign_in: 'Sign in', rail_sign_out: 'Sign out', rail_guest: 'Guest', rail_account: 'Account', rail_go_pro: 'Get Full Access', rail_menu: 'Menu', rail_level: 'Level {n}', rail_xp: '{n} of {next} XP',
   rail_streak: 'Day {n} of your streak', rail_streak_none: 'Your streak starts with today’s practice.', rail_week_days: 'M,T,W,T,F,S,S' };
 const t = (key, fb) => siteCopy(key, fb != null ? fb : FALLBACK[key] || key);
 

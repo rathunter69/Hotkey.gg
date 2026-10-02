@@ -237,6 +237,8 @@
   <url><loc>https://www.hotkey.gg/shortcuts/page-up-down.html</loc></url>
   <url><loc>https://www.hotkey.gg/shortcuts/ctrl-page-up-down.html</loc></url>
   <url><loc>https://www.hotkey.gg/shortcuts/ctrl-g.html</loc></url>
+  <url><loc>https://www.hotkey.gg/shortcuts/alt-w-f-f.html</loc></url>
+  <url><loc>https://www.hotkey.gg/shortcuts/ctrl-k.html</loc></url>
   <url><loc>https://www.hotkey.gg/shortcuts/shift-arrow.html</loc></url>
   <url><loc>https://www.hotkey.gg/shortcuts/ctrl-shift-arrow.html</loc></url>
   <url><loc>https://www.hotkey.gg/shortcuts/shift-space.html</loc></url>
@@ -244,6 +246,9 @@
   <url><loc>https://www.hotkey.gg/shortcuts/ctrl-shift-space.html</loc></url>
   <url><loc>https://www.hotkey.gg/shortcuts/ctrl-a.html</loc></url>
   <url><loc>https://www.hotkey.gg/shortcuts/ctrl-shift-end.html</loc></url>
+  <url><loc>https://www.hotkey.gg/shortcuts/go-to-special.html</loc></url>
+  <url><loc>https://www.hotkey.gg/shortcuts/ctrl-lbracket.html</loc></url>
+  <url><loc>https://www.hotkey.gg/shortcuts/ctrl-rbracket.html</loc></url>
   <url><loc>https://www.hotkey.gg/shortcuts/f2-edit.html</loc></url>
   <url><loc>https://www.hotkey.gg/shortcuts/ctrl-enter.html</loc></url>
   <url><loc>https://www.hotkey.gg/shortcuts/equals.html</loc></url>
@@ -253,6 +258,8 @@
   <url><loc>https://www.hotkey.gg/shortcuts/delete-clear.html</loc></url>
   <url><loc>https://www.hotkey.gg/shortcuts/alt-enter.html</loc></url>
   <url><loc>https://www.hotkey.gg/shortcuts/f4-refs.html</loc></url>
+  <url><loc>https://www.hotkey.gg/shortcuts/ctrl-semicolon.html</loc></url>
+  <url><loc>https://www.hotkey.gg/shortcuts/shift-f2.html</loc></url>
   <url><loc>https://www.hotkey.gg/shortcuts/alt-keytips.html</loc></url>
   <url><loc>https://www.hotkey.gg/shortcuts/alt-h.html</loc></url>
   <url><loc>https://www.hotkey.gg/shortcuts/esc-ribbon.html</loc></url>
@@ -274,6 +281,10 @@
   <url><loc>https://www.hotkey.gg/shortcuts/alt-h-a-r.html</loc></url>
   <url><loc>https://www.hotkey.gg/shortcuts/alt-h-h.html</loc></url>
   <url><loc>https://www.hotkey.gg/shortcuts/alt-h-f-c.html</loc></url>
+  <url><loc>https://www.hotkey.gg/shortcuts/alt-h-w.html</loc></url>
+  <url><loc>https://www.hotkey.gg/shortcuts/alt-h-6.html</loc></url>
+  <url><loc>https://www.hotkey.gg/shortcuts/alt-h-5.html</loc></url>
+  <url><loc>https://www.hotkey.gg/shortcuts/alt-h-f-g.html</loc></url>
   <url><loc>https://www.hotkey.gg/shortcuts/alt-h-b-o.html</loc></url>
   <url><loc>https://www.hotkey.gg/shortcuts/alt-h-b-p.html</loc></url>
   <url><loc>https://www.hotkey.gg/shortcuts/alt-h-b-a.html</loc></url>
@@ -290,24 +301,45 @@
   <url><loc>https://www.hotkey.gg/shortcuts/alt-h-0.html</loc></url>
   <url><loc>https://www.hotkey.gg/shortcuts/alt-h-9.html</loc></url>
   <url><loc>https://www.hotkey.gg/shortcuts/alt-h-k.html</loc></url>
+  <url><loc>https://www.hotkey.gg/shortcuts/alt-h-l-n.html</loc></url>
+  <url><loc>https://www.hotkey.gg/shortcuts/alt-h-l-d.html</loc></url>
+  <url><loc>https://www.hotkey.gg/shortcuts/alt-h-l-s.html</loc></url>
+  <url><loc>https://www.hotkey.gg/shortcuts/alt-h-l-c-s.html</loc></url>
   <url><loc>https://www.hotkey.gg/shortcuts/alt-equals.html</loc></url>
   <url><loc>https://www.hotkey.gg/shortcuts/ctrl-d.html</loc></url>
   <url><loc>https://www.hotkey.gg/shortcuts/ctrl-r.html</loc></url>
   <url><loc>https://www.hotkey.gg/shortcuts/f4-repeat.html</loc></url>
   <url><loc>https://www.hotkey.gg/shortcuts/f9.html</loc></url>
   <url><loc>https://www.hotkey.gg/shortcuts/ctrl-backtick.html</loc></url>
+  <url><loc>https://www.hotkey.gg/shortcuts/alt-h-f-i-s.html</loc></url>
+  <url><loc>https://www.hotkey.gg/shortcuts/ctrl-f3.html</loc></url>
+  <url><loc>https://www.hotkey.gg/shortcuts/alt-m-m-d.html</loc></url>
+  <url><loc>https://www.hotkey.gg/shortcuts/alt-m-x-e.html</loc></url>
+  <url><loc>https://www.hotkey.gg/shortcuts/alt-m-p.html</loc></url>
+  <url><loc>https://www.hotkey.gg/shortcuts/alt-m-d.html</loc></url>
+  <url><loc>https://www.hotkey.gg/shortcuts/alt-m-a-a.html</loc></url>
+  <url><loc>https://www.hotkey.gg/shortcuts/alt-m-v.html</loc></url>
+  <url><loc>https://www.hotkey.gg/shortcuts/alt-m-k.html</loc></url>
+  <url><loc>https://www.hotkey.gg/shortcuts/alt-m-w.html</loc></url>
   <url><loc>https://www.hotkey.gg/shortcuts/ctrl-c.html</loc></url>
   <url><loc>https://www.hotkey.gg/shortcuts/ctrl-x.html</loc></url>
   <url><loc>https://www.hotkey.gg/shortcuts/ctrl-v.html</loc></url>
   <url><loc>https://www.hotkey.gg/shortcuts/ctrl-alt-v.html</loc></url>
   <url><loc>https://www.hotkey.gg/shortcuts/alt-e-s-v.html</loc></url>
   <url><loc>https://www.hotkey.gg/shortcuts/alt-h-v-s.html</loc></url>
+  <url><loc>https://www.hotkey.gg/shortcuts/paste-values.html</loc></url>
+  <url><loc>https://www.hotkey.gg/shortcuts/paste-formats.html</loc></url>
+  <url><loc>https://www.hotkey.gg/shortcuts/paste-transpose.html</loc></url>
   <url><loc>https://www.hotkey.gg/shortcuts/ctrl-shift-plus.html</loc></url>
   <url><loc>https://www.hotkey.gg/shortcuts/ctrl-minus.html</loc></url>
   <url><loc>https://www.hotkey.gg/shortcuts/alt-h-o-i.html</loc></url>
   <url><loc>https://www.hotkey.gg/shortcuts/alt-h-o-a.html</loc></url>
   <url><loc>https://www.hotkey.gg/shortcuts/ctrl-9.html</loc></url>
   <url><loc>https://www.hotkey.gg/shortcuts/unhide-all-rows.html</loc></url>
+  <url><loc>https://www.hotkey.gg/shortcuts/alt-h-o-w.html</loc></url>
+  <url><loc>https://www.hotkey.gg/shortcuts/alt-h-o-h.html</loc></url>
+  <url><loc>https://www.hotkey.gg/shortcuts/ctrl-0.html</loc></url>
+  <url><loc>https://www.hotkey.gg/shortcuts/alt-h-o-u-l.html</loc></url>
   <url><loc>https://www.hotkey.gg/shortcuts/group.html</loc></url>
   <url><loc>https://www.hotkey.gg/shortcuts/ungroup.html</loc></url>
   <url><loc>https://www.hotkey.gg/shortcuts/alt-a-h.html</loc></url>
@@ -315,6 +347,21 @@
   <url><loc>https://www.hotkey.gg/shortcuts/ctrl-shift-l.html</loc></url>
   <url><loc>https://www.hotkey.gg/shortcuts/alt-down.html</loc></url>
   <url><loc>https://www.hotkey.gg/shortcuts/alt-a-s-a.html</loc></url>
+  <url><loc>https://www.hotkey.gg/shortcuts/ctrl-8.html</loc></url>
+  <url><loc>https://www.hotkey.gg/shortcuts/alt-a-s-d.html</loc></url>
+  <url><loc>https://www.hotkey.gg/shortcuts/alt-a-s-s.html</loc></url>
+  <url><loc>https://www.hotkey.gg/shortcuts/alt-a-m.html</loc></url>
+  <url><loc>https://www.hotkey.gg/shortcuts/alt-a-v-v.html</loc></url>
+  <url><loc>https://www.hotkey.gg/shortcuts/alt-a-e.html</loc></url>
+  <url><loc>https://www.hotkey.gg/shortcuts/ctrl-e.html</loc></url>
+  <url><loc>https://www.hotkey.gg/shortcuts/alt-a-w-t.html</loc></url>
+  <url><loc>https://www.hotkey.gg/shortcuts/alt-a-w-g.html</loc></url>
+  <url><loc>https://www.hotkey.gg/shortcuts/alt-n-v-t.html</loc></url>
+  <url><loc>https://www.hotkey.gg/shortcuts/alt-p-o-l.html</loc></url>
+  <url><loc>https://www.hotkey.gg/shortcuts/alt-p-r-s.html</loc></url>
+  <url><loc>https://www.hotkey.gg/shortcuts/alt-p-i.html</loc></url>
+  <url><loc>https://www.hotkey.gg/shortcuts/alt-p-b-i.html</loc></url>
+  <url><loc>https://www.hotkey.gg/shortcuts/alt-w-i.html</loc></url>
   <url><loc>https://www.hotkey.gg/shortcuts/ctrl-z.html</loc></url>
   <url><loc>https://www.hotkey.gg/shortcuts/ctrl-y.html</loc></url>
   <url><loc>https://www.hotkey.gg/shortcuts/ctrl-s.html</loc></url>

@@ -13,7 +13,7 @@ orientation_title,Where things are.
 orientation_learn,"Learn is the course: six chapters of short modules, each ending in a timed challenge on a fresh file."
 orientation_practice,"Drills, the Daily, rapid-fire and the challenges all live under Practice, on the clock."
 orientation_leaderboard,"Each drill and challenge has a board, the Daily too, and only a run with no help and no mouse posts a time."
-orientation_level,"Everything you finish earns XP toward your next level, and speed is what puts you on the boards."
+orientation_level,"Lessons, challenges, drills, the Daily, rapid-fire and quests all pay XP toward your next level, and speed is what puts you on the boards."
 orientation_fine,"Use the arrows and Enter. Sound comes on quietly with your first key, and the sound button at the top of a lesson turns it off."
 first_run_demo_title,This is a lesson.
 first_run_demo_body,"Real keys on a real sheet. You’re graded on how the sheet ends up, so any route that gets there counts."
@@ -68,14 +68,13 @@ drill_daily_attempt,"That was attempt {n} today, and the board stays open until 
 rapid_intro,"We name a command and you press its keys, which stay hidden until you stall."
 rapid_fine,A round counts as practice and pays a little XP; it never sets a drill best.
 boards_closed,Desk and school boards aren’t open yet.
-boards_desk_prompt,Start a desk to compete with your own group.
+boards_desk_prompt,You aren’t on a desk. A desk comes with Teams: a private board for a class or a team.
 account_guest,"You’re a guest, so everything here is saved on this device only."
 account_title,Account
 account_level,Level {n}
 account_data,Your data
-paywall_line,Get full access for the rest of the content.
-paywall_signed_in,"This account doesn’t have full access yet. Get it here, or redeem a code on the Account page."
-teams_desk_signin,"Desks need an account, and desk creation isn’t open yet."
+paywall_line,Get Full Access for the rest of the content.
+paywall_signed_in,"This account doesn’t have Full Access yet. Get it here, or redeem a code on the Account page."
 page_failed,{page} didn’t load.
 rail_home,Home
 rail_learn,Learn
@@ -90,7 +89,7 @@ rail_level,Level {n}
 rail_xp,{n} of {next} XP
 rail_streak,Day {n} of your streak
 rail_streak_none,Your streak starts with today’s practice.
-rail_go_pro,Get full access
+rail_go_pro,Get Full Access
 rail_account,Account
 rail_sign_in,Sign in
 rail_guest,Guest
@@ -249,7 +248,7 @@ home_streak_day,Day {n}
 home_achievements,Achievements
 home_count_of,{n} of {m}
 home_ach_next,Next: {badge}
-paywall_go_pro,Get full access
+paywall_go_pro,Get Full Access
 paywall_not_now,Not now
 learn_tab,Chapter {n}
 learn_page_fill,Pass its challenge to finish the module and earn its badge.
@@ -325,7 +324,7 @@ boards_seconds,{n} seconds
 boards_none_yet,No clean run on this board yet.
 boards_signed_out,Your own clean runs. The field opens when you sign in.
 boards_desks_signed_out,Sign in to see your desk’s board.
-boards_desk_link,Teams and desks
+boards_desk_link,Teams
 boards_loading,Loading the board
 boards_failed,Couldn’t load the board.
 boards_retry,Try again
@@ -377,6 +376,7 @@ landing_demo_failed,The live demo didn’t load; the still shows the finished sh
 landing_plate_drills_title,Format the weekly page
 landing_plate_boards_title,"The Daily, Thursday"
 landing_plate_boards_facts,184 clean runs
+landing_plate_boards_example,Example board
 landing_show_label,How it works
 landing_show_lesson_title,Lessons
 landing_show_lesson,One job at a time on a real sheet. The card points at the cells and shows the keys.
@@ -402,7 +402,7 @@ footer_eula,EULA
 footer_trademarks,Microsoft and Excel are trademarks of the Microsoft group of companies. LinkedIn is a trademark of LinkedIn Corporation. hotkey.gg isn’t affiliated with either.
 footer_business,
 paywall_pro,Full Access
-paywall_go,Get full access
+paywall_go,Get Full Access
 paywall_chapter,Chapter {n}: {name}
 paywall_this_lesson,This lesson
 pricing_title,Pricing
@@ -439,14 +439,14 @@ pricing_full_4,Everything added to the course later
 pricing_teams_1,Full Access for every seat
 pricing_teams_2,One monthly invoice for the team
 pricing_teams_3,Seats added as the team grows
-pricing_full_go,Get full access
+pricing_full_go,Get Full Access
 pricing_teams_go,Talk to us
 pricing_teams_note,Email us the team size and we set it up.
 pricing_teams_subject,hotkey.gg for a team
 pricing_trust_cancel,Cancel any time from your account.
 pricing_trust_refund,Full refund on your first payment within 14 days.
 pricing_trust_stripe,Payment is handled by Stripe.
-pricing_signed_in_note,You have full access. Manage it on the Account page.
+pricing_signed_in_note,You have Full Access. Manage it on the Account page.
 paywall_price,"Full Access is $15 a month, or $9 with a school email. Cancel any time."
 ref_title,Reference
 ref_loading,Loading the keys.
@@ -473,7 +473,7 @@ ref_drill_it,Drill it
 ref_or,or
 ref_no_match,No key matches that.
 ref_collected,{n} of {m} keys collected.
-ref_drill_note,Drill it opens a short rep on that one key.
+ref_drill_note,Drill it opens a short rep on that one key. Show me plays it on a small sheet.
 settings_title,Settings
 settings_saved_line,Saved as you change them
 settings_not_saved,Couldn’t save on this device
@@ -628,7 +628,7 @@ panel_result_copied,Result copied
 panel_copy_blocked,Couldn’t copy: the clipboard is blocked
 due_none_title,Nothing to drill here.
 due_none_body,That item is not in today’s queue.
-checkout_title,Get full access
+checkout_title,Get Full Access
 checkout_signin_head,Sign in to subscribe
 checkout_signin_line,Enter your email and we send you a 6-digit code. Sign in with a school email for the student price.
 checkout_email,Email
@@ -653,13 +653,13 @@ checkout_inc_1,"All six chapters, and everything added later"
 checkout_inc_2,"Every drill, challenge and assessment"
 checkout_inc_3,"The certificate, with a page anyone can check"
 checkout_cancel,Cancel any time from your account.
-checkout_guarantee,"If it’s not for you, you get your money back within 14 days."
+checkout_guarantee,"If it’s not for you, you get your first payment back in full within 14 days."
 checkout_stripe,Payment is handled by Stripe. Your receipt comes from Link.
-checkout_have_head,You already have full access
+checkout_have_head,You already have Full Access
 checkout_have_line,"Your plan is on the Account page, with your card and receipts under Manage billing."
 checkout_done_title,Unlocking your course
 checkout_done_wait,Payment received. Opening Chapters 2 to 6.
-checkout_done_ok,"You have full access, and Chapters 2 to 6 are open."
+checkout_done_ok,"You have Full Access, and Chapters 2 to 6 are open."
 checkout_done_go,Start Chapter 2
 checkout_done_timeout,Payment received. Unlocking can take a minute; refresh this page.
 checkout_done_support,Still locked after that? Email {email} and we sort it out.
@@ -677,10 +677,11 @@ account_plan_granted_until,"From a code or a grant, until {date}"
 account_plan_free_line,Chapter 1 is yours in full. Full Access opens Chapters 2 to 6.
 account_cancel,Cancel subscription
 account_manage,Manage billing
-account_get,Get full access
+account_get,Get Full Access
 account_cancel_note,Cancelling keeps your access to the end of the month you paid for.
 account_billing_err,Billing didn’t open. Try again in a minute.
 account_billing_none,There is no subscription on this account yet.
+account_delete_sub,"Your subscription still renews. Deleting the account does not stop it, so cancel it first under Plan and billing."
 home_xp_to_go,{n} XP to go
 learn_free,Free
 learn_being_written,Being written
@@ -689,7 +690,7 @@ learn_reward,Finish {module} to earn it
 learn_reward_earned,Earned
 practice_chapter_coming,Chapter {n} is being written. Its drills land here as its lessons do.
 learn_keys_n,{n} keys
-home_xp_why,"Lessons, drills, the Daily and quests pay XP. Every level opens a piece of flair."
+home_xp_why,"Lessons, challenges, drills, the Daily, rapid-fire and quests pay XP. Every level opens a piece of flair."
 save_title,Save your progress
 save_line,Your progress lives in this browser for now. A free account keeps it on any device and puts your times on the boards.
 save_go,Make a free account
@@ -726,6 +727,12 @@ signin_head,Sign in or make a free account
 signin_line,Type your email and we send a 6-digit code. New here? The same code makes your account.
 signin_google,Continue with Google
 signin_fine,Your progress in this browser moves to the account. Chapter 1 stays free either way.
+consent_account,By continuing you agree to the {terms} and the {privacy}.
+consent_terms_link,Terms of Use
+consent_privacy_link,Privacy Policy
+consent_email_use,"We use your email to sign you in and for the emails your account needs, never for marketing."
+consent_age,You must be 13 or older to make an account.
+consent_teams,We use these details only to reply about your team. See the {privacy}.
 home_tour,Take the tour
 rapid_len_short_30,30 s
 rapid_len_short_60,60 s
@@ -796,40 +803,9 @@ save_line_ch1,Chapter 1 is nearly done. A free account keeps your progress on an
 certificate_name,hotkey.gg Certified
 certificate_course,Excel for Finance
 certificate_progress,{n} of 6 chapters Verified
-teams_title,Teams and schools
-teams_sub,"For banks, training providers, finance clubs, classes and friend groups. There are two things a group can do here."
-teams_desk_cap,Start a desk
-teams_desk_tag,Free to create
-teams_desk_heading,A private group with its own board
-teams_desk_body,"A desk is a private group: its own leaderboard, assignments set by a captain, and progress the captain can see (your times on assignments, nothing else)."
-teams_desk_who,"For a study group, a finance club, an analyst class or a team at work."
-teams_desk_create,Create a desk
+teams_title,Teams
+teams_sub,"Full Access for a class or a team, with a desk of its own."
 teams_code_head,Have a code?
-teams_code_line,Join a desk by invite code or link.
-teams_code_join,Join
-teams_code_kept,Code {code} is kept on this device until desks open.
-teams_code_empty,Enter a code or paste an invite link.
-teams_code_failed,Couldn’t save the code on this device.
-teams_group_cap,Group access
-teams_group_tag,Full Access for organizations
-teams_group_heading,"One code, a number of seats, one end date"
-teams_group_body,"Group access opens Full Access for everyone on the code or link, with a progress view for the organizer and invoice-friendly billing. Groups don’t check out on the site yet: send a request and we reply by email."
-teams_field_name,Name
-teams_field_org,Organization
-teams_field_email,Email
-teams_field_seats,Seats
-teams_field_start,Start date
-teams_request,Request group access
-teams_req_local,"For now a request is saved on this device and isn’t sent to us, so write to us as well:"
-teams_req_link,Contact
-teams_req_count,{n} saved on this device.
-teams_req_saved,"Saved on this device. It isn’t sent anywhere yet, so write to us from the contact page as well."
-teams_req_failed,Couldn’t save on this device. Write to us from the contact page.
-teams_err_name,Your name is needed.
-teams_err_org,The organization is needed.
-teams_err_email,A valid email is needed.
-teams_err_seats,"Seats must be a whole number, 1 or more."
-teams_err_start,A start date is needed.
 account_public_note,"Shows your handle, level and best times on the boards and on your profile page. Turned off, nothing is public."
 account_time_saved,Estimated time saved against the mouse-and-menus route: about {d}. It’s an estimate: your key counts against a slow route at half a second an action.
 about_title,About
@@ -1054,7 +1030,7 @@ flair_cur-ink,Ink ghost
 flair_top-bucket,"Crimson, with the Top Bucket frame"
 ach_shelf_label,Achievements: {n} of {m} earned
 ach_banner,Achievement
-orientation_home_level,"Lessons, drills, the Daily and quests all pay XP, and every level opens a piece of flair, drawn here."
+orientation_home_level,"Lessons, challenges, drills, the Daily, rapid-fire and quests all pay XP, and every level opens a piece of flair, drawn here."
 orientation_home_today,"Three quests a day and three a week each pay XP, with a bonus when all three land."
 panel_equipped,Equipped
 profile_xp_head,Where XP comes from
@@ -1151,6 +1127,13 @@ rapid_cmd_delete-row,Delete Row
 rapid_cmd_insert-column,Insert Column
 rapid_cmd_delete-column,Delete Column
 rapid_cmd_autofit-column,AutoFit Column Width
+rapid_cmd_extend-one,Extend the selection one cell
+rapid_cmd_fill-selection,Enter into every selected cell
+rapid_cmd_line-break,Line break in a cell
+rapid_cmd_column-width,Column Width
+rapid_cmd_row-height,Row Height
+rapid_cmd_autofit-row,AutoFit Row Height
+rapid_cmd_print-titles,Print Titles
 rapid_cmd_wrap-text,Wrap Text
 rapid_cmd_hide-rows,Hide Rows
 rapid_cmd_hide-columns,Hide Columns
@@ -1231,3 +1214,430 @@ rapid_cmd_name-manager,Name Manager
 rapid_cmd_define-name,Define Name
 rapid_cmd_pivot-table,PivotTable
 rapid_cmd_calc-except-tables,Automatic Except for Data Tables
+ref_show_me,Show me
+ref_show_close,Close
+ref_show_done,That’s the key. Drill it to make it yours.
+ref_route_ribbon,Ribbon
+ref_route_legacy,Legacy
+ref_also,Also: {routes}
+boards_desk_open,Open your desk
+boards_desk_code,Have a code?
+teams_desk_head,A Teams desk
+teams_by_hand,Set up by hand
+teams_row_1,Full Access for every seat
+teams_row_2,A private board for the desk on every drill
+teams_row_3,A seat view for whoever runs the desk
+teams_row_4,One monthly invoice for the team
+teams_talk_line,Tell us the team and how many seats. We set up the desk and send you its code.
+teams_how_head,How a desk works
+teams_how_1_k,We set it up
+teams_how_1,You get the desk’s code to pass round your team.
+teams_how_2_k,Your team joins
+teams_how_2,Each person signs in and enters the code. Their seat opens all six chapters.
+teams_how_3_k,You see the seats
+teams_how_3,"Lessons done, chapters Verified and when each person was last active."
+teams_how_4_k,The desk races
+teams_how_4,"Every drill has a board for the desk alone, next to the global one."
+teams_your_desk,Open your desk
+teams_code_signin,You sign in or make a free account when you join.
+desk_title,Your desk
+desk_mark,Teams
+desk_signed_out,"Sign in to see your desk. A desk comes with Teams, and you join one with its code."
+desk_none,You aren’t on a desk yet. Enter the code your team was sent.
+desk_failed,Couldn’t load the desk.
+desk_teams_head,Teams
+desk_teams_line,"A desk is how a class or a team takes the course together: a seat each, a board of its own, and a seat view for whoever runs it."
+desk_teams_link,About Teams
+desk_code_head,Join a desk
+desk_code_label,Desk code
+desk_code_go,Join
+desk_join_title,Join a desk
+desk_join_owner_k,Run by
+desk_join_seats_k,Seats left
+desk_join_until_k,Paid until
+desk_join_line,Your seat opens all six chapters for as long as the desk runs.
+desk_join_go,Join the desk
+desk_join_signin,Sign in to join
+desk_join_signin_line,A free account is all it takes. Anything you did on this device comes with you.
+desk_joined,You joined {name}.
+desk_sees_head,What the owner sees
+desk_sees_1,Your handle and level
+desk_sees_2,How many lessons you’ve done
+desk_sees_3,How many chapters you’ve Verified
+desk_sees_4,When you were last active
+desk_sees_not,"Nothing else: not your runs, your mistakes or your settings. Your times show on the desk’s board, as they do on the global ones."
+desk_seats_used,{used} of {seats} seats taken
+desk_until,Paid until {date}
+desk_seats_head,Seats
+desk_col_lessons,Lessons done
+desk_col_verified,Chapters Verified
+desk_col_active,Last active
+desk_role_owner,Owner
+desk_you,You
+desk_free_seat,Free the seat
+desk_free_confirm,Press again to remove {handle}
+desk_freed,"{handle} left the desk, and the seat is free."
+desk_seat_left,1 seat left
+desk_seats_left,{n} seats left
+desk_seats_full,Every seat is taken
+desk_seats_line,"A freed seat ends that person’s access from the desk. To add seats, write to us."
+desk_invite_head,Invite
+desk_invite_line,"Send the link, or the code on its own. Anyone with it can take a free seat."
+desk_copy_link,Copy the invite link
+desk_copied,Invite link copied
+desk_copy_blocked,Couldn’t copy: the clipboard is blocked
+desk_new_code,New code
+desk_new_code_line,A new code stops the old one working. Everyone on the desk stays.
+desk_new_code_done,The desk has a new code.
+desk_members_head,On the desk
+desk_leave,Leave the desk
+desk_leave_confirm,Press again to leave
+desk_leave_line,"Leaving frees your seat, and the chapters it opened close again."
+desk_left,You left the desk.
+desk_board_head,The desk’s board
+desk_active_today,Today
+desk_active_yesterday,Yesterday
+desk_active_days,{n} days ago
+desk_active_never,Not yet
+desk_err_bad_code,That code doesn’t match a desk. Check it and try again.
+desk_err_tries,Too many tries. Wait an hour and try again.
+desk_err_ended,This desk has ended. Ask whoever runs it.
+desk_err_on_desk,You’re already on a desk. Leave it first to join this one.
+desk_err_full,Every seat on this desk is taken. Ask whoever runs it for another.
+desk_err_signin,Sign in first.
+desk_err_not_on,You aren’t on a desk.
+desk_err_not_owner,Only the desk’s owner can do that.
+desk_err_owner_stays,The owner can’t leave the desk. Write to us to hand it on.
+desk_err_no_member,That person isn’t on your desk.
+desk_err_failed,Something went wrong. Try again.
+ops_title,Ops
+ops_line,"Errors, billing alerts and the weekly digest, for the people who run hotkey.gg."
+ops_refresh,Refresh
+ops_week,This week
+ops_days,Last {n} days
+ops_week_accounts,New accounts
+ops_week_lessons,First lesson completions
+ops_week_runs,"Lesson runs, signed in"
+ops_week_errors,Error reports
+ops_week_alerts,Open billing alerts
+ops_col_what,Figure
+ops_col_now,This week
+ops_col_before,Week before
+ops_errors,Errors
+ops_errors_facts,{n} messages
+ops_errors_none,No errors in this window.
+ops_col_message,Message
+ops_col_reports,Reports
+ops_col_sessions,Sessions
+ops_col_last,Last seen
+ops_col_page,Page
+ops_col_browser,Browser
+ops_unknown,Unknown
+ops_alerts,Billing alerts
+ops_alerts_facts,{n} open
+ops_alerts_none,No open alerts.
+ops_col_kind,Alert
+ops_resolve,Resolve
+ops_digests,Weekly digests
+ops_digests_none,No digest stored yet. The first is written on Monday morning.
+ops_col_week,Week to
+ops_col_accounts,Accounts
+ops_col_lessons,Completions
+ops_col_errors,Errors
+ops_col_alerts,Alerts
+ops_copy,Copy text
+ops_copied,Copied
+ops_unavailable,"This page reads the live database, which isn’t connected here."
+ops_signed_out,Sign in to open this page.
+ops_not_member,This page is for the people who run hotkey.gg.
+ops_failed,The figures didn’t load. Try Refresh.
+ops_loading,Loading the figures.
+grade_an_input_shown,{cell} is an input shown {color}. Inputs are blue
+grade_formula_shown_blue,{cell} is a formula shown in blue
+grade_green_but_reads,{cell} is green but reads nothing on another sheet
+grade_formula_shown,{cell} is a formula shown in {color}
+grade_has_typed_inside,{cell} has {number} typed inside the formula. Inputs live in their own cell
+grade_breaks_row_s,"{cell} breaks its row's formula. One formula per row, filled right"
+grade_shows_minus_standard,{cell} shows a minus. The standard uses parentheses
+grade_shows_decimals_against,{cell} shows {decimals} decimals against {want} at {first}. Decimals are consistent down a line
+grade_shows_zero_zero,{cell} shows a zero as {shown}. Zero is a dash
+grade_carries_currency_sign,{cell} carries a $. The currency sign sits on the first and total rows only
+grade_has_no_first,{cell} has no $. The first and total rows carry the currency sign
+grade_shows_cost_positive,"{cell} shows a cost as a positive. Costs are negative, stated once up top"
+grade_sign_convention_stated,the sign convention is not stated. Say once in the top rows that costs are shown as negatives
+grade_gridlines_page_someone,gridlines are on. A page someone else reads has them off
+grade_carries_grid_border,"{cell} carries a grid border. A total gets a top border, the block gets none"
+grade_has_no_title,{cell} has no title
+grade_padded_spaces_center,"{cell} is padded with spaces. Center Across Selection, never a merge"
+grade_centered_across_columns,"{cell} is not centered across {span} columns. Center Across Selection, never a merge"
+grade_header_over_numbers,{cell} is a header over numbers that is not right-aligned
+grade_percentage_line_italic,{cell} is a percentage line that is not italic
+grade_sub_item_indented,{cell} is a sub-item that is not indented
+grade_different_font_size,{cell} is a different font size from {first}. One size across the page
+grade_title_smaller_than,"{cell} is a title smaller than the page. One size across, the title may be larger"
+grade_sheet_missing,the sheet is missing
+grade_total_without_top,{cell} is a total without a top border
+grade_no_units_line,"no units line. State the currency once in the top rows (""USD unless stated"")"
+grade_formula_check_live,"{cell} is not a formula. A check is a live difference, not a typed 0"
+grade_does_move_inputs,{cell} does not move with its inputs
+grade_reads_check_does,{cell} reads {value}. The check does not tie
+grade_column_hidden_group,column {col} is hidden. Group it instead
+grade_row_hidden_group,row {row} is hidden. Group it instead
+grade_typed_number_where,{cell} is a typed number where a live formula belongs
+grade_changed_fix_faults,{cell} changed. Fix the faults and nothing else
+grade_has_no_title_2,A1 has no title
+grade_title_bold,A1 is a title that is not bold
+grade_has_no_units,A2 has no units line
+grade_units_line_italic,A2 is the units line and is not italic
+grade_filled_row_spacer,"{cell} is filled, row 3 is the spacer"
+grade_header_bold,{cell} is a header that is not bold
+grade_row_has_no,row 4 has no headers
+grade_holds_label_labels,"{cell} holds a label, labels sit in column B from Chapter 2 on"
+grade_indented_spaces_use,"{cell} is indented with spaces, use the indent button"
+grade_figure_no_number,{cell} is a figure with no number format
+grade_percentage_italic,{cell} is a percentage that is not italic
+grade_carries_vertical_border,{col} carries a vertical border. The A/E divider is the one vertical line a page allows
+grade_total_bold_top,{cell} is a total that is not bold with a top border
+grade_panes_frozen,panes are not frozen at {cell}
+grade_desk_number_format,"{cell} is not in the desk number format: thousands separator, no decimals, negatives in brackets"
+acct_tab_signin,Sign in
+acct_check_email,Check your email.
+acct_magic_go,Email me a link
+acct_unavailable,Sign-in is not configured.
+acct_signup_fine,"You pick a handle right after, and one is suggested."
+acct_keep_head,Keep your progress across devices.
+acct_keep_line,"Email and password, a magic link, or Google. No anonymous accounts: as a guest your work stays in this browser."
+acct_carried_head,What is carried over when you sign up
+acct_carried_lessons,"Lesson progress: {n} started, {d} completed"
+acct_carried_bests,Personal bests: {n}
+acct_carried_platform,Platform ({p}) and theme
+acct_carried_skipped,Skipped lessons from placement: {n}
+acct_carried_fine,"Carried once, to the account you create, never from another account. Your handle appears on public boards and your public profile only if you allow it."
+acct_handle,Handle
+acct_handle_fine,Appears on public boards and your public profile if you allow it; change any time (once a day).
+acct_handle_save,Save handle
+acct_public,Public profile
+acct_code,Have a code?
+acct_redeem,Redeem
+acct_stats_empty,"Nothing yet: stats build from your lessons, drills and Dailies as you play."
+acct_stats,Stats
+acct_stat_level,level ({xp} XP)
+acct_stat_time,timed practice
+acct_stat_runs,recorded runs
+acct_stat_keys,keystrokes in runs
+acct_stat_pbs,personal bests
+acct_stat_streak,day streak
+acct_improvement,Improvement:
+acct_most_used,Most-used shortcuts (from your best runs):
+acct_delete_line,"Profile, attempts, bests and board entries go, and it cannot be undone. Type {word} to confirm."
+acct_confirm,Confirm
+acct_delete_go,Delete my account
+acct_delete_keep,Keep my account
+acct_data_line_in,"Your progress lives in your account. Export everything we hold, or delete the account and all of it."
+acct_export,Export data (JSON)
+acct_delete_local,Delete local data
+acct_stored,{n} of {m} lessons have progress.
+acct_err_network,Network error. Check your connection and try again.
+acct_link_sent,The sign-in link is on its way; it works on this device.
+acct_confirm_link,Click the confirmation link to finish creating your account.
+acct_google_off,"Google sign-in isn’t switched on yet, so use email for now."
+acct_handle_saved,Handle saved
+acct_err_network_short,Network error. Try again.
+acct_save_failed,Couldn’t save. Try again.
+acct_public_on,Profile is public
+acct_public_off,Profile is private
+acct_signing_out,Signing out…
+acct_code_empty,Enter the code you were given.
+acct_code_bad,That code isn’t right. Check it and try again.
+acct_code_used,That code has already been used.
+acct_code_expired,That code has expired.
+acct_code_tries,Too many tries. Wait an hour.
+acct_code_failed,Couldn’t redeem. Try again.
+acct_paid_until,Paid access is on until {date}.
+acct_code_redeemed,Code redeemed
+acct_export_failed,Export failed. Try again.
+acct_exported,Exported
+acct_local_confirm,Delete all progress and settings saved on this device? This cannot be undone.
+acct_local_deleted,Local data deleted
+acct_deleting,Deleting…
+acct_delete_failed,Couldn’t delete. Try again or contact support.
+acct_deleted,Account deleted
+acct_delete_network,"Network error, so nothing was deleted. Try again."
+acct_signout_unsaved,{n} runs have not reached your account yet and will be lost from this device. Sign out anyway?
+save_state_device,Saved on this device
+flair_unlocks_at,Unlocks at level {n}
+first_run_exp_new_label,New to Excel
+first_run_exp_sometimes_label,I use it sometimes
+first_run_exp_daily_label,I use it daily
+first_run_keyboard_win_label,Windows
+handle_rule,"3 to 20 letters, digits or underscores."
+handle_banned,That handle is not allowed.
+landing_headline_2,Excel isn’t learned. It’s practiced.
+landing_headline_3,The better way to learn Excel
+lesson_save_blocked,Couldn’t save on this device (storage blocked); the lesson still counts for this visit.
+grade_check_failed,a convention check failed
+demo_poster_note,"The live demo didn’t load, so this still shows the finished sheet. {link} to do it yourself."
+demo_poster_alt,A finished demo: four goals from Chapter 1 done on the weekly report
+fx_sound_off_title,Sound is off. Click to turn it on.
+fx_sound_off,Sound off
+err_mount,"Something broke on our side. Retry, or go to {page}."
+err_cap,Couldn’t load
+err_head,{page} didn’t load.
+err_retry,Retry
+narrow_head,hotkey.gg needs a keyboard and a wider screen.
+err_fetch,{page} couldn’t be fetched. Check your connection and try again.
+narrow_line,"Lessons and drills run on a real spreadsheet with the keyboard. Open this page on a laptop or desktop, at least 900px wide."
+narrow_back,Back to Learn
+page_label_home,Home
+page_label_landing,The front page
+page_label_root,Home
+page_label_start,Getting started
+page_label_learn,Learn
+page_label_lesson,This lesson
+page_label_practice,Practice
+page_label_drill,This drill
+page_label_daily,The Daily
+page_label_rapid,Rapid-fire
+page_label_due,Due today
+page_label_leaderboard,The leaderboard
+page_label_reference,The shortcut reference
+page_label_pricing,Pricing
+page_label_teams,Teams
+page_label_account,Your account
+page_label_checkout,Checkout
+page_label_desk,Your desk
+page_label_other,This page
+save_state_pending,Saving to your account…
+save_state_account,Saved to your account
+save_state_retry,"Couldn’t save, will retry"
+save_state_failed,Couldn’t save on this device
+save_line_device,saved on this device
+save_line_pending,being saved to your account
+save_line_account,saved to your account
+save_line_retry,kept on this device until your account can be reached
+save_line_failed,not being saved: this browser is blocking storage
+first_run_keyboard_mac_label,Mac
+learn_plan_1,"The worksheet and the active cell, moving, selecting, entering and editing, the Ribbon and dialog boxes, basic formatting, basic formulas, copy, paste and fill."
+learn_plan_2,"Number formats, fonts, borders and fills, alignment, column widths and cell styles: a report that reads cleanly."
+learn_plan_3,"Relative and absolute references, SUM, AVERAGE, IF, text and date functions, and how to audit a formula."
+learn_plan_4,"Lists, sort and filter, lookups and summaries: the questions a manager asks of a table."
+learn_plan_5,"Schedules, the three statements, linking them together, and auditing a model."
+learn_plan_6,"DCF, comps, LBO and waterfalls, built the way a deal team builds them."
+fx_sound_on_title,Sound is on. Click to mute.
+fx_sound_on,Sound on
+acct_signout_unsaved_one,One run has not reached your account yet and will be lost from this device. Sign out anyway?
+acct_tab_signup,Create account
+acct_tab_magic,Magic link
+acct_delete_head,Delete your account for good.
+acct_data_line_out,"Progress and settings live in this browser’s storage. Export them as a file, or delete them here."
+acct_delete,Delete account
+acct_stored_times,{n} of {m} lessons have progress; best times total {s} s.
+acct_stored_none,Nothing is stored yet.
+acct_delete_fine,"Deleting the account removes your profile, attempts and board entries. It cannot be undone."
+acct_paid_on,Paid access is on.
+demo_poster_link,Open lesson 1.1.1
+demo_title,Alignment and titles
+demo_brief,"The Report’s figures are in. Make the units line a note, right-align the headers over the figures and turn the gridlines off."
+demo_teach_1,"Ctrl+I sets italic, so a note reads as a note."
+demo_goal_1,"Make the units line italic, A2."
+demo_teach_2,Ctrl+Shift+→ selects to the edge in one press.
+demo_goal_2,"Select the headers over the figures, C4:I4."
+demo_teach_3,"Alt walks the Ribbon: H for Home, A for Align, R for Right."
+demo_goal_3,"Right-align the headers, C4:I4."
+demo_teach_4,"Alt walks the Ribbon: W for View, V then G for Gridlines."
+demo_goal_4,Turn the gridlines off.
+conv_A1_name,Set Excel up before you model
+conv_A1_short,"Set up once: calc mode, iteration, defaults"
+conv_A2_name,The QAT holds your formatting commands
+conv_A2_short,Alt+number beats a long Alt chord
+conv_A3_name,Gridlines off on a page someone reads
+conv_A3_short,"Borders carry structure, not gridlines"
+conv_A4_name,"Descriptive tab names, logical order"
+conv_A4_short,"Name the tabs; outputs left, data right"
+conv_A5_name,Keyboard first
+conv_A5_short,"The mouse is for reviewing, not building"
+conv_A6_name,Save versions as you go
+conv_A6_short,Never overwrite the only copy
+conv_B1_name,"Blue inputs, black formulas"
+conv_B1_short,"Inputs blue, formulas black"
+conv_B2_name,Green links to other sheets
+conv_B2_short,Links green; external links avoided
+conv_B3_name,Inputs may carry a light fill
+conv_B3_short,A tint marks the input block
+conv_B4_name,No hardcodes inside formulas
+conv_B4_short,"One input, one cell; formulas reference it"
+conv_B5_name,Actuals and estimates look different
+conv_B5_short,Mark the A/E divider
+conv_B6_name,Document every hardcode
+conv_B6_short,"Label the source (""per utility contract"")"
+conv_C1_name,Inputs → calculations → outputs
+conv_C1_short,"Inputs, calcs, outputs, in that order"
+conv_C2_name,"One timeline row, equal period columns"
+conv_C2_short,"Timeline on top, equal widths"
+conv_C3_name,"One formula per row, filled right"
+conv_C3_short,"Write once, fill right"
+conv_C4_name,"One sign convention, stated"
+conv_C4_short,"Income positive, costs negative"
+conv_C5_name,Units stated once
+conv_C5_short,"A units line: ""USD unless stated"""
+conv_C6_name,Long sheets over many tabs
+conv_C6_short,"Schedules feed statements, never back"
+conv_C7_name,"Group, don’t hide"
+conv_C7_short,Hidden columns get forgotten
+conv_C8_name,Freeze panes on long sheets
+conv_C8_short,Keep the timeline and labels in view
+conv_C9_name,"Named ranges, sparingly"
+conv_C9_short,Name toggles and key inputs only
+conv_D1_name,Negatives in parentheses
+conv_D1_short,"Parentheses, never a leading minus"
+conv_D2_name,Consistent decimals down a line
+conv_D2_short,One decimals setting per line
+conv_D3_name,Zero shown as a dash
+conv_D3_short,"A dash, not 0.0"
+conv_D4_name,Currency symbol first and total rows only
+conv_D4_short,$ on the first and total rows
+conv_D5_name,Totals bold with a top border
+conv_D5_short,"A top border, never an all-borders grid"
+conv_D6_name,"Indent hierarchy, right-aligned headers"
+conv_D6_short,Indent sub-items; headers over numbers
+conv_D7_name,"Center Across Selection, never merge"
+conv_D7_short,Merged cells break everything
+conv_D8_name,"One font, one size"
+conv_D8_short,No color for decoration
+conv_D9_name,Custom formats do the labelling
+conv_D9_short,"Units live in the format, not typed text"
+conv_E1_name,"Point, don’t type"
+conv_E1_short,Build references by pointing; F2 to read back
+conv_E2_name,F4 anchors while typing
+conv_E2_short,Know the four anchor states
+conv_E3_name,"Fill, don’t retype"
+conv_E3_short,"Ctrl+D down, Ctrl+R across"
+conv_E4_name,Paste Special on purpose
+conv_E4_short,"Values to snapshot, never over live formulas"
+conv_E5_name,AutoSum the block plus its edge
+conv_E5_short,"Alt+= once, across the block"
+conv_E6_name,"No nested-IF towers, no volatile functions"
+conv_E6_short,MIN/MAX or a lookup instead
+conv_E7_name,Avoid external workbook links
+conv_E7_short,Check for stray links before sending
+conv_E8_name,Circularity only on purpose
+conv_E8_short,Iterative calc + a circuit breaker
+conv_E9_name,Scenarios in one model
+conv_E9_short,"A case toggle, never copies of the file"
+conv_F1_name,A checks row wherever two things must agree
+conv_F1_short,The check is a live difference → 0
+conv_F2_name,Never plug
+conv_F2_short,Cash balances the sheet; nothing is forced
+conv_F3_name,Hardcode hunt before you send
+conv_F3_short,"Go To Special, show formulas, trace"
+conv_F4_name,Sense-check magnitudes
+conv_F4_short,Read the page before anyone else does
+conv_F5_name,Read what Excel tells you
+conv_F5_short,"The count, the proposal, the error code"
+conv_G1_name,Print set-up is part of the model
+conv_G1_short,"Fit to page, titles, footer"
+conv_G2_name,A page reads like an MD reads
+conv_G2_short,"Title, units, timeline, then the answer"
+conv_G3_name,Consistent labels and footnotes
+conv_G3_short,Attention to detail is judged first
+auth_bad_credentials,"That email and password didn’t work. Check them, or use a magic link."

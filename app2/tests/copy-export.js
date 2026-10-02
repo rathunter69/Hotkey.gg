@@ -12,7 +12,8 @@ import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { COPY_DIR, FILES, HEADERS, readCopyDir, renderIndex } from './copy-build.js';
 import { parseCsv, toCsv } from '../content/copy/csv.js';
-import { joinParas } from '../content/copy/apply.js';
+import { joinParas, drillLines } from '../content/copy/apply.js';
+import { DRILLS } from '../content/drills.js';
 import { SITE_KEYS } from '../content/copy/rules.js';
 import { CHAPTERS, modulesOf, moduleOf, sectionsOf } from '../content/index.js';
 import { CONVENTIONS } from '../content/conventions.js';
@@ -201,7 +202,26 @@ export function exportCopy(current) {
   const cur = current.micro || {};
   for (const id in MICRO) { const m = MICRO[id]; const r = { id, prompt: (cur[id] && cur[id].prompt) || '', teach: (cur[id] && cur[id].teach) || '' }; fill(r, 'prompt', m.task); fill(r, 'teach', (m.goals && m.goals[0] && m.goals[0].teach) || ''); micro.push(r); }
   for (const id in cur) if (!MICRO[id]) micro.push({ id, prompt: cur[id].prompt || '', teach: cur[id].teach || '' });
-  return { lessons, goals, modules, site, micro };
+  // drills (R8, M1): one row per keyed drill in catalog order, then its goal, end-state and what-if lines
+  // (a challenge is a lesson, so its words are lessons.csv's)
+  const drills = [], drillGoals = [];
+  const curD = current.drills || {}, curG = current.drillGoals || {};
+  const dseen = new Set();
+  for (const d of DRILLS) {
+    if (d.kind === 'challenge') continue;
+    const r = { id: d.id, title: (curD[d.id] && curD[d.id].title) || '', task: (curD[d.id] && curD[d.id].task) || '' };
+    fill(r, 'title', d.title); fill(r, 'task', d.task);
+    drills.push(r); dseen.add(d.id);
+    const rows = curG[d.id] || [];
+    for (const line of drillLines(d)) {
+      const g0 = rows.find(x => x.kind === line.kind && Number(x.index) === line.index) || {};
+      const gr = { drill_id: d.id, kind: line.kind, index: String(line.index), text: g0.text || '' };
+      fill(gr, 'text', line.text);
+      drillGoals.push(gr);
+    }
+  }
+  for (const id in curD) if (!dseen.has(id)) { drills.push({ ...curD[id] }); for (const g of curG[id] || []) drillGoals.push({ ...g }); }
+  return { lessons, goals, modules, site, micro, drills, drillGoals };
 }
 
 function orderKey(order) {
@@ -217,7 +237,7 @@ if (isMain) {
   const current = readCopyDir(COPY_DIR);
   const out = exportCopy(current);
   mkdirSync(dir, { recursive: true });
-  const texts = { 'lessons.csv': toCsv(HEADERS['lessons.csv'], out.lessons), 'goals.csv': toCsv(HEADERS['goals.csv'], out.goals), 'modules.csv': toCsv(HEADERS['modules.csv'], out.modules), 'site.csv': toCsv(HEADERS['site.csv'], out.site), 'micro.csv': toCsv(HEADERS['micro.csv'], out.micro) };
+  const texts = { 'lessons.csv': toCsv(HEADERS['lessons.csv'], out.lessons), 'goals.csv': toCsv(HEADERS['goals.csv'], out.goals), 'modules.csv': toCsv(HEADERS['modules.csv'], out.modules), 'site.csv': toCsv(HEADERS['site.csv'], out.site), 'micro.csv': toCsv(HEADERS['micro.csv'], out.micro), 'drills.csv': toCsv(HEADERS['drills.csv'], out.drills), 'drill_goals.csv': toCsv(HEADERS['drill_goals.csv'], out.drillGoals) };
   let changed = 0;
   for (const f of FILES) {
     const p = join(dir, f);

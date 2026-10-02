@@ -1,6 +1,6 @@
 // app2/content/drills.js — the drill catalogue (SITE_SPEC §5): timed exercises over taught
 // material. Order is catalog order (prev/next in the drill bar walks it). BENCHMARKS are the
-// boards that feed rank (Phase B/§9); DAILY_POOL is where the Daily draws from.
+// boards that feed a learner's profile; DAILY_POOL is where the Daily draws from.
 import get_around from './drills/get-around.js';
 import enter_and_fill from './drills/enter-and-fill.js';
 import find_and_fix from './drills/find-and-fix.js';
@@ -75,6 +75,7 @@ import ch6_cap_the_amort from './drills/ch6-cap-the-amort.js';
 import ch6_lenders_return from './drills/ch6-lenders-return.js';
 import ch6_ceiling_price from './drills/ch6-ceiling-price.js';
 import { LESSONS } from './index.js';
+import { applyDrillCopy } from './copy/apply.js';
 
 /**
  * Chapter 1's eleven drills (screenplay 6.1, resized 2026-10-01; M108), in the order the chapter
@@ -162,12 +163,15 @@ export const DRILLS = [
   ch6_ceiling_price,
   puzzle_ch6,
 ];
+// The words come from the copy sheets (drills.csv, drill_goals.csv; R8, M1): the drill files keep
+// the mechanics, and their lines are only the fallback
+for (const d of DRILLS) applyDrillCopy(d);
 
 /**
  * The module challenges (C2 Run 4) registered as drills: each entry is a thin catalogue record
  * over the challenge lesson (kind 'challenge'); the drill page and the Daily hand it to the
- * lesson workspace (`#/lesson/<id>`), which runs it seeded, timed and tier-scored. Two are the
- * benchmarks that feed rank once boards exist.
+ * lesson workspace (`#/lesson/<id>`), which runs it seeded, timed and tier-scored. Two are
+ * benchmarks.
  */
 const BENCHMARK_CHALLENGES = new Set(['challenge-to-standard-in-three-minutes', 'challenge-the-site-pnl']);
 export const CHALLENGE_DRILLS = LESSONS.filter(l => l.kind === 'challenge').map(l => ({
@@ -178,7 +182,15 @@ DRILLS.push(...CHALLENGE_DRILLS);
 
 export const DRILLS_BY_ID = Object.fromEntries(DRILLS.map(d => [d.id, d]));
 export const drillById = id => DRILLS_BY_ID[id] || null;
-/** The drills whose boards feed rank once boards exist (§9). */
+/** The benchmark drills: one a chapter, the boards a profile percentile can read later (6.8). */
 export const BENCHMARKS = DRILLS.filter(d => d.benchmark);
-/** The Daily draws from every free drill; seeded ones vary their figures by the day. */
-export const DAILY_POOL = DRILLS.filter(d => d.access === 'free').map(d => d.id);
+/**
+ * The Daily draws from every keyed drill, free and Full Access (screenplay 6.4; M20), except the
+ * stretch and long ones (M85): the same rule as the catalog's dailyEligible, which a test holds
+ * equal. A free learner meets a Full Access drill and plays it anyway. The module challenges stay
+ * out: they run in the lesson workspace, which a free account can't open past Chapter 1.
+ */
+const LONG_PASS = 181;   // catalog.js LONG_FROM
+const tagged = (d, tag) => Array.isArray(d.tags) && d.tags.includes(tag);
+export const dailyEligible = d => !!d && d.kind !== 'challenge' && !d.stretch && !tagged(d, 'stretch') && !tagged(d, 'long') && !(d.pars && d.pars.pass >= LONG_PASS) && (d.mode === undefined || d.mode === 'drill');
+export const DAILY_POOL = DRILLS.filter(dailyEligible).map(d => d.id);

@@ -17075,7 +17075,7 @@ export const COPY = {
   "orientation_learn": "Learn is the course: six chapters of short modules, each ending in a timed challenge on a fresh file.",
   "orientation_practice": "Drills, the Daily, rapid-fire and the challenges all live under Practice, on the clock.",
   "orientation_leaderboard": "Each drill and challenge has a board, the Daily too, and only a run with no help and no mouse posts a time.",
-  "orientation_level": "Everything you finish earns XP toward your next level, and speed is what puts you on the boards.",
+  "orientation_level": "Lessons, challenges, drills, the Daily, rapid-fire and quests all pay XP toward your next level, and speed is what puts you on the boards.",
   "orientation_fine": "Use the arrows and Enter. Sound comes on quietly with your first key, and the sound button at the top of a lesson turns it off.",
   "first_run_demo_title": "This is a lesson.",
   "first_run_demo_body": "Real keys on a real sheet. You’re graded on how the sheet ends up, so any route that gets there counts.",
@@ -17130,14 +17130,13 @@ export const COPY = {
   "rapid_intro": "We name a command and you press its keys, which stay hidden until you stall.",
   "rapid_fine": "A round counts as practice and pays a little XP; it never sets a drill best.",
   "boards_closed": "Desk and school boards aren’t open yet.",
-  "boards_desk_prompt": "Start a desk to compete with your own group.",
+  "boards_desk_prompt": "You aren’t on a desk. A desk comes with Teams: a private board for a class or a team.",
   "account_guest": "You’re a guest, so everything here is saved on this device only.",
   "account_title": "Account",
   "account_level": "Level {n}",
   "account_data": "Your data",
-  "paywall_line": "Get full access for the rest of the content.",
-  "paywall_signed_in": "This account doesn’t have full access yet. Get it here, or redeem a code on the Account page.",
-  "teams_desk_signin": "Desks need an account, and desk creation isn’t open yet.",
+  "paywall_line": "Get Full Access for the rest of the content.",
+  "paywall_signed_in": "This account doesn’t have Full Access yet. Get it here, or redeem a code on the Account page.",
   "page_failed": "{page} didn’t load.",
   "rail_home": "Home",
   "rail_learn": "Learn",
@@ -17152,7 +17151,7 @@ export const COPY = {
   "rail_xp": "{n} of {next} XP",
   "rail_streak": "Day {n} of your streak",
   "rail_streak_none": "Your streak starts with today’s practice.",
-  "rail_go_pro": "Get full access",
+  "rail_go_pro": "Get Full Access",
   "rail_account": "Account",
   "rail_sign_in": "Sign in",
   "rail_guest": "Guest",
@@ -17311,7 +17310,7 @@ export const COPY = {
   "home_achievements": "Achievements",
   "home_count_of": "{n} of {m}",
   "home_ach_next": "Next: {badge}",
-  "paywall_go_pro": "Get full access",
+  "paywall_go_pro": "Get Full Access",
   "paywall_not_now": "Not now",
   "learn_tab": "Chapter {n}",
   "learn_page_fill": "Pass its challenge to finish the module and earn its badge.",
@@ -17387,7 +17386,7 @@ export const COPY = {
   "boards_none_yet": "No clean run on this board yet.",
   "boards_signed_out": "Your own clean runs. The field opens when you sign in.",
   "boards_desks_signed_out": "Sign in to see your desk’s board.",
-  "boards_desk_link": "Teams and desks",
+  "boards_desk_link": "Teams",
   "boards_loading": "Loading the board",
   "boards_failed": "Couldn’t load the board.",
   "boards_retry": "Try again",
@@ -17439,6 +17438,7 @@ export const COPY = {
   "landing_plate_drills_title": "Format the weekly page",
   "landing_plate_boards_title": "The Daily, Thursday",
   "landing_plate_boards_facts": "184 clean runs",
+  "landing_plate_boards_example": "Example board",
   "landing_show_label": "How it works",
   "landing_show_lesson_title": "Lessons",
   "landing_show_lesson": "One job at a time on a real sheet. The card points at the cells and shows the keys.",
@@ -17464,7 +17464,7 @@ export const COPY = {
   "footer_trademarks": "Microsoft and Excel are trademarks of the Microsoft group of companies. LinkedIn is a trademark of LinkedIn Corporation. hotkey.gg isn’t affiliated with either.",
   "footer_business": "",
   "paywall_pro": "Full Access",
-  "paywall_go": "Get full access",
+  "paywall_go": "Get Full Access",
   "paywall_chapter": "Chapter {n}: {name}",
   "paywall_this_lesson": "This lesson",
   "pricing_title": "Pricing",
@@ -17501,14 +17501,14 @@ export const COPY = {
   "pricing_teams_1": "Full Access for every seat",
   "pricing_teams_2": "One monthly invoice for the team",
   "pricing_teams_3": "Seats added as the team grows",
-  "pricing_full_go": "Get full access",
+  "pricing_full_go": "Get Full Access",
   "pricing_teams_go": "Talk to us",
   "pricing_teams_note": "Email us the team size and we set it up.",
   "pricing_teams_subject": "hotkey.gg for a team",
   "pricing_trust_cancel": "Cancel any time from your account.",
   "pricing_trust_refund": "Full refund on your first payment within 14 days.",
   "pricing_trust_stripe": "Payment is handled by Stripe.",
-  "pricing_signed_in_note": "You have full access. Manage it on the Account page.",
+  "pricing_signed_in_note": "You have Full Access. Manage it on the Account page.",
   "paywall_price": "Full Access is $15 a month, or $9 with a school email. Cancel any time.",
   "ref_title": "Reference",
   "ref_loading": "Loading the keys.",
@@ -17535,7 +17535,7 @@ export const COPY = {
   "ref_or": "or",
   "ref_no_match": "No key matches that.",
   "ref_collected": "{n} of {m} keys collected.",
-  "ref_drill_note": "Drill it opens a short rep on that one key.",
+  "ref_drill_note": "Drill it opens a short rep on that one key. Show me plays it on a small sheet.",
   "settings_title": "Settings",
   "settings_saved_line": "Saved as you change them",
   "settings_not_saved": "Couldn’t save on this device",
@@ -17690,7 +17690,7 @@ export const COPY = {
   "panel_copy_blocked": "Couldn’t copy: the clipboard is blocked",
   "due_none_title": "Nothing to drill here.",
   "due_none_body": "That item is not in today’s queue.",
-  "checkout_title": "Get full access",
+  "checkout_title": "Get Full Access",
   "checkout_signin_head": "Sign in to subscribe",
   "checkout_signin_line": "Enter your email and we send you a 6-digit code. Sign in with a school email for the student price.",
   "checkout_email": "Email",
@@ -17715,13 +17715,13 @@ export const COPY = {
   "checkout_inc_2": "Every drill, challenge and assessment",
   "checkout_inc_3": "The certificate, with a page anyone can check",
   "checkout_cancel": "Cancel any time from your account.",
-  "checkout_guarantee": "If it’s not for you, you get your money back within 14 days.",
+  "checkout_guarantee": "If it’s not for you, you get your first payment back in full within 14 days.",
   "checkout_stripe": "Payment is handled by Stripe. Your receipt comes from Link.",
-  "checkout_have_head": "You already have full access",
+  "checkout_have_head": "You already have Full Access",
   "checkout_have_line": "Your plan is on the Account page, with your card and receipts under Manage billing.",
   "checkout_done_title": "Unlocking your course",
   "checkout_done_wait": "Payment received. Opening Chapters 2 to 6.",
-  "checkout_done_ok": "You have full access, and Chapters 2 to 6 are open.",
+  "checkout_done_ok": "You have Full Access, and Chapters 2 to 6 are open.",
   "checkout_done_go": "Start Chapter 2",
   "checkout_done_timeout": "Payment received. Unlocking can take a minute; refresh this page.",
   "checkout_done_support": "Still locked after that? Email {email} and we sort it out.",
@@ -17739,10 +17739,11 @@ export const COPY = {
   "account_plan_free_line": "Chapter 1 is yours in full. Full Access opens Chapters 2 to 6.",
   "account_cancel": "Cancel subscription",
   "account_manage": "Manage billing",
-  "account_get": "Get full access",
+  "account_get": "Get Full Access",
   "account_cancel_note": "Cancelling keeps your access to the end of the month you paid for.",
   "account_billing_err": "Billing didn’t open. Try again in a minute.",
   "account_billing_none": "There is no subscription on this account yet.",
+  "account_delete_sub": "Your subscription still renews. Deleting the account does not stop it, so cancel it first under Plan and billing.",
   "home_xp_to_go": "{n} XP to go",
   "learn_free": "Free",
   "learn_being_written": "Being written",
@@ -17751,7 +17752,7 @@ export const COPY = {
   "learn_reward_earned": "Earned",
   "practice_chapter_coming": "Chapter {n} is being written. Its drills land here as its lessons do.",
   "learn_keys_n": "{n} keys",
-  "home_xp_why": "Lessons, drills, the Daily and quests pay XP. Every level opens a piece of flair.",
+  "home_xp_why": "Lessons, challenges, drills, the Daily, rapid-fire and quests pay XP. Every level opens a piece of flair.",
   "save_title": "Save your progress",
   "save_line": "Your progress lives in this browser for now. A free account keeps it on any device and puts your times on the boards.",
   "save_go": "Make a free account",
@@ -17788,6 +17789,12 @@ export const COPY = {
   "signin_line": "Type your email and we send a 6-digit code. New here? The same code makes your account.",
   "signin_google": "Continue with Google",
   "signin_fine": "Your progress in this browser moves to the account. Chapter 1 stays free either way.",
+  "consent_account": "By continuing you agree to the {terms} and the {privacy}.",
+  "consent_terms_link": "Terms of Use",
+  "consent_privacy_link": "Privacy Policy",
+  "consent_email_use": "We use your email to sign you in and for the emails your account needs, never for marketing.",
+  "consent_age": "You must be 13 or older to make an account.",
+  "consent_teams": "We use these details only to reply about your team. See the {privacy}.",
   "home_tour": "Take the tour",
   "rapid_len_short_30": "30 s",
   "rapid_len_short_60": "60 s",
@@ -17858,40 +17865,9 @@ export const COPY = {
   "certificate_name": "hotkey.gg Certified",
   "certificate_course": "Excel for Finance",
   "certificate_progress": "{n} of 6 chapters Verified",
-  "teams_title": "Teams and schools",
-  "teams_sub": "For banks, training providers, finance clubs, classes and friend groups. There are two things a group can do here.",
-  "teams_desk_cap": "Start a desk",
-  "teams_desk_tag": "Free to create",
-  "teams_desk_heading": "A private group with its own board",
-  "teams_desk_body": "A desk is a private group: its own leaderboard, assignments set by a captain, and progress the captain can see (your times on assignments, nothing else).",
-  "teams_desk_who": "For a study group, a finance club, an analyst class or a team at work.",
-  "teams_desk_create": "Create a desk",
+  "teams_title": "Teams",
+  "teams_sub": "Full Access for a class or a team, with a desk of its own.",
   "teams_code_head": "Have a code?",
-  "teams_code_line": "Join a desk by invite code or link.",
-  "teams_code_join": "Join",
-  "teams_code_kept": "Code {code} is kept on this device until desks open.",
-  "teams_code_empty": "Enter a code or paste an invite link.",
-  "teams_code_failed": "Couldn’t save the code on this device.",
-  "teams_group_cap": "Group access",
-  "teams_group_tag": "Full Access for organizations",
-  "teams_group_heading": "One code, a number of seats, one end date",
-  "teams_group_body": "Group access opens Full Access for everyone on the code or link, with a progress view for the organizer and invoice-friendly billing. Groups don’t check out on the site yet: send a request and we reply by email.",
-  "teams_field_name": "Name",
-  "teams_field_org": "Organization",
-  "teams_field_email": "Email",
-  "teams_field_seats": "Seats",
-  "teams_field_start": "Start date",
-  "teams_request": "Request group access",
-  "teams_req_local": "For now a request is saved on this device and isn’t sent to us, so write to us as well:",
-  "teams_req_link": "Contact",
-  "teams_req_count": "{n} saved on this device.",
-  "teams_req_saved": "Saved on this device. It isn’t sent anywhere yet, so write to us from the contact page as well.",
-  "teams_req_failed": "Couldn’t save on this device. Write to us from the contact page.",
-  "teams_err_name": "Your name is needed.",
-  "teams_err_org": "The organization is needed.",
-  "teams_err_email": "A valid email is needed.",
-  "teams_err_seats": "Seats must be a whole number, 1 or more.",
-  "teams_err_start": "A start date is needed.",
   "account_public_note": "Shows your handle, level and best times on the boards and on your profile page. Turned off, nothing is public.",
   "account_time_saved": "Estimated time saved against the mouse-and-menus route: about {d}. It’s an estimate: your key counts against a slow route at half a second an action.",
   "about_title": "About",
@@ -18116,7 +18092,7 @@ export const COPY = {
   "flair_top-bucket": "Crimson, with the Top Bucket frame",
   "ach_shelf_label": "Achievements: {n} of {m} earned",
   "ach_banner": "Achievement",
-  "orientation_home_level": "Lessons, drills, the Daily and quests all pay XP, and every level opens a piece of flair, drawn here.",
+  "orientation_home_level": "Lessons, challenges, drills, the Daily, rapid-fire and quests all pay XP, and every level opens a piece of flair, drawn here.",
   "orientation_home_today": "Three quests a day and three a week each pay XP, with a bonus when all three land.",
   "panel_equipped": "Equipped",
   "profile_xp_head": "Where XP comes from",
@@ -18213,6 +18189,13 @@ export const COPY = {
   "rapid_cmd_insert-column": "Insert Column",
   "rapid_cmd_delete-column": "Delete Column",
   "rapid_cmd_autofit-column": "AutoFit Column Width",
+  "rapid_cmd_extend-one": "Extend the selection one cell",
+  "rapid_cmd_fill-selection": "Enter into every selected cell",
+  "rapid_cmd_line-break": "Line break in a cell",
+  "rapid_cmd_column-width": "Column Width",
+  "rapid_cmd_row-height": "Row Height",
+  "rapid_cmd_autofit-row": "AutoFit Row Height",
+  "rapid_cmd_print-titles": "Print Titles",
   "rapid_cmd_wrap-text": "Wrap Text",
   "rapid_cmd_hide-rows": "Hide Rows",
   "rapid_cmd_hide-columns": "Hide Columns",
@@ -18292,7 +18275,434 @@ export const COPY = {
   "rapid_cmd_name-manager": "Name Manager",
   "rapid_cmd_define-name": "Define Name",
   "rapid_cmd_pivot-table": "PivotTable",
-  "rapid_cmd_calc-except-tables": "Automatic Except for Data Tables"
+  "rapid_cmd_calc-except-tables": "Automatic Except for Data Tables",
+  "ref_show_me": "Show me",
+  "ref_show_close": "Close",
+  "ref_show_done": "That’s the key. Drill it to make it yours.",
+  "ref_route_ribbon": "Ribbon",
+  "ref_route_legacy": "Legacy",
+  "ref_also": "Also: {routes}",
+  "boards_desk_open": "Open your desk",
+  "boards_desk_code": "Have a code?",
+  "teams_desk_head": "A Teams desk",
+  "teams_by_hand": "Set up by hand",
+  "teams_row_1": "Full Access for every seat",
+  "teams_row_2": "A private board for the desk on every drill",
+  "teams_row_3": "A seat view for whoever runs the desk",
+  "teams_row_4": "One monthly invoice for the team",
+  "teams_talk_line": "Tell us the team and how many seats. We set up the desk and send you its code.",
+  "teams_how_head": "How a desk works",
+  "teams_how_1_k": "We set it up",
+  "teams_how_1": "You get the desk’s code to pass round your team.",
+  "teams_how_2_k": "Your team joins",
+  "teams_how_2": "Each person signs in and enters the code. Their seat opens all six chapters.",
+  "teams_how_3_k": "You see the seats",
+  "teams_how_3": "Lessons done, chapters Verified and when each person was last active.",
+  "teams_how_4_k": "The desk races",
+  "teams_how_4": "Every drill has a board for the desk alone, next to the global one.",
+  "teams_your_desk": "Open your desk",
+  "teams_code_signin": "You sign in or make a free account when you join.",
+  "desk_title": "Your desk",
+  "desk_mark": "Teams",
+  "desk_signed_out": "Sign in to see your desk. A desk comes with Teams, and you join one with its code.",
+  "desk_none": "You aren’t on a desk yet. Enter the code your team was sent.",
+  "desk_failed": "Couldn’t load the desk.",
+  "desk_teams_head": "Teams",
+  "desk_teams_line": "A desk is how a class or a team takes the course together: a seat each, a board of its own, and a seat view for whoever runs it.",
+  "desk_teams_link": "About Teams",
+  "desk_code_head": "Join a desk",
+  "desk_code_label": "Desk code",
+  "desk_code_go": "Join",
+  "desk_join_title": "Join a desk",
+  "desk_join_owner_k": "Run by",
+  "desk_join_seats_k": "Seats left",
+  "desk_join_until_k": "Paid until",
+  "desk_join_line": "Your seat opens all six chapters for as long as the desk runs.",
+  "desk_join_go": "Join the desk",
+  "desk_join_signin": "Sign in to join",
+  "desk_join_signin_line": "A free account is all it takes. Anything you did on this device comes with you.",
+  "desk_joined": "You joined {name}.",
+  "desk_sees_head": "What the owner sees",
+  "desk_sees_1": "Your handle and level",
+  "desk_sees_2": "How many lessons you’ve done",
+  "desk_sees_3": "How many chapters you’ve Verified",
+  "desk_sees_4": "When you were last active",
+  "desk_sees_not": "Nothing else: not your runs, your mistakes or your settings. Your times show on the desk’s board, as they do on the global ones.",
+  "desk_seats_used": "{used} of {seats} seats taken",
+  "desk_until": "Paid until {date}",
+  "desk_seats_head": "Seats",
+  "desk_col_lessons": "Lessons done",
+  "desk_col_verified": "Chapters Verified",
+  "desk_col_active": "Last active",
+  "desk_role_owner": "Owner",
+  "desk_you": "You",
+  "desk_free_seat": "Free the seat",
+  "desk_free_confirm": "Press again to remove {handle}",
+  "desk_freed": "{handle} left the desk, and the seat is free.",
+  "desk_seat_left": "1 seat left",
+  "desk_seats_left": "{n} seats left",
+  "desk_seats_full": "Every seat is taken",
+  "desk_seats_line": "A freed seat ends that person’s access from the desk. To add seats, write to us.",
+  "desk_invite_head": "Invite",
+  "desk_invite_line": "Send the link, or the code on its own. Anyone with it can take a free seat.",
+  "desk_copy_link": "Copy the invite link",
+  "desk_copied": "Invite link copied",
+  "desk_copy_blocked": "Couldn’t copy: the clipboard is blocked",
+  "desk_new_code": "New code",
+  "desk_new_code_line": "A new code stops the old one working. Everyone on the desk stays.",
+  "desk_new_code_done": "The desk has a new code.",
+  "desk_members_head": "On the desk",
+  "desk_leave": "Leave the desk",
+  "desk_leave_confirm": "Press again to leave",
+  "desk_leave_line": "Leaving frees your seat, and the chapters it opened close again.",
+  "desk_left": "You left the desk.",
+  "desk_board_head": "The desk’s board",
+  "desk_active_today": "Today",
+  "desk_active_yesterday": "Yesterday",
+  "desk_active_days": "{n} days ago",
+  "desk_active_never": "Not yet",
+  "desk_err_bad_code": "That code doesn’t match a desk. Check it and try again.",
+  "desk_err_tries": "Too many tries. Wait an hour and try again.",
+  "desk_err_ended": "This desk has ended. Ask whoever runs it.",
+  "desk_err_on_desk": "You’re already on a desk. Leave it first to join this one.",
+  "desk_err_full": "Every seat on this desk is taken. Ask whoever runs it for another.",
+  "desk_err_signin": "Sign in first.",
+  "desk_err_not_on": "You aren’t on a desk.",
+  "desk_err_not_owner": "Only the desk’s owner can do that.",
+  "desk_err_owner_stays": "The owner can’t leave the desk. Write to us to hand it on.",
+  "desk_err_no_member": "That person isn’t on your desk.",
+  "desk_err_failed": "Something went wrong. Try again.",
+  "ops_title": "Ops",
+  "ops_line": "Errors, billing alerts and the weekly digest, for the people who run hotkey.gg.",
+  "ops_refresh": "Refresh",
+  "ops_week": "This week",
+  "ops_days": "Last {n} days",
+  "ops_week_accounts": "New accounts",
+  "ops_week_lessons": "First lesson completions",
+  "ops_week_runs": "Lesson runs, signed in",
+  "ops_week_errors": "Error reports",
+  "ops_week_alerts": "Open billing alerts",
+  "ops_col_what": "Figure",
+  "ops_col_now": "This week",
+  "ops_col_before": "Week before",
+  "ops_errors": "Errors",
+  "ops_errors_facts": "{n} messages",
+  "ops_errors_none": "No errors in this window.",
+  "ops_col_message": "Message",
+  "ops_col_reports": "Reports",
+  "ops_col_sessions": "Sessions",
+  "ops_col_last": "Last seen",
+  "ops_col_page": "Page",
+  "ops_col_browser": "Browser",
+  "ops_unknown": "Unknown",
+  "ops_alerts": "Billing alerts",
+  "ops_alerts_facts": "{n} open",
+  "ops_alerts_none": "No open alerts.",
+  "ops_col_kind": "Alert",
+  "ops_resolve": "Resolve",
+  "ops_digests": "Weekly digests",
+  "ops_digests_none": "No digest stored yet. The first is written on Monday morning.",
+  "ops_col_week": "Week to",
+  "ops_col_accounts": "Accounts",
+  "ops_col_lessons": "Completions",
+  "ops_col_errors": "Errors",
+  "ops_col_alerts": "Alerts",
+  "ops_copy": "Copy text",
+  "ops_copied": "Copied",
+  "ops_unavailable": "This page reads the live database, which isn’t connected here.",
+  "ops_signed_out": "Sign in to open this page.",
+  "ops_not_member": "This page is for the people who run hotkey.gg.",
+  "ops_failed": "The figures didn’t load. Try Refresh.",
+  "ops_loading": "Loading the figures.",
+  "grade_an_input_shown": "{cell} is an input shown {color}. Inputs are blue",
+  "grade_formula_shown_blue": "{cell} is a formula shown in blue",
+  "grade_green_but_reads": "{cell} is green but reads nothing on another sheet",
+  "grade_formula_shown": "{cell} is a formula shown in {color}",
+  "grade_has_typed_inside": "{cell} has {number} typed inside the formula. Inputs live in their own cell",
+  "grade_breaks_row_s": "{cell} breaks its row's formula. One formula per row, filled right",
+  "grade_shows_minus_standard": "{cell} shows a minus. The standard uses parentheses",
+  "grade_shows_decimals_against": "{cell} shows {decimals} decimals against {want} at {first}. Decimals are consistent down a line",
+  "grade_shows_zero_zero": "{cell} shows a zero as {shown}. Zero is a dash",
+  "grade_carries_currency_sign": "{cell} carries a $. The currency sign sits on the first and total rows only",
+  "grade_has_no_first": "{cell} has no $. The first and total rows carry the currency sign",
+  "grade_shows_cost_positive": "{cell} shows a cost as a positive. Costs are negative, stated once up top",
+  "grade_sign_convention_stated": "the sign convention is not stated. Say once in the top rows that costs are shown as negatives",
+  "grade_gridlines_page_someone": "gridlines are on. A page someone else reads has them off",
+  "grade_carries_grid_border": "{cell} carries a grid border. A total gets a top border, the block gets none",
+  "grade_has_no_title": "{cell} has no title",
+  "grade_padded_spaces_center": "{cell} is padded with spaces. Center Across Selection, never a merge",
+  "grade_centered_across_columns": "{cell} is not centered across {span} columns. Center Across Selection, never a merge",
+  "grade_header_over_numbers": "{cell} is a header over numbers that is not right-aligned",
+  "grade_percentage_line_italic": "{cell} is a percentage line that is not italic",
+  "grade_sub_item_indented": "{cell} is a sub-item that is not indented",
+  "grade_different_font_size": "{cell} is a different font size from {first}. One size across the page",
+  "grade_title_smaller_than": "{cell} is a title smaller than the page. One size across, the title may be larger",
+  "grade_sheet_missing": "the sheet is missing",
+  "grade_total_without_top": "{cell} is a total without a top border",
+  "grade_no_units_line": "no units line. State the currency once in the top rows (\"USD unless stated\")",
+  "grade_formula_check_live": "{cell} is not a formula. A check is a live difference, not a typed 0",
+  "grade_does_move_inputs": "{cell} does not move with its inputs",
+  "grade_reads_check_does": "{cell} reads {value}. The check does not tie",
+  "grade_column_hidden_group": "column {col} is hidden. Group it instead",
+  "grade_row_hidden_group": "row {row} is hidden. Group it instead",
+  "grade_typed_number_where": "{cell} is a typed number where a live formula belongs",
+  "grade_changed_fix_faults": "{cell} changed. Fix the faults and nothing else",
+  "grade_has_no_title_2": "A1 has no title",
+  "grade_title_bold": "A1 is a title that is not bold",
+  "grade_has_no_units": "A2 has no units line",
+  "grade_units_line_italic": "A2 is the units line and is not italic",
+  "grade_filled_row_spacer": "{cell} is filled, row 3 is the spacer",
+  "grade_header_bold": "{cell} is a header that is not bold",
+  "grade_row_has_no": "row 4 has no headers",
+  "grade_holds_label_labels": "{cell} holds a label, labels sit in column B from Chapter 2 on",
+  "grade_indented_spaces_use": "{cell} is indented with spaces, use the indent button",
+  "grade_figure_no_number": "{cell} is a figure with no number format",
+  "grade_percentage_italic": "{cell} is a percentage that is not italic",
+  "grade_carries_vertical_border": "{col} carries a vertical border. The A/E divider is the one vertical line a page allows",
+  "grade_total_bold_top": "{cell} is a total that is not bold with a top border",
+  "grade_panes_frozen": "panes are not frozen at {cell}",
+  "grade_desk_number_format": "{cell} is not in the desk number format: thousands separator, no decimals, negatives in brackets",
+  "acct_tab_signin": "Sign in",
+  "acct_check_email": "Check your email.",
+  "acct_magic_go": "Email me a link",
+  "acct_unavailable": "Sign-in is not configured.",
+  "acct_signup_fine": "You pick a handle right after, and one is suggested.",
+  "acct_keep_head": "Keep your progress across devices.",
+  "acct_keep_line": "Email and password, a magic link, or Google. No anonymous accounts: as a guest your work stays in this browser.",
+  "acct_carried_head": "What is carried over when you sign up",
+  "acct_carried_lessons": "Lesson progress: {n} started, {d} completed",
+  "acct_carried_bests": "Personal bests: {n}",
+  "acct_carried_platform": "Platform ({p}) and theme",
+  "acct_carried_skipped": "Skipped lessons from placement: {n}",
+  "acct_carried_fine": "Carried once, to the account you create, never from another account. Your handle appears on public boards and your public profile only if you allow it.",
+  "acct_handle": "Handle",
+  "acct_handle_fine": "Appears on public boards and your public profile if you allow it; change any time (once a day).",
+  "acct_handle_save": "Save handle",
+  "acct_public": "Public profile",
+  "acct_code": "Have a code?",
+  "acct_redeem": "Redeem",
+  "acct_stats_empty": "Nothing yet: stats build from your lessons, drills and Dailies as you play.",
+  "acct_stats": "Stats",
+  "acct_stat_level": "level ({xp} XP)",
+  "acct_stat_time": "timed practice",
+  "acct_stat_runs": "recorded runs",
+  "acct_stat_keys": "keystrokes in runs",
+  "acct_stat_pbs": "personal bests",
+  "acct_stat_streak": "day streak",
+  "acct_improvement": "Improvement:",
+  "acct_most_used": "Most-used shortcuts (from your best runs):",
+  "acct_delete_line": "Profile, attempts, bests and board entries go, and it cannot be undone. Type {word} to confirm.",
+  "acct_confirm": "Confirm",
+  "acct_delete_go": "Delete my account",
+  "acct_delete_keep": "Keep my account",
+  "acct_data_line_in": "Your progress lives in your account. Export everything we hold, or delete the account and all of it.",
+  "acct_export": "Export data (JSON)",
+  "acct_delete_local": "Delete local data",
+  "acct_stored": "{n} of {m} lessons have progress.",
+  "acct_err_network": "Network error. Check your connection and try again.",
+  "acct_link_sent": "The sign-in link is on its way; it works on this device.",
+  "acct_confirm_link": "Click the confirmation link to finish creating your account.",
+  "acct_google_off": "Google sign-in isn’t switched on yet, so use email for now.",
+  "acct_handle_saved": "Handle saved",
+  "acct_err_network_short": "Network error. Try again.",
+  "acct_save_failed": "Couldn’t save. Try again.",
+  "acct_public_on": "Profile is public",
+  "acct_public_off": "Profile is private",
+  "acct_signing_out": "Signing out…",
+  "acct_code_empty": "Enter the code you were given.",
+  "acct_code_bad": "That code isn’t right. Check it and try again.",
+  "acct_code_used": "That code has already been used.",
+  "acct_code_expired": "That code has expired.",
+  "acct_code_tries": "Too many tries. Wait an hour.",
+  "acct_code_failed": "Couldn’t redeem. Try again.",
+  "acct_paid_until": "Paid access is on until {date}.",
+  "acct_code_redeemed": "Code redeemed",
+  "acct_export_failed": "Export failed. Try again.",
+  "acct_exported": "Exported",
+  "acct_local_confirm": "Delete all progress and settings saved on this device? This cannot be undone.",
+  "acct_local_deleted": "Local data deleted",
+  "acct_deleting": "Deleting…",
+  "acct_delete_failed": "Couldn’t delete. Try again or contact support.",
+  "acct_deleted": "Account deleted",
+  "acct_delete_network": "Network error, so nothing was deleted. Try again.",
+  "acct_signout_unsaved": "{n} runs have not reached your account yet and will be lost from this device. Sign out anyway?",
+  "save_state_device": "Saved on this device",
+  "flair_unlocks_at": "Unlocks at level {n}",
+  "first_run_exp_new_label": "New to Excel",
+  "first_run_exp_sometimes_label": "I use it sometimes",
+  "first_run_exp_daily_label": "I use it daily",
+  "first_run_keyboard_win_label": "Windows",
+  "handle_rule": "3 to 20 letters, digits or underscores.",
+  "handle_banned": "That handle is not allowed.",
+  "landing_headline_2": "Excel isn’t learned. It’s practiced.",
+  "landing_headline_3": "The better way to learn Excel",
+  "lesson_save_blocked": "Couldn’t save on this device (storage blocked); the lesson still counts for this visit.",
+  "grade_check_failed": "a convention check failed",
+  "demo_poster_note": "The live demo didn’t load, so this still shows the finished sheet. {link} to do it yourself.",
+  "demo_poster_alt": "A finished demo: four goals from Chapter 1 done on the weekly report",
+  "fx_sound_off_title": "Sound is off. Click to turn it on.",
+  "fx_sound_off": "Sound off",
+  "err_mount": "Something broke on our side. Retry, or go to {page}.",
+  "err_cap": "Couldn’t load",
+  "err_head": "{page} didn’t load.",
+  "err_retry": "Retry",
+  "narrow_head": "hotkey.gg needs a keyboard and a wider screen.",
+  "err_fetch": "{page} couldn’t be fetched. Check your connection and try again.",
+  "narrow_line": "Lessons and drills run on a real spreadsheet with the keyboard. Open this page on a laptop or desktop, at least 900px wide.",
+  "narrow_back": "Back to Learn",
+  "page_label_home": "Home",
+  "page_label_landing": "The front page",
+  "page_label_root": "Home",
+  "page_label_start": "Getting started",
+  "page_label_learn": "Learn",
+  "page_label_lesson": "This lesson",
+  "page_label_practice": "Practice",
+  "page_label_drill": "This drill",
+  "page_label_daily": "The Daily",
+  "page_label_rapid": "Rapid-fire",
+  "page_label_due": "Due today",
+  "page_label_leaderboard": "The leaderboard",
+  "page_label_reference": "The shortcut reference",
+  "page_label_pricing": "Pricing",
+  "page_label_teams": "Teams",
+  "page_label_account": "Your account",
+  "page_label_checkout": "Checkout",
+  "page_label_desk": "Your desk",
+  "page_label_other": "This page",
+  "save_state_pending": "Saving to your account…",
+  "save_state_account": "Saved to your account",
+  "save_state_retry": "Couldn’t save, will retry",
+  "save_state_failed": "Couldn’t save on this device",
+  "save_line_device": "saved on this device",
+  "save_line_pending": "being saved to your account",
+  "save_line_account": "saved to your account",
+  "save_line_retry": "kept on this device until your account can be reached",
+  "save_line_failed": "not being saved: this browser is blocking storage",
+  "first_run_keyboard_mac_label": "Mac",
+  "learn_plan_1": "The worksheet and the active cell, moving, selecting, entering and editing, the Ribbon and dialog boxes, basic formatting, basic formulas, copy, paste and fill.",
+  "learn_plan_2": "Number formats, fonts, borders and fills, alignment, column widths and cell styles: a report that reads cleanly.",
+  "learn_plan_3": "Relative and absolute references, SUM, AVERAGE, IF, text and date functions, and how to audit a formula.",
+  "learn_plan_4": "Lists, sort and filter, lookups and summaries: the questions a manager asks of a table.",
+  "learn_plan_5": "Schedules, the three statements, linking them together, and auditing a model.",
+  "learn_plan_6": "DCF, comps, LBO and waterfalls, built the way a deal team builds them.",
+  "fx_sound_on_title": "Sound is on. Click to mute.",
+  "fx_sound_on": "Sound on",
+  "acct_signout_unsaved_one": "One run has not reached your account yet and will be lost from this device. Sign out anyway?",
+  "acct_tab_signup": "Create account",
+  "acct_tab_magic": "Magic link",
+  "acct_delete_head": "Delete your account for good.",
+  "acct_data_line_out": "Progress and settings live in this browser’s storage. Export them as a file, or delete them here.",
+  "acct_delete": "Delete account",
+  "acct_stored_times": "{n} of {m} lessons have progress; best times total {s} s.",
+  "acct_stored_none": "Nothing is stored yet.",
+  "acct_delete_fine": "Deleting the account removes your profile, attempts and board entries. It cannot be undone.",
+  "acct_paid_on": "Paid access is on.",
+  "demo_poster_link": "Open lesson 1.1.1",
+  "demo_title": "Alignment and titles",
+  "demo_brief": "The Report’s figures are in. Make the units line a note, right-align the headers over the figures and turn the gridlines off.",
+  "demo_teach_1": "Ctrl+I sets italic, so a note reads as a note.",
+  "demo_goal_1": "Make the units line italic, A2.",
+  "demo_teach_2": "Ctrl+Shift+→ selects to the edge in one press.",
+  "demo_goal_2": "Select the headers over the figures, C4:I4.",
+  "demo_teach_3": "Alt walks the Ribbon: H for Home, A for Align, R for Right.",
+  "demo_goal_3": "Right-align the headers, C4:I4.",
+  "demo_teach_4": "Alt walks the Ribbon: W for View, V then G for Gridlines.",
+  "demo_goal_4": "Turn the gridlines off.",
+  "conv_A1_name": "Set Excel up before you model",
+  "conv_A1_short": "Set up once: calc mode, iteration, defaults",
+  "conv_A2_name": "The QAT holds your formatting commands",
+  "conv_A2_short": "Alt+number beats a long Alt chord",
+  "conv_A3_name": "Gridlines off on a page someone reads",
+  "conv_A3_short": "Borders carry structure, not gridlines",
+  "conv_A4_name": "Descriptive tab names, logical order",
+  "conv_A4_short": "Name the tabs; outputs left, data right",
+  "conv_A5_name": "Keyboard first",
+  "conv_A5_short": "The mouse is for reviewing, not building",
+  "conv_A6_name": "Save versions as you go",
+  "conv_A6_short": "Never overwrite the only copy",
+  "conv_B1_name": "Blue inputs, black formulas",
+  "conv_B1_short": "Inputs blue, formulas black",
+  "conv_B2_name": "Green links to other sheets",
+  "conv_B2_short": "Links green; external links avoided",
+  "conv_B3_name": "Inputs may carry a light fill",
+  "conv_B3_short": "A tint marks the input block",
+  "conv_B4_name": "No hardcodes inside formulas",
+  "conv_B4_short": "One input, one cell; formulas reference it",
+  "conv_B5_name": "Actuals and estimates look different",
+  "conv_B5_short": "Mark the A/E divider",
+  "conv_B6_name": "Document every hardcode",
+  "conv_B6_short": "Label the source (\"per utility contract\")",
+  "conv_C1_name": "Inputs → calculations → outputs",
+  "conv_C1_short": "Inputs, calcs, outputs, in that order",
+  "conv_C2_name": "One timeline row, equal period columns",
+  "conv_C2_short": "Timeline on top, equal widths",
+  "conv_C3_name": "One formula per row, filled right",
+  "conv_C3_short": "Write once, fill right",
+  "conv_C4_name": "One sign convention, stated",
+  "conv_C4_short": "Income positive, costs negative",
+  "conv_C5_name": "Units stated once",
+  "conv_C5_short": "A units line: \"USD unless stated\"",
+  "conv_C6_name": "Long sheets over many tabs",
+  "conv_C6_short": "Schedules feed statements, never back",
+  "conv_C7_name": "Group, don’t hide",
+  "conv_C7_short": "Hidden columns get forgotten",
+  "conv_C8_name": "Freeze panes on long sheets",
+  "conv_C8_short": "Keep the timeline and labels in view",
+  "conv_C9_name": "Named ranges, sparingly",
+  "conv_C9_short": "Name toggles and key inputs only",
+  "conv_D1_name": "Negatives in parentheses",
+  "conv_D1_short": "Parentheses, never a leading minus",
+  "conv_D2_name": "Consistent decimals down a line",
+  "conv_D2_short": "One decimals setting per line",
+  "conv_D3_name": "Zero shown as a dash",
+  "conv_D3_short": "A dash, not 0.0",
+  "conv_D4_name": "Currency symbol first and total rows only",
+  "conv_D4_short": "$ on the first and total rows",
+  "conv_D5_name": "Totals bold with a top border",
+  "conv_D5_short": "A top border, never an all-borders grid",
+  "conv_D6_name": "Indent hierarchy, right-aligned headers",
+  "conv_D6_short": "Indent sub-items; headers over numbers",
+  "conv_D7_name": "Center Across Selection, never merge",
+  "conv_D7_short": "Merged cells break everything",
+  "conv_D8_name": "One font, one size",
+  "conv_D8_short": "No color for decoration",
+  "conv_D9_name": "Custom formats do the labelling",
+  "conv_D9_short": "Units live in the format, not typed text",
+  "conv_E1_name": "Point, don’t type",
+  "conv_E1_short": "Build references by pointing; F2 to read back",
+  "conv_E2_name": "F4 anchors while typing",
+  "conv_E2_short": "Know the four anchor states",
+  "conv_E3_name": "Fill, don’t retype",
+  "conv_E3_short": "Ctrl+D down, Ctrl+R across",
+  "conv_E4_name": "Paste Special on purpose",
+  "conv_E4_short": "Values to snapshot, never over live formulas",
+  "conv_E5_name": "AutoSum the block plus its edge",
+  "conv_E5_short": "Alt+= once, across the block",
+  "conv_E6_name": "No nested-IF towers, no volatile functions",
+  "conv_E6_short": "MIN/MAX or a lookup instead",
+  "conv_E7_name": "Avoid external workbook links",
+  "conv_E7_short": "Check for stray links before sending",
+  "conv_E8_name": "Circularity only on purpose",
+  "conv_E8_short": "Iterative calc + a circuit breaker",
+  "conv_E9_name": "Scenarios in one model",
+  "conv_E9_short": "A case toggle, never copies of the file",
+  "conv_F1_name": "A checks row wherever two things must agree",
+  "conv_F1_short": "The check is a live difference → 0",
+  "conv_F2_name": "Never plug",
+  "conv_F2_short": "Cash balances the sheet; nothing is forced",
+  "conv_F3_name": "Hardcode hunt before you send",
+  "conv_F3_short": "Go To Special, show formulas, trace",
+  "conv_F4_name": "Sense-check magnitudes",
+  "conv_F4_short": "Read the page before anyone else does",
+  "conv_F5_name": "Read what Excel tells you",
+  "conv_F5_short": "The count, the proposal, the error code",
+  "conv_G1_name": "Print set-up is part of the model",
+  "conv_G1_short": "Fit to page, titles, footer",
+  "conv_G2_name": "A page reads like an MD reads",
+  "conv_G2_short": "Title, units, timeline, then the answer",
+  "conv_G3_name": "Consistent labels and footnotes",
+  "conv_G3_short": "Attention to detail is judged first",
+  "auth_bad_credentials": "That email and password didn’t work. Check them, or use a magic link."
  },
  "micro": {
   "enter-tab-direction": {
@@ -18535,5 +18945,3076 @@ export const COPY = {
    "prompt": "Reach a command by KeyTips and back out one level at a time.",
    "teach": ""
   }
+ },
+ "drills": {
+  "get-around": {
+   "id": "get-around",
+   "title": "Get around the report",
+   "task": "Get around the report by its edges and fix each part you land on, then fix a typo on Costs by its address."
+  },
+  "enter-and-fill": {
+   "id": "enter-and-fill",
+   "title": "Enter and fill",
+   "task": "Fill the day names, type the missing washes, fix a figure, and fill the week and the targets."
+  },
+  "find-and-fix": {
+   "id": "find-and-fix",
+   "title": "Find and fix",
+   "task": "Find and fix two typos, Replace All a site name and last week’s date, and clean up three cells."
+  },
+  "paste-surgeon": {
+   "id": "paste-surgeon",
+   "title": "Paste surgeon",
+   "task": "Freeze the revenue as values, fix last week’s export with Paste Special math, and paste formats, a formula and a width."
+  },
+  "row-wrangler": {
+   "id": "row-wrangler",
+   "title": "Row wrangler",
+   "task": "Open a row for Cedar Park, drop the stale row, set the widths, group the old codes and freeze the panes."
+  },
+  "format-the-weekly-page": {
+   "id": "format-the-weekly-page",
+   "title": "Format the weekly page",
+   "task": "Give the plain site table the desk format: title, headers, no grid, number formats, blue inputs and a ruled total."
+  },
+  "insert-and-amend": {
+   "id": "insert-and-amend",
+   "title": "Insert and amend",
+   "task": "Add Insurance and Utilities to the site costs and get them into the total, borders intact."
+  },
+  "formula-sprint": {
+   "id": "formula-sprint",
+   "title": "Formula sprint",
+   "task": "Build revenue, the anchored cost, gross profit, margin and share, then the totals, the blended ticket and the total margin."
+  },
+  "combine-two-tabs": {
+   "id": "combine-two-tabs",
+   "title": "Combine two tabs",
+   "task": "Add Austin and San Antonio cell by cell on Combined, without typing a number."
+  },
+  "before-you-send": {
+   "id": "before-you-send",
+   "title": "Before you send",
+   "task": "The report goes to the CFO in two minutes: clear the internal notes and the stray formats, and leave every tab on its home cell."
+  },
+  "weekly-sales-report": {
+   "id": "weekly-sales-report",
+   "title": "The weekly report",
+   "task": "Turn a plain export into a finished report: title, units, headers, live totals, number formats, a ruled total and frozen panes."
+  },
+  "ch2-format-sprint": {
+   "id": "ch2-format-sprint",
+   "title": "Format sprint",
+   "task": "Put the desk number format on every line of the P&L: separators, no decimals, negatives in parentheses."
+  },
+  "ch2-to-thousands": {
+   "id": "ch2-to-thousands",
+   "title": "Dollars to thousands",
+   "task": "The export is in dollars and the page is in thousands: divide the typed figures by 1,000 and leave the formulas alone."
+  },
+  "ch2-flip-and-tie": {
+   "id": "ch2-flip-and-tie",
+   "title": "Flip and tie",
+   "task": "The costs arrived positive in someone else’s formats: make them the page’s, negative, with subtotals that add and tie to the accounts."
+  },
+  "ch2-custom-code": {
+   "id": "ch2-custom-code",
+   "title": "Custom code",
+   "task": "Write the four-section codes: washes in k, negatives in parentheses, a dash for every zero."
+  },
+  "ch2-the-divider": {
+   "id": "ch2-the-divider",
+   "title": "The divider",
+   "task": "Mark where the actuals end and the estimates start: the flags, the shaded estimate headers and the divider."
+  },
+  "ch2-top-and-bottom": {
+   "id": "ch2-top-and-bottom",
+   "title": "Top and bottom",
+   "task": "Bold the four totals with a top border each, a double bottom on EBITDA, and no grid anywhere."
+  },
+  "ch2-flag-it": {
+   "id": "ch2-flag-it",
+   "title": "Flag it",
+   "task": "One rule on each checks block: a check that isn’t zero turns red."
+  },
+  "ch2-print-it": {
+   "id": "ch2-print-it",
+   "title": "Print it",
+   "task": "Set the pack to print: landscape, fit to one page, print titles, and the file, page and date in the footer."
+  },
+  "ch2-pnl-to-standard": {
+   "id": "ch2-pnl-to-standard",
+   "title": "P&L to standard",
+   "task": "Take a raw P&L to presentation quality: title, formats, divider, borders and the print set-up."
+  },
+  "puzzle-ch2": {
+   "id": "puzzle-ch2",
+   "title": "Whose P&L is this?",
+   "task": "One line on this P&L is formatted wrong, and the format tells you which: mark it and fix it."
+  },
+  "ch3-if-ladder": {
+   "id": "ch3-if-ladder",
+   "title": "IF ladder",
+   "task": "Flag every site below target with IF, count the sites on target, then test two conditions at once with AND."
+  },
+  "ch3-override": {
+   "id": "ch3-override",
+   "title": "Override",
+   "task": "Ops can overrule the POS count: read the override when it’s a number, hold it when it’s a note, and keep the ratio from erroring."
+  },
+  "ch3-date-math": {
+   "id": "ch3-date-math",
+   "title": "Date math",
+   "task": "Member tenure from the join and cancel dates, then a month end for every POS date with EOMONTH."
+  },
+  "ch3-sumifs-sprint": {
+   "id": "ch3-sumifs-sprint",
+   "title": "SUMIFS sprint",
+   "task": "Revenue by site and package from the export with one SUMIFS, anchored, filled both ways."
+  },
+  "ch3-bands": {
+   "id": "ch3-bands",
+   "title": "Bands",
+   "task": "Count the tickets under, between and over $15 and $20: the three bands have to add up to every ticket."
+  },
+  "ch3-text-split": {
+   "id": "ch3-text-split",
+   "title": "Text split",
+   "task": "Split the site codes and the memos with LEFT, RIGHT, MID and FIND: formulas, not typed text."
+  },
+  "ch3-loan-schedule": {
+   "id": "ch3-loan-schedule",
+   "title": "Loan schedule",
+   "task": "Build the loan’s payment with PMT and its monthly schedule down to a zero balance, the rate and term anchored."
+  },
+  "ch3-trace-the-error": {
+   "id": "ch3-trace-the-error",
+   "title": "Trace the error",
+   "task": "Five error codes on the Loans page: fix each one at the cell it starts from."
+  },
+  "ch3-tie-it-out": {
+   "id": "ch3-tie-it-out",
+   "title": "Tie it out",
+   "task": "Reconcile the POS export to the managers’ tallies and get every check to zero."
+  },
+  "puzzle-ch3": {
+   "id": "puzzle-ch3",
+   "title": "The fiscal half",
+   "task": "The lead buyer’s fiscal year ends in June: restate every month of Clearcoat’s calendar into the buyer’s year and half."
+  },
+  "ch4-lookup-relay": {
+   "id": "ch4-lookup-relay",
+   "title": "Lookup relay",
+   "task": "The same price three ways: VLOOKUP, INDEX and MATCH, XLOOKUP."
+  },
+  "ch4-sort-and-filter": {
+   "id": "ch4-sort-and-filter",
+   "title": "Sort and filter",
+   "task": "A two-level sort, a filter, and a SUBTOTAL that counts only what shows."
+  },
+  "ch4-pivot-in-90": {
+   "id": "ch4-pivot-in-90",
+   "title": "Pivot in 90",
+   "task": "A PivotTable from the export: sites down, weeks across, washes summed."
+  },
+  "ch4-data-table": {
+   "id": "ch4-data-table",
+   "title": "Data table",
+   "task": "A two-way sensitivity on ticket and member share."
+  },
+  "ch4-goal-seek": {
+   "id": "ch4-goal-seek",
+   "title": "Goal Seek",
+   "task": "The washes a day each site needs to break even."
+  },
+  "ch4-name-it": {
+   "id": "ch4-name-it",
+   "title": "Name it",
+   "task": "Name the toggle and the key inputs, then jump to each by name."
+  },
+  "ch4-cube-it": {
+   "id": "ch4-cube-it",
+   "title": "Cube it",
+   "task": "Two SUMIFS cubes, washes and revenue by site and week, that tie to the export."
+  },
+  "ch4-six-tabs": {
+   "id": "ch4-six-tabs",
+   "title": "Six tabs",
+   "task": "Put the same units line and check row on all six site tabs at once, then fix one site’s typo without touching the others."
+  },
+  "ch4-two-pickers": {
+   "id": "ch4-two-pickers",
+   "title": "Two pickers",
+   "task": "A site picker and a week picker return washes from the cube, and the answer survives an inserted row."
+  },
+  "puzzle-ch4": {
+   "id": "puzzle-ch4",
+   "title": "The missing washes",
+   "task": "The site tabs say one number and the POS export another, so find the washes that went missing."
+  },
+  "ch5-statement-link": {
+   "id": "ch5-statement-link",
+   "title": "Statement link",
+   "task": "Carry net income to the cash flow statement and into equity, and land closing cash on the balance sheet, until it balances."
+  },
+  "ch5-schedule-fill": {
+   "id": "ch5-schedule-fill",
+   "title": "Schedule fill",
+   "task": "Fill the PP&E roll on Schedules right from FY26 to FY31, every row one formula, and give the memo its 0.0x format."
+  },
+  "ch5-balance-it": {
+   "id": "ch5-balance-it",
+   "title": "Balance it",
+   "task": "The balance sheet is out from FY27: find the earliest year the check fails, then fix the break at its source with no plug."
+  },
+  "ch5-discount-it": {
+   "id": "ch5-discount-it",
+   "title": "Discount it",
+   "task": "Build the periods, the discount factors and the present values on DCF by hand, then prove them with NPV."
+  },
+  "ch5-sweep": {
+   "id": "ch5-sweep",
+   "title": "Sweep",
+   "task": "Write the revolver’s draw and repayment with MAX and MIN, then run cash short in FY28 and watch it draw and repay."
+  },
+  "ch5-checks": {
+   "id": "ch5-checks",
+   "title": "Checks",
+   "task": "Rebuild the top of the checks sheet: the balance, cash and debt checks, labeled, live and reading 0, in the desk number format."
+  },
+  "ch5-revenue-build": {
+   "id": "ch5-revenue-build",
+   "title": "Revenue build in three",
+   "task": "Take the cut-back revenue build on Schedules to a total that ties, every row one formula filled right, inside three minutes."
+  },
+  "puzzle-ch5": {
+   "id": "puzzle-ch5",
+   "title": "Why doesn’t it balance?",
+   "task": "Trace a round-number balance sheet error back to its source."
+  },
+  "ch5-is-it-revenue": {
+   "id": "ch5-is-it-revenue",
+   "title": "Is it revenue?",
+   "task": "Eight lines of money came in this month: mark what is revenue and total it."
+  },
+  "ch5-four-rungs": {
+   "id": "ch5-four-rungs",
+   "title": "Four rungs",
+   "task": "One site’s month four times over, each with one more timing gap, so build cash from operations at each rung."
+  },
+  "ch5-two-balance-sheets": {
+   "id": "ch5-two-balance-sheets",
+   "title": "Two balance sheets",
+   "task": "Two balance sheets and the year between them, so write the cash flow statement by formula only and land on the change in cash."
+  },
+  "ch5-two-landings": {
+   "id": "ch5-two-landings",
+   "title": "Two landings",
+   "task": "Seven events, and for each you pick the two lines that move, with the balance check telling you when they are all placed."
+  },
+  "ch5-name-the-driver": {
+   "id": "ch5-name-the-driver",
+   "title": "Name the driver",
+   "task": "Six balances and six drivers, so match each balance to the line that moves it."
+  },
+  "ch5-dep-waterfall": {
+   "id": "ch5-dep-waterfall",
+   "title": "Depreciation waterfall",
+   "task": "Five years of rollout capex, each on its own row over twenty years, plus the old tunnels running off."
+  },
+  "ch5-breaker": {
+   "id": "ch5-breaker",
+   "title": "Breaker",
+   "task": "Someone typed text into an interest cell and the model is a wall of errors, so get it back inside a minute."
+  },
+  "ch5-circle-hunt": {
+   "id": "ch5-circle-hunt",
+   "title": "Circle hunt",
+   "task": "Something on this model adds itself and iteration is on, so nothing warns: find it and fix it."
+  },
+  "ch5-normalize-the-year": {
+   "id": "ch5-normalize-the-year",
+   "title": "Normalize the year",
+   "task": "FY31 still opens six sites, so build the normalized year beside it and feed the perpetuity from that."
+  },
+  "ch5-dcf-read-back": {
+   "id": "ch5-dcf-read-back",
+   "title": "DCF read-back",
+   "task": "Under enterprise value, show how much of it is the terminal value and what multiple it implies."
+  },
+  "ch6-spread-a-comp": {
+   "id": "ch6-spread-a-comp",
+   "title": "Spread a comp",
+   "task": "Spread Summit Express Wash on Comps row 7, from its share price to its multiples and its leverage."
+  },
+  "ch6-median-and-range": {
+   "id": "ch6-median-and-range",
+   "title": "Median and range",
+   "task": "Flag the comps set, drop the struggling operator, and apply the median multiple to Clearcoat’s EBITDA."
+  },
+  "ch6-sources-and-uses": {
+   "id": "ch6-sources-and-uses",
+   "title": "Sources and uses",
+   "task": "Build the sources and uses on the LBO so the sponsor’s equity is the plug and the two sides tie."
+  },
+  "ch6-irr-sprint": {
+   "id": "ch6-irr-sprint",
+   "title": "IRR sprint",
+   "task": "Take the LBO from exit equity to IRR and MOIC, then check IRR by hand with RRI."
+  },
+  "ch6-waterfall": {
+   "id": "ch6-waterfall",
+   "title": "Waterfall",
+   "task": "Run each bid on Bids down its waterfall, from enterprise value to every owner’s proceeds."
+  },
+  "ch6-football-field": {
+   "id": "ch6-football-field",
+   "title": "Football field",
+   "task": "Link the football field on the Summary, one line per method, low, mid and high, with no typed figure."
+  },
+  "ch6-paper-lbo": {
+   "id": "ch6-paper-lbo",
+   "title": "Paper LBO",
+   "task": "Take the paper LBO from sources and uses to IRR on one sheet, every block one formula, inside three minutes."
+  },
+  "ch6-three-ways-to-a-price": {
+   "id": "ch6-three-ways-to-a-price",
+   "title": "Three ways to a price",
+   "task": "Three median multiples, three implied equity values, three bids: which bid clears which?"
+  },
+  "ch6-ltm-two-ways": {
+   "id": "ch6-ltm-two-ways",
+   "title": "LTM two ways",
+   "task": "LTM EBITDA from the fiscal year and the year to date, tied to the four quarters."
+  },
+  "ch6-napkin": {
+   "id": "ch6-napkin",
+   "title": "Napkin LBO",
+   "task": "A bid, a leverage multiple, flat EBITDA and the debt left at the exit: sources and uses, MOIC and the annual return two ways."
+  },
+  "ch6-cap-the-amort": {
+   "id": "ch6-cap-the-amort",
+   "title": "Cap the amortization",
+   "task": "At 40% a year the senior loan’s balance goes negative in year three, so cap the repayment."
+  },
+  "ch6-lenders-return": {
+   "id": "ch6-lenders-return",
+   "title": "Lender’s return",
+   "task": "The senior lender’s cash flows on one row, and their IRR, which should sit near the loan’s rate."
+  },
+  "ch6-ceiling-price": {
+   "id": "ch6-ceiling-price",
+   "title": "Ceiling price",
+   "task": "The most a sponsor can pay at three hurdles, by formula."
+  },
+  "puzzle-ch6": {
+   "id": "puzzle-ch6",
+   "title": "Which bid is really higher?",
+   "task": "Rank the three bids by what the owners take home, not by the headline."
+  }
+ },
+ "drillGoals": {
+  "get-around": [
+   {
+    "drill_id": "get-around",
+    "kind": "goal",
+    "index": "0",
+    "text": "Jump down to the Total row, select A10:F10 to its edge and bold it."
+   },
+   {
+    "drill_id": "get-around",
+    "kind": "goal",
+    "index": "1",
+    "text": "Give the same Total row a top border."
+   },
+   {
+    "drill_id": "get-around",
+    "kind": "goal",
+    "index": "2",
+    "text": "Jump up to the headers and right-align B4:F4 over their figures."
+   },
+   {
+    "drill_id": "get-around",
+    "kind": "goal",
+    "index": "3",
+    "text": "Select the typed washes and tickets B5:C9 and color them blue."
+   },
+   {
+    "drill_id": "get-around",
+    "kind": "goal",
+    "index": "4",
+    "text": "Jump down to the cost per wash in B13 and make it blue with F4."
+   },
+   {
+    "drill_id": "get-around",
+    "kind": "goal",
+    "index": "5",
+    "text": "Select the washes by day B17:G21 by their edges and make them blue with F4."
+   },
+   {
+    "drill_id": "get-around",
+    "kind": "goal",
+    "index": "6",
+    "text": "Revenue in column D is too narrow to read: select the column and AutoFit it."
+   },
+   {
+    "drill_id": "get-around",
+    "kind": "goal",
+    "index": "7",
+    "text": "Go to Monday’s card fees on Costs, B8, and fix the typo: 880 should be 88."
+   }
+  ],
+  "enter-and-fill": [
+   {
+    "drill_id": "enter-and-fill",
+    "kind": "goal",
+    "index": "0",
+    "text": "Fill the day names across C4:G4 from Mon in B4 with Fill Series, AutoFill."
+   },
+   {
+    "drill_id": "enter-and-fill",
+    "kind": "goal",
+    "index": "1",
+    "text": "Type Saturday's washes down G5:G8, Enter after each: 205, 150, 160, 215."
+   },
+   {
+    "drill_id": "enter-and-fill",
+    "kind": "goal",
+    "index": "2",
+    "text": "Type Airport's week across B9:G9, Tab between them: 235, 320, 265, 165, 205, 250."
+   },
+   {
+    "drill_id": "enter-and-fill",
+    "kind": "goal",
+    "index": "3",
+    "text": "Mueller was closed Wednesday and Thursday: put 0 in D6:E6 with one Ctrl+Enter."
+   },
+   {
+    "drill_id": "enter-and-fill",
+    "kind": "goal",
+    "index": "4",
+    "text": "Riverside's Monday in B7 has an extra zero: open it with F2 and take it off."
+   },
+   {
+    "drill_id": "enter-and-fill",
+    "kind": "goal",
+    "index": "5",
+    "text": "Fill the Week formula in H5 down H6:H9 with Ctrl+D."
+   },
+   {
+    "drill_id": "enter-and-fill",
+    "kind": "goal",
+    "index": "6",
+    "text": "Fill the 250 target in B13 right across C13:G13."
+   },
+   {
+    "drill_id": "enter-and-fill",
+    "kind": "goal",
+    "index": "7",
+    "text": "Copy the Week formula from H9 into H13."
+   }
+  ],
+  "find-and-fix": [
+   {
+    "drill_id": "find-and-fix",
+    "kind": "goal",
+    "index": "0",
+    "text": "Find the misspelled Airprot and land on it, A9."
+   },
+   {
+    "drill_id": "find-and-fix",
+    "kind": "goal",
+    "index": "1",
+    "text": "Retype A9 as Airport."
+   },
+   {
+    "drill_id": "find-and-fix",
+    "kind": "goal",
+    "index": "2",
+    "text": "Fix Riversid in A19 to read Riverside."
+   },
+   {
+    "drill_id": "find-and-fix",
+    "kind": "goal",
+    "index": "3",
+    "text": "Replace every Muller with Mueller in one pass."
+   },
+   {
+    "drill_id": "find-and-fix",
+    "kind": "goal",
+    "index": "4",
+    "text": "Replace every Sep 8 with Sep 15, three cells at once."
+   },
+   {
+    "drill_id": "find-and-fix",
+    "kind": "goal",
+    "index": "5",
+    "text": "Riverside's washes in B7 are stuck as text: type 1480 over them as a number."
+   },
+   {
+    "drill_id": "find-and-fix",
+    "kind": "goal",
+    "index": "6",
+    "text": "South Lamar's ticket in C8 has an extra zero: take it off with F2."
+   },
+   {
+    "drill_id": "find-and-fix",
+    "kind": "goal",
+    "index": "7",
+    "text": "Clear the stray word out of A3, the spacer row."
+   }
+  ],
+  "paste-surgeon": [
+   {
+    "drill_id": "paste-surgeon",
+    "kind": "goal",
+    "index": "0",
+    "text": "Copy the revenue D5:D9 and paste only its values onto G5:G9, the figures at close."
+   },
+   {
+    "drill_id": "paste-surgeon",
+    "kind": "goal",
+    "index": "1",
+    "text": "Copy the header D4 and paste only its format onto F4:G4."
+   },
+   {
+    "drill_id": "paste-surgeon",
+    "kind": "goal",
+    "index": "2",
+    "text": "Last week in E5:E9 came in cents: divide it by the 100 in B13 with Paste Special."
+   },
+   {
+    "drill_id": "paste-surgeon",
+    "kind": "goal",
+    "index": "3",
+    "text": "Multiply E5:E9 by the -1 in B14 to turn last week positive."
+   },
+   {
+    "drill_id": "paste-surgeon",
+    "kind": "goal",
+    "index": "4",
+    "text": "Copy G5:G9 and paste only its formats onto last week, E5:E9."
+   },
+   {
+    "drill_id": "paste-surgeon",
+    "kind": "goal",
+    "index": "5",
+    "text": "Copy the change formula in F5 and paste only formulas onto F6:F10."
+   },
+   {
+    "drill_id": "paste-surgeon",
+    "kind": "goal",
+    "index": "6",
+    "text": "Copy column D’s width onto column E with Paste Special, Column widths."
+   },
+   {
+    "drill_id": "paste-surgeon",
+    "kind": "goal",
+    "index": "7",
+    "text": "Copy the total D10 and paste only its format onto G10."
+   }
+  ],
+  "row-wrangler": [
+   {
+    "drill_id": "row-wrangler",
+    "kind": "goal",
+    "index": "0",
+    "text": "Insert a whole row above Airport, row 9, for Cedar Park."
+   },
+   {
+    "drill_id": "row-wrangler",
+    "kind": "goal",
+    "index": "1",
+    "text": "Fill South Lamar’s row A8:F8 down into the new row with Ctrl+D."
+   },
+   {
+    "drill_id": "row-wrangler",
+    "kind": "goal",
+    "index": "2",
+    "text": "Type Cedar Park over A9, its 210 washes in B9 and its 14.00 ticket in C9."
+   },
+   {
+    "drill_id": "row-wrangler",
+    "kind": "goal",
+    "index": "3",
+    "text": "Delete the stale export row under the total, row 12, whole."
+   },
+   {
+    "drill_id": "row-wrangler",
+    "kind": "goal",
+    "index": "4",
+    "text": "Set the figure columns B:F to width 12."
+   },
+   {
+    "drill_id": "row-wrangler",
+    "kind": "goal",
+    "index": "5",
+    "text": "AutoFit column A to its labels, A4:A14."
+   },
+   {
+    "drill_id": "row-wrangler",
+    "kind": "goal",
+    "index": "6",
+    "text": "Group the old codes in column G."
+   },
+   {
+    "drill_id": "row-wrangler",
+    "kind": "goal",
+    "index": "7",
+    "text": "Freeze the panes at B5."
+   },
+   {
+    "drill_id": "row-wrangler",
+    "kind": "end",
+    "index": "0",
+    "text": "The total in B11 still counts every site, Cedar Park included"
+   }
+  ],
+  "format-the-weekly-page": [
+   {
+    "drill_id": "format-the-weekly-page",
+    "kind": "goal",
+    "index": "0",
+    "text": "Bold the title in A1 and take it one size up."
+   },
+   {
+    "drill_id": "format-the-weekly-page",
+    "kind": "goal",
+    "index": "1",
+    "text": "Center the title across A1:F1, never merged."
+   },
+   {
+    "drill_id": "format-the-weekly-page",
+    "kind": "goal",
+    "index": "2",
+    "text": "Make the units line in A2 italic."
+   },
+   {
+    "drill_id": "format-the-weekly-page",
+    "kind": "goal",
+    "index": "3",
+    "text": "Bold the headers A4:F4 and right-align B4:F4 over their figures."
+   },
+   {
+    "drill_id": "format-the-weekly-page",
+    "kind": "goal",
+    "index": "4",
+    "text": "Take every border off the table A4:F10."
+   },
+   {
+    "drill_id": "format-the-weekly-page",
+    "kind": "goal",
+    "index": "5",
+    "text": "Give the washes B5:B10 the desk number format with Ctrl+1, no decimals."
+   },
+   {
+    "drill_id": "format-the-weekly-page",
+    "kind": "goal",
+    "index": "6",
+    "text": "Give the money in D5:F10 the same desk number format."
+   },
+   {
+    "drill_id": "format-the-weekly-page",
+    "kind": "goal",
+    "index": "7",
+    "text": "Put the $ on the first and total rows only: D5:F5, then F4 on D10:F10."
+   },
+   {
+    "drill_id": "format-the-weekly-page",
+    "kind": "goal",
+    "index": "8",
+    "text": "Show the tickets C5:C10 to two decimals, with the $ on C5 and C10."
+   },
+   {
+    "drill_id": "format-the-weekly-page",
+    "kind": "goal",
+    "index": "9",
+    "text": "Give the cost per wash in B13 the $ and two decimals."
+   },
+   {
+    "drill_id": "format-the-weekly-page",
+    "kind": "goal",
+    "index": "10",
+    "text": "Color the typed inputs blue: B5:C9, then B13."
+   },
+   {
+    "drill_id": "format-the-weekly-page",
+    "kind": "goal",
+    "index": "11",
+    "text": "Bold the Total row A10:F10 and give it a top border."
+   },
+   {
+    "drill_id": "format-the-weekly-page",
+    "kind": "goal",
+    "index": "12",
+    "text": "Turn the gridlines off with Alt W V G."
+   }
+  ],
+  "insert-and-amend": [
+   {
+    "drill_id": "insert-and-amend",
+    "kind": "goal",
+    "index": "0",
+    "text": "Insert a whole row above Maintenance, row 7, for Insurance."
+   },
+   {
+    "drill_id": "insert-and-amend",
+    "kind": "goal",
+    "index": "1",
+    "text": "Cut Insurance from A16:G16 at the foot of the sheet and paste it into row 7."
+   },
+   {
+    "drill_id": "insert-and-amend",
+    "kind": "goal",
+    "index": "2",
+    "text": "Insert a whole row above Card fees, row 9, for Utilities."
+   },
+   {
+    "drill_id": "insert-and-amend",
+    "kind": "goal",
+    "index": "3",
+    "text": "Cut Utilities from A18:G18 and paste it into row 9."
+   },
+   {
+    "drill_id": "insert-and-amend",
+    "kind": "goal",
+    "index": "4",
+    "text": "Copy the format of B8:G8 and paste it onto the new lines, B7:G7 and B9:G9."
+   },
+   {
+    "drill_id": "insert-and-amend",
+    "kind": "goal",
+    "index": "5",
+    "text": "Copy the Week formula in H8 into H7 and H9."
+   },
+   {
+    "drill_id": "insert-and-amend",
+    "kind": "goal",
+    "index": "6",
+    "text": "Open the total in B11 with F2, press F2 again to point, and add B7 and B9."
+   },
+   {
+    "drill_id": "insert-and-amend",
+    "kind": "goal",
+    "index": "7",
+    "text": "Copy B11 and paste only its formula across C11:H11 with Paste Special."
+   },
+   {
+    "drill_id": "insert-and-amend",
+    "kind": "end",
+    "index": "0",
+    "text": "The total row keeps its bold and its top border"
+   }
+  ],
+  "formula-sprint": [
+   {
+    "drill_id": "formula-sprint",
+    "kind": "goal",
+    "index": "0",
+    "text": "Revenue in D5:D9: washes times ticket, one formula entered into all five with Ctrl+Enter."
+   },
+   {
+    "drill_id": "formula-sprint",
+    "kind": "goal",
+    "index": "1",
+    "text": "Wash cost in E5:E9: washes times the cost per wash in B13, anchored with F4."
+   },
+   {
+    "drill_id": "formula-sprint",
+    "kind": "goal",
+    "index": "2",
+    "text": "Gross profit in F5:F9: revenue less wash cost."
+   },
+   {
+    "drill_id": "formula-sprint",
+    "kind": "goal",
+    "index": "3",
+    "text": "Margin in G5:G9: gross profit over revenue."
+   },
+   {
+    "drill_id": "formula-sprint",
+    "kind": "goal",
+    "index": "4",
+    "text": "Select B5:F10 and AutoSum the Total row with Alt+=."
+   },
+   {
+    "drill_id": "formula-sprint",
+    "kind": "goal",
+    "index": "5",
+    "text": "Make C10 the blended ticket: total revenue D10 over total washes B10."
+   },
+   {
+    "drill_id": "formula-sprint",
+    "kind": "goal",
+    "index": "6",
+    "text": "In G10, the total margin: F10 over D10."
+   },
+   {
+    "drill_id": "formula-sprint",
+    "kind": "goal",
+    "index": "7",
+    "text": "Share of washes in H5:H9: each site’s washes over the total B10, anchored."
+   },
+   {
+    "drill_id": "formula-sprint",
+    "kind": "goal",
+    "index": "8",
+    "text": "AutoSum the shares into H10."
+   },
+   {
+    "drill_id": "formula-sprint",
+    "kind": "end",
+    "index": "0",
+    "text": "The shares add to 100%, and the check in B17 reads zero"
+   }
+  ],
+  "combine-two-tabs": [
+   {
+    "drill_id": "combine-two-tabs",
+    "kind": "goal",
+    "index": "0",
+    "text": "In B5 on Combined, add Monday’s washes on Austin and SanAntonio by pointing."
+   },
+   {
+    "drill_id": "combine-two-tabs",
+    "kind": "goal",
+    "index": "1",
+    "text": "Fill B5 right across C5:G5."
+   },
+   {
+    "drill_id": "combine-two-tabs",
+    "kind": "goal",
+    "index": "2",
+    "text": "Fill B5:G5 down to row 8."
+   },
+   {
+    "drill_id": "combine-two-tabs",
+    "kind": "goal",
+    "index": "3",
+    "text": "Site contribution in B9:G9 from Combined’s own rows: revenue less both costs."
+   },
+   {
+    "drill_id": "combine-two-tabs",
+    "kind": "goal",
+    "index": "4",
+    "text": "Select B5:H9 and AutoSum the week into H5:H9."
+   },
+   {
+    "drill_id": "combine-two-tabs",
+    "kind": "goal",
+    "index": "5",
+    "text": "Copy Austin’s B5:H9 and paste only its formats onto the same block on Combined."
+   },
+   {
+    "drill_id": "combine-two-tabs",
+    "kind": "goal",
+    "index": "6",
+    "text": "Color the links in B5:G8 green: they read another sheet."
+   },
+   {
+    "drill_id": "combine-two-tabs",
+    "kind": "goal",
+    "index": "7",
+    "text": "From B5 on Combined, jump to the first cell it reads with Ctrl+[."
+   }
+  ],
+  "before-you-send": [
+   {
+    "drill_id": "before-you-send",
+    "kind": "goal",
+    "index": "0",
+    "text": "Clear the internal note in H6, \"check with ops\"."
+   },
+   {
+    "drill_id": "before-you-send",
+    "kind": "goal",
+    "index": "1",
+    "text": "Clear the second internal note, in H9."
+   },
+   {
+    "drill_id": "before-you-send",
+    "kind": "goal",
+    "index": "2",
+    "text": "Clear the stray fills and borders off H5:J9 with Alt H E F."
+   },
+   {
+    "drill_id": "before-you-send",
+    "kind": "goal",
+    "index": "3",
+    "text": "One gross profit in F5:F9 is a typed number: find it and put the formula back, revenue less wash cost."
+   },
+   {
+    "drill_id": "before-you-send",
+    "kind": "goal",
+    "index": "4",
+    "text": "Turn the gridlines off on Report with Alt W V G."
+   },
+   {
+    "drill_id": "before-you-send",
+    "kind": "goal",
+    "index": "5",
+    "text": "Delete the stale Old wk37 tab."
+   },
+   {
+    "drill_id": "before-you-send",
+    "kind": "goal",
+    "index": "6",
+    "text": "Leave Raw on A1 with Ctrl+Home."
+   },
+   {
+    "drill_id": "before-you-send",
+    "kind": "goal",
+    "index": "7",
+    "text": "Leave Costs on its home cell, B5, under the frozen panes."
+   },
+   {
+    "drill_id": "before-you-send",
+    "kind": "goal",
+    "index": "8",
+    "text": "Finish on Report, the first tab, at B5."
+   },
+   {
+    "drill_id": "before-you-send",
+    "kind": "end",
+    "index": "0",
+    "text": "The check in B17 reads zero"
+   },
+   {
+    "drill_id": "before-you-send",
+    "kind": "end",
+    "index": "1",
+    "text": "The source line in A14 is still there"
+   }
+  ],
+  "weekly-sales-report": [
+   {
+    "drill_id": "weekly-sales-report",
+    "kind": "goal",
+    "index": "0",
+    "text": "Bold the title in A1 and take it one size up."
+   },
+   {
+    "drill_id": "weekly-sales-report",
+    "kind": "goal",
+    "index": "1",
+    "text": "Center the title across A1:E1, never merged."
+   },
+   {
+    "drill_id": "weekly-sales-report",
+    "kind": "goal",
+    "index": "2",
+    "text": "Type the units line, USD unless stated, into A2 in italics."
+   },
+   {
+    "drill_id": "weekly-sales-report",
+    "kind": "goal",
+    "index": "3",
+    "text": "Bold the headers A4:E4 and right-align B4:E4 over their figures."
+   },
+   {
+    "drill_id": "weekly-sales-report",
+    "kind": "goal",
+    "index": "4",
+    "text": "Gross profit in E5:E9: revenue less wash cost, one formula for all five."
+   },
+   {
+    "drill_id": "weekly-sales-report",
+    "kind": "goal",
+    "index": "5",
+    "text": "Type Total into A10 and AutoSum B10:E10."
+   },
+   {
+    "drill_id": "weekly-sales-report",
+    "kind": "goal",
+    "index": "6",
+    "text": "Give the figures B5:E10 the desk number format with Ctrl+1."
+   },
+   {
+    "drill_id": "weekly-sales-report",
+    "kind": "goal",
+    "index": "7",
+    "text": "Put the $ on the first and total rows only: C5:E5 and C10:E10."
+   },
+   {
+    "drill_id": "weekly-sales-report",
+    "kind": "goal",
+    "index": "8",
+    "text": "Color the typed figures B5:D9 blue."
+   },
+   {
+    "drill_id": "weekly-sales-report",
+    "kind": "goal",
+    "index": "9",
+    "text": "Bold the Total row A10:E10 and give it a top border."
+   },
+   {
+    "drill_id": "weekly-sales-report",
+    "kind": "goal",
+    "index": "10",
+    "text": "Freeze the panes at B5."
+   },
+   {
+    "drill_id": "weekly-sales-report",
+    "kind": "goal",
+    "index": "11",
+    "text": "Turn the gridlines off with Alt W V G."
+   },
+   {
+    "drill_id": "weekly-sales-report",
+    "kind": "end",
+    "index": "0",
+    "text": "The totals still add the five sites"
+   }
+  ],
+  "ch2-format-sprint": [
+   {
+    "drill_id": "ch2-format-sprint",
+    "kind": "goal",
+    "index": "0",
+    "text": "Give the revenue lines C7:E10 the desk number format from Ctrl+1: Number, no decimals, the separator and (1,234)."
+   },
+   {
+    "drill_id": "ch2-format-sprint",
+    "kind": "goal",
+    "index": "1",
+    "text": "Select the site costs C13:E20 and repeat the format with F4."
+   },
+   {
+    "drill_id": "ch2-format-sprint",
+    "kind": "goal",
+    "index": "2",
+    "text": "Site contribution, head office and EBITDA in C22:E24 take it too: select them and press F4."
+   },
+   {
+    "drill_id": "ch2-format-sprint",
+    "kind": "goal",
+    "index": "3",
+    "text": "Sites and washes in C33:E34 read the same way: select them and press F4."
+   },
+   {
+    "drill_id": "ch2-format-sprint",
+    "kind": "goal",
+    "index": "4",
+    "text": "Revenue per wash in C35:E35 reads to the cent: give it two decimals with Ctrl+Shift+1."
+   },
+   {
+    "drill_id": "ch2-format-sprint",
+    "kind": "end",
+    "index": "0",
+    "text": "Every dollar line and both counts read in the desk number format, and revenue per wash reads to the cent"
+   }
+  ],
+  "ch2-to-thousands": [
+   {
+    "drill_id": "ch2-to-thousands",
+    "kind": "goal",
+    "index": "0",
+    "text": "Copy the 1000 waiting in G2 with Ctrl+C."
+   },
+   {
+    "drill_id": "ch2-to-thousands",
+    "kind": "goal",
+    "index": "1",
+    "text": "Select C7:E24, then only its typed figures with Go To Special, Constants: F5, Alt+S, O, Enter."
+   },
+   {
+    "drill_id": "ch2-to-thousands",
+    "kind": "goal",
+    "index": "2",
+    "text": "Divide them by the copied 1000 in one Paste Special: Ctrl+Alt+V, V, I, Enter."
+   },
+   {
+    "drill_id": "ch2-to-thousands",
+    "kind": "goal",
+    "index": "3",
+    "text": "Change the units line in A2 to USD thousands unless stated; costs shown as negatives."
+   },
+   {
+    "drill_id": "ch2-to-thousands",
+    "kind": "goal",
+    "index": "4",
+    "text": "Clear the 1000 from G2 with Delete."
+   },
+   {
+    "drill_id": "ch2-to-thousands",
+    "kind": "end",
+    "index": "0",
+    "text": "Every typed figure is back in thousands, every formula reads as it did, the units line says thousands and G2 is empty"
+   }
+  ],
+  "ch2-flip-and-tie": [
+   {
+    "drill_id": "ch2-flip-and-tie",
+    "kind": "goal",
+    "index": "0",
+    "text": "Select the lines C7:E24 and clear the stray formats with Alt, H, E, F."
+   },
+   {
+    "drill_id": "ch2-flip-and-tie",
+    "kind": "goal",
+    "index": "1",
+    "text": "Give C7:E24 the desk number format back from Ctrl+1: Number, no decimals, the separator and (1,234)."
+   },
+   {
+    "drill_id": "ch2-flip-and-tie",
+    "kind": "goal",
+    "index": "2",
+    "text": "Type -1 in the spare cell G19 and copy it with Ctrl+C."
+   },
+   {
+    "drill_id": "ch2-flip-and-tie",
+    "kind": "goal",
+    "index": "3",
+    "text": "Flip the costs C13:E19 and head office C23:E23 with Paste Special Multiply, Ctrl+Alt+V, V, M, Enter."
+   },
+   {
+    "drill_id": "ch2-flip-and-tie",
+    "kind": "goal",
+    "index": "4",
+    "text": "Rebuild the pasted subtotals in rows 20, 22 and 24 as formulas that add the lines above."
+   },
+   {
+    "drill_id": "ch2-flip-and-tie",
+    "kind": "goal",
+    "index": "5",
+    "text": "Clear the -1 from G19 with Delete."
+   },
+   {
+    "drill_id": "ch2-flip-and-tie",
+    "kind": "goal",
+    "index": "6",
+    "text": "In C41:E41, take the accounts in row 36 off site contribution in row 22, so each check reads 0."
+   },
+   {
+    "drill_id": "ch2-flip-and-tie",
+    "kind": "end",
+    "index": "0",
+    "text": "The costs are negative, the subtotals add live, no stray format is left and site contribution ties to the accounts"
+   }
+  ],
+  "ch2-custom-code": [
+   {
+    "drill_id": "ch2-custom-code",
+    "kind": "goal",
+    "index": "0",
+    "text": "Washes C34:E34 are thousands: give them #,##0k_);(#,##0k);-_) in the Custom box at the foot of Ctrl+1’s list."
+   },
+   {
+    "drill_id": "ch2-custom-code",
+    "kind": "goal",
+    "index": "1",
+    "text": "Sites C33:E33 take the plain code #,##0_);(#,##0);-_), so a zero reads as a dash."
+   },
+   {
+    "drill_id": "ch2-custom-code",
+    "kind": "goal",
+    "index": "2",
+    "text": "The margins C27:E29 take the percent code 0.0%_);(0.0%);-_)."
+   },
+   {
+    "drill_id": "ch2-custom-code",
+    "kind": "goal",
+    "index": "3",
+    "text": "The checks C39:C40 take 0_);[Red](0);-_), so a negative check paints itself red."
+   },
+   {
+    "drill_id": "ch2-custom-code",
+    "kind": "end",
+    "index": "0",
+    "text": "Every code reads a positive, a negative in parentheses and a zero as a dash, the washes with their k"
+   }
+  ],
+  "ch2-the-divider": [
+   {
+    "drill_id": "ch2-the-divider",
+    "kind": "goal",
+    "index": "0",
+    "text": "Type the flags under the timeline: A in C5 and D5, E in E5."
+   },
+   {
+    "drill_id": "ch2-the-divider",
+    "kind": "goal",
+    "index": "1",
+    "text": "Shade the estimate header E4:E5 gray with Alt, H, H, → and Enter."
+   },
+   {
+    "drill_id": "ch2-the-divider",
+    "kind": "goal",
+    "index": "2",
+    "text": "Every month on Monthly is an estimate: shade its header C4:N4 the same gray."
+   },
+   {
+    "drill_id": "ch2-the-divider",
+    "kind": "goal",
+    "index": "3",
+    "text": "Back on the P&L, give the last actual column D4:D35 a right border with Alt, H, B, R."
+   },
+   {
+    "drill_id": "ch2-the-divider",
+    "kind": "end",
+    "index": "0",
+    "text": "The flags read A, A and E, the estimate headers are shaded on both pages, and the divider runs down D"
+   }
+  ],
+  "ch2-top-and-bottom": [
+   {
+    "drill_id": "ch2-top-and-bottom",
+    "kind": "goal",
+    "index": "0",
+    "text": "Select the gridded lines C7:E24 and take every border off with Alt, H, B, N."
+   },
+   {
+    "drill_id": "ch2-top-and-bottom",
+    "kind": "goal",
+    "index": "1",
+    "text": "Put the divider back down the last actual column D7:D24 with Alt, H, B, R."
+   },
+   {
+    "drill_id": "ch2-top-and-bottom",
+    "kind": "goal",
+    "index": "2",
+    "text": "Bold the four totals: B10:E10, B20:E20, B22:E22 and B24:E24."
+   },
+   {
+    "drill_id": "ch2-top-and-bottom",
+    "kind": "goal",
+    "index": "3",
+    "text": "Give each total a top border with Alt, H, B, P, and F4 for the next three."
+   },
+   {
+    "drill_id": "ch2-top-and-bottom",
+    "kind": "goal",
+    "index": "4",
+    "text": "EBITDA B24:E24 is the answer: give it a double bottom from Ctrl+1’s Border tab."
+   },
+   {
+    "drill_id": "ch2-top-and-bottom",
+    "kind": "goal",
+    "index": "5",
+    "text": "Turn the gridlines off with Alt, W, V, G."
+   },
+   {
+    "drill_id": "ch2-top-and-bottom",
+    "kind": "end",
+    "index": "0",
+    "text": "Four bold totals with a top border, a double bottom on EBITDA, the divider, and no other border on the page"
+   }
+  ],
+  "ch2-flag-it": [
+   {
+    "drill_id": "ch2-flag-it",
+    "kind": "goal",
+    "index": "0",
+    "text": "Select the checks C39:C40 and add the formula rule =C39<>0 with the Light Red Fill."
+   },
+   {
+    "drill_id": "ch2-flag-it",
+    "kind": "goal",
+    "index": "1",
+    "text": "On Monthly, give the checks C34:C35 the same rule, =C34<>0."
+   },
+   {
+    "drill_id": "ch2-flag-it",
+    "kind": "end",
+    "index": "0",
+    "text": "No check is red while the pack ties, and every check that leaves zero turns red"
+   }
+  ],
+  "ch2-print-it": [
+   {
+    "drill_id": "ch2-print-it",
+    "kind": "goal",
+    "index": "0",
+    "text": "Turn the pack landscape with Alt, P, O, L."
+   },
+   {
+    "drill_id": "ch2-print-it",
+    "kind": "goal",
+    "index": "1",
+    "text": "In Page Setup, Alt, P, S, P, pick Fit to with Alt+F and keep 1 page wide by 1 tall."
+   },
+   {
+    "drill_id": "ch2-print-it",
+    "kind": "goal",
+    "index": "2",
+    "text": "Repeat the title, units line, timeline and flags on every page: Print Titles, Alt, P, I, rows 1:5."
+   },
+   {
+    "drill_id": "ch2-print-it",
+    "kind": "goal",
+    "index": "3",
+    "text": "In Page Setup’s Custom Footer, put &[File] left, Page &[Page] of &[Pages] in the center and &[Date] right."
+   },
+   {
+    "drill_id": "ch2-print-it",
+    "kind": "goal",
+    "index": "4",
+    "text": "On Page Setup’s Margins tab, tick Center on page Horizontally with Alt+Z."
+   },
+   {
+    "drill_id": "ch2-print-it",
+    "kind": "end",
+    "index": "0",
+    "text": "The pack prints landscape on one page, titles repeated, centered, with the file, page and date in the footer"
+   }
+  ],
+  "ch2-pnl-to-standard": [
+   {
+    "drill_id": "ch2-pnl-to-standard",
+    "kind": "goal",
+    "index": "0",
+    "text": "Type the title Clearcoat Express Historical Financials in A1 and make it bold."
+   },
+   {
+    "drill_id": "ch2-pnl-to-standard",
+    "kind": "goal",
+    "index": "1",
+    "text": "Give the lines C7:E24 the code #,##0_);(#,##0);-_) in Ctrl+1’s Custom box."
+   },
+   {
+    "drill_id": "ch2-pnl-to-standard",
+    "kind": "goal",
+    "index": "2",
+    "text": "The first row C7:E7 takes $#,##0_);($#,##0);-_), then total revenue C10:E10 and EBITDA C24:E24 with F4."
+   },
+   {
+    "drill_id": "ch2-pnl-to-standard",
+    "kind": "goal",
+    "index": "3",
+    "text": "Shade the estimate header E4 gray with Alt, H, H, → and Enter."
+   },
+   {
+    "drill_id": "ch2-pnl-to-standard",
+    "kind": "goal",
+    "index": "4",
+    "text": "Draw the divider down the last actual column D4:D24 with Alt, H, B, R."
+   },
+   {
+    "drill_id": "ch2-pnl-to-standard",
+    "kind": "goal",
+    "index": "5",
+    "text": "Give the totals B10:E10, B20:E20, B22:E22 and B24:E24 a top border with Alt, H, B, P and F4."
+   },
+   {
+    "drill_id": "ch2-pnl-to-standard",
+    "kind": "goal",
+    "index": "6",
+    "text": "Give EBITDA B24:E24 a double bottom from Ctrl+1’s Border tab."
+   },
+   {
+    "drill_id": "ch2-pnl-to-standard",
+    "kind": "goal",
+    "index": "7",
+    "text": "Turn the gridlines off with Alt, W, V, G."
+   },
+   {
+    "drill_id": "ch2-pnl-to-standard",
+    "kind": "goal",
+    "index": "8",
+    "text": "Turn the page landscape with Alt, P, O, L, then fit it to one page in Page Setup with Alt+F."
+   },
+   {
+    "drill_id": "ch2-pnl-to-standard",
+    "kind": "goal",
+    "index": "9",
+    "text": "In Page Setup’s Custom Footer, put &[File] on the left and &[Date] on the right."
+   },
+   {
+    "drill_id": "ch2-pnl-to-standard",
+    "kind": "end",
+    "index": "0",
+    "text": "The page carries its title, codes, divider, borders and no gridlines, and prints landscape on one page with the file and date"
+   }
+  ],
+  "puzzle-ch2": [
+   {
+    "drill_id": "puzzle-ch2",
+    "kind": "goal",
+    "index": "0",
+    "text": "Type x in column A beside the line whose format breaks the page."
+   },
+   {
+    "drill_id": "puzzle-ch2",
+    "kind": "goal",
+    "index": "1",
+    "text": "Give C16:E16 the page’s number format, so the negatives sit in parentheses like the rest."
+   },
+   {
+    "drill_id": "puzzle-ch2",
+    "kind": "end",
+    "index": "0",
+    "text": "Utilities is marked and reads like every other cost line"
+   }
+  ],
+  "ch3-if-ladder": [
+   {
+    "drill_id": "ch3-if-ladder",
+    "kind": "goal",
+    "index": "0",
+    "text": "Summary E5:E10: On target when washes used in S reach the target in D, Below when they don’t."
+   },
+   {
+    "drill_id": "ch3-if-ladder",
+    "kind": "goal",
+    "index": "1",
+    "text": "Summary F5:F10: 1 when the Sep 15 washes in C reach the target in D, 0 when they don’t."
+   },
+   {
+    "drill_id": "ch3-if-ladder",
+    "kind": "goal",
+    "index": "2",
+    "text": "Count the sites on target in F12 with a SUM of F5:F10."
+   },
+   {
+    "drill_id": "ch3-if-ladder",
+    "kind": "goal",
+    "index": "3",
+    "text": "Summary M5:M10: TRUE with AND when a site is below target and more than two years old in L."
+   },
+   {
+    "drill_id": "ch3-if-ladder",
+    "kind": "goal",
+    "index": "4",
+    "text": "Summary N5:N10: Concern when both hold, a dash when not, with one IF around one AND."
+   },
+   {
+    "drill_id": "ch3-if-ladder",
+    "kind": "end",
+    "index": "0",
+    "text": "The flags, the count and the AND tests tie to the databook, each one IF deep, and move with their inputs"
+   }
+  ],
+  "ch3-override": [
+   {
+    "drill_id": "ch3-override",
+    "kind": "goal",
+    "index": "0",
+    "text": "Summary S5:S10: the override in R when it’s a number, Hold when it’s a note, the POS washes in C otherwise."
+   },
+   {
+    "drill_id": "ch3-override",
+    "kind": "goal",
+    "index": "1",
+    "text": "Summary Q5:Q10: revenue in H over the washes used in S, NM where it can’t be divided."
+   },
+   {
+    "drill_id": "ch3-override",
+    "kind": "end",
+    "index": "0",
+    "text": "Washes used and revenue per wash tie on every row, NM on the two that can’t divide, and both follow a new override"
+   }
+  ],
+  "ch3-date-math": [
+   {
+    "drill_id": "ch3-date-math",
+    "kind": "goal",
+    "index": "0",
+    "text": "Members G5:G44: the cancel date in F, or the as-of date in H2 when F is empty."
+   },
+   {
+    "drill_id": "ch3-date-math",
+    "kind": "goal",
+    "index": "1",
+    "text": "Members H5:H44: tenure in days, the end date in G less the join date in E."
+   },
+   {
+    "drill_id": "ch3-date-math",
+    "kind": "goal",
+    "index": "2",
+    "text": "Members I5:I44: tenure in months, the days in H over 30.4."
+   },
+   {
+    "drill_id": "ch3-date-math",
+    "kind": "goal",
+    "index": "3",
+    "text": "Transactions H5:H94: the month end of each date in A with EOMONTH."
+   },
+   {
+    "drill_id": "ch3-date-math",
+    "kind": "end",
+    "index": "0",
+    "text": "Tenure ties for every member and moves with the dates, and every month end is an EOMONTH formula"
+   }
+  ],
+  "ch3-sumifs-sprint": [
+   {
+    "drill_id": "ch3-sumifs-sprint",
+    "kind": "goal",
+    "index": "0",
+    "text": "Summary F41:H46: retail revenue for the site in B and the package in row 40, one SUMIFS over the export."
+   },
+   {
+    "drill_id": "ch3-sumifs-sprint",
+    "kind": "goal",
+    "index": "1",
+    "text": "Summary C41:E46: the washes for the same pairs, one COUNTIFS filled the same way."
+   },
+   {
+    "drill_id": "ch3-sumifs-sprint",
+    "kind": "goal",
+    "index": "2",
+    "text": "Summary C47:H47: a SUM under each column of the block."
+   },
+   {
+    "drill_id": "ch3-sumifs-sprint",
+    "kind": "end",
+    "index": "0",
+    "text": "Every cell of the block ties to the export, one formula pattern each side, and the totals add the columns"
+   }
+  ],
+  "ch3-bands": [
+   {
+    "drill_id": "ch3-bands",
+    "kind": "goal",
+    "index": "0",
+    "text": "Summary C34: the amounts on Transactions E5:E94 under 15, the comparison typed in quotes."
+   },
+   {
+    "drill_id": "ch3-bands",
+    "kind": "goal",
+    "index": "1",
+    "text": "Summary C35: the amounts from 15 up to but not including 20, two conditions on the one column."
+   },
+   {
+    "drill_id": "ch3-bands",
+    "kind": "goal",
+    "index": "2",
+    "text": "Summary C36: the amounts of 20 and over."
+   },
+   {
+    "drill_id": "ch3-bands",
+    "kind": "goal",
+    "index": "3",
+    "text": "Summary C37: the three bands less a COUNT of the amounts, reading 0."
+   },
+   {
+    "drill_id": "ch3-bands",
+    "kind": "end",
+    "index": "0",
+    "text": "The bands count each edge once, add up to every amount, and the check reads 0"
+   }
+  ],
+  "ch3-text-split": [
+   {
+    "drill_id": "ch3-text-split",
+    "kind": "goal",
+    "index": "0",
+    "text": "Transactions S5:S94: the cluster, the first three characters of the code in B, with LEFT."
+   },
+   {
+    "drill_id": "ch3-text-split",
+    "kind": "goal",
+    "index": "1",
+    "text": "Transactions T5:T94: the site, the last three characters of B with RIGHT around TRIM."
+   },
+   {
+    "drill_id": "ch3-text-split",
+    "kind": "goal",
+    "index": "2",
+    "text": "Transactions U5:U94: where the @ sits in the memo in F, with FIND."
+   },
+   {
+    "drill_id": "ch3-text-split",
+    "kind": "goal",
+    "index": "3",
+    "text": "Transactions V5:V94: the seven characters of site code after the @ and its space, with MID and FIND."
+   },
+   {
+    "drill_id": "ch3-text-split",
+    "kind": "goal",
+    "index": "4",
+    "text": "Transactions W5:W94: the channel between the parentheses, with MID and FIND."
+   },
+   {
+    "drill_id": "ch3-text-split",
+    "kind": "end",
+    "index": "0",
+    "text": "Every split column ties to the export as a formula, and the memo columns read no helper"
+   }
+  ],
+  "ch3-loan-schedule": [
+   {
+    "drill_id": "ch3-loan-schedule",
+    "kind": "goal",
+    "index": "0",
+    "text": "Loans C12 and C13: the monthly rate, the annual rate in C7 over the payments in C9, and the months, C8 times C9."
+   },
+   {
+    "drill_id": "ch3-loan-schedule",
+    "kind": "goal",
+    "index": "1",
+    "text": "Loans C16: the monthly payment as a positive figure, minus PMT on C12, C13 and the principal in C6."
+   },
+   {
+    "drill_id": "ch3-loan-schedule",
+    "kind": "goal",
+    "index": "2",
+    "text": "The opening balance: the principal C6 in D44, then last month’s closing in D45:D163."
+   },
+   {
+    "drill_id": "ch3-loan-schedule",
+    "kind": "goal",
+    "index": "3",
+    "text": "Interest in E44:E163: the opening balance times the monthly rate in $C$12."
+   },
+   {
+    "drill_id": "ch3-loan-schedule",
+    "kind": "goal",
+    "index": "4",
+    "text": "Principal in F44:F163: the payment in $C$16 less the month’s interest."
+   },
+   {
+    "drill_id": "ch3-loan-schedule",
+    "kind": "goal",
+    "index": "5",
+    "text": "The closing balance in G44:G163: opening less principal, so both checks in C167:C168 read 0."
+   },
+   {
+    "drill_id": "ch3-loan-schedule",
+    "kind": "end",
+    "index": "0",
+    "text": "The payment ties to PMT, the schedule runs to zero, both checks read 0, and the payment moves with the rate and the term"
+   }
+  ],
+  "ch3-trace-the-error": [
+   {
+    "drill_id": "ch3-trace-the-error",
+    "kind": "goal",
+    "index": "0",
+    "text": "The #DIV/0! in the monthly rate C12 starts at the payments a year in C9: there are 12."
+   },
+   {
+    "drill_id": "ch3-trace-the-error",
+    "kind": "goal",
+    "index": "1",
+    "text": "The #REF! in the interest over the term C18 is a lost reference: the paid total in C17 less the principal in C6."
+   },
+   {
+    "drill_id": "ch3-trace-the-error",
+    "kind": "goal",
+    "index": "2",
+    "text": "The #NUM! in the IRR C36 starts at the build in C27, typed as a positive: the build is an outflow of 5,000."
+   },
+   {
+    "drill_id": "ch3-trace-the-error",
+    "kind": "goal",
+    "index": "3",
+    "text": "The #VALUE! in the discount factors starts at the rate in C30, which reads tbc: the rate is 10%."
+   },
+   {
+    "drill_id": "ch3-trace-the-error",
+    "kind": "goal",
+    "index": "4",
+    "text": "The #NAME? in the NPV by hand C33 is a misspelled function: sum the discounted flows C32:H32."
+   },
+   {
+    "drill_id": "ch3-trace-the-error",
+    "kind": "end",
+    "index": "0",
+    "text": "No error code is left on the page, each fault is fixed at its source, and every formula is still a formula"
+   }
+  ],
+  "ch3-tie-it-out": [
+   {
+    "drill_id": "ch3-tie-it-out",
+    "kind": "goal",
+    "index": "0",
+    "text": "Summary C51:C56: link each site’s POS washes from the site counts in C15:C20."
+   },
+   {
+    "drill_id": "ch3-tie-it-out",
+    "kind": "goal",
+    "index": "1",
+    "text": "E51:E56: the managers’ tally in D less the POS washes in C."
+   },
+   {
+    "drill_id": "ch3-tie-it-out",
+    "kind": "goal",
+    "index": "2",
+    "text": "H51:H56: the tally plus the adjustment in G."
+   },
+   {
+    "drill_id": "ch3-tie-it-out",
+    "kind": "goal",
+    "index": "3",
+    "text": "I51:I56: the adjusted tally less the POS washes, reading 0 for every site."
+   },
+   {
+    "drill_id": "ch3-tie-it-out",
+    "kind": "goal",
+    "index": "4",
+    "text": "Total the block in row 57: C57:E57 and G57:I57, each a SUM of the six sites."
+   },
+   {
+    "drill_id": "ch3-tie-it-out",
+    "kind": "goal",
+    "index": "5",
+    "text": "Rebuild the checks C80:C83, the count not at zero in C86 and the verdict in C87, so the databook reads OK."
+   },
+   {
+    "drill_id": "ch3-tie-it-out",
+    "kind": "end",
+    "index": "0",
+    "text": "The reconciliation ties to the databook site by site, every check reads 0 and the verdict reads OK"
+   }
+  ],
+  "puzzle-ch3": [
+   {
+    "drill_id": "puzzle-ch3",
+    "kind": "goal",
+    "index": "0",
+    "text": "Sites D20:D31: the buyer’s fiscal year for each month end in C, named for the June it closes in."
+   },
+   {
+    "drill_id": "puzzle-ch3",
+    "kind": "goal",
+    "index": "1",
+    "text": "Sites E20:E31: H1 for July to December, H2 for January to June."
+   },
+   {
+    "drill_id": "puzzle-ch3",
+    "kind": "goal",
+    "index": "2",
+    "text": "Sites F20:F31: the last day of the buyer’s half, from EOMONTH, with no IF."
+   },
+   {
+    "drill_id": "puzzle-ch3",
+    "kind": "end",
+    "index": "0",
+    "text": "All twelve months tie to the buyer’s calendar, on the edges too, and the half end holds no IF"
+   }
+  ],
+  "ch4-lookup-relay": [
+   {
+    "drill_id": "ch4-lookup-relay",
+    "kind": "goal",
+    "index": "0",
+    "text": "In Lists C31:D31, the price and the fee for the code in C30 by VLOOKUP on B14:E16, exact match."
+   },
+   {
+    "drill_id": "ch4-lookup-relay",
+    "kind": "goal",
+    "index": "1",
+    "text": "In C32:D32, the same two by INDEX and MATCH, one formula filled across."
+   },
+   {
+    "drill_id": "ch4-lookup-relay",
+    "kind": "goal",
+    "index": "2",
+    "text": "In C33:D33, the same two by XLOOKUP."
+   },
+   {
+    "drill_id": "ch4-lookup-relay",
+    "kind": "goal",
+    "index": "3",
+    "text": "Type U in C30: all three lines move to Ultimate together."
+   },
+   {
+    "drill_id": "ch4-lookup-relay",
+    "kind": "end",
+    "index": "0",
+    "text": "Three lookups read the code in C30 and agree on its price and fee"
+   }
+  ],
+  "ch4-sort-and-filter": [
+   {
+    "drill_id": "ch4-sort-and-filter",
+    "kind": "goal",
+    "index": "0",
+    "text": "Sort Export sort by Site A to Z, then by Retail revenue largest to smallest, in one Sort dialog."
+   },
+   {
+    "drill_id": "ch4-sort-and-filter",
+    "kind": "goal",
+    "index": "1",
+    "text": "Turn on the filter arrows at A4 and show Airport only: Alt+Down on Site, then search AIR."
+   },
+   {
+    "drill_id": "ch4-sort-and-filter",
+    "kind": "goal",
+    "index": "2",
+    "text": "Under the list, E96 totals the washes showing with SUBTOTAL(109) and E97 counts the rows with SUBTOTAL(103)."
+   },
+   {
+    "drill_id": "ch4-sort-and-filter",
+    "kind": "goal",
+    "index": "3",
+    "text": "Clear the filter with Alt, A, C: E96 and E97 now read the whole list."
+   },
+   {
+    "drill_id": "ch4-sort-and-filter",
+    "kind": "end",
+    "index": "0",
+    "text": "Export sort runs by site, best revenue first, with every row showing"
+   },
+   {
+    "drill_id": "ch4-sort-and-filter",
+    "kind": "end",
+    "index": "1",
+    "text": "E96 and E97 are SUBTOTALs that read only the rows a filter leaves"
+   }
+  ],
+  "ch4-pivot-in-90": [
+   {
+    "drill_id": "ch4-pivot-in-90",
+    "kind": "goal",
+    "index": "0",
+    "text": "From Export!A4, insert a PivotTable on a new sheet with Alt, N, V, T and Enter."
+   },
+   {
+    "drill_id": "ch4-pivot-in-90",
+    "kind": "goal",
+    "index": "1",
+    "text": "In the field list, put Site in Rows and Total washes in Values."
+   },
+   {
+    "drill_id": "ch4-pivot-in-90",
+    "kind": "goal",
+    "index": "2",
+    "text": "Put Week in Columns and press Enter: sites down, weeks across, washes summed."
+   },
+   {
+    "drill_id": "ch4-pivot-in-90",
+    "kind": "goal",
+    "index": "3",
+    "text": "Name the pivot’s sheet Cuts with Alt, H, O, R."
+   },
+   {
+    "drill_id": "ch4-pivot-in-90",
+    "kind": "end",
+    "index": "0",
+    "text": "The pivot on Cuts shows washes by site and week, and its figures tie to the export"
+   }
+  ],
+  "ch4-data-table": [
+   {
+    "drill_id": "ch4-data-table",
+    "kind": "goal",
+    "index": "0",
+    "text": "Start the table at Scenarios C32: =C24 in the corner, then the tickets 12 to 16 across D32:H32."
+   },
+   {
+    "drill_id": "ch4-data-table",
+    "kind": "goal",
+    "index": "1",
+    "text": "Type the member shares down C33:C37: 40, 45, 50, 55 and 60, which the format reads as percentages."
+   },
+   {
+    "drill_id": "ch4-data-table",
+    "kind": "goal",
+    "index": "2",
+    "text": "Select C32:H37 and press Alt, A, W, T: Row input cell G6, Column input cell G7."
+   },
+   {
+    "drill_id": "ch4-data-table",
+    "kind": "goal",
+    "index": "3",
+    "text": "Mark the base case, $14 and 50%, in bold in F35."
+   },
+   {
+    "drill_id": "ch4-data-table",
+    "kind": "end",
+    "index": "0",
+    "text": "C32:H37 is a Data Table of EBITDA on G6 and G7, every value tied to the model"
+   }
+  ],
+  "ch4-goal-seek": [
+   {
+    "drill_id": "ch4-goal-seek",
+    "kind": "goal",
+    "index": "0",
+    "text": "Goal Seek Scenarios C44 to 0 by changing C43: Domain’s break-even washes a day."
+   },
+   {
+    "drill_id": "ch4-goal-seek",
+    "kind": "goal",
+    "index": "1",
+    "text": "Type AUS-MUE in C40 and Goal Seek again: Mueller’s break-even lands in C43."
+   },
+   {
+    "drill_id": "ch4-goal-seek",
+    "kind": "goal",
+    "index": "2",
+    "text": "Then Airport: AUS-AIR in C40, and Goal Seek C44 to 0 once more."
+   },
+   {
+    "drill_id": "ch4-goal-seek",
+    "kind": "end",
+    "index": "0",
+    "text": "C43 holds Airport’s break-even washes a day and C44 reads zero"
+   }
+  ],
+  "ch4-name-it": [
+   {
+    "drill_id": "ch4-name-it",
+    "kind": "goal",
+    "index": "0",
+    "text": "Name the case number in Scenarios C11 Case, with Alt, M, M, D."
+   },
+   {
+    "drill_id": "ch4-name-it",
+    "kind": "goal",
+    "index": "1",
+    "text": "Name the ticket in Inputs C15 Ticket and the cost per wash in Inputs C5 Cost_Per_Wash."
+   },
+   {
+    "drill_id": "ch4-name-it",
+    "kind": "goal",
+    "index": "2",
+    "text": "Rewrite the live column, Scenarios G5:G8, to read Case in place of $C$11."
+   },
+   {
+    "drill_id": "ch4-name-it",
+    "kind": "goal",
+    "index": "3",
+    "text": "Point the check in C58 at Case too: =ROUND(INDEX($D$54:$F$54,Case)-C24,0)."
+   },
+   {
+    "drill_id": "ch4-name-it",
+    "kind": "goal",
+    "index": "4",
+    "text": "Jump to the ticket by its name: Ctrl+G, type Ticket and press Enter."
+   },
+   {
+    "drill_id": "ch4-name-it",
+    "kind": "end",
+    "index": "0",
+    "text": "Case, Ticket and Cost_Per_Wash point at the switch and the two inputs"
+   },
+   {
+    "drill_id": "ch4-name-it",
+    "kind": "end",
+    "index": "1",
+    "text": "The live column and the check read Case, not $C$11"
+   }
+  ],
+  "ch4-cube-it": [
+   {
+    "drill_id": "ch4-cube-it",
+    "kind": "goal",
+    "index": "0",
+    "text": "Fill the washes cube, Summary C15:E20, with one SUMIFS on Export by the site in column B and the week in row 14."
+   },
+   {
+    "drill_id": "ch4-cube-it",
+    "kind": "goal",
+    "index": "1",
+    "text": "Total it: F15:F20 across each site, then C21:F21 down each week."
+   },
+   {
+    "drill_id": "ch4-cube-it",
+    "kind": "goal",
+    "index": "2",
+    "text": "Fill the revenue cube, C25:E30, the same way on the retail revenue in Export column F."
+   },
+   {
+    "drill_id": "ch4-cube-it",
+    "kind": "goal",
+    "index": "3",
+    "text": "Total it: F25:F30 across, then C31:F31 down."
+   },
+   {
+    "drill_id": "ch4-cube-it",
+    "kind": "goal",
+    "index": "4",
+    "text": "Tie each cube to the export in C72:C73: its grand total less the SUM of its Export column, reading 0."
+   },
+   {
+    "drill_id": "ch4-cube-it",
+    "kind": "end",
+    "index": "0",
+    "text": "Every cell of both cubes ties to the export, and the checks in C72:C77 read zero"
+   }
+  ],
+  "ch4-six-tabs": [
+   {
+    "drill_id": "ch4-six-tabs",
+    "kind": "goal",
+    "index": "0",
+    "text": "From Domain A2, group the six site tabs (Ctrl+Shift+PgDn five times) and type the units line Summary carries, once."
+   },
+   {
+    "drill_id": "ch4-six-tabs",
+    "kind": "goal",
+    "index": "1",
+    "text": "Still grouped, the check block once: Checks in B12, its label in B13 and =F7-F5-F6 in C13."
+   },
+   {
+    "drill_id": "ch4-six-tabs",
+    "kind": "goal",
+    "index": "2",
+    "text": "Leave the group with Ctrl+PgUp, then fix the title in Mueller A1 on that tab alone."
+   },
+   {
+    "drill_id": "ch4-six-tabs",
+    "kind": "end",
+    "index": "0",
+    "text": "All six tabs carry the units line and the check block, and no sheets are left grouped"
+   },
+   {
+    "drill_id": "ch4-six-tabs",
+    "kind": "end",
+    "index": "1",
+    "text": "Mueller’s title is right and the other five titles are as they were"
+   }
+  ],
+  "ch4-two-pickers": [
+   {
+    "drill_id": "ch4-two-pickers",
+    "kind": "goal",
+    "index": "0",
+    "text": "In Summary C38, the washes for the site in C34 and the week in C35: INDEX on the cube with two MATCHes."
+   },
+   {
+    "drill_id": "ch4-two-pickers",
+    "kind": "goal",
+    "index": "1",
+    "text": "Insert a row inside the cube at row 17 (Shift+Space, Ctrl+Shift+=): the answer holds, the colleague’s moves."
+   },
+   {
+    "drill_id": "ch4-two-pickers",
+    "kind": "goal",
+    "index": "2",
+    "text": "Insert a column inside the weeks at D (Ctrl+Space, Ctrl+Shift+=): the answer still reads the right washes."
+   },
+   {
+    "drill_id": "ch4-two-pickers",
+    "kind": "end",
+    "index": "0",
+    "text": "The answer reads the cube for the picked site and week after both inserts, with no typed position"
+   }
+  ],
+  "puzzle-ch4": [
+   {
+    "drill_id": "puzzle-ch4",
+    "kind": "goal",
+    "index": "0",
+    "text": "In Summary C80:C82, the site code, the date and the washes the export is missing."
+   },
+   {
+    "drill_id": "puzzle-ch4",
+    "kind": "end",
+    "index": "0",
+    "text": "The missing washes are found and put on the right site and day"
+   }
+  ],
+  "ch5-statement-link": [
+   {
+    "drill_id": "ch5-statement-link",
+    "kind": "goal",
+    "index": "0",
+    "text": "Start the cash flow with net income: =IS!C31 into CF C6:J6 with Ctrl+Enter."
+   },
+   {
+    "drill_id": "ch5-statement-link",
+    "kind": "goal",
+    "index": "1",
+    "text": "Land closing cash on the BS: =CF!C30 into BS C6:J6 with Ctrl+Enter."
+   },
+   {
+    "drill_id": "ch5-statement-link",
+    "kind": "goal",
+    "index": "2",
+    "text": "Add net income to equity: =IS!C31 into BS C22:J22 with Ctrl+Enter."
+   },
+   {
+    "drill_id": "ch5-statement-link",
+    "kind": "end",
+    "index": "0",
+    "text": "The three links are the finished model’s and the balance and cash checks read 0 in every year"
+   }
+  ],
+  "ch5-schedule-fill": [
+   {
+    "drill_id": "ch5-schedule-fill",
+    "kind": "goal",
+    "index": "0",
+    "text": "Fill the capex lines right: select E61:J63 on Schedules and press Ctrl+R."
+   },
+   {
+    "drill_id": "ch5-schedule-fill",
+    "kind": "goal",
+    "index": "1",
+    "text": "Fill depreciation right from E64 to J64, so each year reads its own waterfall total."
+   },
+   {
+    "drill_id": "ch5-schedule-fill",
+    "kind": "goal",
+    "index": "2",
+    "text": "Fill opening PP&E E60:J60 and closing PP&E E65:J65 right, so each closing feeds the next year’s opening."
+   },
+   {
+    "drill_id": "ch5-schedule-fill",
+    "kind": "goal",
+    "index": "3",
+    "text": "Fill the capex to depreciation memo E66:J66 right."
+   },
+   {
+    "drill_id": "ch5-schedule-fill",
+    "kind": "goal",
+    "index": "4",
+    "text": "Give the memo E66:J66 the custom format 0.0x through Ctrl+1."
+   },
+   {
+    "drill_id": "ch5-schedule-fill",
+    "kind": "end",
+    "index": "0",
+    "text": "The PP&E roll on Schedules is the finished model’s from FY27 to FY31, and the memo reads in 0.0x"
+   }
+  ],
+  "ch5-balance-it": [
+   {
+    "drill_id": "ch5-balance-it",
+    "kind": "goal",
+    "index": "0",
+    "text": "Find the earliest year the balance check on Checks row 6 is not 0, and land on that cell."
+   },
+   {
+    "drill_id": "ch5-balance-it",
+    "kind": "goal",
+    "index": "1",
+    "text": "Fix total liabilities on BS C18:J18 so it adds every liability, the delayed-draw loan in row 16 included."
+   },
+   {
+    "drill_id": "ch5-balance-it",
+    "kind": "end",
+    "index": "0",
+    "text": "Total liabilities reads every liability, the balance check reads 0 in every year, and nothing else on the BS has moved"
+   }
+  ],
+  "ch5-discount-it": [
+   {
+    "drill_id": "ch5-discount-it",
+    "kind": "goal",
+    "index": "0",
+    "text": "The periods in DCF C20:J20, mid-year when Inputs C97 is 1: =IF(Inputs!C$6=1,Inputs!C$8-IF(Inputs!$C$97=1,0.5,0),0) with Ctrl+Enter."
+   },
+   {
+    "drill_id": "ch5-discount-it",
+    "kind": "goal",
+    "index": "1",
+    "text": "The discount factors in C21:J21: =IF(Inputs!C$6=1,1/(1+WACC)^C20,0) with Ctrl+Enter."
+   },
+   {
+    "drill_id": "ch5-discount-it",
+    "kind": "goal",
+    "index": "2",
+    "text": "The present values in C22:J22, free cash flow times the factor, and their sum in C23."
+   },
+   {
+    "drill_id": "ch5-discount-it",
+    "kind": "goal",
+    "index": "3",
+    "text": "Prove the factors: the end-year sum in C24 as =NPV(WACC,F16:J16), so the check on Checks C27 reads 0."
+   },
+   {
+    "drill_id": "ch5-discount-it",
+    "kind": "end",
+    "index": "0",
+    "text": "The discounting on DCF is the finished model’s and the NPV check reads 0"
+   }
+  ],
+  "ch5-sweep": [
+   {
+    "drill_id": "ch5-sweep",
+    "kind": "goal",
+    "index": "0",
+    "text": "The draw in Schedules C101:J101, any shortfall under the minimum cash: =IF(Inputs!C$6=0,0,MAX(C100-C99,0))."
+   },
+   {
+    "drill_id": "ch5-sweep",
+    "kind": "goal",
+    "index": "1",
+    "text": "The repayment in C102:J102, any surplus over the minimum up to the balance: =IF(Inputs!C$6=0,0,-MIN(MAX(C99-C100,0),C98))."
+   },
+   {
+    "drill_id": "ch5-sweep",
+    "kind": "goal",
+    "index": "2",
+    "text": "Run FY28 short: type 18 new sites into Inputs G21, and the revolver draws in FY28 and repays in FY31."
+   },
+   {
+    "drill_id": "ch5-sweep",
+    "kind": "end",
+    "index": "0",
+    "text": "The sweep is the finished model’s under the stress: the revolver never below zero and cash never under the minimum"
+   }
+  ],
+  "ch5-checks": [
+   {
+    "drill_id": "ch5-checks",
+    "kind": "goal",
+    "index": "0",
+    "text": "Label Checks B6 Balance sheet balances and enter =ROUND(BS!C10-BS!C25,2) into C6:J6 with Ctrl+Enter."
+   },
+   {
+    "drill_id": "ch5-checks",
+    "kind": "goal",
+    "index": "1",
+    "text": "Label B7 BS cash equals CF closing cash and enter =ROUND(BS!C6-CF!C30,2) into C7:J7."
+   },
+   {
+    "drill_id": "ch5-checks",
+    "kind": "goal",
+    "index": "2",
+    "text": "Label B8 Debt schedule closing equals BS debt and enter =ROUND(Schedules!C109-(BS!C15+BS!C16+BS!C17),2) into C8:J8."
+   },
+   {
+    "drill_id": "ch5-checks",
+    "kind": "goal",
+    "index": "3",
+    "text": "Give the three checks C6:J8 the desk number format through Ctrl+1, so a zero shows as a dash."
+   },
+   {
+    "drill_id": "ch5-checks",
+    "kind": "end",
+    "index": "0",
+    "text": "The three checks are labeled, live, read 0 in every year and carry the number format"
+   }
+  ],
+  "ch5-revenue-build": [
+   {
+    "drill_id": "ch5-revenue-build",
+    "kind": "goal",
+    "index": "0",
+    "text": "Select the rollout C6:J9 on Schedules and press Ctrl+R, so FY25 to FY31 take each row’s FY24 formula."
+   },
+   {
+    "drill_id": "ch5-revenue-build",
+    "kind": "goal",
+    "index": "1",
+    "text": "Type =AVERAGE(C6,C9) into C10:J10 with Ctrl+Enter, then fill the washes C15:J15 right with Ctrl+R."
+   },
+   {
+    "drill_id": "ch5-revenue-build",
+    "kind": "goal",
+    "index": "2",
+    "text": "Fill the ticket, its growth and retail revenue right in one press: select C20:J22 and press Ctrl+R."
+   },
+   {
+    "drill_id": "ch5-revenue-build",
+    "kind": "goal",
+    "index": "3",
+    "text": "Type =C19/(Inputs!C45*12) into C23:J23, pressing F4 right after C45, then fill membership revenue C24:J24 right."
+   },
+   {
+    "drill_id": "ch5-revenue-build",
+    "kind": "goal",
+    "index": "4",
+    "text": "Total revenue in C26:J26: =C22+C24+C25 with Ctrl+Enter, the three revenue lines and not the member count between them."
+   },
+   {
+    "drill_id": "ch5-revenue-build",
+    "kind": "goal",
+    "index": "5",
+    "text": "Give the rollout C6:J9 the desk number format in Ctrl+1’s Custom box, then select the washes C15:J15 and press F4."
+   },
+   {
+    "drill_id": "ch5-revenue-build",
+    "kind": "end",
+    "index": "0",
+    "text": "The rollout and revenue build on Schedules C6:J26 is the finished model’s, every row one formula"
+   },
+   {
+    "drill_id": "ch5-revenue-build",
+    "kind": "end",
+    "index": "1",
+    "text": "The rollout and the washes carry the desk number format"
+   }
+  ],
+  "puzzle-ch5": [
+   {
+    "drill_id": "puzzle-ch5",
+    "kind": "goal",
+    "index": "0",
+    "text": "Find the cell that throws the BS out from FY28 and put it back as a link, so Checks row 6 reads 0 in every year."
+   },
+   {
+    "drill_id": "puzzle-ch5",
+    "kind": "end",
+    "index": "0",
+    "text": "The source cell is a link again, the balance check reads 0 in every year, and nothing else has moved"
+   }
+  ],
+  "ch5-is-it-revenue": [
+   {
+    "drill_id": "ch5-is-it-revenue",
+    "kind": "goal",
+    "index": "0",
+    "text": "Class the first three lines as Revenue with the drop-downs in D5:D7: Alt+↓ opens one."
+   },
+   {
+    "drill_id": "ch5-is-it-revenue",
+    "kind": "goal",
+    "index": "1",
+    "text": "The insurance payout and the interest are Other income: pick it in D8:D9."
+   },
+   {
+    "drill_id": "ch5-is-it-revenue",
+    "kind": "goal",
+    "index": "2",
+    "text": "The settlement, the loan and the fees billed ahead are Not income: pick it in D10:D12."
+   },
+   {
+    "drill_id": "ch5-is-it-revenue",
+    "kind": "goal",
+    "index": "3",
+    "text": "Total revenue in C14 with SUMIF on the classes in D."
+   },
+   {
+    "drill_id": "ch5-is-it-revenue",
+    "kind": "goal",
+    "index": "4",
+    "text": "Total other income in C15 the same way."
+   },
+   {
+    "drill_id": "ch5-is-it-revenue",
+    "kind": "why",
+    "index": "0",
+    "text": "A total doesn’t follow the classes: SUMIF on D, so a changed pick moves it."
+   }
+  ],
+  "ch5-four-rungs": [
+   {
+    "drill_id": "ch5-four-rungs",
+    "kind": "goal",
+    "index": "0",
+    "text": "Build cash from operations in C11 for the all cash month, from the five lines above it."
+   },
+   {
+    "drill_id": "ch5-four-rungs",
+    "kind": "goal",
+    "index": "1",
+    "text": "Fill it right into D11, the month that charges depreciation."
+   },
+   {
+    "drill_id": "ch5-four-rungs",
+    "kind": "goal",
+    "index": "2",
+    "text": "Fill it on into E11, the month with three days of card sales not yet settled."
+   },
+   {
+    "drill_id": "ch5-four-rungs",
+    "kind": "goal",
+    "index": "3",
+    "text": "Fill it on into F11, with chemicals on thirty days and member fees collected ahead."
+   },
+   {
+    "drill_id": "ch5-four-rungs",
+    "kind": "end",
+    "index": "0",
+    "text": "Every rung takes the rise in receivables off and adds the two liabilities, and moves with each of its lines"
+   }
+  ],
+  "ch5-two-balance-sheets": [
+   {
+    "drill_id": "ch5-two-balance-sheets",
+    "kind": "goal",
+    "index": "0",
+    "text": "Write the operating lines in E20:E25: net income and depreciation, each working capital change with its sign, the subtotal."
+   },
+   {
+    "drill_id": "ch5-two-balance-sheets",
+    "kind": "goal",
+    "index": "1",
+    "text": "Back capex out in E26 from the PP&E movement and the depreciation."
+   },
+   {
+    "drill_id": "ch5-two-balance-sheets",
+    "kind": "goal",
+    "index": "2",
+    "text": "Take debt repaid in E27 from the debt movement, and distributions in E28 from the equity roll."
+   },
+   {
+    "drill_id": "ch5-two-balance-sheets",
+    "kind": "goal",
+    "index": "3",
+    "text": "Total the net change in cash in E29, then check it in C32 against the change in the cash line."
+   },
+   {
+    "drill_id": "ch5-two-balance-sheets",
+    "kind": "end",
+    "index": "0",
+    "text": "Every line of the cash flow is a formula on the two balance sheets, and the check reads 0"
+   }
+  ],
+  "ch5-two-landings": [
+   {
+    "drill_id": "ch5-two-landings",
+    "kind": "goal",
+    "index": "0",
+    "text": "Pick the two lines that move for the card washes in D5 and E5."
+   },
+   {
+    "drill_id": "ch5-two-landings",
+    "kind": "goal",
+    "index": "1",
+    "text": "Pick the two lines that move for the chemicals on credit in D6 and E6."
+   },
+   {
+    "drill_id": "ch5-two-landings",
+    "kind": "goal",
+    "index": "2",
+    "text": "Pick the two lines that move for payroll in D7 and E7."
+   },
+   {
+    "drill_id": "ch5-two-landings",
+    "kind": "goal",
+    "index": "3",
+    "text": "Pick the two lines that move for the loan interest in D8 and E8."
+   },
+   {
+    "drill_id": "ch5-two-landings",
+    "kind": "goal",
+    "index": "4",
+    "text": "Pick the two lines that move for the principal repaid in D9 and E9."
+   },
+   {
+    "drill_id": "ch5-two-landings",
+    "kind": "goal",
+    "index": "5",
+    "text": "Pick the two lines that move for a week of wear in D10 and E10."
+   },
+   {
+    "drill_id": "ch5-two-landings",
+    "kind": "goal",
+    "index": "6",
+    "text": "Pick the two lines that move for the new equipment in D11 and E11."
+   },
+   {
+    "drill_id": "ch5-two-landings",
+    "kind": "goal",
+    "index": "7",
+    "text": "Land on the check in C25, which reads 0 with every event placed."
+   },
+   {
+    "drill_id": "ch5-two-landings",
+    "kind": "end",
+    "index": "0",
+    "text": "All fourteen picks are right and the balance sheet balances"
+   }
+  ],
+  "ch5-name-the-driver": [
+   {
+    "drill_id": "ch5-name-the-driver",
+    "kind": "goal",
+    "index": "0",
+    "text": "Pick the line that drives card receivables in E5."
+   },
+   {
+    "drill_id": "ch5-name-the-driver",
+    "kind": "goal",
+    "index": "1",
+    "text": "Pick the line that drives chemical payables in E6."
+   },
+   {
+    "drill_id": "ch5-name-the-driver",
+    "kind": "goal",
+    "index": "2",
+    "text": "Pick the line that drives deferred membership revenue in E7."
+   },
+   {
+    "drill_id": "ch5-name-the-driver",
+    "kind": "goal",
+    "index": "3",
+    "text": "Pick the line that drives accrued payroll in E8."
+   },
+   {
+    "drill_id": "ch5-name-the-driver",
+    "kind": "goal",
+    "index": "4",
+    "text": "Pick the line that drives prepaid insurance in E9."
+   },
+   {
+    "drill_id": "ch5-name-the-driver",
+    "kind": "goal",
+    "index": "5",
+    "text": "Pick the line that drives tax payable in E10."
+   },
+   {
+    "drill_id": "ch5-name-the-driver",
+    "kind": "end",
+    "index": "0",
+    "text": "Every balance is matched to the line that drives it"
+   }
+  ],
+  "ch5-dep-waterfall": [
+   {
+    "drill_id": "ch5-dep-waterfall",
+    "kind": "goal",
+    "index": "0",
+    "text": "Fill Schedules C71:J75 from one formula: each year’s capex in row 63 over the life in Inputs C63, from the year after."
+   },
+   {
+    "drill_id": "ch5-dep-waterfall",
+    "kind": "goal",
+    "index": "1",
+    "text": "Run off the FY26 base in Schedules C70:J70: net PP&E in E65 over the remaining life in Inputs C65."
+   },
+   {
+    "drill_id": "ch5-dep-waterfall",
+    "kind": "goal",
+    "index": "2",
+    "text": "Total the waterfall in Schedules C76:J76, the base and the five vintages summed down."
+   },
+   {
+    "drill_id": "ch5-dep-waterfall",
+    "kind": "goal",
+    "index": "3",
+    "text": "Put capex over depreciation in Schedules C66:J66 and give it the 0.0x format through Ctrl+1."
+   },
+   {
+    "drill_id": "ch5-dep-waterfall",
+    "kind": "end",
+    "index": "0",
+    "text": "The waterfall and the memo are the finished model’s, they move with the lives on Inputs, and the ratio reads in 0.0x"
+   }
+  ],
+  "ch5-breaker": [
+   {
+    "drill_id": "ch5-breaker",
+    "kind": "goal",
+    "index": "0",
+    "text": "Set the breaker, Circ in Inputs C81, to 0 so the error stops feeding round the circle."
+   },
+   {
+    "drill_id": "ch5-breaker",
+    "kind": "goal",
+    "index": "1",
+    "text": "Refill the interest in Schedules G84 from F84, its neighbor on the left."
+   },
+   {
+    "drill_id": "ch5-breaker",
+    "kind": "goal",
+    "index": "2",
+    "text": "Set Circ in Inputs C81 back to 1, so interest reads the average balance again."
+   },
+   {
+    "drill_id": "ch5-breaker",
+    "kind": "goal",
+    "index": "3",
+    "text": "Go to the error count on Checks C30 and read it down to C35, where every sheet reads 0."
+   },
+   {
+    "drill_id": "ch5-breaker",
+    "kind": "end",
+    "index": "0",
+    "text": "The interest row is one formula across, Circ reads 1, no sheet holds an error and the balance check reads 0"
+   }
+  ],
+  "ch5-circle-hunt": [
+   {
+    "drill_id": "ch5-circle-hunt",
+    "kind": "goal",
+    "index": "0",
+    "text": "Find the site-cost total on Schedules whose SUM runs through its own cell, and land on it."
+   },
+   {
+    "drill_id": "ch5-circle-hunt",
+    "kind": "goal",
+    "index": "1",
+    "text": "Stop the SUM in Schedules G38 at row 37, so the site costs add G32:G37 and not themselves."
+   },
+   {
+    "drill_id": "ch5-circle-hunt",
+    "kind": "goal",
+    "index": "2",
+    "text": "Go to the balance check on Checks C6, which reads 0 in every year with Circ still at 1."
+   },
+   {
+    "drill_id": "ch5-circle-hunt",
+    "kind": "end",
+    "index": "0",
+    "text": "No site-cost total reads its own cell, the totals are the finished model’s, and Circ and iteration are still on"
+   }
+  ],
+  "ch5-normalize-the-year": [
+   {
+    "drill_id": "ch5-normalize-the-year",
+    "kind": "goal",
+    "index": "0",
+    "text": "Carry FY31 into the Normalized column, DCF K8:K12: EBITDA and depreciation from J, then EBIT, tax and NOPAT."
+   },
+   {
+    "drill_id": "ch5-normalize-the-year",
+    "kind": "goal",
+    "index": "1",
+    "text": "Set capex equal to depreciation in DCF K13:K14: depreciation added back in K13, capex in K14 as its negative."
+   },
+   {
+    "drill_id": "ch5-normalize-the-year",
+    "kind": "goal",
+    "index": "2",
+    "text": "Link the steady working-capital figure in Inputs C98 into DCF K15, then free cash flow in K16."
+   },
+   {
+    "drill_id": "ch5-normalize-the-year",
+    "kind": "goal",
+    "index": "3",
+    "text": "Repoint the perpetuity in DCF C27 from the raw FY31 cash flow in J16 to the normalized one in K16."
+   },
+   {
+    "drill_id": "ch5-normalize-the-year",
+    "kind": "end",
+    "index": "0",
+    "text": "The normalized column is the finished model’s, the perpetuity reads it, and the raw FY31 column has not moved"
+   }
+  ],
+  "ch5-dcf-read-back": [
+   {
+    "drill_id": "ch5-dcf-read-back",
+    "kind": "goal",
+    "index": "0",
+    "text": "Put the forecast years’ share of enterprise value in DCF C46: the PVs in C23 over C42, as a percentage."
+   },
+   {
+    "drill_id": "ch5-dcf-read-back",
+    "kind": "goal",
+    "index": "1",
+    "text": "Put the terminal value’s share in DCF C45 as a percentage, so C45 and C46 add to 100%."
+   },
+   {
+    "drill_id": "ch5-dcf-read-back",
+    "kind": "goal",
+    "index": "2",
+    "text": "Fill DCF E47:F47 from one formula, enterprise value in $C$42 over each year’s EBITDA in row 8, in the 0.0x format."
+   },
+   {
+    "drill_id": "ch5-dcf-read-back",
+    "kind": "end",
+    "index": "0",
+    "text": "The two shares add to 100% and move with the exit multiple, and the multiples anchor enterprise value and read in 0.0x"
+   }
+  ],
+  "ch6-spread-a-comp": [
+   {
+    "drill_id": "ch6-spread-a-comp",
+    "kind": "goal",
+    "index": "0",
+    "text": "Comps E7: the market cap, the share price in C7 times the shares in D7."
+   },
+   {
+    "drill_id": "ch6-spread-a-comp",
+    "kind": "goal",
+    "index": "1",
+    "text": "Comps H7: enterprise value, the market cap plus debt in F7 less cash in G7."
+   },
+   {
+    "drill_id": "ch6-spread-a-comp",
+    "kind": "goal",
+    "index": "2",
+    "text": "Comps K7 and L7: enterprise value over LTM revenue in I7 and over LTM EBITDA in J7."
+   },
+   {
+    "drill_id": "ch6-spread-a-comp",
+    "kind": "goal",
+    "index": "3",
+    "text": "Comps M7 and Q7: the EBITDA margin, and net debt over EBITDA, below zero for a net cash operator."
+   },
+   {
+    "drill_id": "ch6-spread-a-comp",
+    "kind": "end",
+    "index": "0",
+    "text": "Summit’s line ties to the pack and its multiple moves with the share price"
+   }
+  ],
+  "ch6-median-and-range": [
+   {
+    "drill_id": "ch6-median-and-range",
+    "kind": "goal",
+    "index": "0",
+    "text": "Type 1 in Comps N5:N10 for each peer, and 0 in N9 for Harbor Clean Group, whose note in AB9 says why."
+   },
+   {
+    "drill_id": "ch6-median-and-range",
+    "kind": "goal",
+    "index": "1",
+    "text": "Fill Comps O5:O10 with each EV / EBITDA in column L where the flag is 1, and blank text where it is 0."
+   },
+   {
+    "drill_id": "ch6-median-and-range",
+    "kind": "goal",
+    "index": "2",
+    "text": "Take the median, mean, 25th and 75th percentiles, minimum and maximum of O5:O10 in Comps O11:O16."
+   },
+   {
+    "drill_id": "ch6-median-and-range",
+    "kind": "goal",
+    "index": "3",
+    "text": "Link the low, median and high into Comps C44:E44 and apply each to Clearcoat’s LTM EBITDA in J17, in row 45."
+   },
+   {
+    "drill_id": "ch6-median-and-range",
+    "kind": "end",
+    "index": "0",
+    "text": "The range reads only the included peers and moves when a flag does"
+   }
+  ],
+  "ch6-sources-and-uses": [
+   {
+    "drill_id": "ch6-sources-and-uses",
+    "kind": "goal",
+    "index": "0",
+    "text": "LBO C35:C39: net debt repaid, the equity purchased, enterprise value, the fees on it and total uses."
+   },
+   {
+    "drill_id": "ch6-sources-and-uses",
+    "kind": "goal",
+    "index": "1",
+    "text": "LBO C40:C43: the senior loan and the mezzanine on EBITDA, the owners’ rollover, and the sponsor’s equity as the plug."
+   },
+   {
+    "drill_id": "ch6-sources-and-uses",
+    "kind": "goal",
+    "index": "2",
+    "text": "LBO C44:C45: total sources, and sources less uses rounded to read 0."
+   },
+   {
+    "drill_id": "ch6-sources-and-uses",
+    "kind": "goal",
+    "index": "3",
+    "text": "LBO C46:C48: equity as a share of the price, debt over EBITDA, and the rolled stake’s share of the new equity."
+   },
+   {
+    "drill_id": "ch6-sources-and-uses",
+    "kind": "end",
+    "index": "0",
+    "text": "Sources equal uses as a live check, the sponsor’s equity the plug"
+   }
+  ],
+  "ch6-irr-sprint": [
+   {
+    "drill_id": "ch6-irr-sprint",
+    "kind": "goal",
+    "index": "0",
+    "text": "LBO C102:C104: exit enterprise value on FY31 adjusted EBITDA, less net debt at the exit, equity at the exit."
+   },
+   {
+    "drill_id": "ch6-irr-sprint",
+    "kind": "goal",
+    "index": "1",
+    "text": "LBO C105:C106: equity at entry, the sponsor and the rollover, and MOIC as equity out over equity in."
+   },
+   {
+    "drill_id": "ch6-irr-sprint",
+    "kind": "goal",
+    "index": "2",
+    "text": "LBO C107:H107: the equity in at closing as a negative, and the exit equity in the year the hold ends."
+   },
+   {
+    "drill_id": "ch6-irr-sprint",
+    "kind": "goal",
+    "index": "3",
+    "text": "LBO C108: IRR on the equity cash flows in row 107."
+   },
+   {
+    "drill_id": "ch6-irr-sprint",
+    "kind": "goal",
+    "index": "4",
+    "text": "LBO C109:C110: IRR by hand with RRI over the hold, and the difference rounded to read 0."
+   },
+   {
+    "drill_id": "ch6-irr-sprint",
+    "kind": "end",
+    "index": "0",
+    "text": "IRR and MOIC tie to the pack, the hand check agrees, and IRR moves with the exit multiple"
+   }
+  ],
+  "ch6-waterfall": [
+   {
+    "drill_id": "ch6-waterfall",
+    "kind": "goal",
+    "index": "0",
+    "text": "Bids C30:E32: each bid’s priced value from row 18, less net debt at closing up to that value, and the equity left."
+   },
+   {
+    "drill_id": "ch6-waterfall",
+    "kind": "goal",
+    "index": "1",
+    "text": "Bids C33:E34: the fees on enterprise value, then the option pool above the strike, each no more than what is left."
+   },
+   {
+    "drill_id": "ch6-waterfall",
+    "kind": "goal",
+    "index": "2",
+    "text": "Bids C35:E35: the owners’ net proceeds, equity less the fees and the pool."
+   },
+   {
+    "drill_id": "ch6-waterfall",
+    "kind": "goal",
+    "index": "3",
+    "text": "Bids C36:E38: each owner’s share of the proceeds, from the stakes in C54:C56."
+   },
+   {
+    "drill_id": "ch6-waterfall",
+    "kind": "goal",
+    "index": "4",
+    "text": "Bids C39:E39: the owners’ lines less the proceeds, rounded to read 0."
+   },
+   {
+    "drill_id": "ch6-waterfall",
+    "kind": "end",
+    "index": "0",
+    "text": "Every line links to the one above and the owners’ line ties, moving with the fee"
+   }
+  ],
+  "ch6-football-field": [
+   {
+    "drill_id": "ch6-football-field",
+    "kind": "goal",
+    "index": "0",
+    "text": "Summary C9:E10: the comps range from Comps row 45 and the precedents range from Precedents row 38."
+   },
+   {
+    "drill_id": "ch6-football-field",
+    "kind": "goal",
+    "index": "1",
+    "text": "Summary C11:E11: the low and high of the DCF grid in DCF D77:H81, and the DCF’s value in C42 as the mid."
+   },
+   {
+    "drill_id": "ch6-football-field",
+    "kind": "goal",
+    "index": "2",
+    "text": "Summary C12:E12: what the sponsor can pay at the three hurdles, from LBO row 146."
+   },
+   {
+    "drill_id": "ch6-football-field",
+    "kind": "goal",
+    "index": "3",
+    "text": "Summary C13:E15: each bid’s expected, priced and headline value, from Bids rows 22, 18 and 6."
+   },
+   {
+    "drill_id": "ch6-football-field",
+    "kind": "goal",
+    "index": "4",
+    "text": "Summary F9:F15: each line’s mid over the DCF’s mid in D11, anchored."
+   },
+   {
+    "drill_id": "ch6-football-field",
+    "kind": "end",
+    "index": "0",
+    "text": "Every low, mid and high links to its method’s page, and the bids move with the earnout odds"
+   }
+  ],
+  "ch6-paper-lbo": [
+   {
+    "drill_id": "ch6-paper-lbo",
+    "kind": "goal",
+    "index": "0",
+    "text": "LBO C31:C45: the sale-leaseback lines, then sources and uses with the sponsor’s equity the plug, until C45 reads 0."
+   },
+   {
+    "drill_id": "ch6-paper-lbo",
+    "kind": "goal",
+    "index": "1",
+    "text": "LBO C97:H98: net debt in each year, and how much of it has been paid down since closing."
+   },
+   {
+    "drill_id": "ch6-paper-lbo",
+    "kind": "goal",
+    "index": "2",
+    "text": "LBO C102:C106: exit enterprise value, net debt at the exit, exit equity, equity at entry and MOIC."
+   },
+   {
+    "drill_id": "ch6-paper-lbo",
+    "kind": "goal",
+    "index": "3",
+    "text": "LBO C107:H110: the equity cash flows, IRR on them, IRR by hand with RRI, and the difference at 0."
+   },
+   {
+    "drill_id": "ch6-paper-lbo",
+    "kind": "end",
+    "index": "0",
+    "text": "Sources and uses tie, the debt paydown ties, and exit equity and IRR land on the finished figures, IRR moving with the exit multiple"
+   }
+  ],
+  "ch6-three-ways-to-a-price": [
+   {
+    "drill_id": "ch6-three-ways-to-a-price",
+    "kind": "goal",
+    "index": "0",
+    "text": "Comps D45, D47 and D49: each median multiple above times Clearcoat’s EBITDA, sites and washes in row 17."
+   },
+   {
+    "drill_id": "ch6-three-ways-to-a-price",
+    "kind": "goal",
+    "index": "1",
+    "text": "D51:D53: each of the three enterprise values less the net debt in D50."
+   },
+   {
+    "drill_id": "ch6-three-ways-to-a-price",
+    "kind": "goal",
+    "index": "2",
+    "text": "C59:E61: each bid in row 58 over each equity value in D51:D53, less one, from one formula filled both ways."
+   },
+   {
+    "drill_id": "ch6-three-ways-to-a-price",
+    "kind": "end",
+    "index": "0",
+    "text": "The three implied values tie, and the grid moves with the bids and with the multiples"
+   }
+  ],
+  "ch6-ltm-two-ways": [
+   {
+    "drill_id": "ch6-ltm-two-ways",
+    "kind": "goal",
+    "index": "0",
+    "text": "Comps P21:P26: LTM EBITDA as a SUMIFS over the quarters dated after C30 and up to the LTM date in C29."
+   },
+   {
+    "drill_id": "ch6-ltm-two-ways",
+    "kind": "goal",
+    "index": "1",
+    "text": "R21: Pinnacle from its filings, the fiscal year in K plus 2026’s two quarters less 2025’s."
+   },
+   {
+    "drill_id": "ch6-ltm-two-ways",
+    "kind": "goal",
+    "index": "2",
+    "text": "R22 and R24: Riverbend and Meridian, March year-ends, the fiscal year in L plus June’s quarter less last June’s."
+   },
+   {
+    "drill_id": "ch6-ltm-two-ways",
+    "kind": "goal",
+    "index": "3",
+    "text": "S21, S22 and S24: each filings figure less its SUMIFS, rounded, reading 0."
+   },
+   {
+    "drill_id": "ch6-ltm-two-ways",
+    "kind": "end",
+    "index": "0",
+    "text": "Both routes tie for all three operators, and the SUMIFS moves with the LTM date"
+   }
+  ],
+  "ch6-napkin": [
+   {
+    "drill_id": "ch6-napkin",
+    "kind": "goal",
+    "index": "0",
+    "text": "LBO C160:C162: the price, the fees on it, and total uses."
+   },
+   {
+    "drill_id": "ch6-napkin",
+    "kind": "goal",
+    "index": "1",
+    "text": "C163:C165: the debt at its multiple of EBITDA, the equity as what is left, and sources less uses at 0."
+   },
+   {
+    "drill_id": "ch6-napkin",
+    "kind": "goal",
+    "index": "2",
+    "text": "C166:C168: exit enterprise value, exit equity after the debt left in C157, and MOIC."
+   },
+   {
+    "drill_id": "ch6-napkin",
+    "kind": "goal",
+    "index": "3",
+    "text": "C169:C171: the annual return by the power and by RRI, and their difference at 0."
+   },
+   {
+    "drill_id": "ch6-napkin",
+    "kind": "end",
+    "index": "0",
+    "text": "The napkin ties, its two returns agree, and the return moves with the bid"
+   }
+  ],
+  "ch6-cap-the-amort": [
+   {
+    "drill_id": "ch6-cap-the-amort",
+    "kind": "goal",
+    "index": "0",
+    "text": "Type 40% in LBO C12 and watch the senior loan’s closing balance in row 75 go below zero."
+   },
+   {
+    "drill_id": "ch6-cap-the-amort",
+    "kind": "goal",
+    "index": "1",
+    "text": "Cap D73:H73 with MIN against the opening balance in row 72, so no closing balance in row 75 goes below zero."
+   },
+   {
+    "drill_id": "ch6-cap-the-amort",
+    "kind": "goal",
+    "index": "2",
+    "text": "Put the term sheet’s 5% back in C12."
+   },
+   {
+    "drill_id": "ch6-cap-the-amort",
+    "kind": "end",
+    "index": "0",
+    "text": "The amortization is capped at the opening balance, at 5% and at 40%, and no balance goes below zero"
+   }
+  ],
+  "ch6-lenders-return": [
+   {
+    "drill_id": "ch6-lenders-return",
+    "kind": "goal",
+    "index": "0",
+    "text": "LBO C117: the senior loan going out at closing, as a negative of the balance in C75."
+   },
+   {
+    "drill_id": "ch6-lenders-return",
+    "kind": "goal",
+    "index": "1",
+    "text": "LBO D117:H117: interest, amortization and sweep coming back each year, plus the balance repaid in the hold’s last year."
+   },
+   {
+    "drill_id": "ch6-lenders-return",
+    "kind": "goal",
+    "index": "2",
+    "text": "LBO C118: IRR on C117:H117, within half a point of the senior rate in C11."
+   },
+   {
+    "drill_id": "ch6-lenders-return",
+    "kind": "end",
+    "index": "0",
+    "text": "The lender’s line ties to the schedule and its IRR sits by the rate and moves with it"
+   }
+  ],
+  "ch6-ceiling-price": [
+   {
+    "drill_id": "ch6-ceiling-price",
+    "kind": "goal",
+    "index": "0",
+    "text": "LBO C145:E145: the most equity that still earns each hurdle in row 144, the PV of the exit equity over the hold."
+   },
+   {
+    "drill_id": "ch6-ceiling-price",
+    "kind": "goal",
+    "index": "1",
+    "text": "C146:E146: the top enterprise value, that equity plus both tranches of debt, over one plus the fees."
+   },
+   {
+    "drill_id": "ch6-ceiling-price",
+    "kind": "goal",
+    "index": "2",
+    "text": "C147:E147: each top price as a multiple of FY26E EBITDA in C6."
+   },
+   {
+    "drill_id": "ch6-ceiling-price",
+    "kind": "goal",
+    "index": "3",
+    "text": "C148:E148: each top price less the bid in C7, the room above it."
+   },
+   {
+    "drill_id": "ch6-ceiling-price",
+    "kind": "end",
+    "index": "0",
+    "text": "Every line ties to the LBO, and the ceiling moves when a hurdle does"
+   }
+  ],
+  "puzzle-ch6": [
+   {
+    "drill_id": "puzzle-ch6",
+    "kind": "goal",
+    "index": "0",
+    "text": "Rank the bids in Bids C28:E28 on the owners’ proceeds in row 35, 1 for the highest."
+   },
+   {
+    "drill_id": "puzzle-ch6",
+    "kind": "end",
+    "index": "0",
+    "text": "Each rank reads the waterfall’s proceeds line and ranks the bids on it"
+   }
+  ]
  }
 };

@@ -7,6 +7,7 @@
 // <html> so a stylesheet picks the look from tokens. Nothing cosmetic is ever sold.
 import { THEME_ORDER, applyTheme, saveTheme } from '../ui/themes.js';
 import { FLAIR, FLAIR_BY_ID, SLOTS, ROLLABLE } from '../content/flair.js';
+import { siteCopy } from '../content/copy/apply.js';
 
 /** The themes everyone has from the first visit. */
 export const FREE_THEMES = ['workbook', 'contrast', 'default'];
@@ -42,7 +43,7 @@ export function themeLock(key, ctx = {}) {
   if (need == null) return null;   // a theme added later defaults open
   const owned = ownedFlair(ctx);
   if (FLAIR.some(f => f.slot === 'theme' && f.value === key && owned.has(f.id))) return null;
-  return `Unlocks at level ${need}`;
+  return siteCopy('flair_unlocks_at', 'Unlocks at level {n}').replace('{n}', need);
 }
 
 /** Every theme with its lock state, in picker order: [{ key, lock }]. */

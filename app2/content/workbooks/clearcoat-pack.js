@@ -20,6 +20,7 @@ import { Sheet } from '../../engine/sheet.js';
 import { pivotCache, pivotLayout } from '../../engine/pivot.js';
 import { refKey, parseRef } from '../../engine/refs.js';
 import { diffStates as diffCells, sessionToState as sessionCells } from './clearcoat-weekly.js';
+import { unclip } from './unclip.js';
 
 export const CHAPTER = 4;
 export const UNITS = 'USD unless stated; costs shown as negatives';
@@ -1214,7 +1215,7 @@ export const STANDARD = {
 export function stateOf(id) {
   const s = STATES[id];
   if (!s) throw new Error('unknown workbook state ' + id);
-  return clone(s);
+  return unclip('clearcoat-pack', clone(s));   // the fit: no label clipped, no #### (content/workbooks/fit.js)
 }
 
 /* ---------------- diffing (the chain test reads these) ---------------- */
@@ -1246,5 +1247,5 @@ export function sessionToState(ses) {
   const unspill = c => { const { spill, value, ...rest } = c; return rest; };
   st.sheets = st.sheets.map(sh => ({ ...sh, cells: Object.fromEntries(Object.entries(sh.cells).map(([k, c]) => [k, c && c.spill ? unspill(c) : c]).filter(([, c]) => c && Object.keys(c).length)) }));
   ses.sheets.forEach((e, i) => { const sh = st.sheets[i]; if (e.sheet.dataTables && e.sheet.dataTables.length) sh.dataTables = clone(e.sheet.dataTables); if (e.sheet.pivots && e.sheet.pivots.length) sh.pivots = clone(e.sheet.pivots); });
-  return st;
+  return unclip('clearcoat-pack', st);   // with the fit the next lesson opens it with
 }

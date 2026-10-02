@@ -16,6 +16,7 @@
 // Importable in Node (no DOM/localStorage at top level): the tests drive bumpOwner/signOutWipe.
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js';
 import { prefs } from './prefs.js';
+import { siteCopy } from '../content/copy/apply.js';
 
 let client = null;
 let owner = '';           // the signed-in user id, '' for guest
@@ -24,6 +25,24 @@ let currentUser = null;
 let listeners = [];
 let readyPromise = null;
 let lost = null;          // the uid whose session expired under it (this page load only)
+
+/**
+ * No user enumeration (liability checklist, Security): what a sign-in, sign-up or link request answers
+ * must never say whether an account exists for an email. Supabase already answers a sign-up for a
+ * taken email like a new one while "Confirm email" is on, and a wrong password or unknown email both
+ * read "Invalid login credentials"; this closes the gaps the client could still show: "already
+ * registered" (confirmations off), "Email not confirmed" and "Signups not allowed" (account creation
+ * off). Pure: the raw platform message in, { confirm: true } (answer as if the email went out) or
+ * { error } (a message safe to show) out.
+ */
+export const CREDENTIALS_TEXT = siteCopy('auth_bad_credentials', 'That email and password didn’t work. Check them, or use a magic link.');
+export function enumerationSafe(raw, kind) {
+  const m = String(raw || '');
+  const telling = /already (been )?registered|already exists|user not found|email not confirmed|signups? (is )?(not allowed|disabled)/i.test(m);
+  if (kind === 'signin') return { error: telling || /invalid login credentials/i.test(m) ? CREDENTIALS_TEXT : m };
+  if (telling) return { confirm: true };   // signup, magic link, code: "check your email" either way
+  return { error: m };
+}
 
 /** Pure core of the generation rule, exported for the tests. */
 export function makeOwnerTracker() {
@@ -141,22 +160,22 @@ export const auth = {
   },
 
   async signInPassword(email, password) {
-    if (!client) return { error: 'Sign-in is not configured' };
+    if (!client) return { error: siteCopy('acct_unavailable', 'Sign-in is not configured.') };
     const { error } = await client.auth.signInWithPassword({ email, password });
-    return { error: error ? error.message : null };
+    return { error: error ? enumerationSafe(error.message, 'signin').error : null };
   },
   async signUpPassword(email, password) {
-    if (!client) return { error: 'Sign-in is not configured' };
+    if (!client) return { error: siteCopy('acct_unavailable', 'Sign-in is not configured.') };
     const { data, error } = await client.auth.signUp({ email, password });
-    if (error) return { error: error.message };
+    if (error) return enumerationSafe(error.message, 'signup');
     // Supabase with email confirmation on: a user but no session until the link is clicked
     if (data && data.user && !data.session) return { confirm: true };
     return {};
   },
   async magicLink(email) {
-    if (!client) return { error: 'Sign-in is not configured' };
+    if (!client) return { error: siteCopy('acct_unavailable', 'Sign-in is not configured.') };
     const { error } = await client.auth.signInWithOtp({ email, options: { emailRedirectTo: redirectTo() } });
-    return error ? { error: error.message } : { confirm: true };
+    return error ? enumerationSafe(error.message, 'link') : { confirm: true };
   },
   /**
    * The checkout page's sign-in (E-checkout decision 11): a 6-digit code by email, typed on the same
@@ -164,17 +183,18 @@ export const auth = {
    * template to carry {{ .Token }}.
    */
   async sendCode(email) {
-    if (!client) return { error: 'Sign-in is not configured' };
+    if (!client) return { error: siteCopy('acct_unavailable', 'Sign-in is not configured.') };
     const { error } = await client.auth.signInWithOtp({ email, options: { shouldCreateUser: true } });
-    return error ? { error: error.message } : {};
+    const r = error ? enumerationSafe(error.message, 'code') : {};
+    return r.error ? r : {};
   },
   async verifyCode(email, code) {
-    if (!client) return { error: 'Sign-in is not configured' };
+    if (!client) return { error: siteCopy('acct_unavailable', 'Sign-in is not configured.') };
     const { error } = await client.auth.verifyOtp({ email, token: String(code || '').trim(), type: 'email' });
     return { error: error ? error.message : null };
   },
   async google() {
-    if (!client) return { error: 'Sign-in is not configured' };
+    if (!client) return { error: siteCopy('acct_unavailable', 'Sign-in is not configured.') };
     const { error } = await client.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: redirectTo() } });
     return { error: error ? error.message : null };
   },

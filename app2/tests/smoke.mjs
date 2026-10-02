@@ -9,6 +9,7 @@ import { spawn } from 'node:child_process';
 import { LESSONS } from '../content/index.js';
 import { parseKeyScript, parseKeySpec } from '../engine/keyboard.js';
 import { textProblems, readableText } from './text-guard.js';
+import { unnamed } from './a11y-guard.js';
 
 const require = createRequire(import.meta.url);
 let chromium;
@@ -46,6 +47,8 @@ await context.addInitScript(() => {
   const start = () => new MutationObserver(skip).observe(document.documentElement, { subtree: true, childList: true });
   if (document.documentElement) start(); else document.addEventListener('DOMContentLoaded', start);
 });
+// every Content-Security-Policy violation is reported as a console error (and so fails the run)
+await context.addInitScript(() => document.addEventListener('securitypolicyviolation', e => console.error(`CSP violation: ${e.effectiveDirective} blocked ${e.blockedURI || 'inline'} in ${e.sourceFile || location.pathname}`)));
 const page = await context.newPage();
 const errors = [];
 page.on('pageerror', e => errors.push('pageerror: ' + e.message));
@@ -80,11 +83,35 @@ const t = label => console.log(`  ${label} at ${((Date.now() - T0) / 1000).toFix
 async function guardText(label) {
   const txt = await page.evaluate(readableText);
   for (const p of textProblems(txt)) fail(`${label}: text: ${p.rule}: ${p.line.slice(0, 140)}`);
+  // every image has an alt and every control has a name (liability checklist, R9)
+  for (const p of await page.evaluate(`(${unnamed.toString()})()`)) fail(`${label}: a11y: ${p.tag} ${p.why}: ${p.html}`);
 }
 
 try {
+  // a freshly loaded lesson tab takes the learner's first key: no click, no warm-up key (its own context and
+  // page, so a real load that leaves the main run's storage alone; the same loopback-only rule)
+  {
+    const freshCtx = await browser.newContext({ viewport: { width: 1400, height: 900 }, serviceWorkers: 'block' });
+    await freshCtx.route('**/*', route => {
+      let origin; try { origin = new URL(route.request().url()).origin; } catch (e) { return route.abort('blockedbyclient'); }
+      return origin === `http://127.0.0.1:${PORT}` ? route.continue() : route.abort('blockedbyclient');
+    });
+    const fresh = await freshCtx.newPage();
+    fresh.on('pageerror', e => errors.push('pageerror (fresh tab): ' + e.message));
+    await fresh.goto(base + '#/lesson/know-the-screen');
+    const card = await fresh.waitForSelector('.tc', { state: 'visible', timeout: 8000 }).catch(() => null);
+    if (!card) fail('fresh lesson tab: no task card');
+    else {
+      const nb = () => fresh.evaluate(() => (document.querySelector('.namebox') || {}).textContent);
+      const before = await nb();
+      await fresh.keyboard.press('ArrowDown');
+      await fresh.waitForTimeout(100);
+      if ((await nb()) === before) fail(`fresh lesson tab: the first key was lost (the cursor stayed on ${before})`);
+    }
+    await freshCtx.close();
+  }
   // every route renders
-  for (const route of ['#/', '#/learn', '#/practice', '#/practice/daily', '#/practice/rapid', '#/practice/challenges', '#/leaderboard', '#/leaderboard?board=drills', '#/leaderboard?board=challenges', '#/reference', '#/pricing', '#/teams', '#/account', '#/account?section=settings', '#/about', '#/terms', '#/privacy', '#/contact', '#/checkout', '#/checkout/done', '#/nope']) {
+  for (const route of ['#/', '#/learn', '#/practice', '#/practice/daily', '#/practice/rapid', '#/practice/challenges', '#/leaderboard', '#/leaderboard?board=drills', '#/leaderboard?board=challenges', '#/reference', '#/pricing', '#/teams', '#/desk', '#/desk/join/TEAM-ABCD-EFGH', '#/leaderboard?board=desks', '#/account', '#/account?section=settings', '#/about', '#/terms', '#/privacy', '#/contact', '#/checkout', '#/checkout/done', '#/nope']) {
     await page.goto(base + route);
     await page.waitForTimeout(250);
     const text = await page.evaluate(() => document.body.innerText.trim().length);
@@ -345,8 +372,24 @@ try {
     if (!(await p4.waitForSelector('.dp-poster img', { timeout: 5000 }).catch(() => null))) fail('failure: the landing without its demo player shows no still');
     await p4.waitForFunction(() => /didn.t load/i.test((document.querySelector('#ldDemoNote') || {}).textContent || ''), null, { timeout: 5000 }).catch(() => fail('failure: the landing does not say its live demo did not load'));
     block = null;
+    // the boot watchdog (no inline onerror under the CSP): a failed app module shows the reload card at once
+    const p5 = await ctx2.newPage();
+    block = /\/app\/main\.js$/;
+    await p5.goto(base + '#/');
+    if (!(await p5.waitForSelector('#bootReload', { timeout: 5000 }).catch(() => null))) fail('failure: a failed app module does not show the boot reload card');
+    block = null;
     await ctx2.close();
     t('failure paths');
+  }
+  {
+    // the CSP (serve.js sends app2/_headers' site-wide policy): the static page types load under it too,
+    // and any violation anywhere in the run is a console error the errors list catches
+    for (const path of ['lessons/accrual-and-cash.html', 'shortcuts/', 'shortcuts/alt-a-h.html', '404.html']) {
+      const res = await page.goto(`http://127.0.0.1:${PORT}/app2/${path}`);
+      if (!res || !/script-src 'self'/.test(res.headers()['content-security-policy'] || '')) fail(`csp: ${path} was served without the policy`);
+      await page.waitForLoadState('load');
+    }
+    t('csp');
   }
 } finally {
   if (errors.length) { failures += errors.length; console.log('ERRORS\n' + errors.join('\n')); }

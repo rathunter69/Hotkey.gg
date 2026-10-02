@@ -4,7 +4,7 @@
 // track, the folding checklist), Result (the time and its tier, New best, the XP row, the board
 // row, a level-up row, then Next drill on Enter, Run it again on R, See the board on B), Next.
 // The chrome is ui/components/chrome.js; the panel ui/components/run-panel.js; the record
-// app/run-record.js through DrillRun. The sandbox is retired: #/drill/sandbox goes to Practice.
+// app/run-record.js through DrillRun. The sandbox is dropped (M21): its routes open Practice.
 import { mountSheetTabs } from '../ui/sheet-tabs.js';
 import { SheetView } from '../ui/sheet-view.js';
 import { RibbonView } from '../ui/ribbon-view.js';
@@ -32,7 +32,9 @@ import { recordRun } from './quest-loop.js';
 import { hasPickers, PICKER_LESSON } from '../content/catalog.js';
 import { equipReward } from './cosmetics.js';
 import { shortcutsUsed } from './runner.js';
+import { keyStates } from './key-states.js';
 import { siteCopy } from '../content/copy/apply.js';
+import { entitlement } from './entitlement.js';
 import { createChrome, confirmDialog, isExitKey, EXIT_KEY, sheetKeys, noteSheetKey, sheetKeysDelivered, canFullscreen, fullscreenKeys } from '../ui/components/chrome.js';
 import { createFocusVeil } from '../ui/components/focus-veil.js';
 import { pingMark } from '../ui/components/sheet-marks.js';
@@ -43,6 +45,7 @@ const shortDay = d => { try { return new Date(d + 'T12:00:00Z').toLocaleDateStri
 const fill = (s, vars) => String(s).replace(/\{(\w+)\}/g, (m, k) => (vars && vars[k] != null ? vars[k] : m));
 const t = (key, fb, vars) => fill(siteCopy(key, fb), vars);
 const MODS = new Set(['Alt', 'Control', 'Shift', 'Meta']);
+const entitled = () => { try { return entitlement.entitled(); } catch (e) { return false; } };
 const GRADED = () => DRILLS.filter(d => d.kind !== 'challenge');
 
 /** The drill after `id` in the set (?set=a,b,c) or, with no set, in catalog order; null at the end. Pure. */
@@ -56,8 +59,7 @@ export function nextDrillId(id, setList) {
 
 export function mountDrillPage(root, ctx = {}) {
   const daily = !!(ctx.params && ctx.params.daily) && (() => { const d = dailyDrill(dayOf()); return d.drill ? d : null; })();
-  const id = daily ? daily.drill.id : (ctx.params && ctx.params.id) || 'sandbox';
-  if (!daily && id === 'sandbox') { location.replace('#/practice'); return { destroy() {} }; }
+  const id = daily ? daily.drill.id : (ctx.params && ctx.params.id) || '';
   const drill = daily ? daily.drill : drillById(id);
   if (!drill) { location.replace('#/practice'); return { destroy() {} }; }
   // a module challenge in the catalogue runs in the lesson workspace (seeded, timed, tier-scored); the Daily passes its seed
@@ -183,6 +185,8 @@ export function mountDrillPage(root, ctx = {}) {
   /** The lines the Ready beat carries above the tasks (M85): a stretch drill's one rule, and the drop-downs when the lesson that teaches them isn't done. */
   function readyNotes(d, all) {
     const notes = [];
+    // the Daily draws Full Access drills too (M20): a free account is told, and plays it anyway
+    if (daily && d.access === 'paid' && !entitled()) notes.push(t('daily_pro_note', 'Today’s drill is from Chapter {n}, which comes with Full Access. Everyone plays the same sheet, so play it anyway.', { n: chapterNo }));
     if (d.ruleLine) notes.push(d.ruleLine);
     if (hasPickers(d) && !(all[PICKER_LESSON] && all[PICKER_LESSON].completed)) notes.push(siteCopy('panel_pickers', 'The class cells are drop-downs: Alt+↓ opens one, ↑ and ↓ move, Enter picks.'));
     return notes;
@@ -254,7 +258,9 @@ export function mountDrillPage(root, ctx = {}) {
     effects.finish(chrome.stage);
     if (newPb) effects.newPB(); else if (attempt.tier !== 'none') effects.parTier(attempt.tier);
     // the quest loop (6.10): the run ticks its quests before the XP is read, so their XP lands in this result
-    const qr = recordRun({ kind: daily ? 'daily' : 'drill', ref: drill.id, clean: attempt.clean, tier: attempt.tier, pb: newPb, ghost: newPb && !!pbBefore, noWaste: attempt.clean && drill.optimalKeys > 0 && attempt.keys <= drill.optimalKeys, noMouse: !attempt.mouse, used: shortcutsUsed(run.session.keyLog) });
+    const used = shortcutsUsed(run.session.keyLog);
+    keyStates.notePressed(used);   // the keys this run pressed are practiced (M57)
+    const qr = recordRun({ kind: daily ? 'daily' : 'drill', ref: drill.id, clean: attempt.clean, tier: attempt.tier, pb: newPb, ghost: newPb && !!pbBefore, noWaste: attempt.clean && drill.optimalKeys > 0 && attempt.keys <= drill.optimalKeys, noMouse: !attempt.mouse, used });
     busyOn = false; if (effects.setBusy) effects.setBusy(false);
     const earned = celebrate(effects, ctxBefore);
     const ctxAfter = gameCtx();
@@ -275,6 +281,7 @@ export function mountDrillPage(root, ctx = {}) {
       newBest: newPb ? { by: pbBefore ? pbBefore.secs - attempt.secs : null } : null,
       pars: drill.pars, oldBest: pbBefore ? pbBefore.secs : null,
       tasks: { total: run.goals.length, done: run.doneCount },
+      shortcuts: used.filter(u => /[+ ]/.test(u.keys)).slice(0, 6).map(u => ({ keys: u.keys, count: u.count })),   // the chords, not the plain moves; six fit above the buttons
       note: attempt.clean ? (daily ? t('panel_daily_attempts', 'Attempts today: {n}', { n: attemptsToday() }) : '') : (attempt.helped ? siteCopy('panel_no_time_help', 'Help was used, so no time is posted. It still counts as practice.') : siteCopy('panel_no_time_mouse', 'The mouse touched the sheet, so no time is posted. It still counts as practice.')),
       xp: gained ? { gained, pct: ctxAfter.levelInfo.pct } : null,
       board: ix >= 0 ? { title: daily ? siteCopy('panel_board_today', 'Today’s board') : siteCopy('panel_board', 'Your board'), place: ix + 1, of: board.length, move: null } : null,

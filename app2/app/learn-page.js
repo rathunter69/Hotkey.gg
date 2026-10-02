@@ -249,7 +249,7 @@ export function mountLearnPage(root, ctx = {}) {
     return tabs.map(x => {
       const rows = x.built ? chapterModel(x.built, all, skipped, store.chapter(x.key)) : [];
       const done = rows.filter(r => r.status === 'complete').length;
-      const locked = x.access === 'paid' && !entitlement.entitled();
+      const locked = entitlement.locked(x);
       return { key: x.key, n: x.n, title: x.title, on: x.key === chapterKey, locked, pct: rows.length ? 100 * done / rows.length : 0,
         note: x.access === 'free' ? t('learn_free') : locked ? t('paywall_pro') : '',
         count: rows.length ? t('chapter_modules_done', { d: done, m: rows.length }) : t('learn_being_written') };
@@ -268,7 +268,7 @@ export function mountLearnPage(root, ctx = {}) {
   function render(focusTab) {
     const tab = tabs.find(x => x.key === chapterKey);
     const all = store.all(); const skipped = prefs.get().skipped;
-    const locked = tab.access === 'paid' && !entitlement.entitled();
+    const locked = entitlement.locked(tab);
     const gate = store.chapter(tab.key);
     const rows = tab.built ? chapterModel(tab.built, all, skipped, gate) : [];
     if (!openModule || !rows.some(r => r.id === openModule)) openModule = (rows.find(r => r.current) || rows.find(r => r.status !== 'complete') || rows[0] || {}).id || null;
@@ -294,7 +294,7 @@ export function mountLearnPage(root, ctx = {}) {
       const to = tab.built.lessons.find(l => l.kind === 'testout');
       if (to) facts = (gate.testout || gate.assessment ? esc(t('learn_verified')) + ',' : `<a href="#/lesson/${esc(to.id)}">${esc(t('learn_testout'))}</a>`) + ' ' + facts;
     }
-    const body = rows.length ? `<div class="mod-list${locked ? ' mod-list-locked' : ''}">${list}</div>` : `<p class="panel-line">${esc(t('learn_coming', { n: tab.n }))}</p>${plan ? `<p class="panel-line">${esc(plan.line)}</p>` : ''}`;
+    const body = rows.length ? `<div class="mod-list${locked ? ' mod-list-locked' : ''}">${list}</div>` : `<p class="panel-line">${esc(t('learn_coming', { n: tab.n }))}</p>${plan ? `<p class="panel-line">${esc(t('learn_plan_' + plan.n, plan.line))}</p>` : ''}`;
     const paywall = locked ? paywallHtml({ heading: t('paywall_chapter', { n: tab.n, name: tab.title }), signedIn: auth.state() === 'in', mode: 'learn', ids: { go: 'learnGoPro', notNow: 'learnNotNow' } }) : '';   // the one paywall panel (M105)
     let side = '';
     if (open && tab.built && !locked) {

@@ -98,7 +98,7 @@ select is((select first_run_done from public.profiles where id = pg_temp.uid(1))
 select is((select count(*) from public.attempts where user_id = pg_temp.uid(1) and source = 'guest'), 4::bigint, 'carried attempts are marked guest');
 select is((select best_secs from public.lesson_progress where user_id = pg_temp.uid(1) and lesson_id = 'active-cell'), 18.2::numeric(8,2), 'the carried best is a best');
 select is((select best_secs from public.lesson_progress where user_id = pg_temp.uid(1) and lesson_id = 'moving-around'), null::numeric(8,2), 'a moused guest run carries no best');
-select is((select xp from public.profiles where id = pg_temp.uid(1)), 220, 'carried completions pay their XP (100+100 first, 10+10 repeats)');
+select is((select xp from public.profiles where id = pg_temp.uid(1)), 100, 'carried completions pay their XP (50+50 first, repeats nothing; 0016)');
 
 -- ================================================= once means once
 set local role authenticated;

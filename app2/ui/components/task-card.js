@@ -111,9 +111,18 @@ export function rangeRect(ref, geom) {
 
 /* ---------------- the keys that answer (pure) ---------------- */
 
-const GLYPH = { Enter: '↵', Return: '↵', Escape: 'Esc', Up: '↑', Down: '↓', Left: '←', Right: '→', Backspace: '⌫', Space: 'Space' };
+const GLYPH = { Enter: '↵', Return: '↵', Escape: 'Esc', Up: '↑', Down: '↓', Left: '←', Right: '→', Backspace: '⌫', Space: 'Space',
+  PageDown: 'PgDn', PageUp: 'PgUp', Del: 'Delete' };
+/** A shifted symbol is its digit key: Ctrl+Shift+$ is the keycap Ctrl+Shift+4, as the route writes it. */
+const SHIFTED = { '!': '1', '@': '2', '#': '3', $: '4', '%': '5', '^': '6', '&': '7', '*': '8', '(': '9', ')': '0', '~': '`', _: '-' };
 /** One key's label the way the session logs it (↵ for Enter, ↓ for Down, Ctrl+↓ for Ctrl+Down). */
-export const normKey = k => String(k || '').split('+').map(p => GLYPH[p] || p).join('+');
+export const normKey = k => {
+  const s = String(k || '');
+  if (s === '+' || s.endsWith('++')) return s;
+  const parts = s.split('+').map(p => GLYPH[p] || p);
+  if (parts.length > 1 && parts.includes('Shift') && SHIFTED[parts[parts.length - 1]]) parts[parts.length - 1] = SHIFTED[parts[parts.length - 1]];
+  return parts.join('+');
+};
 
 /**
  * A goal's keys as the keycaps show them: 'Ctrl+Home ↑ ×3 then Ctrl+1 A "1200" ↵' →
@@ -143,6 +152,8 @@ export function routeTokens(keys) {
  */
 /** Keys that work the workspace, not the sheet (the Ribbon's fold, the formula bar's height): never a wrong key on a route. */
 const CHROME_KEYS = new Set(['Ctrl+F1', 'Ctrl+Shift+U']);
+/** A typed character against the route's: case-blind, since a dialog's box (Go To, Find) logs a letter as its keycap. */
+const sameChar = (k, ch) => k === ch || (ch != null && k.length === 1 && k.toLowerCase() === String(ch).toLowerCase());
 export function routeProgress(tokens, pressed) {
   let matched = 0, chars = 0, wrong = null;
   const list = (pressed || []).map(p => (typeof p === 'string' ? p : p && p.k)).filter(k => k && k !== '⚠' && !CHROME_KEYS.has(k));
@@ -151,13 +162,13 @@ export function routeProgress(tokens, pressed) {
     if (matched >= tokens.length) break;
     const tok = tokens[matched];
     if (tok.text != null) {
-      if (k === tok.text[chars]) { chars++; if (chars >= tok.text.length) { matched++; chars = 0; } wrong = null; continue; }
+      if (sameChar(k, tok.text[chars])) { chars++; if (chars >= tok.text.length) { matched++; chars = 0; } wrong = null; continue; }
     } else if (k === tok.key) { matched++; wrong = null; continue; }
     // wrong: the row resets; the key may start the route again
     wrong = k; matched = 0; chars = 0;
     const first = tokens[0];
     if (first && first.key === k) { matched = 1; wrong = null; }
-    else if (first && first.text != null && first.text[0] === k) { chars = 1; wrong = null; }
+    else if (first && first.text != null && sameChar(k, first.text[0])) { chars = 1; wrong = null; }
   }
   return { matched, chars, wrong, next: tokens[matched] || null, done: matched >= tokens.length && tokens.length > 0 };
 }
@@ -213,8 +224,48 @@ export function tryLine(progress, tokens, platform) {
  */
 export function worksToo(tokens, altTokens, pressed) {
   if (!tokens || !tokens.length || !pressed || !pressed.length) return false;
-  if (routeProgress(tokens, pressed).done) return false;
-  return !(altTokens || []).some(t => routeProgress(t, pressed).done);
+  return !followed(tokens, pressed) && !(altTokens || []).some(t => followed(t, pressed));
+}
+/** Keys that move or back out without changing what a route does: a route may skip them, a learner may add them. */
+const SLACK = new Set(['↑', '↓', '←', '→', 'Home', 'End', 'Esc']);
+/**
+ * Whether the keys pressed for a goal that landed are the route (or the start of it: a goal can land
+ * before its last keys, the Esc that backs out of the Ribbon, say). Walked in order: a key that is the
+ * route's next is taken, as is the route's text letter by letter (a dialog's box logs a letter as its
+ * keycap); the route's moving and backing-out keys may go unpressed (an edit-mode caret move is not
+ * logged) and a learner's own may be extra; pressing the key just taken again is a retry. Anything
+ * else left the route. Alt then a key is the chord Alt+key. Pure.
+ */
+export function followed(tokens, pressed) {
+  if (routeProgress(tokens, pressed).done) return true;
+  const routeKeys = new Set(tokens.map(t => t.key).filter(Boolean));
+  const list = (pressed || []).map(p => (typeof p === 'string' ? p : p && p.k)).filter(k => k && k !== '⚠' && (!CHROME_KEYS.has(k) || routeKeys.has(k))).map(normKey);
+  // the route as single keys: text letter by letter, Alt+X as Alt then X (the session may log either);
+  // a caret move inside a cell being edited (after F2, before Enter or Esc) is slack too
+  const route = [];
+  let editing = false;
+  for (const t of tokens) {
+    if (t.text != null) { for (const ch of t.text) route.push({ ch }); continue; }
+    const m = /^Alt\+(.)$/.exec(t.key);
+    const caret = editing && /^(?:Ctrl\+|Shift\+|Ctrl\+Shift\+)?(?:←|→|↑|↓|Home|End)$/.test(t.key);
+    if (m) route.push({ key: t.key, pair: ['Alt', m[1]] }); else route.push({ key: t.key, slack: SLACK.has(t.key) || caret, caret });
+    if (t.key === 'F2') editing = true; else if (t.key === '↵' || t.key === 'Esc' || t.key === 'Tab') editing = false;
+  }
+  const same = (k, step) => (step.ch != null ? (sameChar(k, step.ch) || (k === 'Space' && step.ch === ' ')) : k === step.key);
+  let i = 0, last = null, taken = 0, skipped = 0;
+  for (let p = 0; p < list.length; p++) {
+    const k = list[p];
+    // skip the route's slack keys the learner did not press
+    let j = i; while (j < route.length && !same(k, route[j]) && !(route[j].pair && k === 'Alt' && list[p + 1] === route[j].pair[1]) && route[j].slack) j++;
+    const step = route[j];
+    if (step && step.pair && k === 'Alt' && list[p + 1] === step.pair[1]) { p++; skipped += route.slice(i, j).filter(s => !s.caret).length; i = j + 1; last = step; taken++; continue; }
+    if (step && same(k, step)) { skipped += route.slice(i, j).filter(s => !s.caret).length; i = j + 1; last = step; taken++; continue; }
+    if (SLACK.has(k)) continue;                       // the learner's own move or back-out
+    if (last && same(k, last)) continue;              // a retry of the key just taken
+    return false;
+  }
+  // skipping most of the route (five ↓ for one Ctrl+↓) is another route, not the one shown
+  return taken > 0 && skipped < taken;
 }
 /** The line for worksToo: "That works too. The keys here: Ctrl+↓." Pure. */
 export function worksTooLine(tokens, platform) {

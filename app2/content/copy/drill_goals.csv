@@ -1,0 +1,427 @@
+drill_id,kind,index,text
+get-around,goal,0,"Jump down to the Total row, select A10:F10 to its edge and bold it."
+get-around,goal,1,Give the same Total row a top border.
+get-around,goal,2,Jump up to the headers and right-align B4:F4 over their figures.
+get-around,goal,3,Select the typed washes and tickets B5:C9 and color them blue.
+get-around,goal,4,Jump down to the cost per wash in B13 and make it blue with F4.
+get-around,goal,5,Select the washes by day B17:G21 by their edges and make them blue with F4.
+get-around,goal,6,Revenue in column D is too narrow to read: select the column and AutoFit it.
+get-around,goal,7,"Go to Monday’s card fees on Costs, B8, and fix the typo: 880 should be 88."
+enter-and-fill,goal,0,"Fill the day names across C4:G4 from Mon in B4 with Fill Series, AutoFill."
+enter-and-fill,goal,1,"Type Saturday's washes down G5:G8, Enter after each: 205, 150, 160, 215."
+enter-and-fill,goal,2,"Type Airport's week across B9:G9, Tab between them: 235, 320, 265, 165, 205, 250."
+enter-and-fill,goal,3,Mueller was closed Wednesday and Thursday: put 0 in D6:E6 with one Ctrl+Enter.
+enter-and-fill,goal,4,Riverside's Monday in B7 has an extra zero: open it with F2 and take it off.
+enter-and-fill,goal,5,Fill the Week formula in H5 down H6:H9 with Ctrl+D.
+enter-and-fill,goal,6,Fill the 250 target in B13 right across C13:G13.
+enter-and-fill,goal,7,Copy the Week formula from H9 into H13.
+find-and-fix,goal,0,"Find the misspelled Airprot and land on it, A9."
+find-and-fix,goal,1,Retype A9 as Airport.
+find-and-fix,goal,2,Fix Riversid in A19 to read Riverside.
+find-and-fix,goal,3,Replace every Muller with Mueller in one pass.
+find-and-fix,goal,4,"Replace every Sep 8 with Sep 15, three cells at once."
+find-and-fix,goal,5,Riverside's washes in B7 are stuck as text: type 1480 over them as a number.
+find-and-fix,goal,6,South Lamar's ticket in C8 has an extra zero: take it off with F2.
+find-and-fix,goal,7,"Clear the stray word out of A3, the spacer row."
+paste-surgeon,goal,0,"Copy the revenue D5:D9 and paste only its values onto G5:G9, the figures at close."
+paste-surgeon,goal,1,Copy the header D4 and paste only its format onto F4:G4.
+paste-surgeon,goal,2,Last week in E5:E9 came in cents: divide it by the 100 in B13 with Paste Special.
+paste-surgeon,goal,3,Multiply E5:E9 by the -1 in B14 to turn last week positive.
+paste-surgeon,goal,4,"Copy G5:G9 and paste only its formats onto last week, E5:E9."
+paste-surgeon,goal,5,Copy the change formula in F5 and paste only formulas onto F6:F10.
+paste-surgeon,goal,6,"Copy column D’s width onto column E with Paste Special, Column widths."
+paste-surgeon,goal,7,Copy the total D10 and paste only its format onto G10.
+row-wrangler,goal,0,"Insert a whole row above Airport, row 9, for Cedar Park."
+row-wrangler,goal,1,Fill South Lamar’s row A8:F8 down into the new row with Ctrl+D.
+row-wrangler,goal,2,"Type Cedar Park over A9, its 210 washes in B9 and its 14.00 ticket in C9."
+row-wrangler,goal,3,"Delete the stale export row under the total, row 12, whole."
+row-wrangler,goal,4,Set the figure columns B:F to width 12.
+row-wrangler,goal,5,"AutoFit column A to its labels, A4:A14."
+row-wrangler,goal,6,Group the old codes in column G.
+row-wrangler,goal,7,Freeze the panes at B5.
+row-wrangler,end,0,"The total in B11 still counts every site, Cedar Park included"
+format-the-weekly-page,goal,0,Bold the title in A1 and take it one size up.
+format-the-weekly-page,goal,1,"Center the title across A1:F1, never merged."
+format-the-weekly-page,goal,2,Make the units line in A2 italic.
+format-the-weekly-page,goal,3,Bold the headers A4:F4 and right-align B4:F4 over their figures.
+format-the-weekly-page,goal,4,Take every border off the table A4:F10.
+format-the-weekly-page,goal,5,"Give the washes B5:B10 the desk number format with Ctrl+1, no decimals."
+format-the-weekly-page,goal,6,Give the money in D5:F10 the same desk number format.
+format-the-weekly-page,goal,7,"Put the $ on the first and total rows only: D5:F5, then F4 on D10:F10."
+format-the-weekly-page,goal,8,"Show the tickets C5:C10 to two decimals, with the $ on C5 and C10."
+format-the-weekly-page,goal,9,Give the cost per wash in B13 the $ and two decimals.
+format-the-weekly-page,goal,10,"Color the typed inputs blue: B5:C9, then B13."
+format-the-weekly-page,goal,11,Bold the Total row A10:F10 and give it a top border.
+format-the-weekly-page,goal,12,Turn the gridlines off with Alt W V G.
+insert-and-amend,goal,0,"Insert a whole row above Maintenance, row 7, for Insurance."
+insert-and-amend,goal,1,Cut Insurance from A16:G16 at the foot of the sheet and paste it into row 7.
+insert-and-amend,goal,2,"Insert a whole row above Card fees, row 9, for Utilities."
+insert-and-amend,goal,3,Cut Utilities from A18:G18 and paste it into row 9.
+insert-and-amend,goal,4,"Copy the format of B8:G8 and paste it onto the new lines, B7:G7 and B9:G9."
+insert-and-amend,goal,5,Copy the Week formula in H8 into H7 and H9.
+insert-and-amend,goal,6,"Open the total in B11 with F2, press F2 again to point, and add B7 and B9."
+insert-and-amend,goal,7,Copy B11 and paste only its formula across C11:H11 with Paste Special.
+insert-and-amend,end,0,The total row keeps its bold and its top border
+formula-sprint,goal,0,"Revenue in D5:D9: washes times ticket, one formula entered into all five with Ctrl+Enter."
+formula-sprint,goal,1,"Wash cost in E5:E9: washes times the cost per wash in B13, anchored with F4."
+formula-sprint,goal,2,Gross profit in F5:F9: revenue less wash cost.
+formula-sprint,goal,3,Margin in G5:G9: gross profit over revenue.
+formula-sprint,goal,4,Select B5:F10 and AutoSum the Total row with Alt+=.
+formula-sprint,goal,5,Make C10 the blended ticket: total revenue D10 over total washes B10.
+formula-sprint,goal,6,"In G10, the total margin: F10 over D10."
+formula-sprint,goal,7,"Share of washes in H5:H9: each site’s washes over the total B10, anchored."
+formula-sprint,goal,8,AutoSum the shares into H10.
+formula-sprint,end,0,"The shares add to 100%, and the check in B17 reads zero"
+combine-two-tabs,goal,0,"In B5 on Combined, add Monday’s washes on Austin and SanAntonio by pointing."
+combine-two-tabs,goal,1,Fill B5 right across C5:G5.
+combine-two-tabs,goal,2,Fill B5:G5 down to row 8.
+combine-two-tabs,goal,3,Site contribution in B9:G9 from Combined’s own rows: revenue less both costs.
+combine-two-tabs,goal,4,Select B5:H9 and AutoSum the week into H5:H9.
+combine-two-tabs,goal,5,Copy Austin’s B5:H9 and paste only its formats onto the same block on Combined.
+combine-two-tabs,goal,6,Color the links in B5:G8 green: they read another sheet.
+combine-two-tabs,goal,7,"From B5 on Combined, jump to the first cell it reads with Ctrl+[."
+before-you-send,goal,0,"Clear the internal note in H6, ""check with ops""."
+before-you-send,goal,1,"Clear the second internal note, in H9."
+before-you-send,goal,2,Clear the stray fills and borders off H5:J9 with Alt H E F.
+before-you-send,goal,3,"One gross profit in F5:F9 is a typed number: find it and put the formula back, revenue less wash cost."
+before-you-send,goal,4,Turn the gridlines off on Report with Alt W V G.
+before-you-send,goal,5,Delete the stale Old wk37 tab.
+before-you-send,goal,6,Leave Raw on A1 with Ctrl+Home.
+before-you-send,goal,7,"Leave Costs on its home cell, B5, under the frozen panes."
+before-you-send,goal,8,"Finish on Report, the first tab, at B5."
+before-you-send,end,0,The check in B17 reads zero
+before-you-send,end,1,The source line in A14 is still there
+weekly-sales-report,goal,0,Bold the title in A1 and take it one size up.
+weekly-sales-report,goal,1,"Center the title across A1:E1, never merged."
+weekly-sales-report,goal,2,"Type the units line, USD unless stated, into A2 in italics."
+weekly-sales-report,goal,3,Bold the headers A4:E4 and right-align B4:E4 over their figures.
+weekly-sales-report,goal,4,"Gross profit in E5:E9: revenue less wash cost, one formula for all five."
+weekly-sales-report,goal,5,Type Total into A10 and AutoSum B10:E10.
+weekly-sales-report,goal,6,Give the figures B5:E10 the desk number format with Ctrl+1.
+weekly-sales-report,goal,7,Put the $ on the first and total rows only: C5:E5 and C10:E10.
+weekly-sales-report,goal,8,Color the typed figures B5:D9 blue.
+weekly-sales-report,goal,9,Bold the Total row A10:E10 and give it a top border.
+weekly-sales-report,goal,10,Freeze the panes at B5.
+weekly-sales-report,goal,11,Turn the gridlines off with Alt W V G.
+weekly-sales-report,end,0,The totals still add the five sites
+ch2-format-sprint,goal,0,"Give the revenue lines C7:E10 the desk number format from Ctrl+1: Number, no decimals, the separator and (1,234)."
+ch2-format-sprint,goal,1,Select the site costs C13:E20 and repeat the format with F4.
+ch2-format-sprint,goal,2,"Site contribution, head office and EBITDA in C22:E24 take it too: select them and press F4."
+ch2-format-sprint,goal,3,Sites and washes in C33:E34 read the same way: select them and press F4.
+ch2-format-sprint,goal,4,Revenue per wash in C35:E35 reads to the cent: give it two decimals with Ctrl+Shift+1.
+ch2-format-sprint,end,0,"Every dollar line and both counts read in the desk number format, and revenue per wash reads to the cent"
+ch2-to-thousands,goal,0,Copy the 1000 waiting in G2 with Ctrl+C.
+ch2-to-thousands,goal,1,"Select C7:E24, then only its typed figures with Go To Special, Constants: F5, Alt+S, O, Enter."
+ch2-to-thousands,goal,2,"Divide them by the copied 1000 in one Paste Special: Ctrl+Alt+V, V, I, Enter."
+ch2-to-thousands,goal,3,Change the units line in A2 to USD thousands unless stated; costs shown as negatives.
+ch2-to-thousands,goal,4,Clear the 1000 from G2 with Delete.
+ch2-to-thousands,end,0,"Every typed figure is back in thousands, every formula reads as it did, the units line says thousands and G2 is empty"
+ch2-flip-and-tie,goal,0,"Select the lines C7:E24 and clear the stray formats with Alt, H, E, F."
+ch2-flip-and-tie,goal,1,"Give C7:E24 the desk number format back from Ctrl+1: Number, no decimals, the separator and (1,234)."
+ch2-flip-and-tie,goal,2,Type -1 in the spare cell G19 and copy it with Ctrl+C.
+ch2-flip-and-tie,goal,3,"Flip the costs C13:E19 and head office C23:E23 with Paste Special Multiply, Ctrl+Alt+V, V, M, Enter."
+ch2-flip-and-tie,goal,4,"Rebuild the pasted subtotals in rows 20, 22 and 24 as formulas that add the lines above."
+ch2-flip-and-tie,goal,5,Clear the -1 from G19 with Delete.
+ch2-flip-and-tie,goal,6,"In C41:E41, take the accounts in row 36 off site contribution in row 22, so each check reads 0."
+ch2-flip-and-tie,end,0,"The costs are negative, the subtotals add live, no stray format is left and site contribution ties to the accounts"
+ch2-custom-code,goal,0,"Washes C34:E34 are thousands: give them #,##0k_);(#,##0k);-_) in the Custom box at the foot of Ctrl+1’s list."
+ch2-custom-code,goal,1,"Sites C33:E33 take the plain code #,##0_);(#,##0);-_), so a zero reads as a dash."
+ch2-custom-code,goal,2,The margins C27:E29 take the percent code 0.0%_);(0.0%);-_).
+ch2-custom-code,goal,3,"The checks C39:C40 take 0_);[Red](0);-_), so a negative check paints itself red."
+ch2-custom-code,end,0,"Every code reads a positive, a negative in parentheses and a zero as a dash, the washes with their k"
+ch2-the-divider,goal,0,"Type the flags under the timeline: A in C5 and D5, E in E5."
+ch2-the-divider,goal,1,"Shade the estimate header E4:E5 gray with Alt, H, H, → and Enter."
+ch2-the-divider,goal,2,Every month on Monthly is an estimate: shade its header C4:N4 the same gray.
+ch2-the-divider,goal,3,"Back on the P&L, give the last actual column D4:D35 a right border with Alt, H, B, R."
+ch2-the-divider,end,0,"The flags read A, A and E, the estimate headers are shaded on both pages, and the divider runs down D"
+ch2-top-and-bottom,goal,0,"Select the gridded lines C7:E24 and take every border off with Alt, H, B, N."
+ch2-top-and-bottom,goal,1,"Put the divider back down the last actual column D7:D24 with Alt, H, B, R."
+ch2-top-and-bottom,goal,2,"Bold the four totals: B10:E10, B20:E20, B22:E22 and B24:E24."
+ch2-top-and-bottom,goal,3,"Give each total a top border with Alt, H, B, P, and F4 for the next three."
+ch2-top-and-bottom,goal,4,EBITDA B24:E24 is the answer: give it a double bottom from Ctrl+1’s Border tab.
+ch2-top-and-bottom,goal,5,"Turn the gridlines off with Alt, W, V, G."
+ch2-top-and-bottom,end,0,"Four bold totals with a top border, a double bottom on EBITDA, the divider, and no other border on the page"
+ch2-flag-it,goal,0,Select the checks C39:C40 and add the formula rule =C39<>0 with the Light Red Fill.
+ch2-flag-it,goal,1,"On Monthly, give the checks C34:C35 the same rule, =C34<>0."
+ch2-flag-it,end,0,"No check is red while the pack ties, and every check that leaves zero turns red"
+ch2-print-it,goal,0,"Turn the pack landscape with Alt, P, O, L."
+ch2-print-it,goal,1,"In Page Setup, Alt, P, S, P, pick Fit to with Alt+F and keep 1 page wide by 1 tall."
+ch2-print-it,goal,2,"Repeat the title, units line, timeline and flags on every page: Print Titles, Alt, P, I, rows 1:5."
+ch2-print-it,goal,3,"In Page Setup’s Custom Footer, put &[File] left, Page &[Page] of &[Pages] in the center and &[Date] right."
+ch2-print-it,goal,4,"On Page Setup’s Margins tab, tick Center on page Horizontally with Alt+Z."
+ch2-print-it,end,0,"The pack prints landscape on one page, titles repeated, centered, with the file, page and date in the footer"
+ch2-pnl-to-standard,goal,0,Type the title Clearcoat Express Historical Financials in A1 and make it bold.
+ch2-pnl-to-standard,goal,1,"Give the lines C7:E24 the code #,##0_);(#,##0);-_) in Ctrl+1’s Custom box."
+ch2-pnl-to-standard,goal,2,"The first row C7:E7 takes $#,##0_);($#,##0);-_), then total revenue C10:E10 and EBITDA C24:E24 with F4."
+ch2-pnl-to-standard,goal,3,"Shade the estimate header E4 gray with Alt, H, H, → and Enter."
+ch2-pnl-to-standard,goal,4,"Draw the divider down the last actual column D4:D24 with Alt, H, B, R."
+ch2-pnl-to-standard,goal,5,"Give the totals B10:E10, B20:E20, B22:E22 and B24:E24 a top border with Alt, H, B, P and F4."
+ch2-pnl-to-standard,goal,6,Give EBITDA B24:E24 a double bottom from Ctrl+1’s Border tab.
+ch2-pnl-to-standard,goal,7,"Turn the gridlines off with Alt, W, V, G."
+ch2-pnl-to-standard,goal,8,"Turn the page landscape with Alt, P, O, L, then fit it to one page in Page Setup with Alt+F."
+ch2-pnl-to-standard,goal,9,"In Page Setup’s Custom Footer, put &[File] on the left and &[Date] on the right."
+ch2-pnl-to-standard,end,0,"The page carries its title, codes, divider, borders and no gridlines, and prints landscape on one page with the file and date"
+puzzle-ch2,goal,0,Type x in column A beside the line whose format breaks the page.
+puzzle-ch2,goal,1,"Give C16:E16 the page’s number format, so the negatives sit in parentheses like the rest."
+puzzle-ch2,end,0,Utilities is marked and reads like every other cost line
+ch3-if-ladder,goal,0,"Summary E5:E10: On target when washes used in S reach the target in D, Below when they don’t."
+ch3-if-ladder,goal,1,"Summary F5:F10: 1 when the Sep 15 washes in C reach the target in D, 0 when they don’t."
+ch3-if-ladder,goal,2,Count the sites on target in F12 with a SUM of F5:F10.
+ch3-if-ladder,goal,3,Summary M5:M10: TRUE with AND when a site is below target and more than two years old in L.
+ch3-if-ladder,goal,4,"Summary N5:N10: Concern when both hold, a dash when not, with one IF around one AND."
+ch3-if-ladder,end,0,"The flags, the count and the AND tests tie to the databook, each one IF deep, and move with their inputs"
+ch3-override,goal,0,"Summary S5:S10: the override in R when it’s a number, Hold when it’s a note, the POS washes in C otherwise."
+ch3-override,goal,1,"Summary Q5:Q10: revenue in H over the washes used in S, NM where it can’t be divided."
+ch3-override,end,0,"Washes used and revenue per wash tie on every row, NM on the two that can’t divide, and both follow a new override"
+ch3-date-math,goal,0,"Members G5:G44: the cancel date in F, or the as-of date in H2 when F is empty."
+ch3-date-math,goal,1,"Members H5:H44: tenure in days, the end date in G less the join date in E."
+ch3-date-math,goal,2,"Members I5:I44: tenure in months, the days in H over 30.4."
+ch3-date-math,goal,3,Transactions H5:H94: the month end of each date in A with EOMONTH.
+ch3-date-math,end,0,"Tenure ties for every member and moves with the dates, and every month end is an EOMONTH formula"
+ch3-sumifs-sprint,goal,0,"Summary F41:H46: retail revenue for the site in B and the package in row 40, one SUMIFS over the export."
+ch3-sumifs-sprint,goal,1,"Summary C41:E46: the washes for the same pairs, one COUNTIFS filled the same way."
+ch3-sumifs-sprint,goal,2,Summary C47:H47: a SUM under each column of the block.
+ch3-sumifs-sprint,end,0,"Every cell of the block ties to the export, one formula pattern each side, and the totals add the columns"
+ch3-bands,goal,0,"Summary C34: the amounts on Transactions E5:E94 under 15, the comparison typed in quotes."
+ch3-bands,goal,1,"Summary C35: the amounts from 15 up to but not including 20, two conditions on the one column."
+ch3-bands,goal,2,Summary C36: the amounts of 20 and over.
+ch3-bands,goal,3,"Summary C37: the three bands less a COUNT of the amounts, reading 0."
+ch3-bands,end,0,"The bands count each edge once, add up to every amount, and the check reads 0"
+ch3-text-split,goal,0,"Transactions S5:S94: the cluster, the first three characters of the code in B, with LEFT."
+ch3-text-split,goal,1,"Transactions T5:T94: the site, the last three characters of B with RIGHT around TRIM."
+ch3-text-split,goal,2,"Transactions U5:U94: where the @ sits in the memo in F, with FIND."
+ch3-text-split,goal,3,"Transactions V5:V94: the seven characters of site code after the @ and its space, with MID and FIND."
+ch3-text-split,goal,4,"Transactions W5:W94: the channel between the parentheses, with MID and FIND."
+ch3-text-split,end,0,"Every split column ties to the export as a formula, and the memo columns read no helper"
+ch3-loan-schedule,goal,0,"Loans C12 and C13: the monthly rate, the annual rate in C7 over the payments in C9, and the months, C8 times C9."
+ch3-loan-schedule,goal,1,"Loans C16: the monthly payment as a positive figure, minus PMT on C12, C13 and the principal in C6."
+ch3-loan-schedule,goal,2,"The opening balance: the principal C6 in D44, then last month’s closing in D45:D163."
+ch3-loan-schedule,goal,3,Interest in E44:E163: the opening balance times the monthly rate in $C$12.
+ch3-loan-schedule,goal,4,Principal in F44:F163: the payment in $C$16 less the month’s interest.
+ch3-loan-schedule,goal,5,"The closing balance in G44:G163: opening less principal, so both checks in C167:C168 read 0."
+ch3-loan-schedule,end,0,"The payment ties to PMT, the schedule runs to zero, both checks read 0, and the payment moves with the rate and the term"
+ch3-trace-the-error,goal,0,The #DIV/0! in the monthly rate C12 starts at the payments a year in C9: there are 12.
+ch3-trace-the-error,goal,1,The #REF! in the interest over the term C18 is a lost reference: the paid total in C17 less the principal in C6.
+ch3-trace-the-error,goal,2,"The #NUM! in the IRR C36 starts at the build in C27, typed as a positive: the build is an outflow of 5,000."
+ch3-trace-the-error,goal,3,"The #VALUE! in the discount factors starts at the rate in C30, which reads tbc: the rate is 10%."
+ch3-trace-the-error,goal,4,The #NAME? in the NPV by hand C33 is a misspelled function: sum the discounted flows C32:H32.
+ch3-trace-the-error,end,0,"No error code is left on the page, each fault is fixed at its source, and every formula is still a formula"
+ch3-tie-it-out,goal,0,Summary C51:C56: link each site’s POS washes from the site counts in C15:C20.
+ch3-tie-it-out,goal,1,E51:E56: the managers’ tally in D less the POS washes in C.
+ch3-tie-it-out,goal,2,H51:H56: the tally plus the adjustment in G.
+ch3-tie-it-out,goal,3,"I51:I56: the adjusted tally less the POS washes, reading 0 for every site."
+ch3-tie-it-out,goal,4,"Total the block in row 57: C57:E57 and G57:I57, each a SUM of the six sites."
+ch3-tie-it-out,goal,5,"Rebuild the checks C80:C83, the count not at zero in C86 and the verdict in C87, so the databook reads OK."
+ch3-tie-it-out,end,0,"The reconciliation ties to the databook site by site, every check reads 0 and the verdict reads OK"
+puzzle-ch3,goal,0,"Sites D20:D31: the buyer’s fiscal year for each month end in C, named for the June it closes in."
+puzzle-ch3,goal,1,"Sites E20:E31: H1 for July to December, H2 for January to June."
+puzzle-ch3,goal,2,"Sites F20:F31: the last day of the buyer’s half, from EOMONTH, with no IF."
+puzzle-ch3,end,0,"All twelve months tie to the buyer’s calendar, on the edges too, and the half end holds no IF"
+ch4-lookup-relay,goal,0,"In Lists C31:D31, the price and the fee for the code in C30 by VLOOKUP on B14:E16, exact match."
+ch4-lookup-relay,goal,1,"In C32:D32, the same two by INDEX and MATCH, one formula filled across."
+ch4-lookup-relay,goal,2,"In C33:D33, the same two by XLOOKUP."
+ch4-lookup-relay,goal,3,Type U in C30: all three lines move to Ultimate together.
+ch4-lookup-relay,end,0,Three lookups read the code in C30 and agree on its price and fee
+ch4-sort-and-filter,goal,0,"Sort Export sort by Site A to Z, then by Retail revenue largest to smallest, in one Sort dialog."
+ch4-sort-and-filter,goal,1,"Turn on the filter arrows at A4 and show Airport only: Alt+Down on Site, then search AIR."
+ch4-sort-and-filter,goal,2,"Under the list, E96 totals the washes showing with SUBTOTAL(109) and E97 counts the rows with SUBTOTAL(103)."
+ch4-sort-and-filter,goal,3,"Clear the filter with Alt, A, C: E96 and E97 now read the whole list."
+ch4-sort-and-filter,end,0,"Export sort runs by site, best revenue first, with every row showing"
+ch4-sort-and-filter,end,1,E96 and E97 are SUBTOTALs that read only the rows a filter leaves
+ch4-pivot-in-90,goal,0,"From Export!A4, insert a PivotTable on a new sheet with Alt, N, V, T and Enter."
+ch4-pivot-in-90,goal,1,"In the field list, put Site in Rows and Total washes in Values."
+ch4-pivot-in-90,goal,2,"Put Week in Columns and press Enter: sites down, weeks across, washes summed."
+ch4-pivot-in-90,goal,3,"Name the pivot’s sheet Cuts with Alt, H, O, R."
+ch4-pivot-in-90,end,0,"The pivot on Cuts shows washes by site and week, and its figures tie to the export"
+ch4-data-table,goal,0,"Start the table at Scenarios C32: =C24 in the corner, then the tickets 12 to 16 across D32:H32."
+ch4-data-table,goal,1,"Type the member shares down C33:C37: 40, 45, 50, 55 and 60, which the format reads as percentages."
+ch4-data-table,goal,2,"Select C32:H37 and press Alt, A, W, T: Row input cell G6, Column input cell G7."
+ch4-data-table,goal,3,"Mark the base case, $14 and 50%, in bold in F35."
+ch4-data-table,end,0,"C32:H37 is a Data Table of EBITDA on G6 and G7, every value tied to the model"
+ch4-goal-seek,goal,0,Goal Seek Scenarios C44 to 0 by changing C43: Domain’s break-even washes a day.
+ch4-goal-seek,goal,1,Type AUS-MUE in C40 and Goal Seek again: Mueller’s break-even lands in C43.
+ch4-goal-seek,goal,2,"Then Airport: AUS-AIR in C40, and Goal Seek C44 to 0 once more."
+ch4-goal-seek,end,0,C43 holds Airport’s break-even washes a day and C44 reads zero
+ch4-name-it,goal,0,"Name the case number in Scenarios C11 Case, with Alt, M, M, D."
+ch4-name-it,goal,1,Name the ticket in Inputs C15 Ticket and the cost per wash in Inputs C5 Cost_Per_Wash.
+ch4-name-it,goal,2,"Rewrite the live column, Scenarios G5:G8, to read Case in place of $C$11."
+ch4-name-it,goal,3,"Point the check in C58 at Case too: =ROUND(INDEX($D$54:$F$54,Case)-C24,0)."
+ch4-name-it,goal,4,"Jump to the ticket by its name: Ctrl+G, type Ticket and press Enter."
+ch4-name-it,end,0,"Case, Ticket and Cost_Per_Wash point at the switch and the two inputs"
+ch4-name-it,end,1,"The live column and the check read Case, not $C$11"
+ch4-cube-it,goal,0,"Fill the washes cube, Summary C15:E20, with one SUMIFS on Export by the site in column B and the week in row 14."
+ch4-cube-it,goal,1,"Total it: F15:F20 across each site, then C21:F21 down each week."
+ch4-cube-it,goal,2,"Fill the revenue cube, C25:E30, the same way on the retail revenue in Export column F."
+ch4-cube-it,goal,3,"Total it: F25:F30 across, then C31:F31 down."
+ch4-cube-it,goal,4,"Tie each cube to the export in C72:C73: its grand total less the SUM of its Export column, reading 0."
+ch4-cube-it,end,0,"Every cell of both cubes ties to the export, and the checks in C72:C77 read zero"
+ch4-six-tabs,goal,0,"From Domain A2, group the six site tabs (Ctrl+Shift+PgDn five times) and type the units line Summary carries, once."
+ch4-six-tabs,goal,1,"Still grouped, the check block once: Checks in B12, its label in B13 and =F7-F5-F6 in C13."
+ch4-six-tabs,goal,2,"Leave the group with Ctrl+PgUp, then fix the title in Mueller A1 on that tab alone."
+ch4-six-tabs,end,0,"All six tabs carry the units line and the check block, and no sheets are left grouped"
+ch4-six-tabs,end,1,Mueller’s title is right and the other five titles are as they were
+ch4-two-pickers,goal,0,"In Summary C38, the washes for the site in C34 and the week in C35: INDEX on the cube with two MATCHes."
+ch4-two-pickers,goal,1,"Insert a row inside the cube at row 17 (Shift+Space, Ctrl+Shift+=): the answer holds, the colleague’s moves."
+ch4-two-pickers,goal,2,"Insert a column inside the weeks at D (Ctrl+Space, Ctrl+Shift+=): the answer still reads the right washes."
+ch4-two-pickers,end,0,"The answer reads the cube for the picked site and week after both inserts, with no typed position"
+puzzle-ch4,goal,0,"In Summary C80:C82, the site code, the date and the washes the export is missing."
+puzzle-ch4,end,0,The missing washes are found and put on the right site and day
+ch5-statement-link,goal,0,Start the cash flow with net income: =IS!C31 into CF C6:J6 with Ctrl+Enter.
+ch5-statement-link,goal,1,Land closing cash on the BS: =CF!C30 into BS C6:J6 with Ctrl+Enter.
+ch5-statement-link,goal,2,Add net income to equity: =IS!C31 into BS C22:J22 with Ctrl+Enter.
+ch5-statement-link,end,0,The three links are the finished model’s and the balance and cash checks read 0 in every year
+ch5-schedule-fill,goal,0,Fill the capex lines right: select E61:J63 on Schedules and press Ctrl+R.
+ch5-schedule-fill,goal,1,"Fill depreciation right from E64 to J64, so each year reads its own waterfall total."
+ch5-schedule-fill,goal,2,"Fill opening PP&E E60:J60 and closing PP&E E65:J65 right, so each closing feeds the next year’s opening."
+ch5-schedule-fill,goal,3,Fill the capex to depreciation memo E66:J66 right.
+ch5-schedule-fill,goal,4,Give the memo E66:J66 the custom format 0.0x through Ctrl+1.
+ch5-schedule-fill,end,0,"The PP&E roll on Schedules is the finished model’s from FY27 to FY31, and the memo reads in 0.0x"
+ch5-balance-it,goal,0,"Find the earliest year the balance check on Checks row 6 is not 0, and land on that cell."
+ch5-balance-it,goal,1,"Fix total liabilities on BS C18:J18 so it adds every liability, the delayed-draw loan in row 16 included."
+ch5-balance-it,end,0,"Total liabilities reads every liability, the balance check reads 0 in every year, and nothing else on the BS has moved"
+ch5-discount-it,goal,0,"The periods in DCF C20:J20, mid-year when Inputs C97 is 1: =IF(Inputs!C$6=1,Inputs!C$8-IF(Inputs!$C$97=1,0.5,0),0) with Ctrl+Enter."
+ch5-discount-it,goal,1,"The discount factors in C21:J21: =IF(Inputs!C$6=1,1/(1+WACC)^C20,0) with Ctrl+Enter."
+ch5-discount-it,goal,2,"The present values in C22:J22, free cash flow times the factor, and their sum in C23."
+ch5-discount-it,goal,3,"Prove the factors: the end-year sum in C24 as =NPV(WACC,F16:J16), so the check on Checks C27 reads 0."
+ch5-discount-it,end,0,The discounting on DCF is the finished model’s and the NPV check reads 0
+ch5-sweep,goal,0,"The draw in Schedules C101:J101, any shortfall under the minimum cash: =IF(Inputs!C$6=0,0,MAX(C100-C99,0))."
+ch5-sweep,goal,1,"The repayment in C102:J102, any surplus over the minimum up to the balance: =IF(Inputs!C$6=0,0,-MIN(MAX(C99-C100,0),C98))."
+ch5-sweep,goal,2,"Run FY28 short: type 18 new sites into Inputs G21, and the revolver draws in FY28 and repays in FY31."
+ch5-sweep,end,0,The sweep is the finished model’s under the stress: the revolver never below zero and cash never under the minimum
+ch5-checks,goal,0,"Label Checks B6 Balance sheet balances and enter =ROUND(BS!C10-BS!C25,2) into C6:J6 with Ctrl+Enter."
+ch5-checks,goal,1,"Label B7 BS cash equals CF closing cash and enter =ROUND(BS!C6-CF!C30,2) into C7:J7."
+ch5-checks,goal,2,"Label B8 Debt schedule closing equals BS debt and enter =ROUND(Schedules!C109-(BS!C15+BS!C16+BS!C17),2) into C8:J8."
+ch5-checks,goal,3,"Give the three checks C6:J8 the desk number format through Ctrl+1, so a zero shows as a dash."
+ch5-checks,end,0,"The three checks are labeled, live, read 0 in every year and carry the number format"
+ch5-revenue-build,goal,0,"Select the rollout C6:J9 on Schedules and press Ctrl+R, so FY25 to FY31 take each row’s FY24 formula."
+ch5-revenue-build,goal,1,"Type =AVERAGE(C6,C9) into C10:J10 with Ctrl+Enter, then fill the washes C15:J15 right with Ctrl+R."
+ch5-revenue-build,goal,2,"Fill the ticket, its growth and retail revenue right in one press: select C20:J22 and press Ctrl+R."
+ch5-revenue-build,goal,3,"Type =C19/(Inputs!C45*12) into C23:J23, pressing F4 right after C45, then fill membership revenue C24:J24 right."
+ch5-revenue-build,goal,4,"Total revenue in C26:J26: =C22+C24+C25 with Ctrl+Enter, the three revenue lines and not the member count between them."
+ch5-revenue-build,goal,5,"Give the rollout C6:J9 the desk number format in Ctrl+1’s Custom box, then select the washes C15:J15 and press F4."
+ch5-revenue-build,end,0,"The rollout and revenue build on Schedules C6:J26 is the finished model’s, every row one formula"
+ch5-revenue-build,end,1,The rollout and the washes carry the desk number format
+puzzle-ch5,goal,0,"Find the cell that throws the BS out from FY28 and put it back as a link, so Checks row 6 reads 0 in every year."
+puzzle-ch5,end,0,"The source cell is a link again, the balance check reads 0 in every year, and nothing else has moved"
+ch5-is-it-revenue,goal,0,Class the first three lines as Revenue with the drop-downs in D5:D7: Alt+↓ opens one.
+ch5-is-it-revenue,goal,1,The insurance payout and the interest are Other income: pick it in D8:D9.
+ch5-is-it-revenue,goal,2,"The settlement, the loan and the fees billed ahead are Not income: pick it in D10:D12."
+ch5-is-it-revenue,goal,3,Total revenue in C14 with SUMIF on the classes in D.
+ch5-is-it-revenue,goal,4,Total other income in C15 the same way.
+ch5-is-it-revenue,why,0,"A total doesn’t follow the classes: SUMIF on D, so a changed pick moves it."
+ch5-four-rungs,goal,0,"Build cash from operations in C11 for the all cash month, from the five lines above it."
+ch5-four-rungs,goal,1,"Fill it right into D11, the month that charges depreciation."
+ch5-four-rungs,goal,2,"Fill it on into E11, the month with three days of card sales not yet settled."
+ch5-four-rungs,goal,3,"Fill it on into F11, with chemicals on thirty days and member fees collected ahead."
+ch5-four-rungs,end,0,"Every rung takes the rise in receivables off and adds the two liabilities, and moves with each of its lines"
+ch5-two-balance-sheets,goal,0,"Write the operating lines in E20:E25: net income and depreciation, each working capital change with its sign, the subtotal."
+ch5-two-balance-sheets,goal,1,Back capex out in E26 from the PP&E movement and the depreciation.
+ch5-two-balance-sheets,goal,2,"Take debt repaid in E27 from the debt movement, and distributions in E28 from the equity roll."
+ch5-two-balance-sheets,goal,3,"Total the net change in cash in E29, then check it in C32 against the change in the cash line."
+ch5-two-balance-sheets,end,0,"Every line of the cash flow is a formula on the two balance sheets, and the check reads 0"
+ch5-two-landings,goal,0,Pick the two lines that move for the card washes in D5 and E5.
+ch5-two-landings,goal,1,Pick the two lines that move for the chemicals on credit in D6 and E6.
+ch5-two-landings,goal,2,Pick the two lines that move for payroll in D7 and E7.
+ch5-two-landings,goal,3,Pick the two lines that move for the loan interest in D8 and E8.
+ch5-two-landings,goal,4,Pick the two lines that move for the principal repaid in D9 and E9.
+ch5-two-landings,goal,5,Pick the two lines that move for a week of wear in D10 and E10.
+ch5-two-landings,goal,6,Pick the two lines that move for the new equipment in D11 and E11.
+ch5-two-landings,goal,7,"Land on the check in C25, which reads 0 with every event placed."
+ch5-two-landings,end,0,All fourteen picks are right and the balance sheet balances
+ch5-name-the-driver,goal,0,Pick the line that drives card receivables in E5.
+ch5-name-the-driver,goal,1,Pick the line that drives chemical payables in E6.
+ch5-name-the-driver,goal,2,Pick the line that drives deferred membership revenue in E7.
+ch5-name-the-driver,goal,3,Pick the line that drives accrued payroll in E8.
+ch5-name-the-driver,goal,4,Pick the line that drives prepaid insurance in E9.
+ch5-name-the-driver,goal,5,Pick the line that drives tax payable in E10.
+ch5-name-the-driver,end,0,Every balance is matched to the line that drives it
+ch5-dep-waterfall,goal,0,"Fill Schedules C71:J75 from one formula: each year’s capex in row 63 over the life in Inputs C63, from the year after."
+ch5-dep-waterfall,goal,1,Run off the FY26 base in Schedules C70:J70: net PP&E in E65 over the remaining life in Inputs C65.
+ch5-dep-waterfall,goal,2,"Total the waterfall in Schedules C76:J76, the base and the five vintages summed down."
+ch5-dep-waterfall,goal,3,Put capex over depreciation in Schedules C66:J66 and give it the 0.0x format through Ctrl+1.
+ch5-dep-waterfall,end,0,"The waterfall and the memo are the finished model’s, they move with the lives on Inputs, and the ratio reads in 0.0x"
+ch5-breaker,goal,0,"Set the breaker, Circ in Inputs C81, to 0 so the error stops feeding round the circle."
+ch5-breaker,goal,1,"Refill the interest in Schedules G84 from F84, its neighbor on the left."
+ch5-breaker,goal,2,"Set Circ in Inputs C81 back to 1, so interest reads the average balance again."
+ch5-breaker,goal,3,"Go to the error count on Checks C30 and read it down to C35, where every sheet reads 0."
+ch5-breaker,end,0,"The interest row is one formula across, Circ reads 1, no sheet holds an error and the balance check reads 0"
+ch5-circle-hunt,goal,0,"Find the site-cost total on Schedules whose SUM runs through its own cell, and land on it."
+ch5-circle-hunt,goal,1,"Stop the SUM in Schedules G38 at row 37, so the site costs add G32:G37 and not themselves."
+ch5-circle-hunt,goal,2,"Go to the balance check on Checks C6, which reads 0 in every year with Circ still at 1."
+ch5-circle-hunt,end,0,"No site-cost total reads its own cell, the totals are the finished model’s, and Circ and iteration are still on"
+ch5-normalize-the-year,goal,0,"Carry FY31 into the Normalized column, DCF K8:K12: EBITDA and depreciation from J, then EBIT, tax and NOPAT."
+ch5-normalize-the-year,goal,1,"Set capex equal to depreciation in DCF K13:K14: depreciation added back in K13, capex in K14 as its negative."
+ch5-normalize-the-year,goal,2,"Link the steady working-capital figure in Inputs C98 into DCF K15, then free cash flow in K16."
+ch5-normalize-the-year,goal,3,Repoint the perpetuity in DCF C27 from the raw FY31 cash flow in J16 to the normalized one in K16.
+ch5-normalize-the-year,end,0,"The normalized column is the finished model’s, the perpetuity reads it, and the raw FY31 column has not moved"
+ch5-dcf-read-back,goal,0,"Put the forecast years’ share of enterprise value in DCF C46: the PVs in C23 over C42, as a percentage."
+ch5-dcf-read-back,goal,1,"Put the terminal value’s share in DCF C45 as a percentage, so C45 and C46 add to 100%."
+ch5-dcf-read-back,goal,2,"Fill DCF E47:F47 from one formula, enterprise value in $C$42 over each year’s EBITDA in row 8, in the 0.0x format."
+ch5-dcf-read-back,end,0,"The two shares add to 100% and move with the exit multiple, and the multiples anchor enterprise value and read in 0.0x"
+ch6-spread-a-comp,goal,0,"Comps E7: the market cap, the share price in C7 times the shares in D7."
+ch6-spread-a-comp,goal,1,"Comps H7: enterprise value, the market cap plus debt in F7 less cash in G7."
+ch6-spread-a-comp,goal,2,Comps K7 and L7: enterprise value over LTM revenue in I7 and over LTM EBITDA in J7.
+ch6-spread-a-comp,goal,3,"Comps M7 and Q7: the EBITDA margin, and net debt over EBITDA, below zero for a net cash operator."
+ch6-spread-a-comp,end,0,Summit’s line ties to the pack and its multiple moves with the share price
+ch6-median-and-range,goal,0,"Type 1 in Comps N5:N10 for each peer, and 0 in N9 for Harbor Clean Group, whose note in AB9 says why."
+ch6-median-and-range,goal,1,"Fill Comps O5:O10 with each EV / EBITDA in column L where the flag is 1, and blank text where it is 0."
+ch6-median-and-range,goal,2,"Take the median, mean, 25th and 75th percentiles, minimum and maximum of O5:O10 in Comps O11:O16."
+ch6-median-and-range,goal,3,"Link the low, median and high into Comps C44:E44 and apply each to Clearcoat’s LTM EBITDA in J17, in row 45."
+ch6-median-and-range,end,0,The range reads only the included peers and moves when a flag does
+ch6-sources-and-uses,goal,0,"LBO C35:C39: net debt repaid, the equity purchased, enterprise value, the fees on it and total uses."
+ch6-sources-and-uses,goal,1,"LBO C40:C43: the senior loan and the mezzanine on EBITDA, the owners’ rollover, and the sponsor’s equity as the plug."
+ch6-sources-and-uses,goal,2,"LBO C44:C45: total sources, and sources less uses rounded to read 0."
+ch6-sources-and-uses,goal,3,"LBO C46:C48: equity as a share of the price, debt over EBITDA, and the rolled stake’s share of the new equity."
+ch6-sources-and-uses,end,0,"Sources equal uses as a live check, the sponsor’s equity the plug"
+ch6-irr-sprint,goal,0,"LBO C102:C104: exit enterprise value on FY31 adjusted EBITDA, less net debt at the exit, equity at the exit."
+ch6-irr-sprint,goal,1,"LBO C105:C106: equity at entry, the sponsor and the rollover, and MOIC as equity out over equity in."
+ch6-irr-sprint,goal,2,"LBO C107:H107: the equity in at closing as a negative, and the exit equity in the year the hold ends."
+ch6-irr-sprint,goal,3,LBO C108: IRR on the equity cash flows in row 107.
+ch6-irr-sprint,goal,4,"LBO C109:C110: IRR by hand with RRI over the hold, and the difference rounded to read 0."
+ch6-irr-sprint,end,0,"IRR and MOIC tie to the pack, the hand check agrees, and IRR moves with the exit multiple"
+ch6-waterfall,goal,0,"Bids C30:E32: each bid’s priced value from row 18, less net debt at closing up to that value, and the equity left."
+ch6-waterfall,goal,1,"Bids C33:E34: the fees on enterprise value, then the option pool above the strike, each no more than what is left."
+ch6-waterfall,goal,2,"Bids C35:E35: the owners’ net proceeds, equity less the fees and the pool."
+ch6-waterfall,goal,3,"Bids C36:E38: each owner’s share of the proceeds, from the stakes in C54:C56."
+ch6-waterfall,goal,4,"Bids C39:E39: the owners’ lines less the proceeds, rounded to read 0."
+ch6-waterfall,end,0,"Every line links to the one above and the owners’ line ties, moving with the fee"
+ch6-football-field,goal,0,Summary C9:E10: the comps range from Comps row 45 and the precedents range from Precedents row 38.
+ch6-football-field,goal,1,"Summary C11:E11: the low and high of the DCF grid in DCF D77:H81, and the DCF’s value in C42 as the mid."
+ch6-football-field,goal,2,"Summary C12:E12: what the sponsor can pay at the three hurdles, from LBO row 146."
+ch6-football-field,goal,3,"Summary C13:E15: each bid’s expected, priced and headline value, from Bids rows 22, 18 and 6."
+ch6-football-field,goal,4,"Summary F9:F15: each line’s mid over the DCF’s mid in D11, anchored."
+ch6-football-field,end,0,"Every low, mid and high links to its method’s page, and the bids move with the earnout odds"
+ch6-paper-lbo,goal,0,"LBO C31:C45: the sale-leaseback lines, then sources and uses with the sponsor’s equity the plug, until C45 reads 0."
+ch6-paper-lbo,goal,1,"LBO C97:H98: net debt in each year, and how much of it has been paid down since closing."
+ch6-paper-lbo,goal,2,"LBO C102:C106: exit enterprise value, net debt at the exit, exit equity, equity at entry and MOIC."
+ch6-paper-lbo,goal,3,"LBO C107:H110: the equity cash flows, IRR on them, IRR by hand with RRI, and the difference at 0."
+ch6-paper-lbo,end,0,"Sources and uses tie, the debt paydown ties, and exit equity and IRR land on the finished figures, IRR moving with the exit multiple"
+ch6-three-ways-to-a-price,goal,0,"Comps D45, D47 and D49: each median multiple above times Clearcoat’s EBITDA, sites and washes in row 17."
+ch6-three-ways-to-a-price,goal,1,D51:D53: each of the three enterprise values less the net debt in D50.
+ch6-three-ways-to-a-price,goal,2,"C59:E61: each bid in row 58 over each equity value in D51:D53, less one, from one formula filled both ways."
+ch6-three-ways-to-a-price,end,0,"The three implied values tie, and the grid moves with the bids and with the multiples"
+ch6-ltm-two-ways,goal,0,Comps P21:P26: LTM EBITDA as a SUMIFS over the quarters dated after C30 and up to the LTM date in C29.
+ch6-ltm-two-ways,goal,1,"R21: Pinnacle from its filings, the fiscal year in K plus 2026’s two quarters less 2025’s."
+ch6-ltm-two-ways,goal,2,"R22 and R24: Riverbend and Meridian, March year-ends, the fiscal year in L plus June’s quarter less last June’s."
+ch6-ltm-two-ways,goal,3,"S21, S22 and S24: each filings figure less its SUMIFS, rounded, reading 0."
+ch6-ltm-two-ways,end,0,"Both routes tie for all three operators, and the SUMIFS moves with the LTM date"
+ch6-napkin,goal,0,"LBO C160:C162: the price, the fees on it, and total uses."
+ch6-napkin,goal,1,"C163:C165: the debt at its multiple of EBITDA, the equity as what is left, and sources less uses at 0."
+ch6-napkin,goal,2,"C166:C168: exit enterprise value, exit equity after the debt left in C157, and MOIC."
+ch6-napkin,goal,3,"C169:C171: the annual return by the power and by RRI, and their difference at 0."
+ch6-napkin,end,0,"The napkin ties, its two returns agree, and the return moves with the bid"
+ch6-cap-the-amort,goal,0,Type 40% in LBO C12 and watch the senior loan’s closing balance in row 75 go below zero.
+ch6-cap-the-amort,goal,1,"Cap D73:H73 with MIN against the opening balance in row 72, so no closing balance in row 75 goes below zero."
+ch6-cap-the-amort,goal,2,Put the term sheet’s 5% back in C12.
+ch6-cap-the-amort,end,0,"The amortization is capped at the opening balance, at 5% and at 40%, and no balance goes below zero"
+ch6-lenders-return,goal,0,"LBO C117: the senior loan going out at closing, as a negative of the balance in C75."
+ch6-lenders-return,goal,1,"LBO D117:H117: interest, amortization and sweep coming back each year, plus the balance repaid in the hold’s last year."
+ch6-lenders-return,goal,2,"LBO C118: IRR on C117:H117, within half a point of the senior rate in C11."
+ch6-lenders-return,end,0,The lender’s line ties to the schedule and its IRR sits by the rate and moves with it
+ch6-ceiling-price,goal,0,"LBO C145:E145: the most equity that still earns each hurdle in row 144, the PV of the exit equity over the hold."
+ch6-ceiling-price,goal,1,"C146:E146: the top enterprise value, that equity plus both tranches of debt, over one plus the fees."
+ch6-ceiling-price,goal,2,C147:E147: each top price as a multiple of FY26E EBITDA in C6.
+ch6-ceiling-price,goal,3,"C148:E148: each top price less the bid in C7, the room above it."
+ch6-ceiling-price,end,0,"Every line ties to the LBO, and the ceiling moves when a hurdle does"
+puzzle-ch6,goal,0,"Rank the bids in Bids C28:E28 on the owners’ proceeds in row 35, 1 for the highest."
+puzzle-ch6,end,0,Each rank reads the waterfall’s proceeds line and ranks the bids on it

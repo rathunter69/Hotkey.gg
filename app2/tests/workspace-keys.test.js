@@ -7,7 +7,7 @@ import assert from 'node:assert/strict';
 import { Sheet } from '../engine/sheet.js';
 import { Session } from '../engine/keyboard.js';
 import { sheetKeys, isExitKey, EXIT_KEY, noteSheetKey } from '../ui/components/chrome.js';
-import { alternates, offRoute, tryLine, worksToo, worksTooLine, routeTokens } from '../ui/components/task-card.js';
+import { alternates, offRoute, tryLine, worksToo, followed, worksTooLine, routeTokens } from '../ui/components/task-card.js';
 import { beaconPlace } from '../ui/components/sheet-marks.js';
 import { veilSwallows } from '../ui/components/focus-veil.js';
 import { MOMENTS } from '../ui/effects.js';
@@ -103,6 +103,13 @@ test('tryLine and worksToo: the gentle lines', () => {
   assert.equal(worksToo(route, [], ['↓', '↓', '↓', '↓', '↓', 'Ctrl+↓']), false, 'the route shown');
   assert.equal(worksToo(routeTokens('Ctrl+Shift+='), [routeTokens('Alt H I C')], ['Alt', 'H', 'I', 'C']), false, 'an alternate the card showed');
   assert.equal(worksToo(route, [], []), false);
+  // the keys shown, as the session logs them, are never "another route" (R8: 6.4.4 said so)
+  assert.equal(worksToo(routeTokens('Ctrl+G "lbo!c146" ↵'), [], ['Ctrl+G', 'L', 'B', 'O', '!', 'C', '1', '4', '6', '↵']), false, 'Go To logs typed letters as capitals');
+  assert.equal(worksToo(routeTokens('Ctrl+Shift+$'), [], ['Ctrl+Shift+4']), false, 'a shifted symbol logs as its digit');
+  assert.equal(worksToo(routeTokens('Alt+H'), [], ['Alt', 'H']), false, 'Alt+H logs as Alt then H');
+  assert.equal(worksToo(routeTokens('F2 Home → → ↵'), [], ['F2', '↵']), false, 'caret moves in an edit are not logged');
+  assert.equal(followed(routeTokens('↑ ↑ F2 Esc'), ['↑', '↑', '↑', 'F2', 'Esc']), true, 'an extra arrow of the learner own');
+  assert.equal(followed(routeTokens('Ctrl+B'), ['Ctrl+I']), false);
   assert.match(worksTooLine(route, 'win'), /^That works too\. .*↓ ↓ ↓ ↓ ↓ Ctrl\+↓\.$/);
   for (const k of ['card_live_try', 'card_live_works', 'card_also_works']) assert.ok(COPY.site[k], k);
 });

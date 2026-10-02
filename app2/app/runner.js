@@ -7,8 +7,10 @@ import { CalcGraph, sheetId } from '../engine/calc.js';
 import { Session, parseKeyScript, parseKeySpec } from '../engine/keyboard.js';
 import { stepPath } from '../engine/ribbon.js';
 import { WORKBOOKS, workbookState, applyStatePatch } from '../content/workbooks/index.js';
+import { unclip } from '../content/workbooks/unclip.js';
 import { mulberry32 } from '../engine/rng.js';
 import { SEEDED_KINDS } from '../content/schema.js';
+import { siteCopy } from '../content/copy/apply.js';
 
 export class LessonRun {
   /**
@@ -59,6 +61,8 @@ export class LessonRun {
     if (moduleState && this.lesson.plant && typeof this.lesson.plant === 'object') applyStatePatch(moduleState, this.lesson.plant);
     // a test's or a Daily's patch: { '<Sheet>!<ref>': cellRecord | null, '<Sheet>!#colW': {…} } applied over `before`
     if (moduleState && this.opts.statePatch) applyStatePatch(moduleState, this.opts.statePatch);
+    // the fit (R8) over what was planted too, so a planted header wraps as the finished page does
+    if (moduleState) unclip(this.lesson.workbook, moduleState);
     const spec = moduleState ? moduleState.sheets[0] : this.lesson.sheet || {};
     const first = build(spec);
     this.session = new Session(first, { onKey: this.opts.onKey, onToast: this.opts.onToast, onRefuse: this.opts.onRefuse, now: this.opts.now, onMouse: this.opts.onMouse });
@@ -289,8 +293,8 @@ export class LessonRun {
     // M84: a what-if over the answer block, judged against the reference route under the same change
     if (this.lesson.whatIf && !this.opts.noWhatIf) fns.push(ses => whatIf(ses, this.referenceSession(), this.lesson.whatIf));
     return fns.map(fn => {
-      try { const r = fn(this.session); return { ok: !!(r && r.ok), why: (r && r.why) || 'a convention check failed' }; }
-      catch (e) { return { ok: false, why: 'a convention check failed' }; }
+      try { const r = fn(this.session); return { ok: !!(r && r.ok), why: (r && r.why) || siteCopy('grade_check_failed', 'a convention check failed') }; }
+      catch (e) { return { ok: false, why: siteCopy('grade_check_failed', 'a convention check failed') }; }
     });
   }
   /**

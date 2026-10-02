@@ -18,6 +18,7 @@ import { prefs } from './prefs.js';
 import { auth } from './auth.js';
 import { applyTheme, saveTheme, currentTheme } from '../ui/themes.js';
 import { track } from './telemetry.js';
+import { siteCopy } from '../content/copy/apply.js';
 
 export const CACHE_KEY = 'hk2_cache_v1';
 export const OUTBOX_KEY = 'hk2_outbox_v1';
@@ -207,6 +208,7 @@ async function sendOne(sb, t, rpc, args) {
     if (isAuthError(error, status)) return 'auth';
     const msg = String(error.message || '');
     if (msg.includes('bad attempt')) return 'drop';
+    if (msg.includes('no access')) return 'drop';   // 0013: a paid chapter's run from an account that can't open it; retrying can't change that
     if (/does not exist|schema cache|PGRST202/i.test(msg)) return 'missing';
     return 'retry';
   } catch (e) {
@@ -498,13 +500,12 @@ export const store = {
       const { data, error } = await sb.rpc('rpc_board', { p_ref: ref, p_limit: limit, p_seed: seed == null ? null : seed });
       if (!auth.current(t) || error || !Array.isArray(data)) return null;
       const me = profile && profile.handle;
-      const v = { me: me || null, rows: data.map(r => ({ pos: Number(r.pos), handle: r.handle, level: r.level, secs: Number(r.secs), keys: r.keys, tier: r.tier, mine: !!me && r.handle === me })) };
+      // 0014: the server marks the caller's own row (pinned under the top rows when it sits lower) and the field's size; before it, the handle decides
+      const v = { me: me || null, field: data.length && data[0].field != null ? Number(data[0].field) : null, rows: data.map(r => ({ pos: Number(r.pos), handle: r.handle, level: r.level, secs: Number(r.secs), keys: r.keys, mine: typeof r.mine === 'boolean' ? r.mine : !!me && r.handle === me })) };
       boardCache.set(key, { at: Date.now(), v });
       return v;
     } catch (e) { return null; }
   },
-  /** Rank needs real boards (Phase B): every guest is Unranked, honestly. */
-  rank() { return null; },
 
   /* ---- learner state: prefs stays the read path; the store writes through ---- */
   skipped() { return prefs.get().skipped; },
@@ -530,12 +531,12 @@ export const store = {
   /** The §1 string for a state (nav and pages share one wording). */
   saveText(state) {
     const s = state || this.saveState();
-    return SAVE_TEXT[s] || SAVE_TEXT.device;
+    return siteCopy('save_state_' + (SAVE_TEXT[s] ? s : 'device'), SAVE_TEXT[s] || SAVE_TEXT.device);
   },
   /** The same state as a phrase after "Your progress is …" (landing, learn, home). */
   saveLine(state) {
     const s = state || this.saveState();
-    return SAVE_LINE[s] || SAVE_LINE.device;
+    return siteCopy('save_line_' + (SAVE_LINE[s] ? s : 'device'), SAVE_LINE[s] || SAVE_LINE.device);
   },
 
   /* ---- account ---- */
@@ -615,6 +616,7 @@ export const store = {
   pending() { return accountMode() ? readOutbox().length + readGameOutbox().length : 0; },
 };
 
+/** The save state's words: site.csv save_state_<state> and save_line_<state> (M1); these are the fallbacks. */
 const SAVE_TEXT = {
   device: 'Saved on this device',
   pending: 'Saving to your account…',

@@ -12,11 +12,13 @@
 //   { id, name, what, category, win, mac, lessonId,
 //     concept: the schema.js concept the shortcut belongs to (null when no lesson covers it),
 //     note: a muted aside ('Compact keyboards: Ctrl+Fn+←'), macNote: the Mac caveat ('' when none),
-//     addin: 'Macabacus' | 'FactSet' | null }
-// lessonId is derived: the first lesson in the catalogue whose `concepts` list the entry's concept.
-// When a later chapter teaches a concept, the link appears here without touching this file.
+//     addin: 'Macabacus' | 'FactSet' | null,
+//     native rows also: group, chapter, ribbon, legacy, alternatives (from content/keys.csv) }
+// lessonId is the lesson the keys sheet names; a row that names none takes the first lesson in the
+// catalogue whose `concepts` list the entry's concept.
 
 import { LESSONS } from './index.js';
+import { KEYS } from './keys.js';
 
 /* ---------- chord notation ---------- */
 
@@ -108,128 +110,10 @@ export const lessonForConcept = concept => (concept && LESSON_BY_CONCEPT[concept
 
 /* ---------- the reference ---------- */
 
-const R = (id, win, name, what, extra = {}) => ({ id, win, name, what, ...extra });
-
-const NATIVE = [
-  ['Navigation', [
-    R('arrow-keys', '↑/↓/←/→', 'Move one cell', 'Move the active cell one cell up, down, left or right.', { concept: 'arrow-keys' }),
-    R('ctrl-arrow', 'Ctrl+↑/↓/←/→', 'Jump to the edge of the data', 'Jump to the edge of the data region.', { concept: 'ctrl-arrow' }),
-    R('home', 'Home', 'Start of the row', 'Move to column A of the current row.', { concept: 'home-key' }),
-    R('ctrl-home', 'Ctrl+Home', 'Go to A1', 'Go to A1, the top-left cell.', { concept: 'ctrl-home-end', note: 'Compact keyboards: Ctrl+Fn+←' }),
-    R('ctrl-end', 'Ctrl+End', 'Go to the last used cell', 'Go to the last used cell of the worksheet.', { concept: 'ctrl-home-end', note: 'Compact keyboards: Ctrl+Fn+→' }),
-    R('tab-move', 'Tab', 'Move right', 'Move right (Shift+Tab to move left).', { concept: 'enter-tab-move' }),
-    R('enter-move', 'Enter', 'Move down', 'Move down (Shift+Enter to move up).', { concept: 'enter-tab-move' }),
-    R('page-up-down', 'PageUp/PageDown', 'Scroll one screen', 'Scroll one screen up or down.', { note: 'Compact keyboards: Fn+↑ / Fn+↓' }),
-    R('ctrl-page-up-down', 'Ctrl+PageUp/PageDown', 'Previous / next worksheet', 'Move to the previous or next worksheet.', { concept: 'sheet-tabs', note: 'Compact keyboards: Ctrl+Fn+↑ / Ctrl+Fn+↓' }),
-    R('ctrl-g', 'Ctrl+G', 'Go To', 'Open Go To: type a cell or range reference and press Enter to jump there. F5 does the same.', { concept: 'go-to' }),
-  ]],
-  ['Selection', [
-    R('shift-arrow', 'Shift+↑/↓/←/→', 'Extend the selection one cell', 'Extend the selection one cell at a time.', { concept: 'shift-arrow' }),
-    R('ctrl-shift-arrow', 'Ctrl+Shift+↑/↓/←/→', 'Extend to the edge of the data', 'Extend the selection to the edge of the data region.', { concept: 'ctrl-shift-arrow' }),
-    R('shift-space', 'Shift+Space', 'Select the entire row', 'Select the entire row of the active cell.', { concept: 'row-col-select' }),
-    R('ctrl-space', 'Ctrl+Space', 'Select the entire column', 'Select the entire column of the active cell.', { concept: 'row-col-select' }),
-    R('ctrl-shift-space', 'Ctrl+Shift+Space', 'Select the current region', 'Select the current region: the whole table under the cursor.'),
-    R('ctrl-a', 'Ctrl+A', 'Select the current region, then the whole sheet', 'Select the current region; press again for the whole sheet.', { concept: 'ctrl-a' }),
-    R('ctrl-shift-end', 'Ctrl+Shift+End', 'Select to the last used cell', 'Select from here to the last used cell.', { note: 'Compact keyboards: Ctrl+Shift+Fn+→' }),
-  ]],
-  ['Editing', [
-    R('f2-edit', 'F2', 'Edit the active cell', 'Edit the active cell with the insertion point at the end.', { concept: 'edit-mode-f2' }),
-    R('ctrl-enter', 'Ctrl+Enter', 'Commit into every selected cell', 'Commit the edit into every selected cell; formulas translate per cell.'),
-    R('equals', '=', 'Start a formula', 'Start a formula in the active cell.'),
-    R('enter-commit', 'Enter', 'Commit and move down', 'Confirm the entry and move down.', { concept: 'enter-commits' }),
-    R('tab-commit', 'Tab', 'Commit and move right', 'Confirm the entry and move right.', { concept: 'tab-commits' }),
-    R('esc-cancel', 'Esc', 'Cancel the edit', 'Cancel the edit and keep the previous contents.', { concept: 'escape-cancels' }),
-    R('delete-clear', 'Delete', 'Clear cell contents', 'Clear the contents of the selected cells.', { concept: 'delete-clears' }),
-    R('alt-enter', 'Alt+Enter', 'Line break inside a cell', 'Start a new line inside the cell while editing.'),
-    R('f4-refs', 'F4', 'Cycle absolute / relative references', 'Cycle absolute / relative references ($) while editing a formula.'),
-  ]],
-  ['Ribbon', [
-    R('alt-keytips', 'Alt', 'Show KeyTips', 'Show KeyTips on the Ribbon; the letters choose a tab, then a command.', { concept: 'keytips' }),
-    R('alt-h', 'Alt H', 'Home tab', 'Open the Home tab, which holds the everyday formatting commands.', { concept: 'home-tab' }),
-    R('esc-ribbon', 'Esc', 'Back out of the Ribbon', 'Back out of the Ribbon one level at a time.', { concept: 'escape-backs-out' }),
-  ]],
-  ['Formatting', [
-    R('ctrl-b', 'Ctrl+B', 'Bold', 'Make the selected cells bold.', { concept: 'bold-command' }),
-    R('alt-h-1', 'Alt H 1', 'Bold (Ribbon)', 'Bold from the Ribbon: Home tab, then 1.', { concept: 'bold-command' }),
-    R('ctrl-i', 'Ctrl+I', 'Italic', 'Make the selected cells italic.'),
-    R('ctrl-u', 'Ctrl+U', 'Underline', 'Underline the selected cells.'),
-    R('ctrl-1', 'Ctrl+1', 'Format Cells dialog box', 'Open the Format Cells dialog box.', { concept: 'format-cells-dialog' }),
-    R('alt-h-o-e', 'Alt H O E', 'Format Cells (Ribbon)', 'Open the Format Cells dialog box from the Ribbon: Home, Format, Format Cells.', { concept: 'ribbon-route-dialog' }),
-    R('alt-w-v-g', 'Alt W V G', 'Gridlines', 'View tab: show or hide the gridlines.', { concept: 'gridlines' }),
-    R('alt-h-o-r', 'Alt H O R', 'Rename sheet', 'Home › Format › Rename Sheet: type the new name and press Enter.', { concept: 'rename-sheet' }),
-    R('alt-h-i-s', 'Alt H I S', 'Insert sheet', 'Home › Insert › Insert Sheet, the same as Shift+F11.', { concept: 'insert-sheet' }),
-    R('alt-h-d-s', 'Alt H D S', 'Delete sheet', 'Home › Delete › Delete Sheet; Excel asks first when the sheet holds anything.', { concept: 'delete-sheet' }),
-    R('alt-h-o-m', 'Alt H O M', 'Move or copy sheet', 'Home › Format › Move or Copy Sheet: pick the sheet it goes before, or move it to the end.', { concept: 'move-sheet' }),
-    R('alt-f-t', 'Alt F T', 'Excel Options', 'Open Excel Options from the File menu: calculation mode, iterative calculation, the Quick Access Toolbar.', { concept: 'excel-options' }),
-    R('alt-p-s-p', 'Alt P S P', 'Page Setup dialog box', 'Open Page Setup from the Page Layout tab: orientation and scaling.', { concept: 'page-setup' }),
-    R('alt-h-a-l', 'Alt H A L', 'Align left', 'Align the selected cells left.', { concept: 'align-command' }),
-    R('alt-h-a-c', 'Alt H A C', 'Center', 'Center the selected cells.', { concept: 'align-command' }),
-    R('alt-h-a-r', 'Alt H A R', 'Align right', 'Align the selected cells right.', { concept: 'align-command' }),
-    R('alt-h-h', 'Alt H H', 'Fill color', 'Fill (cell shading) color.'),
-    R('alt-h-f-c', 'Alt H F C', 'Font color', 'Font color: models colour inputs blue and formulas black.', { concept: 'font-color' }),
-  ]],
-  ['Borders', [
-    R('alt-h-b-o', 'Alt H B O', 'Bottom border', 'Put a border along the bottom of the selected cells.', { concept: 'borders-menu' }),
-    R('alt-h-b-p', 'Alt H B P', 'Top border', 'Put a border along the top of the selected cells.', { concept: 'borders-menu' }),
-    R('alt-h-b-a', 'Alt H B A', 'All borders', 'Put a border on every edge of every selected cell.', { concept: 'borders-menu' }),
-    R('alt-h-b-s', 'Alt H B S', 'Outside borders', 'Put a border around the outside of the selection.', { concept: 'borders-menu' }),
-    R('alt-h-b-t', 'Alt H B T', 'Thick box border', 'Put a thick border around the outside of the selection.', { concept: 'borders-menu' }),
-    R('alt-h-b-b', 'Alt H B B', 'Double bottom border', 'Double bottom border (grand total).', { concept: 'borders-menu' }),
-    R('alt-h-b-d', 'Alt H B D', 'Top and bottom border', 'Put a border along the top and the bottom of the selection.', { concept: 'borders-menu' }),
-    R('alt-h-b-n', 'Alt H B N', 'No border', 'Remove the borders from the selected cells.', { concept: 'borders-menu' }),
-  ]],
-  ['Number formats', [
-    R('ctrl-shift-dollar', 'Ctrl+Shift+$', 'Currency', 'Currency, 2 decimals.'),
-    R('ctrl-shift-percent', 'Ctrl+Shift+%', 'Percent', 'Percent, 0 decimals.'),
-    R('ctrl-shift-bang', 'Ctrl+Shift+!', 'Comma', 'Comma (thousands separator), 2 decimals.'),
-    R('ctrl-shift-tilde', 'Ctrl+Shift+~', 'General', 'General format.'),
-    R('ctrl-shift-hash', 'Ctrl+Shift+#', 'Date', 'Date format.'),
-    R('alt-h-0', 'Alt H 0', 'Add a decimal place', 'Show one more decimal place.'),
-    R('alt-h-9', 'Alt H 9', 'Remove a decimal place', 'Show one fewer decimal place.'),
-    R('alt-h-k', 'Alt H K', 'Comma style', 'Apply Comma Style from the Ribbon.'),
-  ]],
-  ['Formulas and fill', [
-    R('alt-equals', 'Alt+=', 'AutoSum', 'AutoSum the adjacent range.'),
-    R('ctrl-d', 'Ctrl+D', 'Fill down', 'Fill down from the cell above.'),
-    R('ctrl-r', 'Ctrl+R', 'Fill right', 'Fill right from the cell to the left.'),
-    R('f4-repeat', 'F4', 'Repeat the last action', 'Repeat the last action (when not editing).', { macVaries: true, concept: 'f4-repeat' }),
-    R('f9', 'F9', 'Recalculate', 'Recalculate all open workbooks (Calculate Now, when calculation is set to Manual).', { concept: 'calculate-now' }),
-    R('ctrl-backtick', 'Ctrl+`', 'Show formulas', 'Toggle between showing formulas and showing values.', { concept: 'show-formulas' }),
-  ]],
-  ['Copy and paste', [
-    R('ctrl-c', 'Ctrl+C', 'Copy', 'Copy the selected cells.'),
-    R('ctrl-x', 'Ctrl+X', 'Cut', 'Cut the selected cells.'),
-    R('ctrl-v', 'Ctrl+V', 'Paste', 'Paste at the active cell.'),
-    R('ctrl-alt-v', 'Ctrl+Alt+V', 'Paste Special dialog box', 'Open the Paste Special dialog box.'),
-    R('alt-e-s-v', 'Alt E S V', 'Paste values', 'Paste values only (legacy chain).'),
-    R('alt-h-v-s', 'Alt H V S', 'Paste Special (Ribbon)', 'Open Paste Special from the Ribbon.'),
-  ]],
-  ['Rows and columns', [
-    R('ctrl-shift-plus', 'Ctrl+Shift++', 'Insert rows / columns', 'Insert rows or columns. Select the whole row or column first (Shift+Space / Ctrl+Space).'),
-    R('ctrl-minus', 'Ctrl+-', 'Delete rows / columns', 'Delete rows or columns. Select the whole row or column first.'),
-    R('alt-h-o-i', 'Alt H O I', 'AutoFit column width', 'Fit the column width to its contents.'),
-    R('alt-h-o-a', 'Alt H O A', 'AutoFit row height', 'Fit the row height to its contents.'),
-    R('ctrl-9', 'Ctrl+9', 'Hide rows', 'Hide the selected rows (Ctrl+0 hides columns).'),
-    R('unhide-all-rows', 'Ctrl+A Alt H O U O', 'Unhide every row', 'Unhide every row: select all first, then Format, Hide & Unhide, Unhide Rows.'),
-  ]],
-  ['Data and outline', [
-    R('group', 'Shift+Alt+→', 'Group', 'Group the selected rows or columns into an outline.', { concept: 'group-ungroup' }),
-    R('ungroup', 'Shift+Alt+←', 'Ungroup', 'Ungroup the selected rows or columns.', { concept: 'group-ungroup' }),
-    R('alt-a-h', 'Alt A H', 'Hide detail', 'Hide (fold) the group detail.'),
-    R('alt-a-j', 'Alt A J', 'Show detail', 'Show the group detail.'),
-    R('ctrl-shift-l', 'Ctrl+Shift+L', 'AutoFilter', 'Toggle AutoFilter on the header row.'),
-    R('alt-down', 'Alt+↓', 'Open the filter picker', 'Open the filter value picker on a header cell.'),
-    R('alt-a-s-a', 'Alt A S A', 'Sort ascending', 'Sort ascending (Alt A S D for descending).'),
-  ]],
-  ['Workbook', [
-    R('ctrl-z', 'Ctrl+Z', 'Undo', 'Undo the last action.'),
-    R('ctrl-y', 'Ctrl+Y', 'Redo', 'Redo the last undone action.'),
-    R('ctrl-s', 'Ctrl+S', 'Save', 'Save the workbook.'),
-    R('ctrl-f', 'Ctrl+F', 'Find', 'Open Find.'),
-    R('ctrl-h', 'Ctrl+H', 'Find and replace', 'Open Find and Replace.'),
-    R('ctrl-p', 'Ctrl+P', 'Print', 'Print.'),
-  ]],
-];
+// The course's keys come from the keys sheet, content/keys.csv (M50; inlined as content/keys.js by
+// tests/copy-build.js): one row per key with its group, Windows key, Ribbon route, legacy route,
+// Mac key, taught-in lesson and accepted alternatives. Rows sit in category order.
+const NATIVE_ROWS = KEYS;
 
 // Add-in layers, as the old page listed them (from drills.js HOTKEY_PLUGIN_LAYERS): Windows-only
 // defaults, remappable in each vendor's shortcut manager. [chord, name, what]
@@ -287,6 +171,13 @@ const ADDINS = [
 const SLUG = { '+': '-', ' ': '-', '↑': 'up', '↓': 'down', '←': 'left', '→': 'right', ',': 'comma', '.': 'period', ';': 'semicolon', '=': 'equals', '-': 'minus', '[': 'lbracket', ']': 'rbracket', '/': '-' };
 const slug = chord => String(chord).split('').map(c => SLUG[c] !== undefined ? SLUG[c] : c.toLowerCase()).join('').replace(/-+/g, '-').replace(/^-|-$/g, '');
 
+/** A native row from the keys sheet: the lesson the sheet names, else the one that teaches its concept. */
+function native(k) {
+  const concept = k.concept || null;
+  return { id: k.id, name: k.command, what: k.what, category: k.category, group: k.group, win: k.win, mac: k.mac || macChord(k.win), macNote: k.mac ? k.mac_note : macNote(k.win), note: k.note || '', concept, addin: null,
+    lessonId: k.lesson || lessonForConcept(concept), chapter: Number(k.chapter) || null, ribbon: k.ribbon || '', legacy: k.legacy || '', alternatives: k.alternatives || '' };
+}
+
 function finish(category, r) {
   const addin = r.addin || null;
   let mac, note;
@@ -298,7 +189,7 @@ function finish(category, r) {
 }
 
 /** Category display order. */
-export const CATEGORIES = [...NATIVE.map(s => s[0]), ...ADDINS.map(s => s[0])];
+export const CATEGORIES = [...new Set(NATIVE_ROWS.map(k => k.category)), ...ADDINS.map(s => s[0])];
 
 /** Per-category notes (only the add-ins carry one). */
 export const CATEGORY_NOTES = Object.fromEntries(ADDINS.map(([name, note]) => [name, note]));
@@ -307,7 +198,7 @@ export const ADDIN_DISCLAIMER = 'Macabacus is a trademark of Macabacus Inc.; Fac
 
 /** The whole reference, in display order. */
 export const REFERENCE = [
-  ...NATIVE.flatMap(([category, rows]) => rows.map(r => finish(category, r))),
+  ...NATIVE_ROWS.map(native),
   ...ADDINS.flatMap(([name, , rows]) => rows.map(([win, label, what]) => finish(name, { id: `${name.toLowerCase()}-${slug(win)}`, win, name: label, what, addin: name }))),
 ];
 

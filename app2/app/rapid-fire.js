@@ -24,6 +24,7 @@ import { store } from './store.js';
 import { attemptId, dayOf } from './records.js';
 import { gameCtx, celebrate } from './stats.js';
 import { schedule, rapidOrder, RAPID_CONCEPT } from './schedule.js';
+import { keyStates } from './key-states.js';
 import { track } from './telemetry.js';
 import { siteCopy } from '../content/copy/apply.js';
 import { esc, fill, fmtClock } from '../ui/components/format.js';
@@ -292,6 +293,7 @@ export function mountRapidPage(root, ctx = {}) {
     (times[prompt.id] = times[prompt.id] || []).push(Math.round(secs * 10) / 10);
     points += hitPoints(combo); combo++; hits++; bestCombo = Math.max(bestCombo, combo);
     noteMemory(prompt.id, secs <= 3 ? 5 : 4);
+    try { keyStates.notePressed([prompt.keys]); } catch (e) { /* storage */ }   // a hit is the command pressed (M57)
     hold = true; if (stallH) clearTimeout(stallH);
     $('#rfFrag').classList.add('hit');
     paintCaps('pressed');

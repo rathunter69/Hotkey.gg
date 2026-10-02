@@ -58,9 +58,7 @@ function frame({ title, description, up, body }) {
 <meta name="description" content="${esc(description)}">
 <meta name="generator" content="app2/tests/public-pages.js — generated from lesson data; do not edit by hand">
 ${THEME_PRELOAD}
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="${up}ui/fonts/fonts.css">
 <link rel="stylesheet" href="${up}ui/public.css">
 </head>
 <body>

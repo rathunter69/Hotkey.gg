@@ -130,6 +130,7 @@ export function drillUnlocked(entry, all, skipped) {
  * over the catalog's drill entries (mode 'drill'). `bests` is { id: { secs, tier } }. Pure.
  */
 export function catalogRows(catalog, { all = {}, skipped = [], bests = {}, pro = false } = {}) {
+  const opens = typeof pro === 'function' ? pro : () => !!pro;   // M58: true/false for every chapter, or a chapter test
   const groups = [];
   for (const c of COURSE.chapters) {
     const entries = catalog.filter(e => e.mode === 'drill' && e.chapter === c.id);
@@ -137,7 +138,7 @@ export function catalogRows(catalog, { all = {}, skipped = [], bests = {}, pro =
     const rows = entries.map(e => {
       const u = drillUnlocked(e, all, skipped);
       const b = bests[e.id] || null;
-      return { id: e.id, title: e.title, length: e.length, best: b ? b.secs : null, tier: (b && b.tier) || 'none', open: u.open, after: u.after, pro: e.access === 'paid' && !pro };
+      return { id: e.id, title: e.title, length: e.length, best: b ? b.secs : null, tier: (b && b.tier) || 'none', open: u.open, after: u.after, pro: e.access === 'paid' && !opens(e.chapter) };
     });
     const built = CHAPTERS.find(ch => ch.id === c.id);
     groups.push({ id: c.id, n: c.n, title: built ? built.title : c.title, rows, passed: rows.filter(r => r.tier !== 'none').length, of: rows.length });
@@ -169,14 +170,14 @@ const bestsOf = () => { const out = {}; for (const d of DRILLS) { const pb = sto
 
 /**
  * The catalog as a worksheet (the drills, the challenges): A the name (and the module under it), B the
- * keys it drills as keycaps, C the length, D your time or why it is closed, E the tier. rows: [{ id,
+ * keys it drills as keycaps (Wolf, 02:08: the keys, not the minutes), C your time or why it is closed, D the tier. rows: [{ id,
  * title, sub, keys, length, best, tier, open, after, pro, href, next, done }].
  */
 function drillSheetHtml(rows, label) {
   const lock = (word, cls = '') => `<span class="dt-lock${cls}">${esc(word)}</span>`;
-  const columns = [{ key: 'name', label: t('col_drill') }, { key: 'keys', label: t('col_keys') }, { key: 'len', label: t('col_length'), align: 'right', cls: 'min' }, { key: 'best', label: t('col_best'), align: 'right', cls: 'best' }, { key: 'tier', label: '', align: 'right', cls: 'tier' }];
+  const columns = [{ key: 'name', label: t('col_drill') }, { key: 'keys', label: t('col_keys') }, { key: 'best', label: t('col_best'), align: 'right', cls: 'best' }, { key: 'tier', label: '', align: 'right', cls: 'tier' }];
   return tableHtml({ sheet: true, columns, label, cls: 'tbl-drills', rows: rows.map(r => ({
-    cells: { name: `<span class="row-name">${esc(r.title)}</span>${r.sub ? `<span class="row-sub">${esc(r.sub)}</span>` : ''}`, keys: keysRowHtml(r.keys || [], { max: 3 }), len: esc(r.length || ''),
+    cells: { name: `<span class="row-name">${esc(r.title)}</span>${r.sub ? `<span class="row-sub">${esc(r.sub)}</span>` : ''}`, keys: keysRowHtml(r.keys || [], { max: 4 }),
       best: r.pro ? lock(t('paywall_pro')) : !r.open ? lock(t('practice_after', { n: r.after }), ' dt-after') : r.best ? `<span class="dt-time">${esc(r.best)}</span>` : `<span class="dt-new">${esc(r.done ? t('status_done') : t('practice_not_played'))}</span>`,
       tier: r.pro || !r.open ? '' : tierMarksHtml(r.tier || 'none') },
     cls: `row-drill${r.pro ? ' pro' : ''}${!r.open && !r.pro ? ' later' : ''}${r.next ? ' next' : ''}`, href: r.pro || !r.open ? '' : r.href, attrs: r.pro ? { 'data-pro': r.id } : null, cursor: r.pro || r.open })) });
@@ -186,7 +187,7 @@ function drillSheetHtml(rows, label) {
 
 function drillsPage(el, ctx) {
   const all = store.all(); const skipped = prefs.get().skipped;
-  const pro = entitlement.entitled();
+  const pro = id => entitlement.chapterOpen(id);   // M58: a chapter at a time
   const bests = bestsOf();
   const groups = catalogRows(CATALOG, { all, skipped, bests, pro });
   const unlocked = CATALOG.filter(e => drillUnlocked(e, all, skipped).open).map(e => e.id);
@@ -207,18 +208,18 @@ function drillsPage(el, ctx) {
     // the chapters as the same cards Learn uses: the number on a key, the bar, the count or the lock; all six, so what Full Access opens is in view
     const cards = chapterTabs().map(c => {
       const gr = groups.find(x => x.id === c.key);
-      const locked = c.access === 'paid' && !pro;
+      const locked = entitlement.locked(c);
       return { key: c.key, n: c.n, title: c.title, on: c.key === chapterKey, locked, pct: gr && gr.of ? 100 * gr.passed / gr.of : 0,
         note: c.access === 'free' ? t('learn_free') : locked ? t('paywall_pro') : '', count: gr ? t('practice_chapter_fact', { done: gr.passed, of: gr.of }) : t('learn_being_written') };
     });
     const tab = chapterTabs().find(c => c.key === chapterKey) || chapterTabs()[0];
     const g = groups.find(x => x.id === chapterKey) || { id: tab.key, n: tab.n, title: tab.title, rows: [], passed: 0, of: 0 };
-    const chLocked = tab.access === 'paid' && !pro;
+    const chLocked = entitlement.locked(tab);
     const nextId = (g.rows.find(r => r.open && !r.pro && r.best == null) || {}).id;
     const tiles = drillSheetHtml(g.rows.map(r => ({ id: r.id, title: r.title, sub: (DRILLS_BY_ID[r.id] && DRILLS_BY_ID[r.id].ruleLine) || undefined, keys: keysOf(r.id), length: fmtLength(r.length), best: r.best != null ? fmtClock(r.best) : '', tier: r.tier, open: r.open, after: r.after, pro: r.pro, href: '#/drill/' + r.id, next: r.id === nextId })), g.title);
     const main = panelHtml({ heading: esc(t('chapter_heading', { n: g.n, name: g.title })), facts: g.of ? esc(t('practice_chapter_fact', { done: g.passed, of: g.of })) : '', body: g.rows.length ? tiles : `<p class="panel-line">${esc(t('practice_chapter_coming', { n: g.n }))}</p>`, cls: 'catalog', stretch: true });
     // the set, inline: what Start drilling plays, in order, and why each is in it
-    const setRows = set.ids.map((id, i) => { const e = CATALOG.find(x => x.id === id); return `<a class="set-row" href="#/drill/${esc(id)}"><kbd class="key set-n">${i + 1}</kbd><span class="set-main"><span class="row-name">${esc(e.title)}</span><span class="row-sub">${esc(t('reason_' + String(set.reasons[id]).replace('-', '_')))}</span></span><span class="set-len">${esc(fmtLength(e.length))}</span></a>`; }).join('');
+    const setRows = set.ids.map((id, i) => { const e = CATALOG.find(x => x.id === id); return `<a class="set-row" href="#/drill/${esc(id)}"><kbd class="key set-n">${i + 1}</kbd><span class="set-main"><span class="row-name">${esc(e.title)}</span><span class="row-sub">${esc(t('reason_' + String(set.reasons[id]).replace('-', '_')))}</span></span><span class="set-keys">${keysRowHtml(keysOf(id), { max: 3 })}</span></a>`; }).join('');
     const setPanel = panelHtml({ heading: esc(t('practice_set_heading')), facts: set.ids.length ? esc(fmtLength(set.secs)) : '', body: set.ids.length ? `<div class="set-list">${setRows}</div>` : `<p class="panel-line">${esc(t('practice_set_none'))}</p>`, cls: 'set-panel' });
     // rapid-fire, one click from here (Wolf): the last length played, straight to the stage, where Enter starts it
     const rlen = lastRapidLen();
@@ -252,7 +253,7 @@ function drillsPage(el, ctx) {
 function dailyPage(el, ctx) {
   const day = dayOf(); const pick = dailyFor(day); const drill = DRILLS_BY_ID[pick.drillId] || null;
   const chapterN = drill ? (COURSE.chapters.find(c => c.id === drill.chapter) || {}).n : 1;
-  const proNote = drill && drill.access === 'paid' && !entitlement.entitled() ? `<p class="panel-line">${esc(t('daily_pro_note', { n: chapterN }))}</p>` : '';
+  const proNote = drill && entitlement.locked(drill) ? `<p class="panel-line">${esc(t('daily_pro_note', { n: chapterN }))}</p>` : '';
   // the week under the board: each day's drill, the keys it drilled and your time, so the page is a record and not one button
   const mine = store.attempts({ kind: 'daily' });
   const week = Array.from({ length: 7 }, (_, i) => { const d = new Date(day + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() - i); return d.toISOString().slice(0, 10); });
@@ -363,7 +364,7 @@ function challengesPage(el, ctx) {
   function render(focusTab) {
     const cards = tabs.map(c => {
       const mine = rows.filter(r => chOf(r.id) === c.key);
-      const locked = c.access === 'paid' && !entitlement.entitled();
+      const locked = entitlement.locked(c);
       const passed = mine.filter(r => r.passed).length;
       return { key: c.key, n: c.n, title: c.title, on: c.key === chapterKey, locked, pct: mine.length ? 100 * passed / mine.length : 0,
         note: c.access === 'free' ? t('learn_free') : locked ? t('paywall_pro') : '', count: mine.length ? t('chapter_modules_done', { d: passed, m: mine.length }) : t('learn_being_written') };
@@ -376,7 +377,7 @@ function challengesPage(el, ctx) {
     const nd = next ? drills.find(d => d.id === next.id) : null;
     const pars = nd && nd.pars ? nd.pars : null;
     const tierRows = pars ? [['pass', 'tier_pass', pars.pass], ['pro', 'tier_expert', pars.pro], ['legendary', 'tier_legendary', pars.legendary]].map(([tier, k, secs]) => `<div class="tier-row${next && tierAtLeast(next.tier, tier) ? ' on' : ''}">${tierMarksHtml(tier)}<span class="row-name">${esc(t(k))}</span><span class="tier-time">${esc(fmtClock(secs, true))}</span></div>`).join('') : '';
-    const lockedTab = tab.access === 'paid' && !entitlement.entitled();
+    const lockedTab = entitlement.locked(tab);
     const side = paywall || lockedTab ? paywallHtml({ heading: t('paywall_chapter', { n: tab.n, name: tab.title }), signedIn: auth.state() === 'in', mode: 'challenges', ids: { go: 'chGoPro', notNow: 'chNotNow' } })
       : panelHtml({ heading: esc(next ? next.module : t('challenges_title')), facts: next ? esc(next.n) : '', body: `${next ? `<p class="panel-line">${esc(next.title)}</p>` : ''}${tierRows ? `<div class="tier-list">${tierRows}</div>` : ''}<p class="panel-line ink-2">${esc(t('challenges_line'))}</p>`, cls: 'ch-side', stretch: true });
     el.innerHTML = `${headerBlockHtml({ title: t('challenges_title'), line: esc(t('challenges_intro')), button: next ? buttonHtml({ label: t('challenges_start'), key: 'Enter', href: `#/lesson/${next.id}?seed=new`, primary: true, id: 'startChallenge' }) : '', cls: 'hdr-challenges' })}${chapterCardsHtml(cards, t('rail_challenges'))}<div class="pg-two"><div class="pg-main">${main}</div><div class="pg-side">${side}</div></div>`;

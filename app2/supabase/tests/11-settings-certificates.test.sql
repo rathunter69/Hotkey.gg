@@ -123,12 +123,14 @@ select pg_temp.actor(2);
 select is((select (public.rpc_my_certificate()).display_name), (select handle from public.profiles where id = pg_temp.uid(2)), 'user 2 reads user 2''s');
 reset role;
 
--- anyone verifies by credential id, and sees only the public page's fields
+-- anyone verifies by credential id, and sees only the public page's fields (the id is read
+-- before the role drops: anon cannot read the table, which is the point)
+select set_config('test.cred1', (select credential_id from public.certificates where user_id = pg_temp.uid(1)), true);
 set local role anon;
 select pg_temp.actor(null);
-select is((select display_name from public.rpc_verify_certificate((select credential_id from public.certificates where user_id = pg_temp.uid(1)))), 'Wolf D', 'anon verifies by credential id');
-select is((select (chapters -> 0 ->> 'secs')::numeric from public.rpc_verify_certificate((select credential_id from public.certificates where user_id = pg_temp.uid(1)))), 400.5, 'with the frozen assessment figures');
-select is((select display_name from public.rpc_verify_certificate(lower((select '  ' || credential_id || ' ' from public.certificates where user_id = pg_temp.uid(1))))), 'Wolf D', 'case and spaces do not matter');
+select is((select display_name from public.rpc_verify_certificate(current_setting('test.cred1'))), 'Wolf D', 'anon verifies by credential id');
+select is((select (chapters -> 0 ->> 'secs')::numeric from public.rpc_verify_certificate(current_setting('test.cred1'))), 400.5, 'with the frozen assessment figures');
+select is((select display_name from public.rpc_verify_certificate(lower('  ' || current_setting('test.cred1') || ' '))), 'Wolf D', 'case and spaces do not matter');
 select is((select count(*) from public.rpc_verify_certificate('HK-NOPENOPE12')), 0::bigint, 'an unknown id reads nothing');
 select is((select count(*) from public.rpc_verify_certificate(null)), 0::bigint, 'nor null');
 select is(pg_temp.probe($p$select * from public.certificates$p$), '42501:permission denied for table certificates', 'and the table itself is closed to anon');
@@ -138,7 +140,7 @@ reset role;
 update public.certificates set revoked_at = now() where user_id = pg_temp.uid(1);
 set local role anon;
 select pg_temp.actor(null);
-select is((select count(*) from public.rpc_verify_certificate((select credential_id from public.certificates where user_id = pg_temp.uid(1)))), 0::bigint, 'a revoked certificate no longer verifies');
+select is((select count(*) from public.rpc_verify_certificate(current_setting('test.cred1'))), 0::bigint, 'a revoked certificate no longer verifies');
 reset role;
 
 -- deleting the account takes the certificate with it

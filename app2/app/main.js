@@ -6,11 +6,13 @@
 //   #/learn            the chapter table
 //   #/lesson/<id>      a lesson in the workspace; ?mode=solo|timed
 //   #/practice         Drills; #/practice/daily, /rapid, /challenges the other three modes
-//   #/drill/<id>       a drill; #/daily the Daily; #/drill/sandbox the free sheet
+//   #/drill/<id>       a drill; #/daily the Daily (the sandbox is gone, M21: its old routes open Practice)
 //   #/leaderboard  #/reference  #/pricing  #/teams  #/account
 //   #/about  #/terms  #/privacy  #/eula  #/contact
 //   #/due/<shortcut>   a refresher rep from today's queue (app/due-page.js)
+//   #/desk             a Teams desk; #/desk/join/<code> its join page (app/desk-page.js)
 //   #/checkout         Phase E checkout; #/checkout/done the return from Stripe (app/checkout-page.js)
+//   #/ops              errors, billing alerts and the weekly digests, for ops_admins only (app/ops-page.js)
 //   anything else      404
 //
 // Page modules load lazily with import(); a failed load renders an error card with Retry, never
@@ -33,6 +35,7 @@ import { captureInstall } from './install.js';
 import { LEGACY_IDS } from './progress.js';
 import { skeletonHtml } from '../ui/skeleton.js';
 import { itemNumber } from './numbering.js';
+import { siteCopy } from '../content/copy/apply.js';
 // the lesson catalogue and the XP/cosmetics stack load lazily (they are most of the module graph):
 // the nav, the footer and a page skeleton paint first, then the level chip and theme locks catch up
 const lessonsMod = () => import('../content/index.js');
@@ -47,7 +50,7 @@ const NARROW_QUERY = '(max-width: 900px)';
  * Parse a location hash into { name, params, query }. Pure; exported for the tests.
  *   parseRoute('#/lesson/active-cell?mode=solo')
  *     → { name:'lesson', params:{ id:'active-cell' }, query:{ mode:'solo' } }
- * Unknown paths give name 'notfound'. '#/sandbox' (the old shell's route) maps to the drill.
+ * Unknown paths give name 'notfound'. The retired sandbox's routes ('#/sandbox', '#/drill/sandbox') open Practice (M21).
  */
 export function parseRoute(hash) {
   const raw = String(hash == null ? '' : hash);
@@ -67,13 +70,16 @@ export function parseRoute(hash) {
   else if (path === '/practice') name = 'practice';
   else if ((m = /^\/practice\/(daily|drills|rapid|challenges)$/.exec(path))) { name = 'practice'; params.mode = m[1]; }   // the four modes under Practice (3.0, The rail)
   else if (path === '/leaderboards') name = 'leaderboard';
+  else if (path === '/sandbox' || path === '/drill/sandbox') name = 'practice';   // the sandbox is dropped (M21)
   else if ((m = /^\/drill\/([a-z0-9-]+)$/.exec(path))) { name = 'drill'; params.id = m[1]; }
-  else if (path === '/sandbox') { name = 'drill'; params.id = 'sandbox'; }
   else if (path === '/daily') { name = 'drill'; params.daily = true; }
   else if (path === '/rapid') name = 'rapid';
   else if ((m = /^\/due\/([a-z0-9-]+)$/.exec(path))) { name = 'due'; params.id = m[1]; }
+  else if (path === '/desk') name = 'desk';
+  else if ((m = /^\/desk\/join\/([A-Za-z0-9-]{1,32})$/.exec(path))) { name = 'desk'; params.join = true; params.code = m[1].toUpperCase(); }   // a Teams desk's invite link (Phase F)
   else if (path === '/checkout') name = 'checkout';
   else if (path === '/checkout/done') { name = 'checkout'; params.done = true; }
+  else if (path === '/ops') name = 'ops';   // the operators' page (app/ops-page.js): linked from nowhere, the server decides who reads it
   else if (['/leaderboard', '/reference', '/pricing', '/teams', '/account', '/about', '/terms', '/privacy', '/eula', '/contact'].includes(path)) name = path.slice(1);
   else name = 'notfound';
   return { name, params, query, path };
@@ -88,6 +94,7 @@ export function navKeyFor(name, params = {}) {
   if (name === 'rapid') return 'rapid';
   if (name === 'due') return 'practice';
   if (name === 'leaderboard' || name === 'reference') return name;
+  if (name === 'desk') return 'leaderboard';   // desks live on Leaderboards (3.0, Leaderboards: the Desks tab)
   return '';
 }
 
@@ -98,6 +105,7 @@ export function modeOf(name, params = {}) {
   if (name === 'rapid') return 'rapid';
   if (name === 'due') return 'drills';
   if (name === 'leaderboard') return 'daily';   // the page opens on The Daily's board
+  if (name === 'desk') return 'daily';           // a desk's board is a board: the same color as the Leaderboards page
   return 'learn';
 }
 
@@ -110,7 +118,7 @@ export function titleFor(name, extra) {
     lesson: (extra ? extra + ' · ' : '') + 'hotkey.gg', locked: (extra ? extra + ' · ' : '') + 'Full Access · hotkey.gg', practice: 'Practice · hotkey.gg', drill: (extra ? extra + ' · ' : '') + 'Practice · hotkey.gg', leaderboard: 'Leaderboards · hotkey.gg',
     reference: 'Reference · hotkey.gg', pricing: 'Pricing · hotkey.gg', teams: 'Teams · hotkey.gg', account: 'Account · hotkey.gg', about: 'About · hotkey.gg',
     terms: 'Terms · hotkey.gg', privacy: 'Privacy · hotkey.gg', eula: 'EULA · hotkey.gg', contact: 'Contact · hotkey.gg', notfound: 'Page not found · hotkey.gg',
-    due: 'Due today · hotkey.gg', checkout: 'Get full access · hotkey.gg' };
+    due: 'Due today · hotkey.gg', checkout: 'Get Full Access · hotkey.gg', desk: 'Your desk · hotkey.gg', ops: 'Ops · hotkey.gg' };
   return T[name] || 'hotkey.gg';
 }
 
@@ -174,6 +182,8 @@ const LOADERS = {
   account: { file: './account-page.js', pick: m => m.mountAccountPage },
   profile: { file: './profile-page.js', pick: m => m.mountProfilePage },   // #/account (profile, certificate): the band, the shelf, the level titles; the certificate as progress
   checkout: { file: './checkout-page.js', pick: m => m.mountCheckoutPage },   // Phase E: the embedded form, behind the payments flag
+  desk: { file: './desk-page.js', pick: m => m.mountDeskPage },   // Phase F desks v1: #/desk and #/desk/join/<code>
+  ops: { file: './ops-page.js', pick: m => m.mountOpsPage },   // errors, billing alerts, weekly digests (0015_ops.sql)
   about: { file: './legal-pages.js', pick: m => m.mountAboutPage },
   terms: { file: './legal-pages.js', pick: m => r => m.mountLegalPage(r, 'terms') },
   privacy: { file: './legal-pages.js', pick: m => r => m.mountLegalPage(r, 'privacy') },
@@ -196,8 +206,9 @@ async function loadPage(entry) {
 export function pageLabel(name, params) {
   const L = { home: 'Home', landing: 'The front page', root: 'Home', start: 'Getting started', learn: 'Learn', lesson: 'This lesson',
     practice: 'Practice', drill: params && params.daily ? 'The Daily' : 'This drill', rapid: 'Rapid-fire', due: 'Due today',
-    leaderboard: 'The leaderboard', reference: 'The shortcut reference', pricing: 'Pricing', teams: 'Teams', account: 'Your account', checkout: 'Checkout' };
-  return L[name] || 'This page';
+    leaderboard: 'The leaderboard', reference: 'The shortcut reference', pricing: 'Pricing', teams: 'Teams', account: 'Your account', checkout: 'Checkout', desk: 'Your desk' };
+  const key = name === 'drill' && params && params.daily ? 'daily' : L[name] ? name : 'other';
+  return siteCopy('page_label_' + key, L[name] || 'This page');
 }
 
 /**
@@ -209,11 +220,11 @@ function errorCard(root, { name, params, kind }, retry) {
   const label = pageLabel(name, params);
   const onHome = name === 'home' || name === 'root' || name === 'landing';
   const body = kind === 'mount'
-    ? 'Something broke on our side. Retry, or go to ' + (onHome ? 'Learn' : 'Home') + '.'
-    : label + ' couldn’t be fetched. Check your connection and try again.';
-  root.innerHTML = `<div class="err-card" role="alert"><div class="err-cap">Couldn’t load</div>
-    <div class="err-body"><h1>${esc(label)} didn’t load.</h1><p>${esc(body)}</p>
-    <div class="err-actions"><button class="btn btn-primary" id="errRetry" type="button">Retry</button>${onHome ? '<a class="btn btn-ghost" href="#/learn">Learn</a>' : '<a class="btn btn-ghost" href="#/">Home</a>'}</div></div></div>`;
+    ? siteCopy('err_mount', 'Something broke on our side. Retry, or go to {page}.').replace('{page}', onHome ? siteCopy('rail_learn', 'Learn') : siteCopy('rail_home', 'Home'))
+    : siteCopy('err_fetch', '{page} couldn’t be fetched. Check your connection and try again.').replace('{page}', label);
+  root.innerHTML = `<div class="err-card" role="alert"><div class="err-cap">${esc(siteCopy('err_cap', 'Couldn’t load'))}</div>
+    <div class="err-body"><h1>${esc(siteCopy('err_head', '{page} didn’t load.').replace('{page}', label))}</h1><p>${esc(body)}</p>
+    <div class="err-actions"><button class="btn btn-primary" id="errRetry" type="button">${esc(siteCopy('err_retry', 'Retry'))}</button>${onHome ? '<a class="btn btn-ghost" href="#/learn">Learn</a>' : '<a class="btn btn-ghost" href="#/">Home</a>'}</div></div></div>`;
   const b = root.querySelector('#errRetry'); b.onclick = retry; b.focus();
 }
 
@@ -232,9 +243,9 @@ function narrowNotice(root, lesson, content) {
   const crumb = lesson ? narrowCrumb(lesson, content || {}) : '';
   const code = t => esc(t).replace(/`([^`]+)`/g, '<kbd>$1</kbd>');
   el.innerHTML = `<div class="narrow-msg" role="status"><div class="narrow-cap">hotkey.gg</div>
-      <h1>hotkey.gg needs a keyboard and a wider screen.</h1>
-      <p>Lessons and drills run on a real spreadsheet with the keyboard. Open this page on a laptop or desktop, at least 900px wide.</p>
-      <div class="narrow-actions"><a class="btn btn-ghost" href="#/learn">Back to Learn</a></div></div>` +
+      <h1>${esc(siteCopy('narrow_head', 'hotkey.gg needs a keyboard and a wider screen.'))}</h1>
+      <p>${esc(siteCopy('narrow_line', 'Lessons and drills run on a real spreadsheet with the keyboard. Open this page on a laptop or desktop, at least 900px wide.'))}</p>
+      <div class="narrow-actions"><a class="btn btn-ghost" href="#/learn">${esc(siteCopy('narrow_back', 'Back to Learn'))}</a></div></div>` +
     (lesson ? `<article class="narrow-lesson">${crumb ? `<div class="lesson-crumb">${esc(crumb)}</div>` : ''}<h2>${esc(lesson.title)}</h2>` +
       (lesson.brief ? `<p class="narrow-brief">${code(lesson.brief)}</p>` : '') +
       (teach ? `<h3>${esc(teach.title)}</h3>` + teach.body.map(p => `<p>${code(p)}</p>`).join('') : '') +
@@ -289,7 +300,16 @@ export function startApp({ navEl, rootEl, footEl }) {
   const snapshot = () => { try { return JSON.stringify(store.all()); } catch (e) { return ''; } };
   auth.ready().then(() => {
     syncUser();
+    // the account mirror of quest XP, the clean-lesson bonus and the key states (0012): wired once, it hydrates on every sign-in
+    import('./award-sync.js').then(m => m.startAwardSync()).catch(() => { /* the device keeps them */ });
     if (auth.state() !== 'in') return;
+    // what the account opens (M58): the rail's Go Pro and the catalog's locks follow the server's answer
+    const had = JSON.stringify(entitlement.known());
+    entitlement.refresh().then(() => {
+      try { nav.setPro(entitlement.entitled()); } catch (e) { /* Go Pro shows */ }
+      const n = document.body.dataset.route;
+      if ((n === 'learn' || n === 'practice') && JSON.stringify(entitlement.known()) !== had) route();
+    }, () => { /* offline: the mirror stands */ });
     const before = snapshot();
     store.hydrate().then(() => {
       syncUser();
@@ -342,15 +362,20 @@ export function startApp({ navEl, rootEl, footEl }) {
       }
     }
     let drill = null;
-    if (name === 'drill' && !r.params.daily && r.params.id !== 'sandbox') {
+    if (name === 'drill' && !r.params.daily) {
       try { drill = (await import('../content/drills.js')).drillById(r.params.id); } catch (e) { if (myGen === gen) fetchFailed({ name, params: r.params }); return; }
       if (myGen !== gen) return;
       if (!drill) name = 'notfound';
+      // a paid drill (M58): the same door as a paid lesson, decided by its chapter
+      if (drill && entitlement.locked(drill)) {
+        if (auth.state() === 'in') { await entitlement.refresh(); if (myGen !== gen) return; }
+        if (entitlement.locked(drill)) name = 'locked';
+      }
     }
     nav.setLanding(name === 'landing');
     nav.setActive(navKeyFor(name, r.params));
     if (nav.setSection) nav.setSection(name === 'account' ? (['profile', 'settings', 'billing', 'certificate'].includes(r.query.section) ? r.query.section : 'profile') : null);
-    document.title = titleFor(name, lesson ? lesson.title : name === 'drill' ? (drill ? drill.title : 'Sandbox') : '');
+    document.title = titleFor(name, lesson ? lesson.title : name === 'drill' ? (drill ? drill.title : '') : '');
     document.body.dataset.route = name;
     document.body.dataset.mode = modeOf(name, r.params);
     refreshLevel();
@@ -375,7 +400,7 @@ export function startApp({ navEl, rootEl, footEl }) {
     if (myGen !== gen) return;
     if (rootEl.querySelector('.sk')) rootEl.innerHTML = '';
     try {
-      const ctx = { query: r.query, params: r.params, nav, lesson, keytips };
+      const ctx = { query: r.query, params: r.params, nav, lesson, drill, keytips };
       let res = name === 'lesson' ? mount(rootEl, lesson, { mode: r.query.mode || 'guided', panel: r.query.panel, seed: r.query.seed, daily: r.query.daily }) : mount(rootEl, ctx);
       // the cell cursor on a site page: the arrows move it over whatever the page marked data-cursor, Enter does the item
       if (!WORKSPACE_ROUTES.has(name)) { cursor = createCursor({ root: rootEl }); ctx.cursor = cursor; }
