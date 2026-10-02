@@ -9,10 +9,9 @@
 export const MODULE_NUMBERS = {
   'open-and-set-up': '1.1', 'move-and-select': '1.2', 'enter-edit-copy-fill': '1.3', structure: '1.4',
   format: '1.5', formulas: '1.6', 'present-and-audit': '1.7', 'project-and-assessment': '1.8',
-  // Chapter 2 · Formatting and presentation (SITE_SPEC's table; 2.3–2.7 land in Run 2)
-  'number-formats': '2.1', 'custom-number-formats': '2.2', 'model-formatting-standards': '2.3', 'alignment-and-structure': '2.4',
-  'conditional-formatting': '2.5', 'dates-and-text': '2.6', 'dates-and-text-for-presentation': '2.6', 'printing-and-page-layout': '2.7', 'ch2-project-and-assessment': '2.8', remixes: '2.R',
-  'the-page-a-buyer-reads': '2.3',   // the script's id for 2.3 (run R2)
+  // Chapter 2 · Formatting and presentation (the script's module ids, run R2)
+  'number-formats': '2.1', 'custom-number-formats': '2.2', 'the-page-a-buyer-reads': '2.3', 'alignment-and-structure': '2.4',
+  'conditional-formatting': '2.5', 'dates-and-text-for-presentation': '2.6', 'printing-and-page-layout': '2.7', 'ch2-project-and-assessment': '2.8', remixes: '2.R',
 };
 /** The catalogue section the chapter's project, assessment and test-out sit in (module 1.8). */
 export const FINAL_SECTION = 'Project and assessment';

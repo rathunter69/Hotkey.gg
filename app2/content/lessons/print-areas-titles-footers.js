@@ -32,7 +32,7 @@ export default {
   conventions: ['G1', 'G2'],
   teaches: ['page-numbers-footer', 'center-on-page'],
   uses: ['page-setup', 'orientation', 'fit-to-page', 'print-titles', 'keytips', 'ribbon-tabs'],
-  prerequisites: ['challenge-house-format-set'],
+  prerequisites: ['units-and-period-line'],
   brief: 'Chapter 1 set one page to print; a pack needs the same on every sheet, and Monthly is wider than a page. Fit to one page wide lets a wide sheet run down two pages tall; print titles repeat the header rows on each; the footer carries the file, the page number and the date on every sheet. The key is `Alt P S P`.',
   goals: [
     { id: 'landscape', text: 'The P&L and Monthly both run wider than they are tall: turn the pack landscape with Alt, P, O, L.',

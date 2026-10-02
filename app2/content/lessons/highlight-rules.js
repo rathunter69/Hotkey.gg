@@ -36,7 +36,7 @@ export default {
   conventions: ['F4', 'D8'],
   teaches: ['highlight-rule', 'manage-rules'],
   uses: ['go-to', 'sheet-reference', 'shift-arrow', 'ctrl-shift-arrow', 'replace-by-typing'],
-  prerequisites: ['conditional-codes-and-hidden-zeros'],
+  prerequisites: ['navigation-column'],
   brief: 'Conditional formatting is a rule a range applies to itself, and the built-in rules cover most of what a page needs: less than, greater than, between, equal to. Highlight a negative margin and a month under a threshold, find a duplicate label, and choose the format a reader will understand, not the loudest one. The key is `Alt H L`.',
   goals: [
     { id: 'select-margins', text: 'Select the three margin lines, C27:E29, the cells the first rule will watch.', keys: 'Ctrl+G "C27" ↵ Shift+→ ×2 Shift+↓ ×2', requires: ['go-to', 'shift-arrow'],
