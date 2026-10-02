@@ -40,10 +40,10 @@
   --mono:'JetBrains Mono',ui-monospace,monospace;        /* keys, addresses, formulas, times, the wordmark */
   --cellfont:Arial,'Calibri','Segoe UI',system-ui,sans-serif;   /* the sheet's own face */
   --fx-font:Georgia,'Times New Roman',serif;   /* the formula bar's italic fx */
-  --fs-landing:52px; --fs-prompt:52px; --fs-time:34px; --fs-title:28px; --fs-head:22px; --fs-clock:26px;
+  --fs-landing:64px; --fs-landing-narrow:40px; --fs-prompt:52px; --fs-time:34px; --fs-title:28px; --fs-head:22px; --fs-clock:26px;
   --fs-item:18px; --fs-panel:17px; --fs-body:15px; --fs-name:14.5px; --fs-label:13px; --fs-key:12.5px; --fs-min:12px;
   --fw-heavy:800; --fw-bold:700; --fw-semi:600; --fw-key:500; --fw-body:400;
-  --lh-tight:1.0; --lh-body:1.5;
+  --lh-tight:1.0; --lh-body:1.5; --lh-landing:1.05;
 
   /* ---------- space (3.0, Layout): one scale ---------- */
   --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:20px; --s6:24px; --s8:32px; --s12:48px;
@@ -58,7 +58,9 @@
   --panel-w:340px; --card-w:330px; --card-gap:16px;
   --tabrow-h:34px; --sbar-h:22px; --ws-foot-h:calc(var(--s8) + var(--s2) + var(--sbar-h) + 1px); --ribbon-h:96px; --ribbon-groups-h:72px; --ribbon-tabs-h:24px; --qat-h:26px;
   --cursor-w:2px; --bw-1-5:1.5px; --bw-2:2px; --bw-3:3px; --tick-check:5px; --cursor-handle:6px; --mode-mark:9px; --mode-rule:3px; --key-edge:3px; --route-bar:3px;
-  --theme-tile-w:64px; --theme-tile-h:46px; --demo-w:640px; --demo-h:560px; --narrow:900px;
+  --theme-tile-w:64px; --theme-tile-h:46px; --narrow:900px;
+  /* the landing page (M95): its width, the gap between its sections, the live demo, the proof plates, the task card on them, a chapter's lesson squares */
+  --lp-max:1240px; --lp-gap:88px; --lp-demo-h:440px; --lp-demo-h-narrow:380px; --lp-plate-h:236px; --lp-card-w:264px; --lp-sq:7px; --lp-sq-gap:2px;
   /* the site pages' parts (M89, M104): goal segments, the level and field bars, tier marks, badge tiles, the sheet preview, a table row */
   --seg-w:24px; --seg-h:5px; --bar-h:6px; --field-bar-w:200px; --tier-mark:9px; --badge-tile:48px; --preview-h:300px; --sp-row:17px; --row-h:36px; --level-tile:40px;
   /* the path (Learn, the drill catalog): a lesson's node, the node where the learner is, the line between them, a module's key, a lesson row's status column */
@@ -67,7 +69,7 @@
 
   /* ---------- durations (3.0, Motion and moments) ---------- */
   --d-cursor:80ms; --d-key:90ms; --d-menu:140ms; --d-beat:140ms; --d-route:150ms; --d-note:160ms; --d-card:200ms; --d-goal:250ms;
-  --d-hit:250ms; --d-wrong:300ms; --d-open:500ms; --d-quests:600ms; --d-combo:700ms; --d-streak:900ms;
+  --d-hit:250ms; --d-strip:12ms; --d-wrong:300ms; --d-open:500ms; --d-quests:600ms; --d-combo:700ms; --d-streak:900ms;
   --d-unlock:600ms; --d-result:4000ms; --d-banner:4000ms; --d-nudge:8000ms; --d-help:20000ms;
   /* the result's moments, in order (3.0, the timed run): the time counts up, then the tier, New best, the track, the rows, XP, a level-up, a quest */
   --d-count:900ms; --d-result-tier:1000ms; --d-result-best:1450ms; --d-result-track:1500ms; --d-result-board:1900ms;

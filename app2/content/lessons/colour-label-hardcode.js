@@ -29,8 +29,8 @@ export default {
   minutes: 7,
   headline: 'Alt H F C',
   conventions: ['B1', 'B2'],
-  teaches: ['font-color', 'input-colour-convention', 'link-colour-convention', 'edit-mode-f2'],
-  uses: ['sheet-tabs', 'ctrl-arrow', 'shift-arrow', 'formula-bar', 'format-cells-dialog'],
+  teaches: ['font-color', 'input-colour-convention', 'link-colour-convention', 'edit-mode-f2', 'shift-arrow'],
+  uses: ['sheet-tabs', 'ctrl-arrow', 'formula-bar', 'format-cells-dialog'],
   prerequisites: ['analyst-setup'],
   brief: 'Everything you type into this file will get emailed, printed and handed to someone who wasn’t there when you built it, and they need to understand it without asking you. That’s what font colors are for: blue for a hardcode (a number somebody typed), black for a formula, green for a link to another sheet, red for a link to another file. The formula bar tells you which is which. Inputs has a block of cells that are all still black, so read each one and color it right. The key is `Alt H F C`.',
   goals: [

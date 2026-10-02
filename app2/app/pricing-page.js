@@ -9,6 +9,7 @@
 // opens at launch."; on (preview hosts) it goes to #/checkout. Teams are sold by hand at launch, so
 // Talk to us is an email.
 import { siteCopy } from '../content/copy/apply.js';
+import { PRICES, FREE_ROWS, FULL_ROWS, TEAMS_ROWS } from './plans.js';
 import { buttonHtml } from '../ui/components/table.js';
 import { paymentsOn } from './config.js';
 import { auth } from './auth.js';
@@ -19,15 +20,11 @@ import { isStudentEmail } from '../supabase/functions/_shared/student-domains.js
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const t = (key, fb) => siteCopy(key, fb);
 
-/** The figures, in dollars (decision 3 and 4). The copy sheet carries the same figures as words. */
-export const PRICES = { month: 15, studentMonth: 9, seat: 12, minSeats: 5 };
+/** The figures and the plans' rows live in app/plans.js, which the landing reads too. */
+export { PRICES, FREE_ROWS, FULL_ROWS, TEAMS_ROWS };
 /** Where Talk to us writes to. */
 export const TEAMS_EMAIL = 'teams@hotkey.gg';
 
-/** The ticked rows of each plan, as site.csv rows. */
-export const FREE_ROWS = () => ['pricing_free_1', 'pricing_free_2', 'pricing_free_3', 'pricing_free_4'].map((k, i) => t(k, ['All of Chapter 1', 'Chapter 1’s drills and challenges', 'Rapid-fire and the Daily', 'Boards, streaks and achievements'][i]));
-export const FULL_ROWS = () => ['pricing_full_1', 'pricing_full_2', 'pricing_full_3', 'pricing_full_4'].map((k, i) => t(k, ['All six chapters', 'Every drill, challenge and assessment', 'The certificate, with a page anyone can check', 'Everything added to the course later'][i]));
-export const TEAMS_ROWS = () => ['pricing_teams_1', 'pricing_teams_2', 'pricing_teams_3'].map((k, i) => t(k, ['Full Access for every seat', 'One monthly invoice for the team', 'Seats added as the team grows'][i]));
 /** The trust lines under Get full access, each on its own line (3.0, rule 10). */
 export const TRUST_LINES = () => [t('pricing_trust_cancel', 'Cancel any time from your account.'), t('pricing_trust_refund', 'Full refund on your first payment within 14 days.'), t('pricing_trust_stripe', 'Payment is handled by Stripe.')];
 

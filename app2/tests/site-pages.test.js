@@ -124,7 +124,7 @@ test('the catalog: a row per drill by chapter with its length, best and tier; lo
   const groups = catalogRows(CATALOG, { all: {}, skipped: [], bests: { 'get-around': { secs: 41, tier: 'pro' } }, pro: false });
   assert.equal(groups[0].n, 1); assert.equal(groups[0].rows.length, DRILLS.filter(d => d.kind !== 'challenge' && d.chapter === 'foundations').length);
   const ga = groups[0].rows.find(r => r.id === 'get-around');
-  assert.equal(ga.best, 41); assert.equal(ga.tier, 'pro'); assert.equal(ga.length, 60); assert.equal(ga.open, false); assert.equal(ga.after, '1.2');
+  assert.equal(ga.best, 41); assert.equal(ga.tier, 'pro'); assert.equal(ga.length, 90); assert.equal(ga.open, false); assert.equal(ga.after, '1.2');
   assert.equal(groups[0].passed, 1);
   const paid = catalogRows([{ id: 'x', title: 'X', chapter: 'formatting', mode: 'drill', length: 90, access: 'paid', lesson: null, tags: [] }], { pro: false });
   assert.equal(paid[0].rows[0].pro, true); assert.equal(paid[0].n, 2);

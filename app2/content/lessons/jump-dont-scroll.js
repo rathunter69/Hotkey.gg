@@ -1,7 +1,9 @@
 // Chapter 1 · 1.2.1 — Jump, don't scroll (clearcoat-weekly, S1d → S1d)
-// The CFO's five questions about the feed; each answer is a cell, and each trip is a jump, never
+// The CFO's six questions about the feed; each answer is a cell, and each trip is a jump, never
 // a scroll: Ctrl and an arrow (and where it stops), Ctrl+End, Home, the page keys, and Go To for a
-// far cell you can name. The sheets are untouched. The learner-facing words live in content/copy/*.csv.
+// far cell you can name. Every key answers a question (payoff pass, 2026-10-02: the aimless
+// "back to the top" goal is gone, the page keys and Go To each carry a question). The sheets are
+// untouched. The learner-facing words live in content/copy/*.csv.
 const at = (sheet, ref) => !sheet.sel && sheet.selectionText() === ref;
 const windowKeys = ses => ses.keyLog.slice(ses.goalMark || 0).map(e => e.k);
 const onSheet = (ses, name) => ses.sheets[ses.sheetIndex] && ses.sheets[ses.sheetIndex].name === name;
@@ -23,7 +25,7 @@ export default {
   teaches: ['home-key', 'page-keys', 'go-to', 'sheet-reference'],
   uses: ['ctrl-arrow', 'ctrl-home-end', 'sheet-tabs', 'name-box'],
   prerequisites: ['challenge-inherited-file'],
-  brief: 'The CFO has five questions about the feed, and every answer is a cell. Ctrl and an arrow key jumps to the edge of the data, and it stops at a gap, which is how you find a missing figure in a sixty-row feed without reading it. Ctrl+End goes to the last used cell on the sheet, Home snaps to column A, and Page Down moves a screen at a time when you want to read rather than reach. Nobody who does this for a living scrolls. The key is `Ctrl+↓`.',
+  brief: 'The CFO has six questions about the feed, and every answer is a cell. Ctrl and an arrow key jumps to the edge of the data, and it stops at a gap, which is how you find a missing figure in a sixty-row feed without reading it. Ctrl+End goes to the last used cell on the sheet, Home snaps to column A, and Page Down moves a screen at a time when you want to read rather than reach. Nobody who does this for a living scrolls. The key is `Ctrl+↓`.',
   goals: [
     { id: 'to-raw', teach: 'Ctrl+PgDn walks the tabs to the right, Ctrl+PgUp to the left; Raw is the second tab, the feed the managers’ numbers were pasted into.', text: 'The questions are about the feed: move to Raw.', keys: 'Ctrl+PgDn', requires: ['sheet-tabs'],
       check: (s, ses) => onSheet(ses, 'Raw') },
@@ -35,17 +37,15 @@ export default {
       check: (s, ses) => at(s, 'F11') && windowKeys(ses).includes('Ctrl+↓') },
     { id: 'notes', teach: 'Ctrl+End jumps to the sheet’s last used cell, and Home snaps to column A of the row you’re on; anything below the data is where a reader finds surprises, so look before you send.', text: '"Anything below the feed?" takes Ctrl+End to the far corner, then Home, then up to the Notes header in A64.', keys: 'Ctrl+End Home ↑ ×3', requires: ['ctrl-home-end', 'home-key'],
       check: (s, ses) => at(s, 'A64') && windowKeys(ses).includes('Ctrl+End') && windowKeys(ses).includes('Home') },
-    { id: 'pages', teach: 'PgDn and PgUp move a screen at a time, for reading through, not for reaching a cell; on a Mac that’s fn+↓ and fn+↑.', text: 'Skim the feed a screen at a time: one PgUp, one PgDn.', keys: 'PgUp then PgDn', requires: ['page-keys'],
+    { id: 'pages', teach: 'PgDn and PgUp move a screen at a time, for reading through, not for reaching a cell; on a Mac that’s fn+↓ and fn+↑.', text: '"Is Airport’s week all in?" takes PgUp to read the screen above the notes, where row 61 has a date and no figures, then PgDn back.', keys: 'PgUp then PgDn', requires: ['page-keys'],
       check: (s, ses) => windowKeys(ses).includes('PageUp') && windowKeys(ses).includes('PageDown') },
-    { id: 'top', teach: 'Ctrl+Home from anywhere; the answer sheet: sixty days, six columns, missing wash costs starting at F12, a note at A64.', text: 'Back to the top for the next job: Ctrl+Home.', keys: 'Ctrl+Home', requires: ['ctrl-home-end'],
-      check: (s, ses) => at(s, 'A1') && windowKeys(ses).includes('Ctrl+Home') },
-    { id: 'go-to', teach: 'Ctrl+G opens Go To: a cell address, or Sheet!Cell for another sheet, and Enter lands you on it; for a far cell you can name, it’s one press.', text: 'For a cell you can name, press Ctrl+G, type Costs!B7 and Enter, and you land on South Lamar’s rent figure two sheets away.', keys: 'Ctrl+G "Costs!B7" ↵', requires: ['go-to', 'sheet-reference'],
+    { id: 'go-to', teach: 'Ctrl+G opens Go To: a cell address, or Sheet!Cell for another sheet, and Enter lands you on it; for a far cell you can name, it’s one press.', text: '"What does South Lamar pay in rent?" is two sheets away: press Ctrl+G, type Costs!B7 and Enter, and read 1650.', keys: 'Ctrl+G "Costs!B7" ↵', requires: ['go-to', 'sheet-reference'],
       check: (s, ses) => onSheet(ses, 'Costs') && at(s, 'B7') && windowKeys(ses).includes('Ctrl+G') },
   ],
-  wow: 'Five questions answered, and you never scrolled once.',
+  wow: 'Six questions answered, and you never scrolled once.',
   closing: [
     'Ctrl and an arrow goes to the edge of the data and stops at a gap; Ctrl+End finds the bottom of everything; Home and Ctrl+Home bring you back. Those keys answer most questions about a feed before anyone opens it properly.',
-    'The missing wash costs in column F are the first thing you’ll fix in module 1.3.',
+    'The feed runs sixty rows over twelve days and six columns, the wash costs stop at F11, Airport never sent its Saturday, a note sits under the feed, and South Lamar pays $1,650 a week in rent. The missing figures are the first thing you’ll fix in module 1.3.',
   ],
-  solution: 'Ctrl+PgDn Ctrl+Down Ctrl+Home Ctrl+Right Ctrl+Down Ctrl+End Home Up Up Up PgUp PgDn Ctrl+Home Ctrl+G "Costs!B7" Enter',
+  solution: 'Ctrl+PgDn Ctrl+Down Ctrl+Home Ctrl+Right Ctrl+Down Ctrl+End Home Up Up Up PgUp PgDn Ctrl+G "Costs!B7" Enter',
 };

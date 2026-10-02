@@ -7,7 +7,7 @@ import { beatFor, MODULE_BEATS, pageDelivered, PLANNED_MODULES } from '../app/be
 import { shouldOfferInstall } from '../app/install.js';
 import { BRIEFING, QUESTIONS, stepsFor, FIRST_LESSON } from '../app/first-run.js';
 import { COACH_MARKS, coachMarksDue, visibleMarks } from '../ui/components/coachmarks.js';
-import { HEADLINES, SUBHEAD, TABS, PATH, SECTIONS, courseFacts, landingHtml } from '../app/landing-page.js';
+import { HEADLINES, SUBHEAD, PATH, PROOFS, PLANS, courseFacts, landingHtml } from '../app/landing-page.js';
 import { DEMO_LESSON, demoScript } from '../ui/demo-player.js';
 import { LessonRun } from '../app/runner.js';
 import { parseRoute, titleFor, navKeyFor, pageLabel, HOME_TITLE } from '../app/main.js';
@@ -155,22 +155,26 @@ test('first run (3.0, M92): two questions then one story card, Wolf\'s line, Ame
   assert.deepEqual(visibleMarks(sel => found[sel] || null).map(m => m.key), ['home', 'learn'], 'a hidden or missing rail element gets no mark');
 });
 
-test('landing (3.0, M95): the page is a sheet, the headline and its two alternates, the subhead, the tabs, the path, five sections, pricing and teams', () => {
+test('landing (3.0, M95; re-cut 2026-10-02): the headline and its two alternates, the demo beside it, three proofs, the course as chapter cards, the plans', () => {
   assert.equal(HEADLINES.length, 3);
   assert.equal(HEADLINES[0](), 'The better way to master Excel');
   assert.equal(HEADLINES[1](), 'Excel isn’t learned. It’s practiced.');
   assert.equal(SUBHEAD(), 'Learn like an analyst at a top firm, and build the muscle memory to make it stick.');
   const html = landingHtml(0);
-  assert.ok(html.includes('class="lp-namebox mono">B2<') && html.includes('lp-formula') && html.includes('lp-cols') && html.includes('lp-rows'), 'the Name Box, the formula bar, the column letters and the row numbers');
-  assert.ok(html.includes('id="startLearning"') && html.includes('lp-start-note'), 'Start learning is the selected cell, the free line beside it');
+  assert.doesNotMatch(html, /lp-namebox|lp-formula|lp-cols|lp-rows|lp-tabs/, 'no sheet frame around the hero: the demo is the spreadsheet');
+  assert.ok(html.includes('id="startLearning"') && html.includes('lp-start-note') && html.includes('id="ldDemo"'), 'Start learning, the free line, the live demo');
   assert.ok(html.includes('id="ldSignIn"') && html.includes('href="#/account"'));
-  assert.deepEqual(TABS.map(x => x.id), ['start', 'path', 'drills', 'rapid-fire', 'leaderboards', 'challenges', 'certificate']);
-  for (const x of TABS) assert.ok(html.includes(`id="${x.id}"`), 'a section for the tab ' + x.id);
+  assert.deepEqual(PROOFS.map(p => p.mode), ['learn', 'drills', 'daily'], 'three proofs, each on its mode\'s tint');
+  for (const p of PROOFS) assert.ok(html.includes(`id="proof-${p.id}"`) && html.includes(`--plate:var(--${p.mode}-tint)`), p.id);
   assert.equal(PATH.length, 6); assert.equal(PATH[0].access, 'free'); assert.ok(PATH.slice(1).every(c => c.access === 'pro'));
-  assert.deepEqual(SECTIONS.map(s => s.mode), ['drills', 'rapid', 'daily', 'challenges', 'learn'], 'each section on its mode\'s tint');
-  const facts = courseFacts();
-  assert.ok(facts.lessons > 0 && facts.challenges > 0 && facts.hours === 21, JSON.stringify(facts));
-  assert.ok(html.includes('The rest is $9 a month'), 'the live pricing line stays until Wolf says go');
+  assert.deepEqual(PATH.map(c => c.modules.reduce((a, b) => a + b, 0)), [30, 30, 27, 32, 37, 18], 'the plan\'s lessons per chapter');
+  assert.equal((html.match(/class="lp-ch[ "]/g) || []).length, 6, 'a card per chapter');
+  assert.equal((html.match(/<b style="--i:/g) || []).length, 37, 'a challenge square closing every module');
+  assert.deepEqual(courseFacts(), { lessons: 174, challenges: 37, hours: 21 });
+  assert.deepEqual(PLANS().map(p => p.id), ['free', 'full', 'teams'], 'the plans side by side');
+  assert.ok(html.includes('Full Access') && html.includes('$15') && html.includes('$12'), 'today\'s plans');
+  assert.doesNotMatch(html, /\$9 a month</, 'not the old $9 plan');
+  assert.ok(html.includes('href="#/pricing"') && html.includes('href="#/start"'), 'See pricing and Start learning');
   assert.doesNotMatch(html, /Project Rinse|Clearcoat|Voltline/, 'the case stays inside the lessons');
   assert.doesNotMatch(html, /<video|l-label|ld2-/, 'no clips, no label above a headline, nothing of the older landing');
   assert.ok(landingHtml(2).includes('The better way to learn Excel'));
@@ -184,7 +188,7 @@ test('demo: the self-playing lesson completes on its own script and lasts about 
   const script = demoScript(DEMO_LESSON);
   const keys = script.filter(s => s.spec || s.text).length;
   const ms = script.reduce((a, s) => a + (s.wait || 0), 0);
-  assert.equal(keys, 12);
+  assert.equal(keys, 15);
   assert.ok(ms >= 15000 && ms <= 25000, 'about twenty seconds: ' + ms);
   // the script's keys replay to the same finished state
   const run2 = new LessonRun(DEMO_LESSON, { mode: 'guided' });

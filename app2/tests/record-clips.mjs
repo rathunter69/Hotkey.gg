@@ -42,17 +42,17 @@ async function contextAt(w, h, extra = {}) {
   return context;
 }
 
-/** The poster: the live demo played to 4 / 4, its sheet and card area at the size the poster image fills. */
+/** The poster: the live demo played to 4 / 4, the whole frame at the size the poster image fills. */
 async function poster() {
   const context = await contextAt(1440, 900);
   const page = await context.newPage();
   const errors = []; page.on('pageerror', e => errors.push(e.message));
   await page.goto(BASE + '#/landing');
-  await page.waitForSelector('#ldDemo .dp:not(.dp-poster) .dp-grid', { timeout: 10000 });
+  await page.waitForSelector('#ldDemo .dp-live', { timeout: 10000 });
   await page.waitForFunction(() => /^4 \/ 4$/.test((document.querySelector('#demoCount') || {}).textContent || ''), null, { timeout: 90000 });
   await page.waitForTimeout(900);   // the last goal's tick and the card settle
   const out = join(CLIPS_DIR, 'demo-compact.jpg');
-  await (await page.$('#ldDemo .dp .dp-grid')).screenshot({ path: out, type: 'jpeg', quality: 82 });
+  await (await page.$('#ldDemo .dp-live')).screenshot({ path: out, type: 'jpeg', quality: 82 });
   await context.close();
   if (errors.length) console.log(`  poster: page errors: ${errors.join(' | ')}`);
   console.log(`poster: ${out} ${Math.round(statSync(out).size / 1024)} KB`);

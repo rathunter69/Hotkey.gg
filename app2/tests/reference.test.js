@@ -56,7 +56,7 @@ test('the Foundations shortcuts resolve to the module lesson that teaches them',
     'alt-h-b-o': 'fonts-fills-borders',          // borders-menu
     'ctrl-1': 'ribbon-by-keyboard',              // format-cells-dialog
     'ctrl-arrow': 'inherited-workbook',          // ctrl-arrow (1.1.1's opening goals)
-    'ctrl-shift-arrow': 'inherited-workbook',    // ctrl-shift-arrow
+    'ctrl-shift-arrow': 'know-the-screen',       // ctrl-shift-arrow (1.1.2's status bar read; the payoff pass moved it out of 1.1.1)
     'shift-space': 'select-like-you-mean-it',    // row-col-select
     'ctrl-space': 'select-like-you-mean-it',
     'ctrl-a': 'select-like-you-mean-it',         // ctrl-a

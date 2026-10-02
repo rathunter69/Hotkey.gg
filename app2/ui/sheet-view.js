@@ -29,6 +29,7 @@ export const REF_PALETTE = ['#4286D0', '#C62828', '#2E7D32', '#8E24AA', '#EF6C00
 export const ROW_H = 20;       // px, Excel's 15pt default row
 export const ROWHDR_W = 36;    // px, the row-number column: three digits at 11px
 export const CELL_PAD = 3;     // px each side of a cell's text
+export const CELL_FS = 14.67;  // px: 11pt, the cells' text at 100% (app.css --cellfs)
 const HASH_PX = 9.2;           // one '#' of the #### verdict at the 11pt cell font (8.2px glyph + 1px letter-spacing)
 
 /** An escaped display text with each _x pad marker (PAD_MARK + x) as an invisible x: a gap exactly x wide (M64: _) is a bracket's width). */
@@ -303,6 +304,8 @@ export class SheetView {
     let gh = '';
     if (!patch) {
       gw.style.setProperty('--cellh', Z(ROW_H) + 'px'); gw.style.setProperty('--cellpad', CELL_PAD + 'px'); gw.style.setProperty('--zoom', String(z));
+      // the cells' text scales with the zoom as Excel's does (100% keeps the stylesheet's size, density steps included)
+      if (z === 1) gw.style.removeProperty('--cellfs'); else gw.style.setProperty('--cellfs', (Math.round(CELL_FS * z * 100) / 100) + 'px');
       this.grid.style.width = totalW + 'px';   // table-layout:fixed — the <col> widths are the column widths
       // column widths, then the header row — no active-column highlight (the old build had none)
       gh = '<colgroup><col style="width:' + Z(ROWHDR_W) + 'px">';

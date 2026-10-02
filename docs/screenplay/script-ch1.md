@@ -1469,3 +1469,13 @@ Where the build departs from this script (run R1, 2026-10-01). Each line is one 
 - 1.8.P: the H column turns italic in the formats goal, check labels are indented, and print set-up is one Page Setup pass.
 - G6's typed figure in 1.7.3 is Mueller's last-week washes from the workbook, not 1,240.
 - The drills: twelve became eleven (M108) with new ids; Daily sheets run Monday to Saturday; before-you-send uses notes typed into H6 and H9.
+- Payoff pass (2026-10-02, Wolf's rule that every new key is used for a real job before the next): 1.1.1 no longer selects the table for nothing; its jumps read Sheet2's last row (A15), the #N/A on Old wk37 (A22) and a Costs figure (E4) before the rename, the delete and the report sheet. Selection is taught in 1.1.2 and 1.1.5.
+- 1.1.2 teaches Ctrl+Shift+Down and uses it at once: select Revenue and read its Sum in the status bar.
+- 1.1.3 runs Alt W as "find Gridlines" then "now run it"; Ctrl+1 gives Inputs B6 a thousands separator (9,000) and Alt H O E makes B7 a percentage (2.50%).
+- 1.1.4 drops the standalone F9 goal (now in the iterative-calculation teach); the new Quick Access button, Alt 7 (Decrease Decimal), takes Inputs B7 to 2.5%.
+- 1.1.5 teaches Shift+arrow at its first real job, coloring a block.
+- 1.2.1 answers six questions with no "back to the top" goal: PgUp and PgDn read Airport's missing Saturday, and Go To lands on Costs!B7 for South Lamar's rent ($1,650).
+- 1.2.2 orders selection small to large, each with a job: Shift+Right right-aligns the headers, Ctrl+Shift+Down sums Revenue, Shift+Space sets row 1 to height 20, Ctrl+Space AutoFits Site, Ctrl+A counts the feed (357 of 366), Ctrl+Home then Ctrl+Shift+End measures the used range. A new workbook state sits between 1.2.2 and 1.2.3.
+- 1.2.3 is width, then F4 repeating it, insert row, insert column, delete column and wrap the note; AutoFit, row height and align moved to 1.2.2.
+- 1.2.C plants an untidy layout from another cluster: right-align the headers, set the header row height, AutoFit the site column, then mark the stray Revenue constants blue with Go To Special.
+- The Get around the report drill starts half tidied and every movement ends in a fix (bold and rule the Total row, right-align headers, color inputs blue, F4 on the cost and day block, AutoFit Revenue, fix an 880 typo on Costs B8); Pass is now 80 s.

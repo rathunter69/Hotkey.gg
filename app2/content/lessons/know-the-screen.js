@@ -1,6 +1,7 @@
 // Chapter 1 · 1.1.2 — Know the screen (clearcoat-weekly, S1a → S1a; M44)
 // The tour of the window on the feed: the formula bar read against the grid, Ctrl+Shift+U, Ctrl+F1,
-// the status bar over a selection, the Zoom dialog and back to 100%, the sheet keys with the browser
+// the first selection (Ctrl+Shift+↓, moved here from 1.1.1 so it is used the moment it is made) read
+// in the status bar, the Zoom dialog and back to 100%, the sheet keys with the browser
 // alias. Nothing on the sheets changes; every goal grades the window's state and the keys since the
 // goal became current. The learner-facing words live in content/copy/*.csv.
 const at = (sheet, ref) => !sheet.sel && sheet.selectionText() === ref;
@@ -22,8 +23,8 @@ export default {
   minutes: 5,
   headline: 'Ctrl+Shift+U',
   conventions: ['A5'],
-  teaches: ['formula-bar-expand', 'ribbon-collapse', 'status-bar', 'zoom'],
-  uses: ['formula-bar', 'sheet-tabs', 'ctrl-arrow', 'ctrl-shift-arrow', 'ctrl-home-end'],
+  teaches: ['formula-bar-expand', 'ribbon-collapse', 'status-bar', 'zoom', 'ctrl-shift-arrow'],
+  uses: ['formula-bar', 'sheet-tabs', 'ctrl-arrow', 'ctrl-home-end'],
   prerequisites: ['inherited-workbook'],
   brief: 'Before the hotkeys, the screen. The Name Box (top left) tells you where you are; the formula bar next to it tells you what the cell really holds; the Ribbon holds every command; the sheet tabs along the bottom are the pages of the file; the status bar under them totals whatever you select; and the zoom sits in the corner. Ten minutes here and nothing on the screen will surprise you again. The key is `Ctrl+Shift+U`.',
   goals: [
@@ -33,7 +34,7 @@ export default {
       check: (s, ses) => onSheet(ses, 'Raw') && at(s, 'H1') && count(ses, 'Ctrl+Shift+U') >= 2 && ses.settings.formulaBarExpanded === false },
     { id: 'collapse-ribbon', teach: 'Ctrl+F1 hides the Ribbon down to its tab names and shows it again; Alt still works while it’s collapsed, so the hotkeys don’t care.', text: 'Collapse the Ribbon with Ctrl+F1 to see more rows, then bring it back.', keys: 'Ctrl+F1 then Ctrl+F1', requires: ['ribbon-collapse'],
       check: (s, ses) => count(ses, 'Ctrl+F1') >= 2 && ses.settings.ribbonCollapsed === false },
-    { id: 'status-bar', teach: 'The status bar totals whatever is selected, with no formula written: Sum, Average, Count.', text: 'Select the wash counts C2:C60 and read the status bar at the bottom: Sum, Average and Count.', keys: 'Ctrl+Home ↓ → → then Ctrl+Shift+↓', requires: ['status-bar', 'ctrl-shift-arrow', 'ctrl-home-end'],
+    { id: 'status-bar', teach: 'Hold Ctrl and Shift and press ↓, and the selection runs from the active cell to the edge of the data. The status bar totals whatever is selected, with no formula written: Sum, Average, Count.', text: 'Select the wash counts C2:C60 with one Ctrl+Shift+↓ from C2, then read the status bar at the bottom: Sum, Average and Count.', keys: 'Ctrl+Home ↓ → → then Ctrl+Shift+↓', requires: ['status-bar', 'ctrl-shift-arrow', 'ctrl-home-end'],
       check: (s, ses) => onSheet(ses, 'Raw') && s.selectionText() === 'C2:C60' && !!ses.statusInfo().show },
     { id: 'zoom', teach: 'The Zoom dialog is View › Zoom (Alt, W, Q); Alt, W, J is 100% in one press.', text: 'Zoom out to see the whole feed: Alt, W, Q, pick 75%, then back to 100% with Alt, W, J.', keys: 'Alt W Q 7 ↵ then Alt W J', requires: ['zoom'],
       check: (s, ses) => s.zoom === 100 && windowKeys(ses).includes('Q') && windowKeys(ses).includes('7') && windowKeys(ses).includes('J') },

@@ -50,14 +50,18 @@ test('diffStates: empty on identity, exact on a change, and each derivation is a
   assert.deepEqual([d[0].sheet, d[0].kind, d[0].key], ['Inputs', 'cell', 'B4']);
   // the chain S0 → S1a → … each step changes something, and only the lesson's own ground
   const order = STATE_ORDER;
-  assert.deepEqual(order.slice(0, 6), ['S0', 'S1a', 'S1b', 'S1c', 'S1d', 'S2a']);
+  assert.deepEqual(order.slice(0, 7), ['S0', 'S1a', 'S1b', 'S1c', 'S1d', 'S1e', 'S2a']);
   for (let i = 1; i < order.length; i++) {
     const diff = diffStates(stateOf(order[i - 1]), stateOf(order[i]));
     assert.ok(diff.length > 0, `${order[i]} differs from ${order[i - 1]}`);
   }
-  // S1b touches exactly one thing: Report's gridlines
+  // S1b touches exactly three things: Report's gridlines, and the two inputs 1.1.3 formats as the payoff
+  // of Ctrl+1 and Alt H O E (B6 with a separator, B7 a percentage)
   const d1b = diffStates(stateOf('S1a'), stateOf('S1b'));
-  assert.deepEqual(d1b.map(x => [x.sheet, x.kind]), [['Report', 'gridlines']]);
+  assert.deepEqual(d1b.map(x => [x.sheet, x.kind, x.key]), [['Report', 'gridlines', 'gridlines'], ['Inputs', 'cell', 'B6'], ['Inputs', 'cell', 'B7']]);
+  // S1e (1.2.2) changes only Raw: the selections' payoffs (aligned headers, row 1's height, column B fitted)
+  const d1e = diffStates(stateOf('S1d'), stateOf('S1e'));
+  assert.ok(d1e.length > 0 && d1e.every(x => x.sheet === 'Raw'), 'S1e touches Raw only');
 });
 
 test('the figures are deterministic and the plantings sit where the map says', () => {

@@ -1506,7 +1506,7 @@ Wolf's calls, Round 5 (2026-09-27), written up as the practice layer. Fewer syst
 
 | Drill | Built from | After | Pass par |
 | :- | :- | :- | :- |
-| Get around the report | Edge jumps, Go anywhere, Block select | 1.2 | 60 s |
+| Get around the report | Edge jumps, Go anywhere, Block select | 1.2 | 80 s |
 | Enter and fill | Type the column, Fill factory | 1.3 | 90 s |
 | Find and fix | Find and fix | 1.3 | 60 s |
 | Paste surgeon | Paste surgeon | 1.3 | 90 s |

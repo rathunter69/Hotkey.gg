@@ -1,41 +1,42 @@
-// app2/ui/demo-player.js — a real lesson that plays itself (experience pass, decision 1): the
-// Austin feed at S0 on the real sheet and ribbon, a task card that ticks as the platform presses
-// the keys, the keycaps lighting up as they go. About twenty seconds. Used by the first run's
-// opening step and the landing hero; on the landing, once the visitor clicks it or tabs to it,
-// their first key takes the sheet over (SITE_SPEC §3), so the demo is the lesson, not a film of one.
+// app2/ui/demo-player.js — a real lesson that plays itself (experience pass, decision 1; screenplay
+// 3.0 "The landing page"): the weekly Report on the real sheet, under the Ribbon's tab row, with
+// the task card that points (ui/components/task-card.js) sitting beside each goal's target, its
+// keycaps filling as the platform presses them. About twenty seconds. The landing's hero runs it;
+// once the visitor clicks it or tabs to it, their first key takes the sheet over (SITE_SPEC §3),
+// so the demo is the lesson, not a film of one.
 //
-//   const demo = mountDemo(hostEl, { compact, loop, autoplay, focusable, onDone, onPlay, onChange, onTakeover });
+//   const demo = mountDemo(hostEl, { loop, autoplay, focusable, onDone, onPlay, onChange, onTakeover });
 //   demo.play(); demo.skip(); demo.destroy();
 //
-// The keys pressed echo in a band of their own (the foot of the task panel; a strip under the
-// grid in the compact card), never over the cells. The feed's columns are widened the way AutoFit
-// would before the sheet paints, and the grid ends on a column boundary, so no label is cut off.
+// The sheet opens at the zoom that fits the Report across the frame (demoZoom, held between 85%
+// and 100% so the cells stay readable), and the grid ends on a column boundary, so no label is cut off.
 //
 // No sound (the learner has not pressed a key yet), no records, no XP: nothing here counts.
 import { LessonRun, hintToScript } from '../app/runner.js';
 import { parseKeyScript } from '../engine/keyboard.js';
 import { SheetView } from './sheet-view.js';
 import { RibbonView } from './ribbon-view.js';
-import { mountKeycaps } from './keycaps.js';
 import { keyLabel } from '../app/prefs.js';
 import { siteCopy } from '../content/copy/apply.js';
 import { COLW_DEFAULT, COLW_MAX, FIT_SLACK, cellTxtPx } from '../engine/sheet.js';
+import { createTaskCard, placeCard, routeTokens, routeProgress } from './components/task-card.js';
+import { inferTarget, targetBoxes, unionBox } from './cues.js';
 
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const at = (sheet, ref) => !sheet.sel && sheet.selectionText() === ref;
+const NUM_HEADERS = ['C4', 'D4', 'E4', 'F4', 'G4', 'H4', 'I4'];
 
-/** The demo lesson: four goals on the feed, each one real, each graded on the sheet's end state. */
+/** The demo lesson: four goals on the weekly Report (1.5.3's page before its alignment pass), each one real, each graded on the sheet's end state. */
 export const DEMO_LESSON = {
-  id: 'demo', kind: 'lesson', chapter: 'foundations', section: 'Move and select', title: 'Jump, don’t scroll', difficulty: 'easy', tags: [], access: 'free',
-  workbook: 'clearcoat-weekly', state: { before: 'S0', after: 'S0' }, minutes: 1,
-  brief: 'Management sent the Austin feed. Get to the bottom of it, select the Revenue column, bold the header and turn the gridlines off.',
+  id: 'demo', kind: 'lesson', chapter: 'foundations', section: 'Format', title: 'Alignment and titles', difficulty: 'easy', tags: [], access: 'free',
+  workbook: 'clearcoat-weekly', state: { before: 'S5b', after: 'S5b' }, minutes: 1,
+  brief: 'The Report’s figures are in. Make the units line a note, right-align the headers over the figures and turn the gridlines off.',
   goals: [
-    { id: 'bottom', teach: 'Ctrl+↓ jumps to the edge of the data.', text: 'Jump to the bottom of the feed, A61.', keys: 'Ctrl+↓', requires: ['ctrl-arrow'], check: s => at(s, 'A61') },
-    { id: 'revenue', teach: 'Ctrl+Shift+↓ selects to the edge in one press.', text: 'Select the Revenue column, E1:E60.', keys: 'Ctrl+↑ Ctrl+→ ← then Ctrl+Shift+↓', requires: ['ctrl-shift-arrow'], check: s => s.selectionText() === 'E1:E60' },
-    { id: 'bold', teach: 'Shift+Space selects the row; Ctrl+B bolds it.', text: 'Make the header row bold.', keys: 'Ctrl+Home Shift+Space Ctrl+B', requires: ['bold-command'], check: s => { const c = s.cellAt('F1'); return !!c && !!c.bold && s.selectionText() === 'A1:Z1'; } },
+    { id: 'units', teach: 'Ctrl+I sets italic, so a note reads as a note.', text: 'Make the units line italic, A2.', keys: '↓ Ctrl+I', requires: ['bold-italic-underline'], check: s => !!s.cellAt('A2').it },
+    { id: 'headers', teach: 'Ctrl+Shift+→ selects to the edge in one press.', text: 'Select the headers over the figures, C4:I4.', keys: '↓ ×2 → ×2 Ctrl+Shift+→', requires: ['ctrl-shift-arrow'], check: s => s.selectionText() === 'C4:I4' },
+    { id: 'right', teach: 'Alt walks the Ribbon: H for Home, A for Align, R for Right.', text: 'Right-align the headers, C4:I4.', keys: 'Alt H A R', requires: ['align-command'], check: s => NUM_HEADERS.every(ref => s.cellAt(ref).align === 'r') },
     { id: 'grid', teach: 'Alt walks the Ribbon: W for View, V then G for Gridlines.', text: 'Turn the gridlines off.', keys: 'Alt W V G', requires: ['gridlines'], check: s => s.gridlines === false },
   ],
-  solution: 'Ctrl+Down Ctrl+Up Ctrl+Right Left Ctrl+Shift+Down Ctrl+Home Shift+Space Ctrl+B Alt W V G',
+  solution: 'Down Ctrl+I Down Down Right Right Ctrl+Shift+Right Alt H A R Alt W V G',
 };
 
 /**
@@ -94,59 +95,83 @@ export function demoScript(lesson = DEMO_LESSON, cadence = 560, goalPause = 2000
   return out;
 }
 
+/** The zoom the demo opens at: as much of the Report as fits across the frame, never past 100% nor under 85% (so the cells stay readable). */
+export const DEMO_ZOOM = { floor: 85, max: 100, rowHdr: 36 };
+
+/**
+ * The zoom (%) at which every filled column of the sheet (the row numbers included) fits `width`
+ * px, held between DEMO_ZOOM's floor and max. A whole-row format (a bold header row) does not
+ * count as content, so it never shrinks the page. Pure over the sheet.
+ */
+export function demoZoom(S, width, z = DEMO_ZOOM) {
+  if (!S || !(width > 0)) return z.max;
+  let last = 1;
+  for (let r = 1; r <= S.rows; r++) for (let c = S.cols; c > last; c--) { const x = S.get(r, c); if (x.formula || (x.value !== '' && x.value != null)) { last = c; break; } }
+  let w = z.rowHdr;
+  for (let c = 1; c <= last; c++) w += S.colW[c] || COLW_DEFAULT;
+  return Math.max(z.floor, Math.min(z.max, Math.floor(100 * width / w)));
+}
+
 /**
  * @param {HTMLElement} host
- * @param {object} [o]  compact: the landing card (task on top, keys at the bottom); loop: restart
- *                      after the end; takeover: the visitor's first key stops the demo and the sheet
- *                      is theirs; onDone(), onTakeover(); cadence ms
+ * @param {object} [o]  loop: restart after the end; autoplay (default true); focusable: the frame
+ *                      is one tab stop and its keys go to the sheet; onDone(), onPlay(), onChange(),
+ *                      onTakeover(); cadence ms
  */
 export function mountDemo(host, o = {}) {
   const el = document.createElement('div');
-  el.className = 'dp' + (o.compact ? ' dp-compact' : '');
-  if (o.focusable) { el.tabIndex = 0; el.setAttribute('role', 'group'); el.setAttribute('aria-label', 'A lesson playing itself. While it has focus your keys go to the sheet; Tab moves on.'); }
-  // the keys pressed, in a band of their own: the compact card's sheet-tab strip under the grid, the foot of the task panel otherwise
-  const keyband = o.compact
-    ? '<div class="dp-keyband"><span class="dp-sheettab" id="demoTab"></span><div class="keyflash demo dp-keys" id="demoKeys" aria-hidden="true"></div></div>'
-    : '<div class="dp-keyband"><span class="dp-keyband-cap">keys pressed</span><div class="keyflash demo dp-keys" id="demoKeys" aria-hidden="true"></div></div>';
+  el.className = 'dp dp-live';
+  if (o.focusable) { el.tabIndex = 0; el.setAttribute('role', 'group'); el.setAttribute('aria-label', siteCopy('demo_aria', 'A lesson playing itself. While it has focus your keys go to the sheet; Tab moves on.')); }
   el.innerHTML = `
-    <div class="dp-head"><span class="dp-dots"><i></i><i></i><i></i></span><span class="dp-cap">Chapter 1, four goals from three modules</span><span class="dp-count" id="demoCount">0 / 4</span></div>
-    <div class="dp-grid">
-      <div class="dp-stage"><div class="stage"><div class="stage-row"><div class="stage-main">
-        <div class="ribbon-slot rib-full" id="demoRibbonSlot"><div class="ribbon" id="demoRibbon"></div></div><div id="demoSheet"></div>
-      </div></div>${o.compact ? keyband : ''}</div>
-        <button type="button" class="dp-play" id="demoPlay" hidden>▶ Play the demo</button></div>
-      <aside class="dp-panel">
-        <div class="task-card" id="demoTask"></div>
-        <ol class="goals dp-goals" id="demoGoals"></ol>
-        <div class="dp-hand" id="demoHand" hidden><b>Your turn.</b> The sheet is yours: same goals, any route.</div>
-        ${o.compact ? '' : keyband}
-      </aside>
-    </div>`;
+    <div class="ribbon-slot dp-rib" id="demoRibbonSlot"><div class="ribbon" id="demoRibbon"></div></div>
+    <div class="dp-stage" id="demoStage"><div class="stage"><div class="stage-row"><div class="stage-main"><div id="demoSheet"></div></div></div></div>
+      <button type="button" class="dp-play" id="demoPlay" hidden>${esc(siteCopy('demo_play', 'Play the demo'))}</button></div>
+    <div class="dp-foot"><span class="dp-sheettab" id="demoTab"></span><span class="dp-count" id="demoCount">0 / 4</span></div>`;
   host.appendChild(el);
   const $ = id => el.querySelector('#' + id);
+  const stage = $('demoStage');
+  const card = createTaskCard(stage, {});
 
   const run = new LessonRun(DEMO_LESSON, { mode: 'guided' });
-  let sheetView = null, ribbonView = null, keycaps = null, unclip = null;
+  let sheetView = null, ribbonView = null, unclip = null, ro = null;
   let timer = null, i = 0, playing = false, started = false, taken = false, done = false, destroyed = false;
   const script = demoScript(DEMO_LESSON, o.cadence || 560);
+  const sheetName = () => { const sh = run.session.sheets && run.session.sheets[run.session.sheetIndex]; return sh ? sh.name : ''; };
 
+  function paintCard() {
+    const m = run.goals.length, cur = run.current;
+    if (!cur || run.finished) card.set({ n: m, m, goal: siteCopy('demo_done', 'That was a lesson. The sheet is graded on how it ends up, so any route that gets there counts, and the next one is yours.'), state: 'done' });
+    else {
+      const tokens = routeTokens(cur.keys);
+      const progress = routeProgress(tokens, run.session.keyLog.slice(run.session.goalMark || 0));
+      card.set({ n: Math.min(run.doneCount + 1, m), m, goal: cur.text, keys: tokens, progress, state: 'repeat' });
+    }
+    card.el.hidden = false;
+    placeNow();
+  }
+  /** The card beside the goal's target on the side with the most room (the lesson workspace's rule), or docked when the goal has none. */
+  function placeNow() {
+    if (!sheetView) return;
+    const gw = sheetView.gw, b = sheetView.box(); if (!b) return;
+    const g = gw.getBoundingClientRect(), st = stage.getBoundingClientRect();
+    if (!g.width || !g.height) return;
+    const box = { w: gw.clientWidth, h: gw.clientHeight, x0: b.x0, y0: b.y0 };
+    const sl = gw.scrollLeft, sp = gw.scrollTop;
+    const shift = r => (r ? { left: r.left - sl, top: r.top - sp, width: r.width, height: r.height } : null);
+    const cur = run.finished ? null : run.current;
+    const names = (run.session.sheets || []).map(x => x.name);
+    const target = cur ? shift(unionBox(targetBoxes(sheetView, inferTarget(cur, names), sheetName()))) : null;
+    const sel = run.session.sheet && run.session.sheet.selectionText ? run.session.sheet.selectionText() : '';
+    const avoid = targetBoxes(sheetView, sel, null).map(shift).filter(r => r.width * r.height < 0.3 * box.w * box.h);
+    const size = card.measure();
+    card.place(placeCard(box, target, size, { avoid }), { left: g.left - st.left, top: g.top - st.top });
+  }
   function paint() {
-    if (destroyed) return;
+    if (destroyed || !sheetView || !ribbonView) return;   // a change while the views mount (the zoom) paints once they are up
     ribbonView.render(); sheetView.render();
-    const states = run.goalStates();
     $('demoCount').textContent = `${run.doneCount} / ${run.goals.length}`;
-    const tab = $('demoTab'), sh = run.session.sheets && run.session.sheets[run.session.sheetIndex];
-    if (tab) tab.textContent = sh ? sh.name : '';
-    const cur = run.current;
-    $('demoTask').innerHTML = cur && !run.finished
-      ? `<div class="task-label">${taken ? 'Now' : 'Watch'}</div><div class="task-goal">${esc(cur.text)}</div>${cur.teach ? `<div class="task-teach">${teachHtml(cur.teach)}</div>` : ''}<div class="task-keys">${cur.keys.split(/\s+/).map(k => /^(then|×\d+)$/.test(k) ? `<span class="kx">${esc(k)}</span>` : `<kbd>${esc(keyLabel(k))}</kbd>`).join(' ')}</div>`
-      : `<div class="task-label">Done</div><div class="task-teach">${esc(siteCopy('demo_done', 'That was a lesson. The sheet is graded on how it ends up, so any route that gets there counts, and the next one is yours.'))}</div>`;
-    const list = $('demoGoals');
-    list.innerHTML = states.map(g => `<li class="goal ${g.done ? 'done' : g.current ? 'current' : ''}"><span class="goal-mark">${g.done ? '✓' : g.current ? '›' : ''}</span><span class="goal-text">${esc(g.text)}</span></li>`).join('');
-    // a short frame shows fewer goals: the list keeps the current one in view, at its top (the ticked ones scroll away above it)
-    const now = list.querySelector('.goal.current');
-    list.scrollTop = now && now.offsetTop + now.offsetHeight > list.clientHeight ? now.offsetTop : 0;
-    list.classList.toggle('dp-goals-more', list.scrollHeight - list.scrollTop > list.clientHeight + 1);   // more below: fade the cut line out
+    $('demoTab').textContent = sheetName();
+    paintCard();
   }
 
   function step() {
@@ -169,19 +194,30 @@ export function mountDemo(host, o = {}) {
     run.reset('guided');
     mountViews(); i = 0; done = false; play();
   }
+  /** The zoom that fits the Report across the sheet's frame, at the frame's current width. */
+  function fitZoom() {
+    const S = run.session.sheet, w = $('demoSheet').clientWidth;
+    if (!S || !(w > 0)) return false;
+    const z = demoZoom(S, w - 2);
+    if (z === S.zoom) return false;
+    S.setZoom(z); return true;
+  }
   /** Fresh views on the run's (possibly rebuilt) session. */
   function mountViews() {
-    if (unclip) unclip(); if (sheetView) sheetView.destroy(); if (ribbonView && ribbonView.destroy) ribbonView.destroy(); if (keycaps) keycaps.destroy();
+    if (unclip) unclip(); if (sheetView) sheetView.destroy(); if (ribbonView && ribbonView.destroy) ribbonView.destroy();
     $('demoSheet').innerHTML = ''; $('demoRibbonSlot').innerHTML = '<div class="ribbon" id="demoRibbon"></div>';
-    sheetView = new SheetView($('demoSheet'), run.session);
-    // AutoFit on the cell font as it renders, so the whole feed fits the card where it can; then paint at those widths
-    fitDemoColumns(run.session.sheet, textMeasurer($('demoSheet')) || undefined);
+    const ss = run.session;
+    ss.settings.ribbonCollapsed = true;   // the Ribbon's tab row; a KeyTip walk opens the groups over the sheet, as Ctrl+F1 does in Excel
+    // so small a frame shows the page whole: no outline bar over the column letters, no frozen column holding the title in A
+    for (const e of ss.sheets || []) if (e.sheet) { e.sheet.groups = { rows: [], cols: [] }; e.sheet.freeze = { r: 0, c: 0 }; }
+    sheetView = new SheetView($('demoSheet'), ss);
+    fitDemoColumns(ss.sheet, textMeasurer($('demoSheet')) || undefined);
+    fitZoom();
     sheetView.render();
     // the frame is the one tab stop: its scroll box is not a second one (Tab in, Tab out)
     const gw = $('demoSheet').querySelector('.gridwrap'); if (gw) gw.tabIndex = -1;
-    ribbonView = new RibbonView($('demoRibbon'), run.session, { mode: 'full' });
-    keycaps = mountKeycaps(run.session, { el: $('demoKeys'), hold: 1600 });
-    unclip = clipToColumns($('demoSheet'), run.session);
+    ribbonView = new RibbonView($('demoRibbon'), ss, { mode: 'full' });
+    unclip = clipToColumns($('demoSheet'), ss);
     paint();
   }
   function play() {
@@ -191,13 +227,13 @@ export function mountDemo(host, o = {}) {
     step();
   }
   function stop() { playing = false; if (timer) clearTimeout(timer); timer = null; }
-  /** Play the rest at once (the learner pressed Enter). */
+  /** Play the rest at once. */
   function skip() { stop(); while (i < script.length) { const s = script[i++]; if (s.spec) run.pressSpec(s.spec); else if (s.text) for (const ch of s.text) run.key({ key: ch }); } finish(); }
   /** The visitor's key (or a click on the sheet, no event): the demo stops where it is and the sheet is theirs. */
   function takeover(ev) {
     if (taken) return ev ? run.key(ev) : false;
-    taken = true; stop(); keycaps.reset();
-    $('demoHand').hidden = false; $('demoPlay').hidden = true;
+    taken = true; stop();
+    $('demoPlay').hidden = true;
     if (o.onTakeover) { try { o.onTakeover(); } catch (e) { /* host hook */ } }
     const handled = ev ? run.key(ev) : false;
     paint();
@@ -206,6 +242,8 @@ export function mountDemo(host, o = {}) {
 
   run.onChange(() => { paint(); if (o.onChange) { try { o.onChange(); } catch (e) { /* host hook */ } } });
   mountViews();
+  // a wider or narrower frame (the window, the breakpoint) refits the zoom and moves the card
+  if (typeof ResizeObserver === 'function') { ro = new ResizeObserver(() => { if (destroyed) return; if (fitZoom()) sheetView.render(); placeNow(); }); ro.observe($('demoSheet')); }
   $('demoPlay').onclick = e => { e.stopPropagation(); play(); };
   if (o.autoplay !== false) play();
   else $('demoPlay').hidden = false;   // reduced motion: the first frame, still, with a way to start it
@@ -214,7 +252,7 @@ export function mountDemo(host, o = {}) {
     get playing() { return playing; }, get started() { return started; }, get taken() { return taken; },
     /** Finished: the script ran out, or the goals all landed while the last pause still runs. */
     get done() { return done || run.finished; },
-    destroy() { destroyed = true; stop(); if (unclip) unclip(); if (keycaps) keycaps.destroy(); if (sheetView) sheetView.destroy(); if (ribbonView && ribbonView.destroy) ribbonView.destroy(); el.remove(); },
+    destroy() { destroyed = true; stop(); if (ro) ro.disconnect(); if (unclip) unclip(); card.destroy(); if (sheetView) sheetView.destroy(); if (ribbonView && ribbonView.destroy) ribbonView.destroy(); el.remove(); },
   };
 }
 
