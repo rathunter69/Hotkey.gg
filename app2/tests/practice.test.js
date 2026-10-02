@@ -56,3 +56,33 @@ test('practice: one time format, a space before the unit', () => {
   assert.equal(fmtSecs(150), '150.0 s');
 });
 
+
+// R7's exit check (REBUILD_PLAN 2a): Practice shows every built drill, with pars from a reference route.
+test('practice: every registered drill shows under its chapter and module on Practice, with pars from its reference route', async () => {
+  const { CATALOG } = await import('../content/catalog.js');
+  const { catalogRows } = await import('../app/practice-page.js');
+  const { parsFromRoute } = await import('../app/pars.js');
+  const groups = catalogRows(CATALOG, {});
+  const shown = new Map();
+  for (const g of groups) for (const r of g.rows) { assert.ok(!shown.has(r.id), `${r.id} shows once`); shown.set(r.id, g.id); }
+  const drills = DRILLS.filter(d => d.kind !== 'challenge');
+  assert.equal(shown.size, drills.length, 'the Drills page lists exactly the registered drills');
+  for (const d of drills) {
+    assert.equal(shown.get(d.id), d.chapter, `${d.id} shows under its chapter`);
+    const m = drillModule(d);
+    assert.ok(m && m.id, `${d.id} sits under a Practice module`);
+    assert.ok(Number.isFinite(d.route) && d.route > 0, `${d.id}: a reference route time`);
+    assert.ok(typeof d.solution === 'string' && d.solution.trim(), `${d.id}: a reference route to replay`);
+    assert.deepEqual(d.pars, parsFromRoute(d.route), `${d.id}: pars from its reference route`);
+    const e = CATALOG.find(x => x.id === d.id);
+    assert.deepEqual(e.pars, d.pars, `${d.id}: the catalog carries the pars Practice shows`);
+    assert.equal(e.route.solution, d.solution, `${d.id}: the catalog carries the reference route`);
+  }
+});
+
+test("practice: a drill's keycaps are chords, never typed text in either quote", async () => {
+  const { routeKeys } = await import('../ui/components/path.js');
+  assert.deepEqual(routeKeys(`Ctrl+G "A1" Enter '=MID(F5,FIND("@",F5)+2,7)' Ctrl+Enter Alt H B P`), ['Ctrl+Enter', 'Alt H B P', 'Ctrl+G']);
+  for (const d of DRILLS.filter(x => x.kind !== 'challenge'))
+    for (const k of routeKeys(d.solution)) assert.ok(!/["'(]|^=/.test(k) && !/ .*[=(]/.test(k), `${d.id}: keycap ${k} is typed text`);
+});

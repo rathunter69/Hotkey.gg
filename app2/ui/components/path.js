@@ -22,12 +22,12 @@ const pretty = k => k.split('+').map(p => PRETTY[p] || p).join('+');
  * they are how every route moves, not what a drill drills. Pure.
  */
 export function routeKeys(solution, max = Infinity) {
-  const toks = String(solution || '').match(/"[^"]*"|\S+/g) || [];
+  const toks = String(solution || '').match(/"[^"]*"|'[^']*'|\S+/g) || [];   // typed text in either quote, as the key script reads it
   const out = [];
   const add = k => { if (k && !out.includes(k)) out.push(k); };
   for (let i = 0; i < toks.length; i++) {
     const tk = toks[i];
-    if (tk.startsWith('"')) continue;
+    if (tk.startsWith('"') || tk.startsWith("'")) continue;
     if (tk === 'Alt') {
       const seq = ['Alt'];
       while (i + 1 < toks.length && /^[A-Z0-9]$/i.test(toks[i + 1]) && seq.length < 5) seq.push(toks[++i].toUpperCase());

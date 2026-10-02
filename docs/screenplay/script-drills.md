@@ -894,3 +894,41 @@ What the Chapter 1 build (M108) changed from the sketches above, one line each.
   - A drill may carry up to 20 goals (was 12), since the formatting drills step through a full page.
   - The page builder no longer widens the label column to fit the source line, which overflows across empty cells as in Excel.
   - Shares that always total 100% and links to another sheet are graded by what the formula reads, since the what-if check cannot move them.
+
+## Built differently (R7)
+
+### Chapter 5 Wave 1 drills (r7-drills-5)
+- Circle hunt drops the "breaker to 0, iteration off, F9" step, because the model's interest circle stays circular even with the breaker at 0, as it does in Excel.
+- Depreciation waterfall uses one anchored ROWS/INDEX formula, because the model has no vintage-year column.
+- Four accounting pages gained a column to meet the drill tab's minimum width of five columns.
+- The Seeds variants in the sketches are not built.
+
+### Chapter 4 drills and Chapter 6 Wave 1 drills (r7-drills-46)
+- Chapter 4 has seven planned drills plus the puzzle, because 6.2's table already lists sort and filter.
+- Sort and filter has no second seed using the Subtotal command, because the engine lacks Alt A B.
+- Pivot in 90 puts weeks across, not months, because the export covers one fortnight. Cube it runs site by week.
+- The data table runs the ticket price against the member share. Two pickers uses a week picker.
+- Three ways to a price uses the pack's own medians and has no precedents seed. Ceiling price checks an "against the bid" row instead of a Goal Seek memo.
+- The napkin LBO sits under the LBO, on rows 151 to 171.
+- Polish: LBO row 146 shows ##### in C:E, because the column is too narrow.
+
+### Chapter 2 and 3 drills (r7-drills-23)
+- puzzle-ch2's task line is reworded, because the P&L has seven cost lines, not six.
+- ch2-print-it fits to one page by one page and sets no custom header margin.
+- ch2-custom-code has no second seed (multiples), and ch3-text-split has no three-part lane seed.
+- puzzle-ch3's fiscal-calendar block is planted under the calendar on Sites.
+- ch3-trace-the-error puts its five faults on Loans. ch3-tie-it-out is filed under the auditing module.
+- ch3-date-math's timeline is the export's month-end column.
+
+### Rapid-fire (r7-rapid)
+- The deck has 117 commands from Chapters 1 to 4. Chapters 5 and 6 teach no new keys.
+- The Ctrl+Shift date and time format shortcuts are left out, because the engine lacks them.
+- Drill these starts a 30-second round of just the three slowest commands.
+- Leaving a round with Esc doesn't record it, unless Combo 10 was reached.
+
+### Quests, XP, achievements and what-if (r7-systems)
+- Sound sets are skipped, so that level band pays panel styles instead. With seven themes, most band firsts pay flair rather than a theme.
+- Tested Out is hidden.
+- The clean-lesson +10 and quest XP are kept on the device only, not on the server.
+- Board flair shows on the profile only, not on the leaderboard.
+- Perfect Round counts any round of 20 or more hits with no misses.
