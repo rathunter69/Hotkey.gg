@@ -322,7 +322,6 @@ html[data-effects="off"] .lp-in .lp-mod i, html[data-effects="off"] .lp-in .lp-m
 .kr-tbl td.kr-what{min-width:var(--kr-what-min); line-height:1.3; padding-top:var(--s1); padding-bottom:var(--s1)}
 .kr-tbl td.kr-state{width:1%}
 .kr-keys .chord{white-space:nowrap; display:inline-flex; align-items:center; margin:calc(var(--s1) / 2) 0}
-.key.key-arrows{letter-spacing:var(--s1)}
 .kr-what{font-weight:var(--fw-semi); font-size:var(--fs-name)}
 .kr-or{margin:0 var(--s1)}
 .kr-lesson{color:var(--ink-2); text-decoration:none}

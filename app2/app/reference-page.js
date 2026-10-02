@@ -100,7 +100,7 @@ export function learnerKeyContext() {
 /** Keycaps for one chord: held keys joined with +, alternatives with /, sequence segments side by side. */
 export function chordHtml(chord, parseChord) {
   // the four arrows as alternatives read as one key, the way the cluster sits under your hand
-  const alts = key => (key.length === 4 && ['↑', '↓', '←', '→'].every(k => key.includes(k)) ? '<kbd class="key key-arrows">↑↓←→</kbd>' : key.map(k => `<kbd class="key">${esc(k)}</kbd>`).join('<span class="chord-alt">/</span>'));
+  const alts = key => (key.length === 4 && ['↑', '↓', '←', '→'].every(k => key.includes(k)) ? '<kbd class="key key-arrows">↑ ↓ ← →</kbd>' : key.map(k => `<kbd class="key">${esc(k)}</kbd>`).join('<span class="chord-alt">/</span>'));
   return parseChord(chord).map(seg => `<span class="chord">${seg.map(alts).join('<span class="chord-plus">+</span>')}</span>`).join('');
 }
 
