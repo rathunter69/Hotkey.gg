@@ -223,6 +223,7 @@ import your_stake from './lessons/your-stake.js';
 import football_field_board_page from './lessons/football-field-board-page.js';
 import challenge_board_page from './lessons/challenge-board-page.js';
 import ch6_project from './lessons/ch6-project.js';
+import ch6_assessment from './lessons/ch6-assessment.js';
 
 export const CHAPTERS = [
   {
@@ -381,7 +382,7 @@ export const CHAPTERS = [
     lessons: [
       bids_side_by_side, the_waterfall, your_stake, football_field_board_page,
       challenge_board_page,
-      ch6_project,
+      ch6_project, ch6_assessment,
     ],
   },
 ];

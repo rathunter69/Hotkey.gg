@@ -2463,6 +2463,18 @@ export const COPY = {
    "mac_note": "",
    "story_beat": ""
   },
+  "ch6-assessment": {
+   "id": "ch6-assessment",
+   "module": "ch6-project-and-assessment",
+   "order": "6.5.A",
+   "title": "Assessment: raw comps and bids in, the board’s page out",
+   "brief": "A fresh set: the precedents and the LBO are done, the comps spread and three bids are raw, and the odds are new. Spread the comps, price the bids and their waterfalls, then build the board’s page with every link live. No help, the keyboard only. Pass, and the last chapter is Verified; this is also the test-out. The key is `Ctrl+Enter`.",
+   "closing": "Fresh peers, fresh odds, and fifteen minutes later the board has its page: the comps spread, three bids priced to the owners’ proceeds, the leading one named, every figure live. || That is the pack a sell side team puts in front of a board, and you built it under a clock.",
+   "wow": "Raw comps and three bids in, the board’s page out, on the clock, and the program is yours.",
+   "convention_line": "Write once, fill right; The check is a live difference → 0",
+   "mac_note": "",
+   "story_beat": ""
+  },
   "remix-format-on-the-pnl": {
    "id": "remix-format-on-the-pnl",
    "module": "remixes",
@@ -15436,6 +15448,104 @@ export const COPY = {
     "lesson_id": "ch6-project",
     "goal_index": "14",
     "text": "Does it hold? Watch bid B’s earnout odds in Bids C58 go from 50% to 90%: its line on the football field moves with them.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "ch6-assessment": [
+   {
+    "lesson_id": "ch6-assessment",
+    "goal_index": "0",
+    "text": "Build each peer’s market value, enterprise value and multiples on Comps, columns E to M.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch6-assessment",
+    "goal_index": "1",
+    "text": "Mark all three peers in with 1 in Comps N5:N7, then build the included multiples and their statistics in rows 8 to 13.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch6-assessment",
+    "goal_index": "2",
+    "text": "Build the comps range on Comps, rows 35 to 44: the multiples low, mid and high, enterprise value and equity value each way.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch6-assessment",
+    "goal_index": "3",
+    "text": "Price the three bids on Bids, rows 11 to 20: cash at close, the earnout and the rollover each valued.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch6-assessment",
+    "goal_index": "4",
+    "text": "Weigh each bid by its certainty in Bids row 22, then rank the bids by headline, priced and expected value in rows 25 to 27.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch6-assessment",
+    "goal_index": "5",
+    "text": "Build each bid’s waterfall in Bids rows 30 to 39, from enterprise value to every owner’s proceeds, with its check.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch6-assessment",
+    "goal_index": "6",
+    "text": "Value your options under each bid in Bids rows 42 and 43.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch6-assessment",
+    "goal_index": "7",
+    "text": "Link the football field on Summary, C9:E15, and read each mid against the DCF’s in F9:F15.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch6-assessment",
+    "goal_index": "8",
+    "text": "Name the bid that leads on expected value in Summary C18, then pull its waterfall and your stake into C19:C29.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch6-assessment",
+    "goal_index": "9",
+    "text": "Give the Summary its title in A1, units in A2, the flag and date in C5:C6, a line in B33, and turn the gridlines off.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch6-assessment",
+    "goal_index": "10",
+    "text": "Fill the checks in Summary C36:C39 until each reads 0.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch6-assessment",
+    "goal_index": "11",
+    "text": "Does it hold? Watch bid B’s earnout odds in Bids C58 go to 95%: its line on the football field moves with them.",
     "teach": "",
     "why": "",
     "hint_stuck": ""

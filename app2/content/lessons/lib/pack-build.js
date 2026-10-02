@@ -22,19 +22,27 @@ export const partKeys = p => [...p.typed.map(typedKeys), ...p.blocks.map(blockKe
 
 /**
  * The project's or the assessment's build: `before` cut back against `after`, the planting (formats
- * everywhere, the data whole except the entries `learner(t)` leaves to the learner), and goals
+ * everywhere, the data whole except the entries `learner(t)` leaves to the learner, the formula
+ * blocks whole where `builds(b)` says the learner does not build them, and nothing over the cells
+ * the seed writes, `seeded`), and goals
  * from `PARTS` ({ id, text, of(cut) → part, requires, convention, also(ses) }). `want(ses)` reads
  * the figures a cell should land on (the finished state's, or the finished state on a seed).
  */
-export function packBuild({ before, after, learner, leave = [], sheets = null }) {
+export function packBuild({ before, after, learner, builds = () => true, leave = [], sheets = null, seeded = [] }) {
   let CUT = null, PLANT = null;
   const cut = () => {
     if (CUT) return CUT;
     const all = cutOf(before, after, { sheets });
-    CUT = { blocks: all.blocks, typed: all.typed.filter(learner), given: all.typed.filter(t => !learner(t)) };
+    CUT = { blocks: all.blocks.filter(builds), typed: all.typed.filter(learner), given: all.typed.filter(t => !learner(t)), done: all.blocks.filter(b => !builds(b)) };
     return CUT;
   };
-  const plant = () => PLANT || (PLANT = plantFrom(before, after, { whole: cut().given.map(t => `${t.sheet}!${t.ref}`), leave, sheets }));
+  const whole = () => [...cut().given.map(t => `${t.sheet}!${t.ref}`), ...cut().done.flatMap(b => b.refs.map(r => `${b.sheet}!${r}`))];
+  const plant = () => {
+    if (PLANT) return PLANT;
+    PLANT = plantFrom(before, after, { whole: whole(), leave, sheets });
+    for (const k of seeded) delete PLANT[k];   // the seed writes these, whole
+    return PLANT;
+  };
   const goal = (p, want) => {
     let P = null; const of = () => (P = P || p.of(cut()));
     return { id: p.id, text: p.text, get keys() { return [p.pre, partKeys(of()), p.post].filter(Boolean).join(' '); }, requires: p.requires, convention: p.convention,
