@@ -69,7 +69,7 @@ const SHEET_PROPS = ['condFmt', 'rowH', 'gridlines', 'colW', 'freeze'];
 
 /**
  * A planting over `before` from `after`: every cell that differs arrives with its formats only (the
- * learner types the figure), a cell named in `whole` arrives whole (the term sheets, a note), a
+ * learner types the figure), a cell named in `whole` (or every cell, `whole: true`) arrives whole, a
  * cell `after` lacks is cleared, and a sheet-level difference (conditional formats, gridlines)
  * arrives as after has it unless named in `leave` ('Summary!#gridlines'). `drop` maps a ref
  * ('Bids!C35') to the format fields the learner applies. Returns a state patch.
