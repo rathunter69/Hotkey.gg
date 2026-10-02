@@ -1947,6 +1947,18 @@ export const COPY = {
    "mac_note": "",
    "story_beat": ""
   },
+  "timeline-flags-counters": {
+   "id": "timeline-flags-counters",
+   "module": "model-setup",
+   "order": "5.2.2",
+   "title": "The timeline row: flags and counters",
+   "brief": "Every sheet in the model shares one timeline: FY24 to FY31 across the same columns, built from one date on Inputs (2.6.2), with the A/E flags underneath (2.1.4). This time the flags do work: a projection flag (1 in a projected year, 0 in a historical one, FY26 included) lets one formula read the actual where there is one and calculate where there isn’t, and a counter drives growth and ramps. Build the row once on Inputs and link it to every sheet. The key is `EOMONTH`.",
+   "closing": "One timeline runs across eight sheets, and its flags let one row hold history and forecast. || The projection flag reads a stated date, so when FY26 closes you move one input and the model shifts a year. The counters are what growth and the ramp of a new site will read from 5.3 on, and the same year sits in the same column everywhere.",
+   "wow": "One date on Inputs, and eight years with their flags and counters on every sheet.",
+   "convention_line": "Inputs blue, formulas black; The check is a live difference → 0",
+   "mac_note": "",
+   "story_beat": ""
+  },
   "remix-format-on-the-pnl": {
    "id": "remix-format-on-the-pnl",
    "module": "remixes",
@@ -12285,6 +12297,72 @@ export const COPY = {
     "teach": "",
     "why": "",
     "hint_stuck": "pulse tab Cover · The order of the tabs is the order of the calculation."
+   }
+  ],
+  "timeline-flags-counters": [
+   {
+    "lesson_id": "timeline-flags-counters",
+    "goal_index": "0",
+    "text": "On Inputs, type 12/31/2024 in C4, then =EOMONTH(C4,12) in D4 filled right to J4 with Ctrl+R.",
+    "teach": "The model is annual because it values the business, and it projects five years because fewer gives too little to value and more is hard to defend. One date is typed; every other year end counts on from it.",
+    "why": "",
+    "hint_stuck": "pulse range C4:J4 · Twelve months on from a year end is the next year end."
+   },
+   {
+    "lesson_id": "timeline-flags-counters",
+    "goal_index": "1",
+    "text": "The A/E row: A and A in C5:D5, then E across E5:J5 in one entry with Ctrl+Enter.",
+    "teach": "FY26 is the estimate for the year still running (2.1.4): its accounts aren’t closed, so it reads E like the forecast.",
+    "why": "",
+    "hint_stuck": "pulse range C5:J5 · Ctrl+Enter puts one entry in every selected cell."
+   },
+   {
+    "lesson_id": "timeline-flags-counters",
+    "goal_index": "2",
+    "text": "Type 12/31/2026 in C11 and name it LastHistorical with Alt, M, M, D.",
+    "teach": "The last year with figures from the accountants is an input, typed once in blue and named, so the flag reads a stated date and not a column.",
+    "why": "",
+    "hint_stuck": "pulse cell C11 · Define Name takes the selected cell as its reference."
+   },
+   {
+    "lesson_id": "timeline-flags-counters",
+    "goal_index": "3",
+    "text": "The projection flag in C6, =IF(C$4>LastHistorical,1,0), filled to J6: 0 for FY24 to FY26, 1 after.",
+    "teach": "Best practice: a formula that reads the flag, =IF(flag=0, actual, calculation), lets one row carry history and forecast with no seam.",
+    "why": "",
+    "hint_stuck": "pulse range C6:J6 · FY26 ends on LastHistorical, so it isn’t greater and stays 0."
+   },
+   {
+    "lesson_id": "timeline-flags-counters",
+    "goal_index": "4",
+    "text": "Counters: 1 in C7 and =C7+1 across D7:J7, then =IF(C6=1,MAX(B8,0)+1,0) across C8:J8, which starts at 1 in FY27.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C7:J8 · B8 is a label, and MAX of text and 0 is 0."
+   },
+   {
+    "lesson_id": "timeline-flags-counters",
+    "goal_index": "5",
+    "text": "Fill =COLUMNS($C4:C4) across C9:J9, and =C9-C7 across C10:J10, which reads zero.",
+    "teach": "The desk’s other counter, =COLUMNS($C4:C4), reads 1 in the first period and one more with every column it fills across, with no first cell to break and no typed offset. Insert a column in front and it still counts from 1, where =COLUMN()-2 would not.",
+    "why": "",
+    "hint_stuck": "pulse range C9:J10 · The anchored $C keeps the start still while the end moves."
+   },
+   {
+    "lesson_id": "timeline-flags-counters",
+    "goal_index": "6",
+    "text": "Group IS to DCF with Ctrl+Shift+PgDn, and link row 4 once: =Inputs!C4 in C4, filled right to J4.",
+    "teach": "Best practice: the same year sits in the same column on every sheet, FY26 in column E everywhere, so a link across sheets never needs a MATCH and a reviewer never counts columns.",
+    "why": "",
+    "hint_stuck": "pulse range C4:J4 · Ctrl+PgUp walks back through the group without ending it."
+   },
+   {
+    "lesson_id": "timeline-flags-counters",
+    "goal_index": "7",
+    "text": "Does it tie? Watch the first year end move back a year on Inputs, and every header on IS roll with it.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C4:J4 · Every year end reads the one before it."
    }
   ]
  },
