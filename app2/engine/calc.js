@@ -16,7 +16,8 @@
 import { evalFormula, formulaRefs, isErrVal } from './formula.js';
 import { refKey, parseRef } from './refs.js';
 
-const VOLATILE = /\b(TODAY|NOW|RAND|RANDBETWEEN|RANDARRAY)\s*\(/i;
+// SUBTOTAL rides along: hiding, filtering or folding rows changes what it reads without touching a cell
+const VOLATILE = /\b(TODAY|NOW|RAND|RANDBETWEEN|RANDARRAY|SUBTOTAL)\s*\(/i;
 const rectKeys = rg => { const out = []; for (let r = rg.r1; r <= rg.r2; r++) for (let c = rg.c1; c <= rg.c2; c++) out.push(refKey(r, c)); return out; };
 const same = (a, b) => a === b || (Number.isNaN(a) && Number.isNaN(b));
 const byPos = (a, b) => { const A = parseRef(a), B = parseRef(b); return (A.r - B.r) || (A.c - B.c); };

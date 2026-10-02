@@ -149,7 +149,7 @@ export function tokenize(src) {
 const MIN_ARGS = { SUM: 1, MAX: 1, MIN: 1, ABS: 1, SIGN: 1, INT: 1, TRUNC: 1, AVERAGE: 1, PRODUCT: 1, MEDIAN: 1, COUNT: 1, COUNTA: 1, COUNTBLANK: 1, ROUND: 2, ROUNDUP: 2, ROUNDDOWN: 2, MOD: 2, SQRT: 1, POWER: 2, EXP: 1, LN: 1, LOG: 1, LOG10: 1,
   LARGE: 2, SMALL: 2, RANK: 2, 'RANK.EQ': 2, QUARTILE: 2, 'QUARTILE.INC': 2, PERCENTILE: 2, 'PERCENTILE.INC': 2, SUMPRODUCT: 1, SUMIF: 2, COUNTIF: 2, AVERAGEIF: 2, SUMIFS: 3, COUNTIFS: 2, AVERAGEIFS: 3, MAXIFS: 3, MINIFS: 3, AND: 1, OR: 1, XOR: 1, NOT: 1,
   IF: 2, IFS: 2, IFERROR: 2, IFNA: 2, CHOOSE: 2, SWITCH: 3, ISERROR: 1, ISERR: 1, ISNA: 1,
-  ISBLANK: 1, ISNUMBER: 1, ISTEXT: 1, ISNONTEXT: 1, ISLOGICAL: 1, ISFORMULA: 1, HYPERLINK: 1, MATCH: 2, INDEX: 2, VLOOKUP: 3, HLOOKUP: 3, XLOOKUP: 3, OFFSET: 3, ROWS: 1, COLUMNS: 1, LEN: 1, LEFT: 1, RIGHT: 1, MID: 3,
+  ISBLANK: 1, ISNUMBER: 1, ISTEXT: 1, ISNONTEXT: 1, ISLOGICAL: 1, ISFORMULA: 1, HYPERLINK: 1, MATCH: 2, INDEX: 2, VLOOKUP: 3, HLOOKUP: 3, XLOOKUP: 3, OFFSET: 3, INDIRECT: 1, SUBTOTAL: 2, ROWS: 1, COLUMNS: 1, LEN: 1, LEFT: 1, RIGHT: 1, MID: 3,
   FIND: 2, SEARCH: 2, TRIM: 1, UPPER: 1, LOWER: 1, PROPER: 1, CONCATENATE: 1, CONCAT: 1, TEXTJOIN: 3, SUBSTITUTE: 3, REPT: 2, EXACT: 2, VALUE: 1, TEXT: 2, T: 1, N: 1,
   DATE: 3, YEAR: 1, MONTH: 1, DAY: 1, WEEKDAY: 1, DAYS: 2, EDATE: 2, EOMONTH: 2, YEARFRAC: 2, NPV: 2, IRR: 1, PMT: 3, PV: 3, FV: 3,
   REPLACE: 4, RRI: 3, QUARTILE: 2, 'QUARTILE.INC': 2, PERCENTILE: 2, 'PERCENTILE.INC': 2, ISFORMULA: 1, FILTER: 2, SORT: 1, UNIQUE: 1, SEQUENCE: 1, TRANSPOSE: 1, XMATCH: 2,
@@ -158,7 +158,7 @@ const MIN_ARGS = { SUM: 1, MAX: 1, MIN: 1, ABS: 1, SIGN: 1, INT: 1, TRUNC: 1, AV
 const MAX_ARGS = { ABS: 1, SIGN: 1, INT: 1, TRUNC: 2, COUNTBLANK: 1, ROUND: 2, ROUNDUP: 2, ROUNDDOWN: 2, MOD: 2, SQRT: 1, POWER: 2, EXP: 1, LN: 1, LOG: 2, LOG10: 1, PI: 0, RAND: 0,
   LARGE: 2, SMALL: 2, RANK: 3, 'RANK.EQ': 3, QUARTILE: 2, 'QUARTILE.INC': 2, PERCENTILE: 2, 'PERCENTILE.INC': 2, SUMIF: 3, COUNTIF: 2, AVERAGEIF: 3, NOT: 1, TRUE: 0, FALSE: 0, NA: 0,
   IF: 3, IFERROR: 2, IFNA: 2, ISERROR: 1, ISERR: 1, ISNA: 1, ISBLANK: 1, ISNUMBER: 1, ISTEXT: 1, ISNONTEXT: 1, ISLOGICAL: 1, ISFORMULA: 1, HYPERLINK: 2,
-  MATCH: 3, INDEX: 4, VLOOKUP: 4, HLOOKUP: 4, XLOOKUP: 6, OFFSET: 5, ROWS: 1, COLUMNS: 1, ROW: 1, COLUMN: 1, LEN: 1, LEFT: 2, RIGHT: 2, MID: 3,
+  MATCH: 3, INDEX: 4, VLOOKUP: 4, HLOOKUP: 4, XLOOKUP: 6, OFFSET: 5, INDIRECT: 2, ROWS: 1, COLUMNS: 1, ROW: 1, COLUMN: 1, LEN: 1, LEFT: 2, RIGHT: 2, MID: 3,
   FIND: 3, SEARCH: 3, TRIM: 1, UPPER: 1, LOWER: 1, PROPER: 1, SUBSTITUTE: 4, REPT: 2, EXACT: 2, VALUE: 1, TEXT: 2, T: 1, N: 1,
   TODAY: 0, DATE: 3, YEAR: 1, MONTH: 1, DAY: 1, WEEKDAY: 2, DAYS: 2, EDATE: 2, EOMONTH: 2, YEARFRAC: 3, IRR: 2, PMT: 5, PV: 5, FV: 5,
   REPLACE: 4, RRI: 3, QUARTILE: 2, 'QUARTILE.INC': 2, PERCENTILE: 2, 'PERCENTILE.INC': 2, ISFORMULA: 1, FILTER: 3, SORT: 4, UNIQUE: 3, SEQUENCE: 4, TRANSPOSE: 1, XMATCH: 4,
@@ -939,6 +939,43 @@ export function evalFormula(expr, ctx = {}) {
         const h = has(args, 3) ? toInt(args[3]) : base.rows, w = has(args, 4) ? toInt(args[4]) : base.cols;
         if (h < 1 || w < 1) throw err('#REF!'); const r1 = base.r1 + dr, c1 = base.c1 + dc; if (r1 < 1 || c1 < 1) throw err('#REF!');
         return new Range(r1, c1, r1 + h - 1, c1 + w - 1, base.sheet); }
+      case 'INDIRECT': {
+        // the text of a reference, read as one (A1 style; a sheet prefix, a range and a defined name all
+        // work): an unparseable text, or a text that is not a reference, is #REF!, as Excel reports it
+        if (has(args, 1) && !toBool(args[1])) throw err('#REF!');   // R1C1 texts are not read
+        const t = toText(args[0]).trim(); if (!t) throw err('#REF!');
+        let ast; try { ast = parseFormula('=' + t); } catch (e) { throw err('#REF!'); }
+        if (ast.k === 'name') { const t2 = ctx.name ? ctx.name(ast.v) : null; if (!t2) throw err('#REF!'); return new Range(t2.r1, t2.c1, t2.r2, t2.c2, t2.sheet || undefined); }
+        if (!['ref', 'range', 'colrange', 'rowrange'].includes(ast.k)) throw err('#REF!');
+        return ev(ast); }
+      case 'SUBTOTAL': {
+        // 1 to 11 skip only the rows the AutoFilter hides; 101 to 111 skip every row that does not show
+        // (hidden by hand, filtered, or in a collapsed outline). The sheet answers through ctx.rowFiltered
+        // and ctx.rowHidden; a range on another sheet is read whole.
+        const fn = toInt(args[0]); const base = fn > 100 ? fn - 100 : fn;
+        if (base < 1 || base > 11 || (fn > 11 && fn < 101)) throw err('#VALUE!');
+        const rgs = args.slice(1).map(argRange);
+        const hide = fn > 100 ? ctx.rowHidden : ctx.rowFiltered;
+        const vals = [], nonblank = [];
+        for (const rg of rgs) for (let r = rg.r1; r <= rg.r2; r++) {
+          if (!rg.sheet && hide && hide(r)) continue;
+          for (let c = rg.c1; c <= rg.c2; c++) { const x = cellVal(rg.at(r - rg.r1, c - rg.c1)); if (typeof x === 'number') vals.push(x); if (x !== null && x !== '') nonblank.push(x); }
+        }
+        const mean = xs => xs.reduce((a, b) => a + b, 0) / xs.length;
+        const variance = (xs, sample) => { if (xs.length < (sample ? 2 : 1)) throw err('#DIV/0!'); const m = mean(xs); return xs.reduce((a, x) => a + (x - m) * (x - m), 0) / (xs.length - (sample ? 1 : 0)); };
+        switch (base) {
+          case 1: if (!vals.length) throw err('#DIV/0!'); return mean(vals);
+          case 2: return vals.length;
+          case 3: return nonblank.length;
+          case 4: return vals.length ? Math.max(...vals) : 0;
+          case 5: return vals.length ? Math.min(...vals) : 0;
+          case 6: return vals.length ? vals.reduce((a, b) => a * b, 1) : 0;
+          case 7: return Math.sqrt(variance(vals, true));
+          case 8: return Math.sqrt(variance(vals, false));
+          case 9: return vals.reduce((a, b) => a + b, 0);
+          case 10: return variance(vals, true);
+          default: return variance(vals, false);
+        } }
       case 'ROWS': { const v = args[0]; if (!isRange(v) && !isArr(v)) throw err('#VALUE!'); return v.rows; }
       case 'COLUMNS': { const v = args[0]; if (!isRange(v) && !isArr(v)) throw err('#VALUE!'); return v.cols; }
       /* ---- dynamic arrays (M61): each gives an Arr, which spills at the top of a formula ---- */
@@ -1226,7 +1263,7 @@ export const FUNCTION_NAMES = ['ABS', 'AND', 'AVERAGE', 'AVERAGEIF', 'AVERAGEIFS
   'VALUE', 'VLOOKUP', 'WEEKDAY', 'XLOOKUP', 'XOR', 'YEAR', 'YEARFRAC',
   'FILTER', 'ISFORMULA', 'PERCENTILE', 'PERCENTILE.INC', 'QUARTILE', 'QUARTILE.INC', 'REPLACE', 'RRI', 'SEQUENCE', 'SORT', 'TRANSPOSE', 'UNIQUE', 'XMATCH',
   'NETWORKDAYS.INTL', 'DATEDIF', 'RATE', 'NPER', 'ADDRESS', 'GETPIVOTDATA',
-  'CEILING', 'FLOOR', 'DATEVALUE', 'NETWORKDAYS', 'XNPV', 'XIRR', 'PPMT', 'IPMT'];
+  'CEILING', 'FLOOR', 'DATEVALUE', 'NETWORKDAYS', 'XNPV', 'XIRR', 'PPMT', 'IPMT', 'INDIRECT', 'SUBTOTAL'];
 /**
  * The functions Formula AutoComplete lists (M83): desktop Excel's catalogue, so =AV offers AVEDEV
  * first as Excel's list does; the evaluator's own set plus the common ones it does not compute.

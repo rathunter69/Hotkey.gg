@@ -182,3 +182,13 @@ test('a block cut onto another sheet keeps its own arithmetic: references inside
   assert.equal(T.value('D4'), 30);
   assert.equal(S.cellAt('B10').formula, null, 'the source cells are gone');
 });
+
+test('INDEX and OFFSET over another sheet\'s range read that sheet, not the formula\'s own', () => {
+  const s = new Session(new Sheet({ cells: { A1: { value: 'own' }, A2: { value: 99 }, B2: { value: 77 },
+    C1: { formula: '=INDEX(Lists!$A$1:$A$3,2)' }, C2: { formula: '=INDEX(Lists!$A$1:$A$3,MATCH("b",Lists!$A$1:$A$3,0))' }, C3: { formula: '=INDEX(Lists!$A$1:$B$3,2,2)' },
+    C4: { formula: '=SUM(INDEX(Lists!$A$1:$B$3,0,2))' }, C5: { formula: '=INDEX(Lists!$A$2:$B$2,2)' }, C6: { formula: '=OFFSET(Lists!$A$1,1,1)' }, C7: { formula: '=SUM(OFFSET(Lists!$A$1,0,1,3,1))' } } }), { now: () => 0 });
+  s.sheets[0].name = 'Summary';
+  s.addSheet('Lists', new Sheet({ cells: { A1: { value: 'a' }, A2: { value: 'b' }, A3: { value: 'c' }, B1: { value: 1 }, B2: { value: 2 }, B3: { value: 3 } } }));
+  const S = s.sheets[0].sheet;
+  assert.deepEqual(['C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7'].map(r => S.value(r)), ['b', 'b', 2, 6, 2, 2, 6]);
+});
