@@ -103,9 +103,9 @@ test('records, XP and progress carry the challenge kind', async () => {
   const D = '2026-09-23';
   assert.equal(totalXP([{ kind: 'challenge', ref: 'c', day: D }]), 50, 'first pass pays the module bonus');
   assert.equal(totalXP([
-    { kind: 'challenge', ref: 'c', day: D }, { kind: 'challenge', ref: 'c', day: D },
-    { kind: 'challenge', ref: 'c', day: D }, { kind: 'challenge', ref: 'c', day: D }, { kind: 'challenge', ref: 'c', day: D },
-  ]), 50 + 30, 'repeats pay 10, capped at three a day');
+    { kind: 'challenge', ref: 'c', day: D }, { kind: 'challenge', ref: 'c', day: D, tier: 'pass' },
+    { kind: 'challenge', ref: 'c', day: D, tier: 'pro' }, { kind: 'challenge', ref: 'c', day: D, tier: 'pro' }, { kind: 'challenge', ref: 'c', day: D, tier: 'legendary' },
+  ]), 50 + 25 + 50, 'repeats pay nothing; Expert and Legendary each pay the first time (6.10)');
   // progress: the pass latches the best tier
   const mem = {}; globalThis.localStorage = { getItem: k => mem[k] ?? null, setItem: (k, v) => { mem[k] = String(v); }, removeItem: k => { delete mem[k]; } };
   try {

@@ -52,6 +52,7 @@ export function mergeRun(lessons, id, mode, secs, clean, opts = {}) {
   const p = { ...(out[id] || {}) };
   p.completed = true;
   if (mode === 'solo') p.solo = true;
+  if (clean === true) p.clean = true;
   if (mode === 'timed' || mode === 'challenge') {
     if (mode === 'timed') p.timed = true;
     const prev = Number.isFinite(p.best) ? p.best : null;
