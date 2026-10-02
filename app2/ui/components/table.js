@@ -59,7 +59,9 @@ export function buttonHtml({ label, key = '', href = '', primary = false, quiet 
   const inner = `<span>${esc(label)}</span>${key ? keycapHtml(key) : ''}`;
   const c = `btn2${primary ? ' btn2-primary' : quiet ? ' btn2-quiet' : ''} ${esc(cls)}`;
   if (href) return `<a class="${c}" href="${esc(href)}"${id ? ` id="${esc(id)}"` : ''}${attrsOf(attrs)}>${inner}</a>`;
-  return `<button type="button" class="${c}"${id ? ` id="${esc(id)}"` : ''}${attrsOf(attrs)}>${inner}</button>`;
+  // a form's submit button passes attrs.type = 'submit'; every other button is type="button"
+  const { type = 'button', ...rest } = attrs || {};
+  return `<button type="${type === 'submit' ? 'submit' : 'button'}" class="${c}"${id ? ` id="${esc(id)}"` : ''}${attrsOf(rest)}>${inner}</button>`;
 }
 
 /** The header block of a Practice page: the title, one line, a control at the right and the primary button. */

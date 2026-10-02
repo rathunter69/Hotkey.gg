@@ -57,6 +57,7 @@ export const MOMENTS = {
   'new-best': { when: 'A personal best outside a result', token: 'd-banner', banner: true },
   'note': { when: 'A goal with a tip', token: 'd-note', skip: false },
   'saving': { when: 'A write to the account', token: null, skip: false },
+  'unlocked': { when: 'Checkout unlocks the course (#/checkout/done)', token: 'd-unlock' },
 };
 export const MOMENT_NAMES = Object.keys(MOMENTS);
 /** The result sequence (3.0's table), each step's start and end in ms from the moment the run ends. */

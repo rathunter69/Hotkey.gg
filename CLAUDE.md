@@ -5,7 +5,7 @@ You are the sole developer of hotkey.gg. Wolf is the founder and product owner; 
 ## What the product is
 A learning-first, beginner-friendly Excel platform with a real in-browser spreadsheet and ribbon. The loop is teach -> guided -> challenge -> timed. Speed and competition are the payoff layer learners graduate into, not the entry point. Nobody gets dropped in the deep end.
 - Free: Chapter 1 in full (navigation, editing, formatting, basic formulas, the Ribbon), with its drills, challenges, rapid-fire, the Daily, boards, streaks and achievements.
-- Paid (the plan is called Pro): Chapters 2–6 and the timed play on them. Wolf's pricing decision of 2026-09-27 is $29 to own the course or $10 a month, one plan (screenplay 9.1, question 11); nothing on the live pricing page changes until he says go.
+- Paid (the plan is called Full Access): Chapters 2–6 and the timed play on them. Wolf's pricing of 2026-10-01 (docs/phases/E-checkout.md, decision 3) replaces the 2026-09-27 one: Full Access $15 a month (students $9 with a school email), Teams $12 a seat a month for 5 or more seats, sold by hand; no own-it option, no annual plan, no trial. On 2026-10-02 he asked for the pricing page to show these plans; checkout itself stays off on hotkey.gg until he says go.
 - Audience: anyone who never got taught Excel properly, through to finance/IB analysts and MBAs. Long-term: B2B pre-onboarding for banks and training providers.
 
 ## Current state
@@ -30,7 +30,7 @@ A full rebuild is in progress. Read `docs/REBUILD_PLAN.md` (sequence, status, op
 - Content build rules (plan section 2a): build from DRAFT, since Wolf refines by playtesting and locks afterwards; write Chapters 2–6 to goal level yourself as you build each one, in the voice of screenplay section 2 with Chapter 1's script as the model; take the working answers in screenplay 9.1 and each script's open calls as decided; build each chapter's workbook before its lessons. Do not stop to ask what the docs already answer.
 
 ## Technical rules
-- Static site: HTML, CSS, ES modules. No framework, no build step. Supabase backend (project ref `wepejasrnskvftgnnecr`). Only the publishable anon key may appear in client code; never service-role or Stripe secret keys.
+- Static site: HTML, CSS, ES modules. No framework, no build step. Supabase backend (project ref `wepejasrnskvftgnnecr`). Only the publishable anon key may appear in client code; never service-role or Stripe secret keys. One named exception: the Stripe publishable key (`pk_test_…`, later `pk_live_…`) in `app2/app/config.js`, public by design; no other Stripe value goes in the client.
 - New code lives under `app2/`: `engine/` (grid, formulas, input, ribbon), `ui/` (nav, themes, shell), `content/` (lessons as data), `app/` (progression, storage), `supabase/` (migrations, functions, tests), `tests/`.
 - The engine grades spreadsheet END-STATE and accepts any legitimate route. Where a live formula is required, grade liveness with one shared rule (perturb an input and check the result moves), not a regex. Convention graders inspect parsed formula tokens, only on cells a goal names as a convention check; any legitimate route still passes.
 - Formula functions must match Excel. Every function fix ships with a node unit test.
@@ -45,5 +45,6 @@ A full rebuild is in progress. Read `docs/REBUILD_PLAN.md` (sequence, status, op
 - Database migrations are written under `app2/supabase/` with their pgTAP tests and applied to the live project as they land, through the Supabase connector, then the security advisors run (Wolf, 2026-10-01: "change the live database as you go").
 
 ## Business constraints
-- The LLC is formed; Mercury handles banking and accounting. Stripe stays in TEST mode until Wolf explicitly says to go live. No real charges, no marketing email sends, no change to live pricing or legal pages without his go-ahead.
+- The LLC is formed; Mercury handles banking and accounting. Stripe stays in TEST mode until Wolf explicitly says to go live.
+- Payments (docs/phases/E-checkout.md) belong to the build session, on branch `payments`, behind the `payments` flag (off on hotkey.gg). It writes the code, then asks Wolf for a go-ahead before each of: applying the billing migration, deploying the payment functions, and anything that touches live Stripe or turns the flag on for hotkey.gg. Secrets are set only by Wolf, in the Supabase dashboard. No real charges, no marketing email sends, no change to live pricing or legal pages without his go-ahead.
 - You are not a lawyer or accountant. Flag legal/tax questions for a licensed professional.
