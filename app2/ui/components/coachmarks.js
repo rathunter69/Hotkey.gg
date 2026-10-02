@@ -23,7 +23,7 @@ export const COACH_MARKS = [
   { key: 'practice', at: '.rail-item[data-page="practice"]', copy: 'orientation_practice', fallback: 'Drills, the Daily, rapid-fire and the challenges all live under Practice, on the clock.' },
   { key: 'leaderboard', at: '.rail-item[data-page="leaderboard"]', copy: 'orientation_leaderboard', fallback: 'Each drill and challenge has a board, the Daily too, and only a run with no help and no mouse posts a time.' },
   { key: 'reference', at: '.rail-item[data-page="reference"]', copy: 'orientation_reference', fallback: 'Reference has every key the course teaches, and shows which ones you’ve practiced.' },
-  { key: 'level', at: '#railLevel', copy: 'orientation_level', fallback: 'Lessons, challenges, drills, the Daily, rapid-fire and quests all pay XP toward your next level. Speed is what puts you on the boards.' },
+  { key: 'level', at: '#railLevel', copy: 'orientation_level', fallback: 'Lessons, challenges, drills, the Daily, rapid-fire and quests all pay XP toward your next level, and speed is what puts you on the boards.' },
   { key: 'streak', at: '#railStreak', copy: 'orientation_streak', fallback: 'Your first practice each day fills that day’s cell and adds a day to your streak.' },
   { key: 'pro', at: '#railPro', copy: 'orientation_pro', fallback: 'Chapter 1 is free in full, and Full Access opens Chapters 2 to 6 with their timed play.' },
   { key: 'account', at: '#railAcctBtn', copy: 'orientation_account', fallback: 'Progress saves in this browser until a free account keeps it on any device and puts your times on the boards.', guest: true },
