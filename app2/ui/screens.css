@@ -312,6 +312,7 @@ html[data-effects="off"] .lp-in .lp-mod i, html[data-effects="off"] .lp-in .lp-m
 .kr-focus-name{margin:var(--s1) 0 0; font-size:var(--fs-head); font-weight:var(--fw-heavy); line-height:1.15}
 .kr-focus-what, .kr-focus-note{margin:0; font-size:var(--fs-name); line-height:var(--lh-body); color:var(--ink-2)}
 .kr-board.kr-showing{grid-template-columns:minmax(0,1fr) var(--kr-demo-w)}
+.kr-board.kr-showing .kb-nav{display:none}   /* the demo takes the arrows' room; the main keys stay whole */
 .kr-demo{display:flex; flex-direction:column; gap:var(--s2); border-top:var(--bw-3) solid var(--g); padding-top:var(--s3); height:100%; min-width:0}
 .kr-demo-head{display:flex; align-items:center; gap:var(--s3)}
 .kr-demo-title{font-size:var(--fs-name); font-weight:var(--fw-bold); flex:1 1 auto; min-width:0}

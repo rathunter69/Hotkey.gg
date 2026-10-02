@@ -281,7 +281,7 @@ export function mountDrillPage(root, ctx = {}) {
       newBest: newPb ? { by: pbBefore ? pbBefore.secs - attempt.secs : null } : null,
       pars: drill.pars, oldBest: pbBefore ? pbBefore.secs : null,
       tasks: { total: run.goals.length, done: run.doneCount },
-      shortcuts: used.map(u => ({ keys: u.keys, count: u.count })),
+      shortcuts: used.filter(u => /[+ ]/.test(u.keys)).slice(0, 6).map(u => ({ keys: u.keys, count: u.count })),   // the chords, not the plain moves; six fit above the buttons
       note: attempt.clean ? (daily ? t('panel_daily_attempts', 'Attempts today: {n}', { n: attemptsToday() }) : '') : (attempt.helped ? siteCopy('panel_no_time_help', 'Help was used, so no time is posted. It still counts as practice.') : siteCopy('panel_no_time_mouse', 'The mouse touched the sheet, so no time is posted. It still counts as practice.')),
       xp: gained ? { gained, pct: ctxAfter.levelInfo.pct } : null,
       board: ix >= 0 ? { title: daily ? siteCopy('panel_board_today', 'Today’s board') : siteCopy('panel_board', 'Your board'), place: ix + 1, of: board.length, move: null } : null,
