@@ -289,6 +289,8 @@ export function startApp({ navEl, rootEl, footEl }) {
   const snapshot = () => { try { return JSON.stringify(store.all()); } catch (e) { return ''; } };
   auth.ready().then(() => {
     syncUser();
+    // the account mirror of quest XP, the clean-lesson bonus and the key states (0012): wired once, it hydrates on every sign-in
+    import('./award-sync.js').then(m => m.startAwardSync()).catch(() => { /* the device keeps them */ });
     if (auth.state() !== 'in') return;
     const before = snapshot();
     store.hydrate().then(() => {

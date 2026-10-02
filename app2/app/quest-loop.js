@@ -12,6 +12,7 @@ import { QUESTS_BY_ID } from '../content/quests.js';
 import { FLAIR_BY_ID } from '../content/flair.js';
 import { siteCopy } from '../content/copy/apply.js';
 import { loadLedger, saveLedger, settle, board, logEntry, againCandidates, questEvents } from './quests.js';
+import { awardSync } from './award-sync.js';
 import { rollReward } from './cosmetics.js';
 import { levelOf, totalXP, eventsFrom } from './xp.js';
 
@@ -59,6 +60,7 @@ export function recordRun(run) {
     L.log.push(logEntry(run));
     const r = settle(L, attempts, ctx, Date.now(), roller(attempts));
     saveLedger(L);
+    try { awardSync.quests(r); } catch (e) { /* the device keeps what it paid */ }
     // the rows this run moved: a step forward, or the tick
     const tickedNow = new Set(r.ticked.map(row => row.id));
     const moved = ['daily', 'weekly'].flatMap(p => r.board[p].rows.filter(row => tickedNow.has(row.id) || (had[p + row.id] !== Infinity && row.have > (had[p + row.id] || 0))));
@@ -74,6 +76,7 @@ export function questBoard() {
   const attempts = store.attempts();
   const r = settle(L, attempts, questCtx(), Date.now(), roller(attempts));
   saveLedger(L);
+  try { awardSync.quests(r); } catch (e) { /* the device keeps what it paid */ }
   const b = r.board;
   for (const p of ['daily', 'weekly']) if (b[p]) for (const row of b[p].rows) row.title = questTitle(row);
   b.paid = r.ticked.length + r.bonus.length;

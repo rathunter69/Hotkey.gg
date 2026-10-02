@@ -57,7 +57,7 @@ const copyP = ['copy-build.js', 'copy-check.js', 'css-check.js'].map(script => r
 const testFiles = files.filter(f => f.endsWith('.test.js') && (FULL || !f.endsWith('.slow.test.js'))).sort();
 const base = f => f.slice(f.lastIndexOf('/') + 1).replace(/\.test\.js$/, '');
 /** Files that need a process to themselves: they stub globals (localStorage, fetch, a Supabase client) or hold the auth singleton. */
-const OWN_PROCESS = new Set(['auth', 'challenge', 'effects', 'entitlement', 'leaderboard', 'lessons', 'moments', 'records', 'site-pages', 'store', 'store-sync', 'telemetry']);
+const OWN_PROCESS = new Set(['auth', 'award-sync', 'key-states', 'challenge', 'effects', 'entitlement', 'leaderboard', 'lessons', 'moments', 'records', 'site-pages', 'store', 'store-sync', 'telemetry']);
 /** Rough CPU seconds beyond the shared imports (measured 2026-10-02); an unlisted file counts 0.3. Only the balance depends on them. */
 const WEIGHT = { 'clearcoat-databook': 5.7, 'clearcoat-valuation': 3.6, 'clearcoat-model': 2.7, 'lesson-replay-0': 3.4, 'lesson-replay-1': 2.2, 'lesson-replay-2': 1.5, 'lesson-replay-3': 1.9,
   'recalc-bench': 2.2, drills: 1.3, 'sheet-standard': 1.1, copy: 1.1, schedule: 0.8, 'module-states': 0.8 };

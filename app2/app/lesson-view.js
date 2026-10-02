@@ -26,6 +26,7 @@ import { moduleNumber, itemNumber, isFinalItem, FINAL_MODULE } from './numbering
 import { beatFor, pageDelivered } from './beats.js';
 import { schedule, grade as scheduleGrade, dueToday, FAST_SECS } from './schedule.js';
 import { keyStates, keyIdsForConcept } from './key-states.js';
+import { awardSync } from './award-sync.js';
 import { shouldOfferInstall, installAvailable, promptInstall, INSTALL_PROMPT } from './install.js';
 import { siteCopy } from '../content/copy/apply.js';
 import { settings } from './settings.js';
@@ -609,6 +610,7 @@ export function mountLessonView(root, lesson, { mode = 'guided', seed: seedOpt, 
     const wasFirst = !!run.opts.soft;
     if (isChallenge) track('challenge_result', { ref: lesson.id, tier: lastTier || 'none', secs: Math.round(run.elapsed * 10) / 10, keys: run.session.keyLog.length, first: wasFirst, timed_out: lastTimedOut });
     const saved = store.record(lesson.id, run.mode, run.elapsed, { clean: lastClean, keystrokes: run.session.keyLog.length, mouseCount: run.mouseCount, assisted: assisted(), tier: lastTier || undefined });
+    if (lastClean && !isChallenge) { try { awardSync.cleanLesson(lesson.id); } catch (e) { /* the device keeps the bonus */ } }   // the +10 on the account too (0012)
     const pbBefore = timed ? store.pb(lesson.id) : null;
     let placeNow_ = null;
     if (timed) {
