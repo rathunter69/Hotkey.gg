@@ -270,23 +270,79 @@ html[data-effects="off"] .lp-in .lp-mod i, html[data-effects="off"] .lp-in .lp-m
 
 /* ---------- Reference (3.0, Reference; M106) ---------- */
 .reference .tbl td{padding:var(--s2) var(--s2)}
-.kr-keys{white-space:normal}
+/* Reference: each group has its colour (the theme's mode colours, so every theme keeps its contrast) */
+[data-g="move"]{--g:var(--drills); --g-ink:var(--drills-ink); --g-tint:var(--drills-tint); --g-on:var(--on-fill)}
+[data-g="select"]{--g:var(--challenges); --g-ink:var(--challenges-ink); --g-tint:var(--challenges-tint); --g-on:var(--on-fill)}
+[data-g="edit"]{--g:var(--rapid); --g-ink:var(--rapid-ink); --g-tint:var(--rapid-tint); --g-on:var(--on-fill)}
+[data-g="format"]{--g:var(--daily); --g-ink:var(--daily-ink); --g-tint:var(--daily-tint); --g-on:var(--on-fill)}
+[data-g="formulas"]{--g:var(--learn); --g-ink:var(--learn-ink); --g-tint:var(--learn-tint); --g-on:var(--on-fill)}
+[data-g="ribbon"]{--g:var(--clock); --g-ink:var(--clock-ink); --g-tint:var(--clock-tint); --g-on:var(--ink)}
+[data-g="data"]{--g:var(--ink-2); --g-ink:var(--ink); --g-tint:var(--chrome); --g-on:var(--sheet)}
+.reference{display:flex; flex-direction:column; gap:var(--s5)}
+.reference .h-row-title{margin:0}
+/* the board: the keyboard, its legend, and the card for the key in hand */
+.kr-board{display:grid; grid-template-columns:minmax(0,1fr) var(--kr-focus-w); gap:var(--s6); align-items:stretch}
+.kr-board-main{display:flex; flex-direction:column; gap:var(--s3); min-width:0}
+.kb{display:flex; gap:var(--s4); align-items:flex-start}
+.kb-main, .kb-nav{display:flex; flex-direction:column; gap:var(--kb-gap)}
+.kb-row{display:flex; gap:var(--kb-gap)}
+.kb-row:first-child{margin-bottom:var(--s2)}
+.kb-key, .kb-gap{flex:none; width:calc(var(--kb-u) * var(--w, 1) + var(--kb-gap) * (var(--w, 1) - 1)); height:var(--kb-u); box-sizing:border-box}
+.kb-key{display:flex; align-items:flex-end; justify-content:flex-start; padding:0 var(--s1) var(--kb-pad); font-family:var(--mono); font-style:normal; font-size:var(--fs-kb); font-weight:var(--fw-key); color:var(--ink-2); background:var(--sheet); border:1px solid var(--line); border-bottom-width:var(--key-edge); border-radius:var(--r-btn); transition:transform var(--d-key), background var(--d-key)}
+.kb-key.kb-used{border-color:var(--g); color:var(--g-ink); background:var(--sheet)}
+.kb-key.kb-used.kb-on{background:var(--g-tint); font-weight:var(--fw-bold)}
+.kb-key.kb-down{background:var(--g, var(--ink)); border-color:var(--g, var(--ink)); color:var(--g-on, var(--sheet)); transform:translateY(var(--bw-2)); border-bottom-width:1px}
+.kb-key[data-k="Ctrl"].kb-down, .kb-key[data-k="Shift"].kb-down, .kb-key[data-k="Alt"].kb-down{background:var(--ink); border-color:var(--ink); color:var(--sheet)}
+.kr-legend{display:flex; flex-wrap:wrap; align-items:center; gap:var(--s2) var(--s4); font-size:var(--fs-label)}
+.kr-leg{display:inline-flex; align-items:center; gap:var(--s2); color:var(--ink); text-decoration:none; font-weight:var(--fw-semi)}
+.kr-leg:hover span:nth-child(2){text-decoration:underline}
+.kr-leg-n{color:var(--ink-2); font-weight:var(--fw-body); font-variant-numeric:tabular-nums}
+.kr-sw{display:inline-block; width:var(--s3); height:var(--s3); background:var(--g); border-radius:var(--s1)}
+.kr-leg-key{display:inline-flex; align-items:center; gap:var(--s2); margin-left:auto; color:var(--ink-2)}
+.kr-leg-key .kb-key{--g:var(--ink-2); --g-tint:var(--chrome); --g-ink:var(--ink); width:var(--s5); height:var(--s5); padding:0}
+.kr-focus{border-left:1px solid var(--line); padding-left:var(--s6); display:flex; flex-direction:column; min-width:0}
+.kr-focus-empty{flex:1 1 auto; display:grid; place-items:center; text-align:center}
+.kr-focus-try{display:flex; align-items:center; justify-content:center; gap:var(--s2); margin-bottom:var(--s4)}
+.kr-focus-try .key{font-size:var(--fs-panel); padding:var(--s2) var(--s3)}
+.kr-focus-hint{margin:0; color:var(--ink-2); font-size:var(--fs-name); line-height:var(--lh-body); max-width:var(--side-col)}
+.kr-focus-card{display:flex; flex-direction:column; gap:var(--s2); border-top:var(--bw-3) solid var(--g); padding-top:var(--s3); height:100%}
+.kr-focus-group{font-size:var(--fs-label); font-weight:var(--fw-bold); color:var(--g-ink)}
+.kr-focus-keys .key, .kr-focus-or .key{font-size:var(--fs-body); padding:var(--s1) var(--s2)}
+.kr-focus-or{display:flex; align-items:center; gap:var(--s2)}
+.kr-focus-name{margin:var(--s1) 0 0; font-size:var(--fs-head); font-weight:var(--fw-heavy); line-height:1.15}
+.kr-focus-what, .kr-focus-note{margin:0; font-size:var(--fs-name); line-height:var(--lh-body); color:var(--ink-2)}
+.kr-focus-foot{margin-top:auto; display:flex; align-items:center; justify-content:space-between; gap:var(--s3); flex-wrap:wrap}
+/* the groups: two dense columns, each group's colour on its rule and its swatch */
+.kr-grid{columns:2; column-gap:var(--s5)}
+.kr-group{break-inside:avoid; margin-bottom:var(--s5); min-width:0; border-top:var(--bw-3) solid var(--g); display:block}
+.kr-group .panel-h{display:inline-flex; align-items:center; gap:var(--s2)}
+.kr-tbl td{padding-top:var(--s1); padding-bottom:var(--s1); height:var(--row-h)}
+.kr-tbl{table-layout:auto; width:100%}
+.kr-tbl td.kr-keys, .kr-tbl td.kr-what{white-space:normal}
+.kr-tbl td.kr-what{min-width:var(--kr-what-min); line-height:1.3; padding-top:var(--s1); padding-bottom:var(--s1)}
+.kr-tbl td.kr-state{width:1%}
 .kr-keys .chord{white-space:nowrap; display:inline-flex; align-items:center; margin:calc(var(--s1) / 2) 0}
-.kr-grid{display:grid; grid-template-columns:minmax(0,1fr); gap:var(--s5)}
-.kr-group{min-width:0}
-.kr-act .btn{padding-left:var(--s2); padding-right:var(--s2)}
-.kr-group .tbl th{white-space:nowrap}
-.kr-act .btn{white-space:nowrap}
+.key.key-arrows{letter-spacing:var(--s1)}
+.kr-what{font-weight:var(--fw-semi); font-size:var(--fs-name)}
 .kr-or{margin:0 var(--s1)}
-.kr-what{font-weight:var(--fw-semi)}
-.kr-note{display:block; font-weight:var(--fw-body); font-size:var(--fs-min); color:var(--ink-2)}
-.kr-lesson{color:var(--ink); text-decoration:none}
-.kr-lesson:hover{text-decoration:underline}
+.kr-lesson{color:var(--ink-2); text-decoration:none}
+.kr-lesson:hover{text-decoration:underline; color:var(--ink)}
+.kr-state{white-space:nowrap; display:inline-flex; align-items:center; gap:var(--s1); font-size:var(--fs-label); font-weight:var(--fw-semi); color:var(--ink-2)}
+td.kr-state{display:table-cell}
+.kr-dot{display:inline-block; width:var(--s2); height:var(--s2); border:var(--bw-2) solid var(--g, var(--ink-2)); border-radius:50%; box-sizing:border-box; margin-right:var(--s1); vertical-align:middle}
 .kr-state[data-state="taught"]{color:var(--ink)}
-.kr-state[data-state="practiced"], .kr-state[data-state="under-par"]{color:var(--learn-ink)}
-.kr-act{text-align:right}
+.kr-state[data-state="taught"] .kr-dot{background:var(--g-tint, var(--chrome))}
+.kr-state[data-state="practiced"], .kr-state[data-state="under-par"]{color:var(--g-ink, var(--learn-ink))}
+.kr-state[data-state="practiced"] .kr-dot, .kr-state[data-state="under-par"] .kr-dot{background:var(--g, var(--learn))}
+.kr-act{text-align:right; white-space:nowrap}
+.kr-drill{font-size:var(--fs-label); font-weight:var(--fw-semi); color:var(--g-ink); text-decoration:none}
+.kr-drill:hover{text-decoration:underline}
+.kr-row.kr-lit td{background:var(--g-tint)}
+.kr-row[data-state="not-yet"] .kr-what{color:var(--ink-2); font-weight:var(--fw-body)}
 .kr-row[hidden]{display:none}
 .kr-group[hidden]{display:none}
+@media (max-width:1100px){ .kr-board{grid-template-columns:minmax(0,1fr)} .kr-focus{border-left:0; padding-left:0; border-top:1px solid var(--line); padding-top:var(--s4)} .kb-nav{display:none} }
+@media (max-width:900px){ .kr-grid{columns:1} .kb{display:none} }
 
 /* ---------- Settings (3.0, Account; M101): the Theme band, then Game options ---------- */
 .settings{display:flex; flex-direction:column; gap:var(--s5)}

@@ -11,6 +11,8 @@ export const RIBBON_WORDS = [
 
 export const SITE_KEYS = [
   // the interface match (2026-10-02)
+  'ref_board_hint', 'ref_open_lesson', 'ref_no_key', 'ref_board', 'ref_leg_open', 'ref_leg_got',
+  // the interface match (2026-10-02)
   'pricing_line', 'pricing_sheet_head', 'pricing_col_what', 'pricing_row_play', 'pricing_row_cert', 'pricing_included', 'pricing_not_included',
   // the interface match (2026-10-02)
   'settings_look_line', 'settings_game_head', 'settings_game_line', 'setting_on', 'setting_off', 'theme_light', 'theme_dark',

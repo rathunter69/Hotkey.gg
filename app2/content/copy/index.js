@@ -4723,7 +4723,13 @@ export const COPY = {
   "pricing_row_play": "Rapid-fire, the Daily and the boards",
   "pricing_row_cert": "The certificate",
   "pricing_included": "Included",
-  "pricing_not_included": "Not included"
+  "pricing_not_included": "Not included",
+  "ref_board_hint": "Press any shortcut with Ctrl, or a function key, to find it here. Or point at a row.",
+  "ref_open_lesson": "Lesson {n}",
+  "ref_no_key": "Nothing in the course uses {k} yet.",
+  "ref_board": "The keyboard",
+  "ref_leg_open": "Not yet",
+  "ref_leg_got": "Yours"
  },
  "micro": {
   "enter-tab-direction": {
