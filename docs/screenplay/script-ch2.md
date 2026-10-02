@@ -786,7 +786,7 @@ From screenplay 10.3, rows 2.1–2.7: Ctrl+1 and its Number, Alignment, Border a
 - 2.4.1: the site-cost lines keep one indent (no second level), and the headers go bold as well as right.
 - 2.4.2: one outline level (the engine's outline has no second), so the 7:24 group and the level buttons are out; the groups are 13:19 and 33:35.
 - 2.4.3: the stray block is Monthly detail's top eighteen rows (title, headers, the Austin cluster) at P&L rows 41 to 58, cut onto a new sheet at A1.
-- 2.4.4: Monthly detail runs to 76 rows (four clusters, a company block, source, checks); the names cover the company block's revenue, site costs and EBITDA rows; the navigation column is Q4 (Go to) and Q5:Q7 as text, with no hyperlinks until the engine has Ctrl+K.
+- 2.4.4: Monthly detail runs to 75 rows (four clusters, a company block, source, checks); the names cover the company block's revenue, site costs and EBITDA rows; the navigation column is Q4 (Go to) and Q5:Q7 as text, with no hyperlinks until the engine has Ctrl+K.
 - 2.5.1: the duplicate-values rule is not in the engine, so the duplicate label (B18 reads Marketing) is found by reading; the slow-month threshold is 3,800 with a yellow fill.
 - 2.5.2: the checks rule is on C39:C40 (=C39<>0, light red); the row rule reads an x planted in P&L!A8, and its Does it tie clears the x so the page keeps no flag.
 - 2.5.3: the bars stay on Monthly detail's company revenue row. 2.5.4: the row rule is the one deleted (no duplicate-values rule exists).
