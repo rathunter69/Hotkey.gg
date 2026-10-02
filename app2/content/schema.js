@@ -324,6 +324,11 @@ export const CONCEPTS = {
   'goal-seek': 'Goal Seek (Alt, A, W, G) sets one cell to a value by changing one input, and writes its answer over that input',
   'pass-through-driver': 'a pass-through driver: a blank cell on the table’s sheet and =IF(driver="",input,driver) beside it, so a Data Table can move an input that lives on another sheet',
   'sticky-if': 'a sticky IF reads the live figure when its case is on and otherwise reads its own cell, so it holds its last value; it needs iterative calculation and a label that says so',
+  // Chapter 4 · 4.6 Names and structure (the diligence pack)
+  'names-sparingly': 'name the cells other sheets read and a reviewer hunts for (the case switch, the key inputs) and nothing else; a formula that reads Case reads like English',
+  'name-manager': 'the Name Manager (Ctrl+F3) lists every name with its value, its reference and its scope; Edit renames or re-points one and the formulas follow, Delete removes a stray',
+  'paste-list': 'Paste Name (F3) › Paste List writes every name and what it refers to from the active cell down, so the reviewer can read them on a sheet',
+  'name-driven-list': 'a drop-down whose Source is a name (=Cases) reads the named list wherever it sits, so the list can move and the picker keeps working',
 };
 
 /**
@@ -381,7 +386,7 @@ export function validateLesson(l) {
     need(WORKBOOKS[l.workbook], `unknown workbook "${l.workbook}" (content/workbooks)`);
     need(isObject(l.state) && typeof l.state.before === 'string', 'a module lesson needs state.before');
     need(SEEDED_KINDS.includes(kind) || typeof l.state.after === 'string', 'a module lesson needs state.after (a seeded kind is graded by its goals)');
-    if (l.plant !== undefined) need(isObject(l.plant) && Object.keys(l.plant).every(k => /^[A-Za-z0-9 &]+!(#?[A-Za-z]+[0-9]*)$/.test(k)), 'plant is a state patch: { "Sheet!A1": cell | null, "Sheet!#colW": {…} }');
+    if (l.plant !== undefined) need(isObject(l.plant) && Object.keys(l.plant).every(k => k === '#names' || /^[A-Za-z0-9 &]+!(#?[A-Za-z]+[0-9]*)$/.test(k)), 'plant is a state patch: { "Sheet!A1": cell | null, "Sheet!#colW": {…}, "#names": {…} }');
     if (kind !== 'challenge') {
       need(typeof l.headline === 'string' && l.headline.trim(), 'headline (the one concept the lesson exists to teach) missing');
       need(Array.isArray(l.conventions) && l.conventions.length > 0 && l.conventions.every(id => CONVENTIONS[id]), 'every module lesson carries at least one canon convention id');

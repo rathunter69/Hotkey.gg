@@ -32,6 +32,7 @@ import { tokenize, evalFormula, formulaRefs, evaluateStepper, valueText, transla
 import { refKey, parseRef, parseRange, rangeText, colLetter } from './refs.js';
 import { dispText } from './format.js';
 import { pivotCache, pivotLayout, PIVOT_FNS } from './pivot.js';
+import { isValidName, NAME_BAD_NOTE, NAME_TAKEN_NOTE } from './dialogs.js';
 const clone = x => JSON.parse(JSON.stringify(x));
 /** The Style dialog's tick boxes and the format fields each one carries (Style Includes, By Example). */
 export const STYLE_PARTS = { number: ['fmtStyle', 'decimals', 'numFmt', 'scale'], alignment: ['align', 'wrap', 'indent', 'ca'], font: ['bold', 'it', 'strike', 'uline', 'fontColor', 'fsz'],
@@ -39,9 +40,9 @@ export const STYLE_PARTS = { number: ['fmtStyle', 'decimals', 'numFmt', 'scale']
 const STYLE_KEYS = { 'Alt+N': 'number', 'Alt+L': 'alignment', 'Alt+F': 'font', 'Alt+B': 'border', 'Alt+I': 'fill', 'Alt+R': 'protection' };
 
 /** The dialogs this module drives (keyboard.js routes their keys to toolKey). */
-export const TOOL_DIALOGS = new Set(['evalfx', 'errcheck', 'texttocols', 'removedup', 'validation', 'dvlist', 'editlinks', 'autofilter', 'sortdlg', 'goalseek', 'datatable', 'pivot', 'newstyle', 'hyperlink', 'ctxmenu', 'watch']);
+export const TOOL_DIALOGS = new Set(['evalfx', 'errcheck', 'texttocols', 'removedup', 'validation', 'dvlist', 'editlinks', 'autofilter', 'sortdlg', 'goalseek', 'datatable', 'pivot', 'newstyle', 'hyperlink', 'ctxmenu', 'watch', 'namemgr', 'pastenames']);
 /** The dialogs with a text field that keeps the case typed. */
-export const TOOL_TYPED = new Set(['pivot', 'newstyle', 'hyperlink', 'editlinks', 'watch', 'texttocols', 'validation', 'goalseek', 'datatable', 'sortdlg', 'autofilter']);
+export const TOOL_TYPED = new Set(['namemgr', 'pivot', 'newstyle', 'hyperlink', 'editlinks', 'watch', 'texttocols', 'validation', 'goalseek', 'datatable', 'sortdlg', 'autofilter']);
 /** Excel's messages the tools show verbatim. */
 export const ERRCHECK_DONE_NOTE = 'The error check is complete for the entire sheet.';
 export const FLASH_FILL_NONE_NOTE = "We looked at all the data next to your selection and didn't see a pattern for filling in values for you.";
@@ -187,6 +188,21 @@ export function goalSeek(f, x0, target, { maxIter = 100, tol = 0.001 } = {}) {
   return Math.abs(fb) <= tol * 10 ? b : null;
 }
 
+/** A formula with every use of the defined name `from` (any case) written as `to`; text in quotes and other names untouched. */
+export function renameInFormula(f, from, to) {
+  if (typeof f !== 'string' || !f.startsWith('=')) return f;
+  let toks; try { toks = tokenize(f); } catch (e) { return f; }
+  const hits = toks.filter(t => t.t === 'name' && t.v === String(from).toUpperCase());
+  let out = f; for (const t of hits.reverse()) out = out.slice(0, t.pos) + to + out.slice(t.end);
+  return out;
+}
+/** The rename carried through one sheet: its formulas, its rules' formulas and its validation sources. */
+function renameNameIn(S, from, to) {
+  for (const k in S.cells) { const c = S.cells[k]; if (c && c.formula) { const f = renameInFormula(c.formula, from, to); if (f !== c.formula) c.formula = f; } }
+  for (const r of S.condFmt || []) if (r.formula) r.formula = renameInFormula(r.formula, from, to);
+  for (const k in S.validation || {}) { const v = S.validation[k]; if (v && v.source) v.source = renameInFormula(v.source, from, to); }
+}
+
 /* ======================================================================== */
 /* the Session methods                                                      */
 /* ======================================================================== */
@@ -217,6 +233,7 @@ const methods = {
       case 'AWT': this.openDataTable(); return true;
       case 'NVT': this.openPivot(); return true;
       case 'MW': this.openWatchWindow(); return true;
+      case 'MN': this.openNameManager(); return true;
     }
     return false;
   },
@@ -239,6 +256,8 @@ const methods = {
       case 'hyperlink': return this.hyperlinkKey(key);
       case 'ctxmenu': return this.contextMenuKey(key);
       case 'watch': return this.watchKey(key);
+      case 'namemgr': return this.nameManagerKey(key);
+      case 'pastenames': return this.pasteNamesKey(key);
     }
   },
   /** A typed character into the draft's focused text field (Backspace removes one). */
@@ -1073,6 +1092,85 @@ const methods = {
   /** Recalculate the workbook after a tool wrote a cell directly (the graph sees the change; nothing is emitted). */
   toolRecalc(S) { if (this.book) this.book.recalc(S); else S.recalc(); },
 
+  /* ---------------- Name Manager (Ctrl+F3, Alt M N) and Paste Name (F3) ---------------- */
+  /**
+   * The Name Manager lists every defined name (Name, Value, Refers To, Scope), ↑ / ↓ picking one:
+   * Delete (Alt+D) asks first, Edit (Alt+E) opens the name and its Refers to (Alt+N, Alt+R; OK
+   * renames it, and every formula, rule and list source that reads it follows), New (Alt+N) is Define
+   * Name; Enter or Esc closes. Every name here is workbook-scoped, as Define Name makes them.
+   */
+  openNameManager() {
+    this.startClock(); this.openDialog('namemgr', []);
+    this.dlg = { kind: 'namemgr', idx: 0, edit: null, confirm: false };
+  },
+  /** The rows the Name Manager shows: { name, value, refersTo, scope }. */
+  nameManagerRows() {
+    return this.definedNames().map(n => {
+      const e = this.sheets.find(x => x.name === n.sheet); const rg = parseRange(n.ref.replace(/\$/g, ''));
+      let value = '';
+      if (e && rg) value = rg.r1 === rg.r2 && rg.c1 === rg.c2 ? valueText(e.sheet.get(rg.r1, rg.c1).value) : '{…}';
+      return { name: n.name, value, refersTo: n.refersTo, scope: 'Workbook' };
+    });
+  },
+  nameManagerKey(key) {
+    const d = this.dlg; if (!d) return;
+    const rows = this.definedNames();
+    if (d.confirm) {   // "Are you sure you want to delete the name …?"
+      if (key === 'Enter') { const n = rows[d.idx]; d.confirm = false; if (n) { const all = this.names; delete all[n.name]; this.names = all; this.sheet.commit('names'); } d.idx = Math.max(0, Math.min(d.idx, this.definedNames().length - 1)); }
+      return;
+    }
+    if (d.edit) {
+      const e = d.edit;
+      if (key === 'Alt+N') { e.focus = 'name'; e.fresh = true; return; } if (key === 'Alt+R') { e.focus = 'refersTo'; e.fresh = true; return; }
+      if (key === 'Tab' || key === 'Shift+Tab') { this.toolTab(e, key, ['name', 'refersTo']); e.fresh = true; return; }
+      if (key === 'Enter') { const err = this.editName(e.orig, e.name.trim(), e.refersTo.trim()); if (err) { this.note = err; return; } this.note = ''; d.edit = null; d.idx = Math.max(0, this.definedNames().findIndex(n => n.name === e.name.trim())); return; }
+      if (e.fresh && key.length === 1) e[e.focus] = '';
+      if (this.toolType(e, key, ['name', 'refersTo'])) { e.fresh = false; this.note = ''; }
+      return;
+    }
+    if (key === 'ArrowDown') { d.idx = Math.min(rows.length - 1, d.idx + 1); return; } if (key === 'ArrowUp') { d.idx = Math.max(0, d.idx - 1); return; }
+    if (key === 'Home') { d.idx = 0; return; } if (key === 'End') { d.idx = Math.max(0, rows.length - 1); return; }
+    if (key === 'Alt+D' && rows[d.idx]) { d.confirm = true; return; }
+    if (key === 'Alt+E' && rows[d.idx]) { const n = rows[d.idx]; d.edit = { orig: n.name, name: n.name, refersTo: n.refersTo, focus: 'name', fresh: true }; return; }
+    if (key === 'Alt+N') { this.exitRibbon(false); this.openDefineName(); return; }
+    if (key === 'Enter' || key === 'Alt+C') this.exitRibbon(false);
+  },
+  /** Rename and / or re-point the name `orig`: '' when done, else Excel's message. Formulas, rules and list sources that read it follow a rename. */
+  editName(orig, name, refersTo) {
+    const all = this.names; if (!(orig in all)) return GOALSEEK_REF_NOTE;
+    if (!isValidName(name)) return NAME_BAD_NOTE;
+    if (name.toUpperCase() !== orig.toUpperCase() && Object.keys(all).some(k => k.toUpperCase() === name.toUpperCase())) return NAME_TAKEN_NOTE;
+    const t = refersTo.replace(/^=/, ''); const bang = t.lastIndexOf('!');
+    let sh = bang >= 0 ? t.slice(0, bang) : this.sheets[this.sheetIndex].name; if (/^'.*'$/.test(sh)) sh = sh.slice(1, -1).replace(/''/g, "'");
+    if (!this.sheets.some(x => x.name.toLowerCase() === sh.toLowerCase()) || !parseRange(t.slice(bang + 1).replace(/\$/g, ''))) return GOALSEEK_REF_NOTE;
+    const next = {};
+    for (const k of Object.keys(all)) if (k === orig) next[name] = t; else next[k] = all[k];
+    if (name !== orig) for (const e of this.sheets) renameNameIn(e.sheet, orig, name);
+    this.names = next; this.sheet.commit('names');
+    return '';
+  },
+  /** Paste Name (F3): the names listed; Paste List (Alt+L) writes them and what they refer to from the active cell down, as text; OK starts the active cell's formula with the picked name. */
+  openPasteNames() {
+    if (!this.definedNames().length) return;   // Excel opens nothing when the workbook has no names
+    this.startClock(); this.openDialog('pastenames', []);
+    this.dlg = { kind: 'pastenames', idx: 0 };
+  },
+  pasteNamesKey(key) {
+    const d = this.dlg; if (!d) return; const rows = this.definedNames();
+    if (key === 'ArrowDown') { d.idx = Math.min(rows.length - 1, d.idx + 1); return; } if (key === 'ArrowUp') { d.idx = Math.max(0, d.idx - 1); return; }
+    if (key === 'Alt+L') { this.exitRibbon(false); this.pasteNameList(); return; }
+    if (key === 'Enter' && rows[d.idx]) { const nm = rows[d.idx].name; this.exitRibbon(false); this.startEdit('=' + nm, 'enter'); }
+  },
+  /** Paste List: every name and its reference, two columns from the active cell down, alphabetical; the cells keep their formats. */
+  pasteNameList() {
+    const S = this.sheet; const a = S.dispActive(); const rows = this.definedNames();
+    S.pushUndo();
+    rows.forEach((n, i) => {
+      for (const [dc, v] of [[0, n.name], [1, n.refersTo]]) { const c = S.ensure(a.r + i, a.c + dc); c.formula = null; c.value = v; delete c.table; }
+    });
+    this.toolRecalc(S); S.commit('edit');
+  },
+
   /* ---------------- Goal Seek (Alt A W G) ---------------- */
   /**
    * Set cell (Alt+E, the active cell to start), To value (Alt+V), By changing cell (Alt+C); OK
@@ -1111,6 +1209,7 @@ const methods = {
   /** Esc on a tool dialog: Goal Seek's status box puts the changing cell back; every tool then closes to the grid. */
   toolEscape() {
     const d = this.dlg;
+    if (d && d.kind === 'namemgr' && (d.edit || d.confirm)) { d.edit = null; d.confirm = false; this.note = ''; return; }   // Cancel on Edit Name or the delete question goes back to the list
     if (d && d.kind === 'goalseek' && d.status) { const { by, before } = d.status; const B = by.sheet; B.cells[by.key] = clone(before); if (B.undoStack.length) B.undoStack.pop(); this.toolRecalc(B); B.emit('edit'); }
     this.exitRibbon(false);
   },

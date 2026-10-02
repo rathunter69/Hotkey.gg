@@ -159,6 +159,13 @@ import goal_seek_break_even from './lessons/goal-seek-break-even.js';
 import pass_through_driver from './lessons/pass-through-driver.js';
 import case_outputs_side_by_side from './lessons/case-outputs-side-by-side.js';
 import challenge_three_case_model from './lessons/challenge-three-case-model.js';
+// Chapter 4 · Data and Lookups (Run R4): 4.6 Names and structure, 4.7 Project and assessment
+import naming_sparingly from './lessons/naming-sparingly.js';
+import name_manager from './lessons/name-manager.js';
+import validation_list_by_name from './lessons/validation-list-by-name.js';
+import challenge_toggles_named from './lessons/challenge-toggles-named.js';
+import ch4_project from './lessons/ch4-project.js';
+import ch4_assessment from './lessons/ch4-assessment.js';
 
 export const CHAPTERS = [
   {
@@ -271,6 +278,8 @@ export const CHAPTERS = [
       pass_through_driver,
       case_outputs_side_by_side,
       challenge_three_case_model,
+      naming_sparingly, name_manager, validation_list_by_name, challenge_toggles_named,
+      ch4_project, ch4_assessment,
     ],
   },
 ];

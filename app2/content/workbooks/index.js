@@ -27,10 +27,17 @@ export function workbookState(workbookId, stateId) {
  * Apply a seed's patch to a (cloned) state in place: `{ 'Sheet!B4': cellRecord | null, … }` writes
  * or clears cells (a key with no sheet names the first sheet), and `'Sheet!#colW'`, `'#rowH'`,
  * `'#hiddenCols'`, `'#hiddenRows'`, `'#freeze'`, `'#groups'`, `'#gridlines'`, `'#active'` set that
- * sheet's structure. Unknown sheets are skipped. Returns the state.
+ * sheet's structure. `'#names'` (no sheet) merges defined names into the workbook's, a null value
+ * deleting one. Unknown sheets are skipped. Returns the state.
  */
 export function applyStatePatch(state, patch) {
   for (const key in patch || {}) {
+    if (key === '#names') {
+      const names = { ...(state.names || {}) };
+      for (const [n, ref] of Object.entries(patch[key] || {})) { if (ref === null) delete names[n]; else names[n] = ref; }
+      state.names = Object.fromEntries(Object.entries(names).sort(([a], [b]) => a.toUpperCase().localeCompare(b.toUpperCase())));
+      continue;
+    }
     const [shName, ref] = key.includes('!') ? key.split('!') : [state.sheets[0].name, key];
     const sh = state.sheets.find(x => x.name === shName);
     if (!sh) continue;

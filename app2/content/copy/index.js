@@ -1767,6 +1767,78 @@ export const COPY = {
    "mac_note": "",
    "story_beat": ""
   },
+  "naming-sparingly": {
+   "id": "naming-sparingly",
+   "module": "names-and-structure",
+   "order": "4.6.1",
+   "title": "Naming toggles and key inputs, sparingly",
+   "brief": "You named one cell back in 1.3.5; now decide which cells deserve it. The rule is short: name the cells another sheet reads and a reviewer will hunt for, the case switch and the key inputs, and leave the cubes and the totals alone. Name the switch Case and two inputs, then rewrite the formulas that read the switch so they say Case instead of $C$11. The key is `Alt M M D`.",
+   "closing": "Three names, each on a cell a reviewer would go looking for: the switch every input reads, and two inputs the outputs lean on. The live column now says what it does, INDEX of the row by Case. || The rule for next time: if another sheet reads it and a reviewer would hunt for it, name it. The cube, the totals and the working cells stay as addresses, because a model with a hundred names is harder to read than one with none.",
+   "wow": "Three cells got names, and each is one a reviewer would look for.",
+   "convention_line": "Name toggles and key inputs only; A case toggle, never copies of the file",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "name-manager": {
+   "id": "name-manager",
+   "module": "names-and-structure",
+   "order": "4.6.2",
+   "title": "The Name Manager",
+   "brief": "The Name Manager lists every name in the file, what it holds, where it points and its scope, including the ones somebody left behind. This file has one: OldTicket, still pointing at the ticket’s old cell on Scenarios, which would quietly feed a formula the wrong price. Delete it, give the cost per wash the house spelling, and paste the list where the reviewer will see it. The key is `Ctrl+F3`.",
+   "closing": "The Name Manager is the one place a name can hide, and now it holds three, each pointing where it says. The list on Inputs tells a reviewer the same without opening anything. || Open it on every file you inherit: a name pointing at #REF! after a deleted sheet, or at a cell nobody uses any more, feeds a formula silently. Delete what you cannot explain.",
+   "wow": "Every name in the file is listed, fixed and on the page.",
+   "convention_line": "Name toggles and key inputs only",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "validation-list-by-name": {
+   "id": "validation-list-by-name",
+   "module": "names-and-structure",
+   "order": "4.6.3",
+   "title": "A validation list driven by a name",
+   "brief": "The case picker you built in 4.2.4 reads a range on Lists, so it breaks the day someone moves the list. Name the list Cases and the picker reads =Cases: the name follows the list wherever it goes, and works from any sheet. It is the pattern for every drop-down in the pack, a named list on Lists, a validation that reads the name, a MATCH that turns the choice into a number. The key is `Alt A V V`.",
+   "closing": "Two pickers now read names instead of addresses. Move the case list down five rows, or onto another sheet, and the name moves with it; the picker never notices. || Every drop-down in a model you build should look like this: a named list on Lists, a validation that reads the name, and a MATCH beside it that turns the choice into a number the formulas use.",
+   "wow": "Both pickers read a name, so the lists can move and the pickers won’t notice.",
+   "convention_line": "Name toggles and key inputs only; A case toggle, never copies of the file",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "challenge-toggles-named": {
+   "id": "challenge-toggles-named",
+   "module": "names-and-structure",
+   "order": "4.6.C",
+   "title": "Challenge: a model’s toggles named and wired",
+   "brief": "A model with its switch read by address, a broken Ticket and a stray in the Name Manager. Name the switch and the key inputs, fix the names, drive the picker by name and paste the list on Inputs.",
+   "closing": "",
+   "wow": "",
+   "convention_line": "Name toggles and key inputs only; A case toggle, never copies of the file",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "ch4-project": {
+   "id": "ch4-project",
+   "module": "ch4-project-and-assessment",
+   "order": "4.7.P",
+   "title": "Project: the diligence pack",
+   "brief": "The fortnight after the chapter’s export has landed, and the pack around it has been cut back to its pages: the KPI page blank, the case sheet with no switch wired, no names, and eight of the buyers’ questions open. Build it again in one sitting, from the clean export to the answered log, until every check reads 0. No clock, and nothing here is new. The key is `Ctrl+Enter`.",
+   "closing": "A raw export in, a diligence pack out: the codes cleaned, the KPI page reading the export, the case wired to one switch by name, break-even found, every check at 0 and eight buyers’ questions pointing at the cells that answer them. || This is the file a buyer’s analyst opens in the data room. Now the same pack on another cluster’s export, on the clock.",
+   "wow": "A fresh export in, a diligence pack out with every question answered and every check at 0, and that is Chapter 4.",
+   "convention_line": "Write once, fill right; Name toggles and key inputs only; A case toggle, never copies of the file; The check is a live difference → 0; Links green; external links avoided",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "ch4-assessment": {
+   "id": "ch4-assessment",
+   "module": "ch4-project-and-assessment",
+   "order": "4.7.A",
+   "title": "Assessment: a fresh export, twelve minutes",
+   "brief": "Dallas has sent its own fortnight: six sites you have not seen, the same misspelling in another code, a KPI page and a case sheet cut back the same way, and eight questions open. Build the same diligence pack on the clock with no help and the keyboard only, until every check reads 0. Pass, and the chapter is Verified; this is also the test-out. The key is `Ctrl+Enter`.",
+   "closing": "A cluster you had never seen, a pack to the standard: the export cleaned, the KPI page reading it, the case wired by name, break-even found, every check at 0 and the log answered. || That is the pack a buyer’s analyst opens first in the data room, and you built it under a clock.",
+   "wow": "You built the diligence pack on another cluster’s export, on the clock, and the chapter is Verified.",
+   "convention_line": "Write once, fill right; Name toggles and key inputs only; A case toggle, never copies of the file; The check is a live difference → 0; Links green; external links avoided",
+   "mac_note": "",
+   "story_beat": ""
+  },
   "remix-format-on-the-pnl": {
    "id": "remix-format-on-the-pnl",
    "module": "remixes",
@@ -11156,6 +11228,442 @@ export const COPY = {
     "why": "",
     "hint_stuck": ""
    }
+  ],
+  "naming-sparingly": [
+   {
+    "lesson_id": "naming-sparingly",
+    "goal_index": "0",
+    "text": "Name the case switch on Scenarios C11 Case with Define Name.",
+    "teach": "Define Name (Alt, M, M, D) names the selected cell. Pick the switch, not the picker beside it: C11 holds the case as a number, and that number is what every formula reads.",
+    "why": "",
+    "hint_stuck": "pulse cell C11 · The number under the picker is the switch; type Case over the suggested name."
+   },
+   {
+    "lesson_id": "naming-sparingly",
+    "goal_index": "1",
+    "text": "Name the blended ticket on Inputs C15 Ticket and the cost per wash in Inputs C5 CostPerWash.",
+    "teach": "Inputs that formulas on other sheets read are the next to earn a name. The ticket and the cost per wash both live on Inputs and both turn up in the outputs, the break-even and the sensitivities.",
+    "why": "",
+    "hint_stuck": "pulse cell C15 · Go To takes the sheet name first: Inputs!C15, then Inputs!C5."
+   },
+   {
+    "lesson_id": "naming-sparingly",
+    "goal_index": "2",
+    "text": "Rewrite the live column on Scenarios: =CHOOSE(Case,C5,D5,E5) in G5, then =INDEX(C6:E6,Case) down G6:G8.",
+    "teach": "A name goes anywhere an address goes, and it never needs a dollar sign: it always means the same cell. Read the new formula aloud and it says what it does.",
+    "why": "",
+    "hint_stuck": "pulse range G5:G8 · Case takes the place of $C$11; fill G6:G8 with one entry and Ctrl+Enter."
+   },
+   {
+    "lesson_id": "naming-sparingly",
+    "goal_index": "3",
+    "text": "Rewrite the check in C58 to read the switch by name: =INDEX($C$54:$E$54,Case)-C24.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C58 · The live case’s EBITDA in the side-by-side table, less the EBITDA above."
+   },
+   {
+    "lesson_id": "naming-sparingly",
+    "goal_index": "4",
+    "text": "Go To Case from the Inputs sheet and land on the switch.",
+    "teach": "Go To takes a name where it takes an address, so a reviewer who knows the switch is called Case lands on it from any sheet. That is the test for a name: would someone look for it?",
+    "why": "",
+    "hint_stuck": "pulse cell C11 · Ctrl+G, type the name, Enter."
+   },
+   {
+    "lesson_id": "naming-sparingly",
+    "goal_index": "5",
+    "text": "Does it tie? Watch the picker switch to Downside and the live column, which now reads Case, move with it.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range G5:G8 · Case is still C11; only the way the formulas say it changed."
+   }
+  ],
+  "name-manager": [
+   {
+    "lesson_id": "name-manager",
+    "goal_index": "0",
+    "text": "Open the Name Manager with Ctrl+F3 and pick the stray, OldTicket.",
+    "teach": "Ctrl+F3 opens the Name Manager: one row per name, with its value, what it refers to and its scope. ↑ and ↓ pick a row. OldTicket points at the live ticket on Scenarios, a cell the model no longer treats as the input.",
+    "why": "",
+    "hint_stuck": "pulse the Name Manager · The list is alphabetical: Case, CostPerWash, OldTicket, Ticket."
+   },
+   {
+    "lesson_id": "name-manager",
+    "goal_index": "1",
+    "text": "Delete OldTicket, confirm, and close the Name Manager.",
+    "teach": "Delete (Alt+D) asks before it removes a name, and Enter answers OK. Read the Refers To column first: a stray that still points at a real cell is the dangerous kind, because nothing on the sheet looks broken.",
+    "why": "",
+    "hint_stuck": "pulse the Name Manager · Alt+D on the picked row, Enter to confirm, Esc to close."
+   },
+   {
+    "lesson_id": "name-manager",
+    "goal_index": "2",
+    "text": "Rename CostPerWash to Cost_Per_Wash with Edit (Alt+E) in the Name Manager, then close it.",
+    "teach": "Edit (Alt+E) opens the picked name with its text selected, so typing replaces it; Enter saves, and every formula that reads the name follows it. Scope reads Workbook: a name defined this way works on every sheet, while a sheet copied with its names makes sheet-scoped duplicates, which is where strays like OldTicket come from.",
+    "why": "",
+    "hint_stuck": "pulse the Name Manager · Pick CostPerWash, Alt+E, type the new name over the old one."
+   },
+   {
+    "lesson_id": "name-manager",
+    "goal_index": "3",
+    "text": "Go To Cost_Per_Wash and land on the cost per wash on Inputs C5.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C5 · Ctrl+G takes the new name; the old one no longer exists."
+   },
+   {
+    "lesson_id": "name-manager",
+    "goal_index": "4",
+    "text": "Paste the list of names under its heading on Inputs: F3 in B19, then Paste List.",
+    "teach": "Paste Name (F3) lists the names; Paste List (Alt+L) writes each one and what it refers to from the active cell down, as text. It is a snapshot, so paste it again whenever the names change.",
+    "why": "",
+    "hint_stuck": "pulse cell B19 · F3 opens Paste Name; Alt+L is Paste List."
+   },
+   {
+    "lesson_id": "name-manager",
+    "goal_index": "5",
+    "text": "Does it tie? Watch Go To land on Ticket, a $13 ticket typed there, and EBITDA on Scenarios fall.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C24 on Scenarios · Every name in the list lands where it says."
+   }
+  ],
+  "validation-list-by-name": [
+   {
+    "lesson_id": "validation-list-by-name",
+    "goal_index": "0",
+    "text": "Name the case list on Lists L5:L7 Cases with Define Name.",
+    "teach": "Define Name works on a range as well as a cell: select the three cases and the name covers all of them. A list that a drop-down reads is the other kind of cell that earns a name.",
+    "why": "",
+    "hint_stuck": "pulse range L5:L7 on Lists · Select the three cases first, then Alt M M D."
+   },
+   {
+    "lesson_id": "validation-list-by-name",
+    "goal_index": "1",
+    "text": "Point the case picker on Scenarios C10 at the name: Data Validation, List, Source =Cases.",
+    "teach": "Data Validation (Alt, A, V, V) on the picker: Clear All (Alt+C) empties the old rule, L picks List, and Source (Alt+S) takes =Cases. The = matters; without it the drop-down would offer the word Cases.",
+    "why": "",
+    "hint_stuck": "pulse cell C10 on Scenarios · Alt A V V, Alt+C to clear, L for List, Alt+S, then =Cases."
+   },
+   {
+    "lesson_id": "validation-list-by-name",
+    "goal_index": "2",
+    "text": "Name the unique site list on Lists N5:N10 Sites.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range N5:N10 on Lists · The six codes 4.2.3 left, one row each."
+   },
+   {
+    "lesson_id": "validation-list-by-name",
+    "goal_index": "3",
+    "text": "Point the site picker on Summary C34 at =Sites the same way.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C34 on Summary · The site code the two-way lookup reads."
+   },
+   {
+    "lesson_id": "validation-list-by-name",
+    "goal_index": "4",
+    "text": "Paste the names list again from Inputs B19 so it shows all five names.",
+    "teach": "Paste List writes what the names are now, not what they were, so a list on the page goes stale the moment a name is added. Paste it over the old one.",
+    "why": "",
+    "hint_stuck": "pulse cell B19 on Inputs · F3, then Alt+L for Paste List."
+   },
+   {
+    "lesson_id": "validation-list-by-name",
+    "goal_index": "5",
+    "text": "Does it tie? Watch the case picker drop down the three cases it reads through Cases, and the live column follow the pick.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C10 on Scenarios · The drop-down lists whatever the name Cases covers."
+   }
+  ],
+  "challenge-toggles-named": [
+   {
+    "lesson_id": "challenge-toggles-named",
+    "goal_index": "0",
+    "text": "Name the switch on Scenarios C11 Case, Inputs C5 Cost_Per_Wash and the case list on Lists L5:L7 Cases.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-toggles-named",
+    "goal_index": "1",
+    "text": "In the Name Manager point Ticket at Inputs C15, delete the stray Ticket_old and close it.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-toggles-named",
+    "goal_index": "2",
+    "text": "Make the live column G5:G8 and the check in C58 on Scenarios read the switch as Case.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-toggles-named",
+    "goal_index": "3",
+    "text": "Point the case picker in Scenarios C10 at the name: Data Validation, List, Source =Cases.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-toggles-named",
+    "goal_index": "4",
+    "text": "Paste the names list on Inputs from B19 with F3 and Paste List.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "ch4-project": [
+   {
+    "lesson_id": "ch4-project",
+    "goal_index": "0",
+    "text": "On Export replace the misspelt site code with the right one (Ctrl+H), so every row in B carries one of the six codes.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch4-project",
+    "goal_index": "1",
+    "text": "List the six site codes in Lists N5:N10, prove them with COUNTIF in O5:O11, and add the check in C26.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch4-project",
+    "goal_index": "2",
+    "text": "Fill the site block on Summary C5:E10 by INDEX and MATCH from Lists: the site, its capacity and its hours open.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch4-project",
+    "goal_index": "3",
+    "text": "Fill the KPI block on Summary F5:M11: capacity, days, washes, utilization, the peak, member washes and share, with totals.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch4-project",
+    "goal_index": "4",
+    "text": "Fill both cubes on Summary by SUMIFS on site and week: washes in C15:F21 and retail revenue in C25:F31, totals included.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch4-project",
+    "goal_index": "5",
+    "text": "Sum the washes and the retail revenue between the window’s two dates in Summary C50:C51 with SUMIFS.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch4-project",
+    "goal_index": "6",
+    "text": "Define Case, Cases, Cost_Per_Wash, Sites and Ticket with Alt M M D, then paste the list on Inputs from B19.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch4-project",
+    "goal_index": "7",
+    "text": "Point the case picker in Scenarios C10 at =Cases and the site picker in Summary C34 at =Sites.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch4-project",
+    "goal_index": "8",
+    "text": "Wire the switch on Scenarios: the live column G5:G8 by CHOOSE and INDEX on Case, then Case itself in C11 by MATCH on the picker.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch4-project",
+    "goal_index": "9",
+    "text": "Put the pass-through driver in Scenarios C14: the ticket on Inputs unless C13 holds a figure.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch4-project",
+    "goal_index": "10",
+    "text": "Build the outputs in Scenarios C17:C25 from the live column, from washes a year down to EBITDA and its margin.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch4-project",
+    "goal_index": "11",
+    "text": "Build break-even in Scenarios C41:C45, Goal Seek C44 to 0 by changing C43, and note the answer in C46.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch4-project",
+    "goal_index": "12",
+    "text": "Fill the checks in Summary C72:C77 and Scenarios C58:C60, every one a live difference reading 0.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch4-project",
+    "goal_index": "13",
+    "text": "Answer the eight open questions on Q&A: mark each Answered in E and link its answer in F to the cell that holds it.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch4-project",
+    "goal_index": "14",
+    "text": "Does it tie? Watch the first retail count on Export jump to 500, the cubes and the KPI block move, and every check hold at 0.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "ch4-assessment": [
+   {
+    "lesson_id": "ch4-assessment",
+    "goal_index": "0",
+    "text": "On Export replace the misspelt site code with the right one (Ctrl+H), so every row in B carries one of the six codes.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch4-assessment",
+    "goal_index": "1",
+    "text": "List the six site codes in Lists N5:N10, prove them with COUNTIF in O5:O11, and add the check in C26.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch4-assessment",
+    "goal_index": "2",
+    "text": "Fill the site block on Summary C5:E10 by INDEX and MATCH from Lists: the site, its capacity and its hours open.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch4-assessment",
+    "goal_index": "3",
+    "text": "Fill the KPI block on Summary F5:M11: capacity, days, washes, utilization, the peak, member washes and share, with totals.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch4-assessment",
+    "goal_index": "4",
+    "text": "Fill both cubes on Summary by SUMIFS on site and week: washes in C15:F21 and retail revenue in C25:F31, totals included.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch4-assessment",
+    "goal_index": "5",
+    "text": "Sum the washes and the retail revenue between the window’s two dates in Summary C50:C51 with SUMIFS.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch4-assessment",
+    "goal_index": "6",
+    "text": "Define Case, Cases, Cost_Per_Wash, Sites and Ticket with Alt M M D, then paste the list on Inputs from B19.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch4-assessment",
+    "goal_index": "7",
+    "text": "Point the case picker in Scenarios C10 at =Cases and the site picker in Summary C34 at =Sites.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch4-assessment",
+    "goal_index": "8",
+    "text": "Wire the switch on Scenarios: the live column G5:G8 by CHOOSE and INDEX on Case, then Case itself in C11 by MATCH on the picker.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch4-assessment",
+    "goal_index": "9",
+    "text": "Put the pass-through driver in Scenarios C14: the ticket on Inputs unless C13 holds a figure.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch4-assessment",
+    "goal_index": "10",
+    "text": "Build the outputs in Scenarios C17:C25 from the live column, from washes a year down to EBITDA and its margin.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch4-assessment",
+    "goal_index": "11",
+    "text": "Build break-even in Scenarios C41:C45, Goal Seek C44 to 0 by changing C43, and note the answer in C46.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch4-assessment",
+    "goal_index": "12",
+    "text": "Fill the checks in Summary C72:C77 and Scenarios C58:C60, every one a live difference reading 0.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch4-assessment",
+    "goal_index": "13",
+    "text": "Answer the eight open questions on Q&A: mark each Answered in E and link its answer in F to the cell that holds it.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch4-assessment",
+    "goal_index": "14",
+    "text": "Does it tie? Watch the first retail count on Export jump to 500, the cubes and the KPI block move, and every check hold at 0.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
   ]
  },
  "modules": {
@@ -11361,6 +11869,20 @@ export const COPY = {
    "objective": "A case toggle with CHOOSE and INDEX, one-way and two-way data tables, Goal Seek for break-even, the pass-through driver, and the cases side by side.",
    "story_beat": "What if the ticket falls? || The management case is the company’s own forecast; a buyer builds a base case from what they think will happen and a downside they can live with, and they want all three in one model with a switch, never three files. Then the questions: what if the blended ticket drops a dollar, what if member share slips, how many washes break even. A case toggle and a data table answer them on one sheet.",
    "page_name": "The management case, with sensitivities"
+  },
+  "names-and-structure": {
+   "id": "names-and-structure",
+   "name": "Names and structure",
+   "objective": "Naming the toggles and key inputs, sparingly; the Name Manager; a validation list driven by a name.",
+   "story_beat": "Name the switch, not everything. || The pack is thirteen sheets now, and the case switch is read from all over it. A name turns Scenarios!$C$11 into Case, so a formula reads like English and a reviewer finds the switch by name. But a model with a hundred names is worse than one with none. Name the toggles and the key inputs, manage them, and let the picker read its list by name.",
+   "page_name": "The pack, wired by name"
+  },
+  "ch4-project-and-assessment": {
+   "id": "ch4-project-and-assessment",
+   "name": "Project and assessment",
+   "objective": "Build the weekly report end to end, then prove it against the clock; or test out of the chapter.",
+   "story_beat": "The diligence pack. || A fresh export, a question log with eight questions open, a case sheet with three columns and no switch wired. Answer the log, build the KPI page, wire the case and name what deserves it. Build it, then build it again on another cluster’s export against the clock. The assessment is the test-out.",
+   "page_name": "The diligence pack"
   }
  },
  "site": {

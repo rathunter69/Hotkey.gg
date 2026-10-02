@@ -84,6 +84,11 @@ const BEATS_DEFAULT = {
     body: 'Sponsor B’s analyst wants three cuts of the export by tomorrow, and a PivotTable gives each in a minute: a field down, a field across, a field into values. It’s the fastest way to see a dataset and the wrong thing to build a model on, because it holds a copy of the data and doesn’t refresh on its own. Use it for the cut, and GETPIVOTDATA to read it when a page must.' },
   'scenarios-and-sensitivity': { eyebrow: 'Module 4.5 · scenarios and sensitivity', title: 'What if the ticket falls?',
     body: 'The management case is the company’s own forecast; a buyer builds a base case from what they think will happen and a downside they can live with, and they want all three in one model with a switch, never three files. Then the questions: what if the blended ticket drops a dollar, what if member share slips, how many washes break even. A case toggle and a data table answer them on one sheet.' },
+  // Chapter 4 · Data and Lookups (script-ch4.md story cards)
+  'names-and-structure': { eyebrow: 'Module 4.6 · names and structure', title: 'Name the switch, not everything.',
+    body: 'The pack is thirteen sheets now, and the case switch is read from all over it. A name turns Scenarios!$C$11 into Case, so a formula reads like English and a reviewer finds the switch by name. But a model with a hundred names is worse than one with none. Name the toggles and the key inputs, manage them, and let the picker read its list by name.' },
+  'ch4-project-and-assessment': { eyebrow: 'Module 4.7 · project and assessment', title: 'The diligence pack.',
+    body: 'A fresh export, a question log with eight questions open, a case sheet with three columns and no switch wired. Answer the log, build the KPI page, wire the case and name what deserves it. Build it, then build it again on another cluster’s export against the clock. The assessment is the test-out.' },
   'project-and-assessment': { eyebrow: 'Module 1.8 · project, assessment, test-out', title: 'Management’s next feed is in.',
     body: 'A fresh week, a blank Report, and everything the chapter taught. Build the page start to finish, then prove it against the clock on Monday morning; or test out of the chapter in five minutes.' },
 };

@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 150: The Name Manager — Data and Lookups · hotkey.gg</title>
+<meta name="description" content="The Name Manager lists every name in the file, what it holds, where it points and its scope, including the ones somebody left behind. This file has one: OldTicket, still pointing at the ticket’s old cell on Scenarios, which would quietly feed a formula the wrong price. Delete it, give the cost per wash the house spelling, and paste the list where the reviewer will see it. The key is Ctrl+F3.">
+<meta name="generator" content="app2/tests/public-pages.js — generated from lesson data; do not edit by hand">
+<script>try{var v=JSON.parse(localStorage.getItem('hk2_theme_vars'));if(v&&v.vars){var r=document.documentElement;for(var k in v.vars)r.style.setProperty('--'+k,v.vars[k]);r.setAttribute('data-dark',v.dark?'1':'0');}}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../ui/public.css">
+</head>
+<body>
+<nav class="top"><a class="brand" href="../index.html#/">hotkey<b>.gg</b></a><a href="../index.html#/learn">Learn</a><a href="../index.html#/practice">Practice</a><a href="../index.html#/leaderboard">Leaderboard</a><a href="../index.html#/reference">Reference</a></nav>
+<main>
+<div class="crumb"><a href="../index.html#/learn">Learn</a> › <a href="index.html">Data and Lookups</a> › Names and structure</div>
+<h1>Lesson 150: The Name Manager</h1>
+<div class="meta">Data and Lookups · Names and structure · medium · <span class="">Paid</span></div>
+<div class="card">
+<p style="margin:0">The Name Manager lists every name in the file, what it holds, where it points and its scope, including the ones somebody left behind. This file has one: OldTicket, still pointing at the ticket’s old cell on Scenarios, which would quietly feed a formula the wrong price. Delete it, give the cost per wash the house spelling, and paste the list where the reviewer will see it. The key is <kbd>Ctrl+F3</kbd>.</p>
+</div>
+<h2>What you will do</h2>
+<ol class="goals"><li><span class="muted">Ctrl+F3 opens the Name Manager: one row per name, with its value, what it refers to and its scope. ↑ and ↓ pick a row. OldTicket points at the live ticket on Scenarios, a cell the model no longer treats as the input.</span> Open the Name Manager with Ctrl+F3 and pick the stray, OldTicket.</li><li><span class="muted">Delete (Alt+D) asks before it removes a name, and Enter answers OK. Read the Refers To column first: a stray that still points at a real cell is the dangerous kind, because nothing on the sheet looks broken.</span> Delete OldTicket, confirm, and close the Name Manager.</li><li><span class="muted">Edit (Alt+E) opens the picked name with its text selected, so typing replaces it; Enter saves, and every formula that reads the name follows it. Scope reads Workbook: a name defined this way works on every sheet, while a sheet copied with its names makes sheet-scoped duplicates, which is where strays like OldTicket come from.</span> Rename CostPerWash to Cost_Per_Wash with Edit (Alt+E) in the Name Manager, then close it.</li><li>Go To Cost_Per_Wash and land on the cost per wash on Inputs C5.</li><li><span class="muted">Paste Name (F3) lists the names; Paste List (Alt+L) writes each one and what it refers to from the active cell down, as text. It is a snapshot, so paste it again whenever the names change.</span> Paste the list of names under its heading on Inputs: F3 in B19, then Paste List.</li><li>Does it tie? Watch Go To land on Ticket, a $13 ticket typed there, and EBITDA on Scenarios fall.</li></ol>
+<div class="cta"><a class="btn" href="../index.html#/lesson/name-manager">Start this lesson</a><span class="path">Read → Guided → Try solo → Timed</span></div>
+
+<div class="prevnext"><span>← <a href="naming-sparingly.html">Lesson 149: Naming toggles and key inputs, sparingly</a></span><span><a href="validation-list-by-name.html">Lesson 151: A validation list driven by a name</a> →</span></div>
+</main>
+<footer><a href="../index.html#/pricing">Pricing</a><a href="../index.html#/teams">Teams</a><a href="../index.html#/about">About</a><a href="../index.html#/terms">Terms</a><a href="../index.html#/privacy">Privacy</a><a href="../index.html#/contact">Contact</a><span>© hotkey.gg</span></footer>
+</body>
+</html>

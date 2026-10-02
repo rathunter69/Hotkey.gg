@@ -291,6 +291,7 @@ export const RIBBON_COMMANDS = {
   'HEC': C('Clear contents', 'Editing', 'H', ICON.clearContents, direct(S => S.clearContents()), 'Delete'),
   'HEM': C('Clear comments and notes', 'Editing', 'H', ICON.clearContents, direct(S => S.clearNotes())),
   'MMD': C('Define Name…', 'Defined Names', 'M', ICON.fx, s => { leaveRibbon(s); s.openDefineName(); }),
+  'MN': C('Name Manager', 'Defined Names', 'M', ICON.fx, tool('MN'), 'Ctrl+F3'),
   'WQ': C('Zoom…', 'Zoom', 'W', ICON.goTo, s => { leaveRibbon(s); s.openZoom(); }),
   'WJ': C('Zoom to 100%', 'Zoom', 'W', ICON.goTo, direct((S, s) => { S.setZoom(100); s.emit('settings'); })),
   // Formulas

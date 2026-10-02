@@ -195,6 +195,7 @@
 .od-combo.tc-foc{border-color:var(--accent); box-shadow:0 0 0 2px var(--accent-glow); color:var(--text)}
 .od-item .od-box{margin-right:2px}
 .tc-grid2{display:grid; grid-template-columns:auto 1fr; gap:4px 10px; align-items:center; margin:2px 0 6px}
+.tc-grid4{display:grid; grid-template-columns:minmax(90px,1fr) minmax(70px,1fr) minmax(140px,2fr) minmax(70px,auto); gap:0 10px; width:100%}
 .tc-val{font-family:var(--mono); font-size:11.5px; color:var(--text); overflow-wrap:anywhere}
 .tc-eval{font-family:var(--mono); font-size:11.5px; color:var(--text); min-height:60px; padding:4px 6px; border:1px solid var(--line); border-radius:4px; background:var(--surface); overflow-wrap:anywhere}
 .tc-eval u{text-decoration-color:var(--accent); text-decoration-thickness:2px}

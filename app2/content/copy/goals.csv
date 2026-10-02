@@ -1134,3 +1134,56 @@ challenge-three-case-model,1,The one-way table: select C28:H29 and run a Data Ta
 challenge-three-case-model,2,"The two-way table on C32:H37: Row input cell C13, Column input cell G7.",,,
 challenge-three-case-model,3,"Goal Seek C44 to 0 by changing C43, note the answer in C46 as 121, and put 250 back in C43.",,,
 challenge-three-case-model,4,The cases side by side: select C50:F54 and run a Data Table with the switch C11 as its Row input cell.,,,
+naming-sparingly,0,Name the case switch on Scenarios C11 Case with Define Name.,"Define Name (Alt, M, M, D) names the selected cell. Pick the switch, not the picker beside it: C11 holds the case as a number, and that number is what every formula reads.",,pulse cell C11 · The number under the picker is the switch; type Case over the suggested name.
+naming-sparingly,1,Name the blended ticket on Inputs C15 Ticket and the cost per wash in Inputs C5 CostPerWash.,"Inputs that formulas on other sheets read are the next to earn a name. The ticket and the cost per wash both live on Inputs and both turn up in the outputs, the break-even and the sensitivities.",,"pulse cell C15 · Go To takes the sheet name first: Inputs!C15, then Inputs!C5."
+naming-sparingly,2,"Rewrite the live column on Scenarios: =CHOOSE(Case,C5,D5,E5) in G5, then =INDEX(C6:E6,Case) down G6:G8.","A name goes anywhere an address goes, and it never needs a dollar sign: it always means the same cell. Read the new formula aloud and it says what it does.",,pulse range G5:G8 · Case takes the place of $C$11; fill G6:G8 with one entry and Ctrl+Enter.
+naming-sparingly,3,"Rewrite the check in C58 to read the switch by name: =INDEX($C$54:$E$54,Case)-C24.",,,"pulse cell C58 · The live case’s EBITDA in the side-by-side table, less the EBITDA above."
+naming-sparingly,4,Go To Case from the Inputs sheet and land on the switch.,"Go To takes a name where it takes an address, so a reviewer who knows the switch is called Case lands on it from any sheet. That is the test for a name: would someone look for it?",,"pulse cell C11 · Ctrl+G, type the name, Enter."
+naming-sparingly,5,"Does it tie? Watch the picker switch to Downside and the live column, which now reads Case, move with it.",,,pulse range G5:G8 · Case is still C11; only the way the formulas say it changed.
+name-manager,0,"Open the Name Manager with Ctrl+F3 and pick the stray, OldTicket.","Ctrl+F3 opens the Name Manager: one row per name, with its value, what it refers to and its scope. ↑ and ↓ pick a row. OldTicket points at the live ticket on Scenarios, a cell the model no longer treats as the input.",,"pulse the Name Manager · The list is alphabetical: Case, CostPerWash, OldTicket, Ticket."
+name-manager,1,"Delete OldTicket, confirm, and close the Name Manager.","Delete (Alt+D) asks before it removes a name, and Enter answers OK. Read the Refers To column first: a stray that still points at a real cell is the dangerous kind, because nothing on the sheet looks broken.",,"pulse the Name Manager · Alt+D on the picked row, Enter to confirm, Esc to close."
+name-manager,2,"Rename CostPerWash to Cost_Per_Wash with Edit (Alt+E) in the Name Manager, then close it.","Edit (Alt+E) opens the picked name with its text selected, so typing replaces it; Enter saves, and every formula that reads the name follows it. Scope reads Workbook: a name defined this way works on every sheet, while a sheet copied with its names makes sheet-scoped duplicates, which is where strays like OldTicket come from.",,"pulse the Name Manager · Pick CostPerWash, Alt+E, type the new name over the old one."
+name-manager,3,Go To Cost_Per_Wash and land on the cost per wash on Inputs C5.,,,pulse cell C5 · Ctrl+G takes the new name; the old one no longer exists.
+name-manager,4,"Paste the list of names under its heading on Inputs: F3 in B19, then Paste List.","Paste Name (F3) lists the names; Paste List (Alt+L) writes each one and what it refers to from the active cell down, as text. It is a snapshot, so paste it again whenever the names change.",,pulse cell B19 · F3 opens Paste Name; Alt+L is Paste List.
+name-manager,5,"Does it tie? Watch Go To land on Ticket, a $13 ticket typed there, and EBITDA on Scenarios fall.",,,pulse cell C24 on Scenarios · Every name in the list lands where it says.
+validation-list-by-name,0,Name the case list on Lists L5:L7 Cases with Define Name.,Define Name works on a range as well as a cell: select the three cases and the name covers all of them. A list that a drop-down reads is the other kind of cell that earns a name.,,"pulse range L5:L7 on Lists · Select the three cases first, then Alt M M D."
+validation-list-by-name,1,"Point the case picker on Scenarios C10 at the name: Data Validation, List, Source =Cases.","Data Validation (Alt, A, V, V) on the picker: Clear All (Alt+C) empties the old rule, L picks List, and Source (Alt+S) takes =Cases. The = matters; without it the drop-down would offer the word Cases.",,"pulse cell C10 on Scenarios · Alt A V V, Alt+C to clear, L for List, Alt+S, then =Cases."
+validation-list-by-name,2,Name the unique site list on Lists N5:N10 Sites.,,,"pulse range N5:N10 on Lists · The six codes 4.2.3 left, one row each."
+validation-list-by-name,3,Point the site picker on Summary C34 at =Sites the same way.,,,pulse cell C34 on Summary · The site code the two-way lookup reads.
+validation-list-by-name,4,Paste the names list again from Inputs B19 so it shows all five names.,"Paste List writes what the names are now, not what they were, so a list on the page goes stale the moment a name is added. Paste it over the old one.",,"pulse cell B19 on Inputs · F3, then Alt+L for Paste List."
+validation-list-by-name,5,"Does it tie? Watch the case picker drop down the three cases it reads through Cases, and the live column follow the pick.",,,pulse cell C10 on Scenarios · The drop-down lists whatever the name Cases covers.
+challenge-toggles-named,0,"Name the switch on Scenarios C11 Case, Inputs C5 Cost_Per_Wash and the case list on Lists L5:L7 Cases.",,,
+challenge-toggles-named,1,"In the Name Manager point Ticket at Inputs C15, delete the stray Ticket_old and close it.",,,
+challenge-toggles-named,2,Make the live column G5:G8 and the check in C58 on Scenarios read the switch as Case.,,,
+challenge-toggles-named,3,"Point the case picker in Scenarios C10 at the name: Data Validation, List, Source =Cases.",,,
+challenge-toggles-named,4,Paste the names list on Inputs from B19 with F3 and Paste List.,,,
+ch4-project,0,"On Export replace the misspelt site code with the right one (Ctrl+H), so every row in B carries one of the six codes.",,,
+ch4-project,1,"List the six site codes in Lists N5:N10, prove them with COUNTIF in O5:O11, and add the check in C26.",,,
+ch4-project,2,"Fill the site block on Summary C5:E10 by INDEX and MATCH from Lists: the site, its capacity and its hours open.",,,
+ch4-project,3,"Fill the KPI block on Summary F5:M11: capacity, days, washes, utilization, the peak, member washes and share, with totals.",,,
+ch4-project,4,"Fill both cubes on Summary by SUMIFS on site and week: washes in C15:F21 and retail revenue in C25:F31, totals included.",,,
+ch4-project,5,Sum the washes and the retail revenue between the window’s two dates in Summary C50:C51 with SUMIFS.,,,
+ch4-project,6,"Define Case, Cases, Cost_Per_Wash, Sites and Ticket with Alt M M D, then paste the list on Inputs from B19.",,,
+ch4-project,7,Point the case picker in Scenarios C10 at =Cases and the site picker in Summary C34 at =Sites.,,,
+ch4-project,8,"Wire the switch on Scenarios: the live column G5:G8 by CHOOSE and INDEX on Case, then Case itself in C11 by MATCH on the picker.",,,
+ch4-project,9,Put the pass-through driver in Scenarios C14: the ticket on Inputs unless C13 holds a figure.,,,
+ch4-project,10,"Build the outputs in Scenarios C17:C25 from the live column, from washes a year down to EBITDA and its margin.",,,
+ch4-project,11,"Build break-even in Scenarios C41:C45, Goal Seek C44 to 0 by changing C43, and note the answer in C46.",,,
+ch4-project,12,"Fill the checks in Summary C72:C77 and Scenarios C58:C60, every one a live difference reading 0.",,,
+ch4-project,13,Answer the eight open questions on Q&A: mark each Answered in E and link its answer in F to the cell that holds it.,,,
+ch4-project,14,"Does it tie? Watch the first retail count on Export jump to 500, the cubes and the KPI block move, and every check hold at 0.",,,
+ch4-assessment,0,"On Export replace the misspelt site code with the right one (Ctrl+H), so every row in B carries one of the six codes.",,,
+ch4-assessment,1,"List the six site codes in Lists N5:N10, prove them with COUNTIF in O5:O11, and add the check in C26.",,,
+ch4-assessment,2,"Fill the site block on Summary C5:E10 by INDEX and MATCH from Lists: the site, its capacity and its hours open.",,,
+ch4-assessment,3,"Fill the KPI block on Summary F5:M11: capacity, days, washes, utilization, the peak, member washes and share, with totals.",,,
+ch4-assessment,4,"Fill both cubes on Summary by SUMIFS on site and week: washes in C15:F21 and retail revenue in C25:F31, totals included.",,,
+ch4-assessment,5,Sum the washes and the retail revenue between the window’s two dates in Summary C50:C51 with SUMIFS.,,,
+ch4-assessment,6,"Define Case, Cases, Cost_Per_Wash, Sites and Ticket with Alt M M D, then paste the list on Inputs from B19.",,,
+ch4-assessment,7,Point the case picker in Scenarios C10 at =Cases and the site picker in Summary C34 at =Sites.,,,
+ch4-assessment,8,"Wire the switch on Scenarios: the live column G5:G8 by CHOOSE and INDEX on Case, then Case itself in C11 by MATCH on the picker.",,,
+ch4-assessment,9,Put the pass-through driver in Scenarios C14: the ticket on Inputs unless C13 holds a figure.,,,
+ch4-assessment,10,"Build the outputs in Scenarios C17:C25 from the live column, from washes a year down to EBITDA and its margin.",,,
+ch4-assessment,11,"Build break-even in Scenarios C41:C45, Goal Seek C44 to 0 by changing C43, and note the answer in C46.",,,
+ch4-assessment,12,"Fill the checks in Summary C72:C77 and Scenarios C58:C60, every one a live difference reading 0.",,,
+ch4-assessment,13,Answer the eight open questions on Q&A: mark each Answered in E and link its answer in F to the cell that holds it.,,,
+ch4-assessment,14,"Does it tie? Watch the first retail count on Export jump to 500, the cubes and the KPI block move, and every check hold at 0.",,,
