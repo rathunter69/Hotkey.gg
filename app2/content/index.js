@@ -219,6 +219,7 @@ import ch5_assessment from './lessons/ch5-assessment.js';
 // Chapter 6 · Valuation (Run R6, the valuation pack on clearcoat-valuation): 6.4 The bids and the waterfall, 6.5 Project and assessment
 import bids_side_by_side from './lessons/bids-side-by-side.js';
 import the_waterfall from './lessons/the-waterfall.js';
+import your_stake from './lessons/your-stake.js';
 
 export const CHAPTERS = [
   {
@@ -375,7 +376,7 @@ export const CHAPTERS = [
       { name: 'Project and assessment', blurb: 'The valuation summary for the board from a fresh set, then the bids and the board’s page again on the clock; the assessment is the test-out.' },
     ],
     lessons: [
-      bids_side_by_side, the_waterfall,
+      bids_side_by_side, the_waterfall, your_stake,
     ],
   },
 ];

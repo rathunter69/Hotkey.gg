@@ -2415,6 +2415,18 @@ export const COPY = {
    "mac_note": "",
    "story_beat": ""
   },
+  "your-stake": {
+   "id": "your-stake",
+   "module": "bids-and-waterfall",
+   "order": "6.4.3",
+   "title": "Your stake: what your options are worth under each bid",
+   "brief": "You hold options over 0.2% of the company, fully diluted, with a strike set when the equity was worth $40m. An option is worth the equity value less the strike, times your share, or nothing if the strike is above the price, and MAX handles that. Three bids, three numbers, and one of them is yours. Build the line under the waterfall. The key is `MAX`.",
+   "closing": "Three bids are priced, and the line at the bottom of the waterfall is yours. || Best practice: a manager’s stake is modeled with the same rigor as the owners’ and shown on the page. It’s the line the board forgets and the manager doesn’t, and the note under it says the pool already pays for it.",
+   "wow": "",
+   "convention_line": "One input, one cell; formulas reference it; Ctrl+D down, Ctrl+R across; $ on the first and total rows",
+   "mac_note": "",
+   "story_beat": ""
+  },
   "remix-format-on-the-pnl": {
    "id": "remix-format-on-the-pnl",
    "module": "remixes",
@@ -15079,6 +15091,64 @@ export const COPY = {
     "teach": "",
     "why": "",
     "hint_stuck": "pulse range C36:E38 · The fees come off before the owners, so each of them pays a share."
+   }
+  ],
+  "your-stake": [
+   {
+    "lesson_id": "your-stake",
+    "goal_index": "0",
+    "text": "Select the option plan’s inputs on Bids, C51:C53: the strike valuation, your 0.2% share and vesting at a sale.",
+    "teach": "The plan’s three inputs are typed once and sourced to the option plan: the strike valuation, your share, fully diluted, and how much vests at a sale. Every bid’s line reads them.",
+    "why": "",
+    "hint_stuck": "pulse range C51:C53 · Ctrl+G takes a range as well as a cell."
+   },
+   {
+    "lesson_id": "your-stake",
+    "goal_index": "1",
+    "text": "Value your options under bid A in C42: =MAX(C32*$C$52-$C$51*$C$52,0)*$C$53.",
+    "teach": "An option pays the equity value times your share less the strike times your share, and never less than nothing: MAX(…, 0) floors it. Vesting at 100% means all of it is yours at a sale.",
+    "why": "",
+    "hint_stuck": "pulse cell C42 · Equity value is row 32 of the waterfall; anchor the plan’s inputs with F4."
+   },
+   {
+    "lesson_id": "your-stake",
+    "goal_index": "2",
+    "text": "Select C42:E42 and fill bid A’s value across to bids B and C with Ctrl+R.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C42:E42 · The equity value moves with the column; the plan’s inputs stay anchored."
+   },
+   {
+    "lesson_id": "your-stake",
+    "goal_index": "3",
+    "text": "Show the earnout’s share of yours, deferred, in C43:E43: =C42*IFERROR(C16/C18,0).",
+    "teach": "Bid B pays part of its price later, so part of your value waits with it: the earnout’s share of the priced value is the share of yours that is deferred.",
+    "why": "",
+    "hint_stuck": "pulse range C43:E43 · IFERROR returns zero where a bid has no priced value to divide by."
+   },
+   {
+    "lesson_id": "your-stake",
+    "goal_index": "4",
+    "text": "Format C42:E42 with the code $#,##0_);($#,##0);\"-\"_), the first line of the block carrying the $.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C42:E42 · Ctrl+1, N, then type the code into the Custom box."
+   },
+   {
+    "lesson_id": "your-stake",
+    "goal_index": "5",
+    "text": "Format C43:E43 with the desk code #,##0_);(#,##0);\"-\"_), no $ on the line under it.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C43:E43 · The same route as the line above, without the $."
+   },
+   {
+    "lesson_id": "your-stake",
+    "goal_index": "6",
+    "text": "Does it tie? Watch your share in C52 go from 0.2% to 0.4%: your line doubles and the owners’ lines hold, since the pool already funds you.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C42:E42 · Your options sit inside the 5% pool, so the owners never pay for them twice."
    }
   ]
  },
