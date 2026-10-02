@@ -124,6 +124,7 @@ import challenge_text_dump from './lessons/challenge-text-dump.js';
 
 // Chapter 4 · Data and lookups (Run R4): 4.4 Pivot tables, 4.5 Scenarios and sensitivity
 import build_and_rearrange from './lessons/build-and-rearrange.js';
+import group_dates_and_value_settings from './lessons/group-dates-and-value-settings.js';
 
 export const CHAPTERS = [
   {
@@ -223,6 +224,7 @@ export const CHAPTERS = [
     ],
     lessons: [
       build_and_rearrange,
+      group_dates_and_value_settings,
     ],
   },
 ];

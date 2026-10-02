@@ -997,11 +997,12 @@ const methods = {
   },
   /** The pivot whose block holds the active cell: { sheet, pivot } or null. */
   pivotAtActive() { const S = this.sheet; const a = S.dispActive(); const p = (S.pivots || []).find(x => a.r >= x.r1 && a.r <= x.r2 && a.c >= x.c1 && a.c <= x.c2); return p ? { sheet: S, pivot: p } : null; },
-  /** Show Field List: the field list of an existing pivot, open again on its first field. */
+  /** Show Field List: the field list of an existing pivot, open again on the field in Values (the first field when none). */
   openPivotFields(found) {
     const p = found.pivot; const src = this.toolRange("'" + p.source.sheet.replace(/'/g, "''") + "'!" + p.source.range); if (!src) return false;
     const heads = []; for (let c = src.c1; c <= src.c2; c++) heads.push(dispText(src.sheet.get(src.r1, c)));
-    this.openDialog('pivot', []); this.dlg = { kind: 'pivot', step: 'fields', pivot: p.id, fields: heads, idx: 0 }; return true;
+    const at = p.spec.value ? heads.findIndex(h => h.toLowerCase() === String(p.spec.value).toLowerCase()) : -1;
+    this.openDialog('pivot', []); this.dlg = { kind: 'pivot', step: 'fields', pivot: p.id, fields: heads, idx: Math.max(0, at) }; return true;
   },
   findPivot(id) { for (const e of this.sheets) for (const p of (e.sheet.pivots || [])) if (p.id === id) return { sheet: e.sheet, pivot: p }; return null; },
   pivotColumnNumeric(p, field) { const src = this.toolRange("'" + p.source.sheet.replace(/'/g, "''") + "'!" + p.source.range); if (!src) return false; for (let c = src.c1; c <= src.c2; c++) if (dispText(src.sheet.get(src.r1, c)).toLowerCase() === String(field).toLowerCase()) { for (let r = src.r1 + 1; r <= src.r2; r++) { const v = src.sheet.get(r, c).value; if (v !== null && v !== '') return typeof v === 'number'; } } return false; },

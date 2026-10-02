@@ -44,8 +44,8 @@ test('PivotTable shortcut menu (Shift+F10 on a pivot): Show Values As % of Colum
   P.goTo(4, 1); s.run('Shift+F10 A N'); assert.equal(P.value('B4'), 200, 'No Calculation puts the sums back'); assert.equal(P.cellAt('B4').fmtStyle || 'general', 'general');
   D.commitInput('100', 5, 3); assert.equal(P.value('B5'), 155);
   P.goTo(5, 1); s.run('Shift+F10 R'); assert.equal(P.value('B5'), 195, 'Refresh from the shortcut menu');
-  s.run('Shift+F10 D'); assert.equal(s.dialog, 'pivot'); assert.equal(s.dlg.step, 'fields'); assert.equal(s.dlg.idx, 0);
-  s.run('C'); assert.equal(P.pivots[0].spec.col, 'Site'); assert.equal(P.value('A3'), 'Sum of Washes');
+  s.run('Shift+F10 D'); assert.equal(s.dialog, 'pivot'); assert.equal(s.dlg.step, 'fields'); assert.equal(s.dlg.fields[s.dlg.idx], 'Washes', 'the list opens on the field in Values');
+  s.run('Home C'); assert.equal(P.pivots[0].spec.col, 'Site'); assert.equal(P.value('A3'), 'Sum of Washes');
   s.run('End V'); assert.equal(P.pivots[0].spec.show, undefined, 'a new value field starts at No Calculation');
   s.run('Escape');
   // a date field in Rows: its items wear the source's date format
