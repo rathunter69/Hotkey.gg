@@ -173,6 +173,7 @@ import model_wide_sweep from './lessons/model-wide-sweep.js';
 import stress_tests from './lessons/stress-tests.js';
 import challenge_eight_faults from './lessons/challenge-eight-faults.js';
 import what_a_dcf_is from './lessons/what-a-dcf-is.js';
+import unlevered_free_cash_flow from './lessons/unlevered-free-cash-flow.js';
 
 export const CHAPTERS = [
   {
@@ -307,7 +308,7 @@ export const CHAPTERS = [
     ],
     lessons: [
       tie_outs_cross_foots, error_flags_checks_summary, model_wide_sweep, stress_tests, challenge_eight_faults,
-      what_a_dcf_is,
+      what_a_dcf_is, unlevered_free_cash_flow,
     ],
   },
 ];
