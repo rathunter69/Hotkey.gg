@@ -75,7 +75,7 @@ export default {
       hintStuck: 'pulse range C4:J4 · Ctrl+PgUp walks back through the group without ending it.',
       check: (s, ses) => settled(ses) && !ses.group && linked(ses) },
     { id: 'tie', closer: true, demo: { script: 'Ctrl+G "Inputs!C4" Enter "12/31/2023" Enter Ctrl+PgDn', cadence: 360 },
-      text: 'Does it tie? Watch the first year end move back a year on Inputs, and every header on IS roll with it.', requires: [],
+      text: 'Does it tie? Watch FY24’s year end on Inputs move back a year, and every header on IS roll with it.', requires: [],
       hintStuck: 'pulse range C4:J4 · Every year end reads the one before it.',
       check: (s, ses) => ses.demoDone.has('tie') },
   ],

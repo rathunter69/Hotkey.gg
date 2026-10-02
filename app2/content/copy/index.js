@@ -12359,7 +12359,7 @@ export const COPY = {
    {
     "lesson_id": "timeline-flags-counters",
     "goal_index": "7",
-    "text": "Does it tie? Watch the first year end move back a year on Inputs, and every header on IS roll with it.",
+    "text": "Does it tie? Watch FY24’s year end on Inputs move back a year, and every header on IS roll with it.",
     "teach": "",
     "why": "",
     "hint_stuck": "pulse range C4:J4 · Every year end reads the one before it."
