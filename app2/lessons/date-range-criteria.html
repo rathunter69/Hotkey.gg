@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 124: Date-range criteria: SUMIFS between two dates — Data and Lookups · hotkey.gg</title>
+<meta name="description" content="&quot;Revenue in the last seven days&quot; is a SUMIFS with two conditions on the same column: on or after a start date, and on or before an end date, written &quot;&gt;=&quot;&amp;C48 with the comparison in quotes and the cell joined by &amp;. SUMPRODUCT does the same the old way, and you will meet it in inherited models. Build a window block with a start and an end date a buyer can type. The key is &amp;.">
+<meta name="generator" content="app2/tests/public-pages.js — generated from lesson data; do not edit by hand">
+<script>try{var v=JSON.parse(localStorage.getItem('hotkey_theme_vars'));if(v&&v.vars){var r=document.documentElement;for(var k in v.vars)r.style.setProperty('--'+k,v.vars[k]);r.setAttribute('data-dark',v.dark?'1':'0');}}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../ui/public.css">
+</head>
+<body>
+<nav class="top"><a class="brand" href="../index.html#/">hotkey<b>.gg</b></a><a href="../index.html#/learn">Learn</a><a href="../index.html#/practice">Practice</a><a href="../index.html#/leaderboard">Leaderboard</a><a href="../index.html#/reference">Reference</a></nav>
+<main>
+<div class="crumb"><a href="../index.html#/learn">Learn</a> › <a href="index.html">Data and Lookups</a> › Summaries from raw rows</div>
+<h1>Lesson 124: Date-range criteria: SUMIFS between two dates</h1>
+<div class="meta">Data and Lookups · Summaries from raw rows · medium · <span class="">Paid</span></div>
+<div class="card">
+<p style="margin:0">&quot;Revenue in the last seven days&quot; is a SUMIFS with two conditions on the same column: on or after a start date, and on or before an end date, written &quot;&gt;=&quot;&amp;C48 with the comparison in quotes and the cell joined by &amp;. SUMPRODUCT does the same the old way, and you will meet it in inherited models. Build a window block with a start and an end date a buyer can type. The key is <kbd>&amp;</kbd>.</p>
+</div>
+<h2>What you will do</h2>
+<ol class="goals"><li>On Summary, type the window’s dates in blue: C48 the start, 9/23/2026, and C49 the end, 9/29/2026, the export’s last day.</li><li><span class="muted">A criteria can be an operator joined to a cell: &quot;&gt;=&quot;&amp;C48 reads on or after whatever date C48 holds. Two pairs on the same date column make a window, and moving either date moves the answer.</span> Washes in the window in C50: =SUMIFS(Export!$E$5:$E$94,Export!$A$5:$A$94,&quot;&gt;=&quot;&amp;C48,Export!$A$5:$A$94,&quot;&lt;=&quot;&amp;C49).</li><li>Retail revenue in the window in C51: the same SUMIFS on column F of the export.</li><li>In D50, the old way: =SUMPRODUCT((Export!A5:A94&gt;=C48)*(Export!A5:A94&lt;=C49)*Export!E5:E94), and read that it equals C50.</li><li>Clear D50, then answer question 8 on Q&amp;A: E12 Answered and F12 =Summary!C51.</li><li>Does it tie? Watch the end date in C49 move back a day: C50 and C51 both fall, and so does the answer on the log.</li></ol>
+<div class="cta"><a class="btn" href="../index.html#/lesson/date-range-criteria">Start this lesson</a><span class="path">Read → Guided → Try solo → Timed</span></div>
+
+<div class="prevnext"><span>← <a href="kpi-block.html">Lesson 123: The KPI block: washes per hour, member share, utilization</a></span><span><a href="kpi-page-linked-labeled-checked.html">Lesson 125: The KPI page: linked, labeled, checked</a> →</span></div>
+</main>
+<footer><a href="../index.html#/pricing">Pricing</a><a href="../index.html#/teams">Teams</a><a href="../index.html#/about">About</a><a href="../index.html#/terms">Terms</a><a href="../index.html#/privacy">Privacy</a><a href="../index.html#/contact">Contact</a><span>© hotkey.gg</span></footer>
+</body>
+</html>

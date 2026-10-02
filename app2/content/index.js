@@ -121,6 +121,21 @@ import parse_the_memo from './lessons/parse-the-memo.js';
 import text_to_numbers from './lessons/text-to-numbers.js';
 import text_to_columns_flash_fill from './lessons/text-to-columns-flash-fill.js';
 import challenge_text_dump from './lessons/challenge-text-dump.js';
+// Chapter 4 · Data and Lookups (Run R4, the diligence pack on clearcoat-pack): 4.2 Lists and tables, 4.3 Summaries from raw rows
+import sort_multi_level from './lessons/sort-multi-level.js';
+import autofilter_subtotal from './lessons/autofilter-subtotal.js';
+import remove_duplicates from './lessons/remove-duplicates.js';
+import data_validation_dropdowns from './lessons/data-validation-dropdowns.js';
+import filter_tricks from './lessons/filter-tricks.js';
+import dynamic_arrays from './lessons/dynamic-arrays.js';
+import challenge_filtered_list from './lessons/challenge-filtered-list.js';
+import sumifs_cube from './lessons/sumifs-cube.js';
+import kpi_block from './lessons/kpi-block.js';
+import date_range_criteria from './lessons/date-range-criteria.js';
+import kpi_page_linked_labeled_checked from './lessons/kpi-page-linked-labeled-checked.js';
+import question_end_to_end from './lessons/question-end-to-end.js';
+import three_d_references from './lessons/3d-references.js';
+import challenge_kpi_block from './lessons/challenge-kpi-block.js';
 
 export const CHAPTERS = [
   {
@@ -201,6 +216,26 @@ export const CHAPTERS = [
       pv_fv_pmt, npv_xnpv, irr_xirr, payment_schedule, challenge_new_site_case,
       trace_arrows_evaluate, f9_show_formulas_at_scale, hardcode_external_link_hunt, checks_block_rollup, challenge_six_faults,
       ch3_project, ch3_assessment,
+    ],
+  },
+  {
+    id: 'data-and-lookups',
+    title: 'Data and Lookups',
+    access: 'paid',
+    blurb: 'Lookups, lists, summaries from raw rows, pivot tables, scenarios and names: the data room’s questions answered from the export, in a diligence pack where every answer points at a cell.',
+    // Chapter 4's sections in order (script-ch4.md): the six modules and the closing project block.
+    sections: [
+      { name: 'Lookups', blurb: 'Why a model reads a dataset; VLOOKUP and how it fails; INDEX and MATCH; XLOOKUP; approximate match and IFERROR; multi-criteria lookups; why the standard avoids OFFSET and INDIRECT.' },
+      { name: 'Lists and tables', blurb: 'Sort and multi-level sort; AutoFilter and SUBTOTAL; Remove Duplicates and the unique site list; Data Validation; visible cells, wildcards and skip blanks; UNIQUE, FILTER and SORT.' },
+      { name: 'Summaries from raw rows', blurb: 'The SUMIFS cube; the KPI block of utilization and member share; date-range criteria; the KPI page linked, labeled and checked; a buyer’s question end to end; 3D references and grouped sheets.' },
+      { name: 'Pivot tables', blurb: 'Build and rearrange; group dates and value settings; refresh and GETPIVOTDATA.' },
+      { name: 'Scenarios and sensitivity', blurb: 'A case toggle; one-way and two-way data tables; Goal Seek on break-even; when data tables fail; case outputs side by side.' },
+      { name: 'Names and structure', blurb: 'Naming toggles and key inputs, sparingly; the Name Manager; a validation list driven by a name.' },
+      { name: 'Project and assessment', blurb: 'Build the diligence pack from a fresh export, then a fresh export against the clock.' },
+    ],
+    lessons: [
+      sort_multi_level, autofilter_subtotal, remove_duplicates, data_validation_dropdowns, filter_tricks, dynamic_arrays, challenge_filtered_list,
+      sumifs_cube, kpi_block, date_range_criteria, kpi_page_linked_labeled_checked, question_end_to_end, three_d_references, challenge_kpi_block,
     ],
   },
 ];

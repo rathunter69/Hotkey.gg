@@ -1,5 +1,5 @@
 // Chapter 4 · 4.3.3 Date-range criteria: SUMIFS between two dates (clearcoat-pack, S432 → S433)
-// A window block on Summary: a start and an end date in blue (the export's last seven days), the
+// A window block on Summary: a start and an end date in blue (the export’s last seven days), the
 // washes and the retail revenue in the window as SUMIFS with ">="&C48 and "<="&C49 on the date
 // column, the SUMPRODUCT version beside it to read the same figure the old way, then cleared, and
 // Sponsor C's question 8 answered by a link. The closer moves the end date back a day.
@@ -55,7 +55,7 @@ export default {
     { id: 'answer', text: 'Clear D50, then answer question 8 on Q&A: E12 Answered and F12 =Summary!C51.', keys: `↑ Delete Ctrl+G "'Q&A'!E12" ↵ "Answered" Tab "${F.answer}" ↵`, requires: ['delete-clears', 'cross-sheet-ref', 'go-to', 'tab-commits'],
       hintStuck: 'pulse range E12:F12 · One figure on the page, one link from the log.',
       check: (s, ses) => { const sh = summary(ses); return settled(ses) && !sh.formula('D50') && answered(ses); } },
-    { id: 'tie', closer: true, demo: { script: 'Ctrl+G "Summary!C49" Enter "9/28/2026" Enter Ctrl+G "C50" Enter Escape', cadence: 320 }, text: 'Does it tie? Watch the end date move back a day: washes and revenue in the window both fall, and so does the answer on the log.', requires: [],
+    { id: 'tie', closer: true, demo: { script: 'Ctrl+G "Summary!C49" Enter "9/28/2026" Enter Ctrl+G "C50" Enter Escape', cadence: 320 }, text: 'Does it tie? Watch the end date in C49 move back a day: C50 and C51 both fall, and so does the answer on the log.', requires: [],
       hintStuck: 'pulse range C50:C51 · The window is two typed dates, so a buyer can ask for any week.',
       check: (s, ses) => ses.demoDone.has('tie') },
   ],

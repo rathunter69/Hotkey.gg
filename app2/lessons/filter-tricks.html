@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 119: Filter tricks: visible cells only, wildcards, skip blanks — Data and Lookups · hotkey.gg</title>
+<meta name="description" content="A list does three things to the unwary: copy a block with rows hidden by hand and they come too, unless you select visible cells only first with Alt+;. Search for a site by part of its code and COUNTIF wants a wildcard, * for any run of characters and ? for exactly one. Paste a partial column over a full one and its blanks wipe what was there, unless Paste Special skips blanks. The key is Alt+;.">
+<meta name="generator" content="app2/tests/public-pages.js — generated from lesson data; do not edit by hand">
+<script>try{var v=JSON.parse(localStorage.getItem('hotkey_theme_vars'));if(v&&v.vars){var r=document.documentElement;for(var k in v.vars)r.style.setProperty('--'+k,v.vars[k]);r.setAttribute('data-dark',v.dark?'1':'0');}}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../ui/public.css">
+</head>
+<body>
+<nav class="top"><a class="brand" href="../index.html#/">hotkey<b>.gg</b></a><a href="../index.html#/learn">Learn</a><a href="../index.html#/practice">Practice</a><a href="../index.html#/leaderboard">Leaderboard</a><a href="../index.html#/reference">Reference</a></nav>
+<main>
+<div class="crumb"><a href="../index.html#/learn">Learn</a> › <a href="index.html">Data and Lookups</a> › Lists and tables</div>
+<h1>Lesson 119: Filter tricks: visible cells only, wildcards, skip blanks</h1>
+<div class="meta">Data and Lookups · Lists and tables · hard · <span class="">Paid</span></div>
+<div class="card">
+<p style="margin:0">A list does three things to the unwary: copy a block with rows hidden by hand and they come too, unless you select visible cells only first with Alt+;. Search for a site by part of its code and COUNTIF wants a wildcard, * for any run of characters and ? for exactly one. Paste a partial column over a full one and its blanks wipe what was there, unless Paste Special skips blanks. The key is <kbd>Alt+;</kbd>.</p>
+</div>
+<h2>What you will do</h2>
+<ol class="goals"><li>On Export sort, hide rows 20 to 34 by hand: Go To A20:A34 and press Ctrl+9.</li><li><span class="muted">A copy of a block takes rows hidden by hand along with it. Alt+; selects the visible cells only, so the next Ctrl+C leaves the hidden rows behind; a filter does this on its own.</span> Select the block A4:G94, press Alt+; for visible cells only, then Ctrl+C.</li><li>Insert a sheet after Export sort, rename it Scratch and paste at A1: seventy-five rows and the header.</li><li>Back on Export sort, the block is still selected: Ctrl+Shift+9 brings rows 20 to 34 back.</li><li><span class="muted">In a criteria, * stands for any run of characters and ? for exactly one. &quot;AUS-*&quot; is every Austin code; &quot;AUS-?O?&quot; is a code whose middle letter of three is O.</span> Beside the export, count with wildcards: J96 =COUNTIF(B5:B94,&quot;AUS-*&quot;) and J97 =COUNTIF(B5:B94,&quot;AUS-?O?&quot;).</li><li>In J98, retail revenue for every code ending in R: =SUMIFS(F5:F94,B5:B94,&quot;*R&quot;).</li><li><span class="muted">Paste Special with Skip blanks (Ctrl+Alt+V, then B) leaves a blank cell of the copy out of the paste, so what sits under it stays. Without it, a partial column wipes the full one.</span> On Export sort, copy the corrections I5:I94 and Paste Special them over the hours at G5 with Skip blanks ticked.</li><li>Does it tie? Watch a typo in a Domain code drop the pattern count in J97 to 14 while J96 holds at 90.</li></ol>
+<div class="cta"><a class="btn" href="../index.html#/lesson/filter-tricks">Start this lesson</a><span class="path">Read → Guided → Try solo → Timed</span></div>
+
+<div class="prevnext"><span>← <a href="data-validation-dropdowns.html">Lesson 118: Data Validation and drop-downs</a></span><span><a href="dynamic-arrays.html">Lesson 120: UNIQUE, FILTER and SORT: the modern list tools</a> →</span></div>
+</main>
+<footer><a href="../index.html#/pricing">Pricing</a><a href="../index.html#/teams">Teams</a><a href="../index.html#/about">About</a><a href="../index.html#/terms">Terms</a><a href="../index.html#/privacy">Privacy</a><a href="../index.html#/contact">Contact</a><span>© hotkey.gg</span></footer>
+</body>
+</html>

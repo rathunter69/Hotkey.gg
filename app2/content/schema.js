@@ -295,7 +295,7 @@ export const CONCEPTS = {
   'sumifs-cube': 'a SUMIFS cube: one formula with mixed references ($B15 and C$14) fills a grid of sites by weeks straight from the raw rows',
   'kpi-ratios': 'KPI ratios built from the cube: each one a figure divided by the base it is measured against, with the total row worked from totals, not an average of the rows',
   'date-window': 'a date window in a criteria: ">="&C48 and "<="&C49 join the operator to the date cell, so moving a date moves every figure',
-  'kpi-page': 'a KPI page a buyer reads: the title linked to Inputs, a source line, and a checks block whose ties and flag say the page agrees with the export',
+  'kpi-page': 'a KPI page a buyer reads: the title linked to Inputs, a source line, and a checks block whose ties and flag say the page agrees with the export rows',
   'question-loop': 'the question loop: read the buyer’s question, decide the cut, build it from the blocks already on the page, and answer on the log with a link and the status set',
   'three-d-reference': 'a 3D reference such as =SUM(Domain:CedarPark!C5) adds the same cell across every tab from the first named to the last',
   'group-sheets': 'grouped sheets (Ctrl+Shift+PgDn from the first tab): what you type on one lands on every tab in the group, until you click a tab outside it',

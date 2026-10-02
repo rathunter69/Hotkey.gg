@@ -69,7 +69,7 @@ export default {
     { id: 'answer', text: 'On Q&A, question 7: E11 Answered, and F11 a formula on the leader and its figure in dollars an hour.', keys: `Ctrl+G "'Q&A'!E11" ↵ "Answered" Tab ${q(F.answer)} ↵`, requires: ['question-loop', 'text-function', 'concatenate-amp', 'cross-sheet-ref', 'go-to', 'tab-commits'], convention: 'B2',
       hintStuck: `pulse cell F11 · ${F.answer}`,
       check: (s, ses) => settled(ses) && answered(ses) },
-    { id: 'tie', closer: true, demo: { script: 'Ctrl+G "Summary!C48" Enter "9/16/2026" Enter "9/22/2026" Enter Ctrl+G "\'Q&A\'!F11" Enter Escape', cadence: 320 }, text: 'Does it tie? Watch the window move a week back, and the leader and its figure on the log follow it.', requires: [],
+    { id: 'tie', closer: true, demo: { script: 'Ctrl+G "Summary!C48" Enter "9/16/2026" Enter "9/22/2026" Enter Ctrl+G "\'Q&A\'!F11" Enter Escape', cadence: 320 }, text: 'Does it tie? Watch the window in C48:C49 move a week back, and the answer in F11 on the log follow it.', requires: [],
       hintStuck: 'pulse cell F11 · The answer is a formula, so it is never out of date.',
       check: (s, ses) => ses.demoDone.has('tie') },
   ],

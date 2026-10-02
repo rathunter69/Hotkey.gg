@@ -72,6 +72,11 @@ const BEATS_DEFAULT = {
     body: 'Before you built yours, someone started a Summary sheet and left. It has a SUMIF pointing at a range a row short, a typed number in a formula column, a text "12", and a total that agrees with nothing. Chapter 1 taught the three looks; this module adds the tools a reviewer uses on a sheet they didn’t build, and the checks block that says, in one cell, whether the databook ties.' },
   'ch3-project-and-assessment': { eyebrow: 'Module 3.7 · project and assessment', title: 'The databook, tied out.',
     body: 'A fresh export, a fresh site list, a Summary someone else abandoned. Rebuild it so every number reads the export and the flag reads OK, then value the next site on the list. Build it, then build it again on the clock. The assessment is the test-out.' },
+  // Chapter 4 · Data and Lookups (script-ch4.md story cards)
+  'lists-and-tables': { eyebrow: 'Module 4.2 · lists and tables', title: 'Ninety rows, sorted, filtered, deduplicated.',
+    body: 'Sponsor B wants the export by site and then by day, the Saturdays only, and a clean list of sites with no repeats. They also want the inputs on the case sheet limited to choices from a list, so nobody types "Mangement". Sort, filter, Remove Duplicates and Data Validation are the list tools, and they change the data or what you see of it, so the rule is: on a copy, and with a total that knows what’s filtered.' },
+  'summaries-from-raw-rows': { eyebrow: 'Module 4.3 · summaries from raw rows', title: 'The KPI page.',
+    body: 'Every buyer wants the same page: washes and revenue by site and by week, utilization, member share, and a way to ask any question of the export without touching it. The page is a set of SUMIFS reading the export by keys, laid out as a cube, with a KPI block on top and a checks block underneath, and it answers the log’s questions one after another.' },
   'project-and-assessment': { eyebrow: 'Module 1.8 · project, assessment, test-out', title: 'Management’s next feed is in.',
     body: 'A fresh week, a blank Report, and everything the chapter taught. Build the page start to finish, then prove it against the clock on Monday morning; or test out of the chapter in five minutes.' },
 };
