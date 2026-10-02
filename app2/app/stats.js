@@ -2,6 +2,7 @@
 // achievements/cosmetics ctx, the level, the Stats page numbers, and the celebration diff
 // (which achievements and levels a finished run just earned). Pure over the store reads.
 import { store } from './store.js';
+import { auth } from './auth.js';
 import { eventsFrom, totalXP, levelOf } from './xp.js';
 import { practiceStreak, ACHIEVEMENTS } from '../content/achievements.js';
 import { earnedSet } from '../ui/badges.js';
@@ -20,6 +21,7 @@ export function gameCtx() {
   for (const id in progress) { const at = progress[id] && progress[id].at; if (Number.isFinite(at)) days.push(dayOf(at)); }
   return {
     progress, attempts, pbs, xp,
+    signedIn: (() => { try { return auth.state() === 'in'; } catch (e) { return false; } })(),
     level: lvl.lvl, levelInfo: lvl,
     rank: store.rank(), rankIndex: 0,
     streakDays: practiceStreak([...new Set(days)], dayOf()),
