@@ -147,6 +147,19 @@ import question_end_to_end from './lessons/question-end-to-end.js';
 import three_d_references from './lessons/3d-references.js';
 import challenge_kpi_block from './lessons/challenge-kpi-block.js';
 
+// Chapter 4 · Data and lookups (Run R4): 4.4 Pivot tables, 4.5 Scenarios and sensitivity
+import pivot_build_rearrange from './lessons/pivot-build-rearrange.js';
+import pivot_group_values from './lessons/pivot-group-values.js';
+import pivot_refresh_getpivotdata from './lessons/pivot-refresh-getpivotdata.js';
+import challenge_export_three_ways from './lessons/challenge-export-three-ways.js';
+import case_toggle_choose_index from './lessons/case-toggle-choose-index.js';
+import one_way_data_table from './lessons/one-way-data-table.js';
+import two_way_data_table from './lessons/two-way-data-table.js';
+import goal_seek_break_even from './lessons/goal-seek-break-even.js';
+import pass_through_driver from './lessons/pass-through-driver.js';
+import case_outputs_side_by_side from './lessons/case-outputs-side-by-side.js';
+import challenge_three_case_model from './lessons/challenge-three-case-model.js';
+
 export const CHAPTERS = [
   {
     id: 'foundations',
@@ -247,6 +260,17 @@ export const CHAPTERS = [
       why_lookups, vlookup_hlookup_fail, match_index_match, two_way_index_match, xlookup, approximate_match_bands, multi_criteria_lookups, offset_indirect_why_not, challenge_lookup_summary,
       sort_multi_level, autofilter_subtotal, remove_duplicates, data_validation_dropdowns, filter_tricks, dynamic_arrays, challenge_filtered_list,
       sumifs_cube, kpi_block, date_range_criteria, kpi_page_linked_labeled_checked, question_end_to_end, three_d_references, challenge_kpi_block,
+      pivot_build_rearrange,
+      pivot_group_values,
+      pivot_refresh_getpivotdata,
+      challenge_export_three_ways,
+      case_toggle_choose_index,
+      one_way_data_table,
+      two_way_data_table,
+      goal_seek_break_even,
+      pass_through_driver,
+      case_outputs_side_by_side,
+      challenge_three_case_model,
     ],
   },
 ];

@@ -312,6 +312,18 @@ export const CONCEPTS = {
   'question-loop': 'the question loop: read the buyer’s question, decide the cut, build it from the blocks already on the page, and answer on the log with a link and the status set',
   'three-d-reference': 'a 3D reference such as =SUM(Domain:CedarPark!C5) adds the same cell across every tab from the first named to the last',
   'group-sheets': 'grouped sheets (Ctrl+Shift+PgDn from the first tab): what you type on one lands on every tab in the group, until you click a tab outside it',
+  // Chapter 4 · 4.4 Pivot tables and 4.5 Scenarios and sensitivity (the diligence pack)
+  'pivot-table': 'Insert › PivotTable (Alt, N, V, T) summarizes a flat table on a new sheet; in its field list a field goes to Rows (R), Columns (C) or Values (V), and Enter closes the list',
+  'pivot-value-settings': 'a pivot’s value field sums, counts or averages (S in the field list cycles them), and the pivot’s shortcut menu (Shift+F10) shows the figures as a % of Column Total or opens the field list again',
+  'pivot-refresh': 'a pivot holds a copy of its source and shows it until you refresh: Alt+F5 for the pivot under the cursor, Ctrl+Alt+F5 for every pivot in the workbook',
+  'getpivotdata': 'GETPIVOTDATA(data_field, pivot, field, item) reads one figure from a pivot by its labels, so the reference still finds it after a rearrangement',
+  'case-switch': 'a case switch: one cell says which column of inputs is live, and CHOOSE(switch, a, b, c) or INDEX(range, switch) reads that column',
+  'data-table-one-way': 'a one-way Data Table (Alt, A, W, T) runs one formula for a row of input values at once: values across the top, the formula at the left, the row input cell pointed at the input',
+  'data-table-two-way': 'a two-way Data Table moves two inputs: values across and down, the output in the corner, a row input cell and a column input cell',
+  'calc-except-tables': 'Automatic except for Data Tables (Alt, M, X, E) keeps a big model fast; F9 recalculates the tables, and Alt, M, X, A puts calculation back to Automatic',
+  'goal-seek': 'Goal Seek (Alt, A, W, G) sets one cell to a value by changing one input, and writes its answer over that input',
+  'pass-through-driver': 'a pass-through driver: a blank cell on the table’s sheet and =IF(driver="",input,driver) beside it, so a Data Table can move an input that lives on another sheet',
+  'sticky-if': 'a sticky IF reads the live figure when its case is on and otherwise reads its own cell, so it holds its last value; it needs iterative calculation and a label that says so',
 };
 
 /**

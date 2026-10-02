@@ -47,7 +47,7 @@ export default {
   conventions: ['A4', 'E4'],
   teaches: ['sort-dialog'],
   uses: ['go-to', 'shift-arrow', 'ctrl-shift-arrow', 'copy-cut-paste', 'paste-special', 'insert-sheet', 'rename-sheet', 'sheet-tabs', 'page-keys', 'dialog-box'],
-  prerequisites: ['challenge-lookup-summary', 'ch3-assessment'],
+  prerequisites: ['challenge-lookup-summary'],
   brief: 'Sorting rearranges rows, and it is the one list tool that changes the data’s order for good, so it runs on a copy of the export, never on the sheet the Summary reads. Alt, A, S, S opens the Sort dialog: a level for each column, smallest to largest or the other way, with My data has headers ticked. Sort the copy by site and then by date, then by retail revenue largest first to read the best days at the top. The key is `Alt A S S`.',
   goals: [
     { id: 'copy', text: 'Copy the export’s block, Export!A4:G94, headers and all seven columns: Ctrl+G to A4, select to G94 and press Ctrl+C.', keys: 'Ctrl+G "Export!A4" ↵ Shift+→ ×6 Ctrl+Shift+↓ Ctrl+C', requires: ['go-to', 'shift-arrow', 'ctrl-shift-arrow', 'copy-cut-paste'],

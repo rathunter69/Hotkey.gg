@@ -19,6 +19,7 @@ export const MODULE_NUMBERS = {
   // Chapter 4 · Data and lookups (script-ch4.md)
   lookups: '4.1',
   'lists-and-tables': '4.2', 'summaries-from-raw-rows': '4.3',
+  'pivot-tables': '4.4', 'scenarios-and-sensitivity': '4.5',
 };
 /** The catalogue section the chapter's project, assessment and test-out sit in (module 1.8). */
 export const FINAL_SECTION = 'Project and assessment';

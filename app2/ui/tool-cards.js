@@ -116,7 +116,7 @@ function pivotBody(ss) {
   const fn = (PIVOT_FNS.find(x => x[0] === sp.fn) || PIVOT_FNS[0])[1];
   const area = (title, v) => `<div class="tc-area"><div class="od-caplbl">${title}</div><div class="tc-chip-row">${v ? `<span class="cf-chip">${esc(v)}</span>` : ''}</div></div>`;
   return '<div class="od-caplbl">Choose fields to add to report:</div>' + list(fields) +
-    '<div class="od-caplbl">Drag fields between areas below:</div><div class="tc-areas">' + area('Filters', '') + area('Columns', sp.col) + area('Rows', sp.row) + area('Values', sp.value ? fn + ' of ' + sp.value : '') + '</div>' +
+    '<div class="od-caplbl">Drag fields between areas below:</div><div class="tc-areas">' + area('Filters', '') + area('Columns', sp.col) + area('Rows', sp.row) + area('Values', sp.value ? fn + ' of ' + sp.value + (sp.show === 'pctCol' ? ', % of Column Total' : '') : '') + '</div>' +
     `<div class="cf-btns">${btn('Rows', 'r', 'dset:key:R')}${btn('Columns', 'c', 'dset:key:C')}${btn('Values', 'v', 'dset:key:V')}${btn('Summarize Values By', 's', 'dset:key:S')}</div>`;
 }
 const pivotFoot = ss => ss.dlg && ss.dlg.step === 'create' ? okCancel('OK') : closeOnly();
@@ -244,6 +244,9 @@ function autoFilterBody(ss) {
 const dvListBody = ss => list(ss.dlg.items.map((it, i) => item(i === ss.dlg.idx, 'dset:tpick:' + i, esc(it))), 'foc tc-dv');
 function contextMenuBody(ss) {
   const S = ss.sheet; const a = S.dispActive(); const has = !!ss.linkOf(a.r, a.c);
+  const pv = ss.pivotAtActive ? ss.pivotAtActive() : null;
+  if (pv && ss.dlg && ss.dlg.sub === 'show') return menuItem('N', 'No Calculation', 'dset:key:N') + menuItem('C', '% of Column Total', 'dset:key:C');
+  if (pv) return menuItem('R', 'Refresh', 'dset:key:R') + (pv.pivot.spec.value ? menuItem('A', 'Show Values As', 'dset:key:A') : '') + menuItem('D', 'Show Field List', 'dset:key:D');
   return (has ? menuItem('O', 'Open Hyperlink', 'dset:key:O') : '') + menuItem('H', has ? 'Edit Hyperlink…' : 'Link', 'dset:key:H') + (S.get(a.r, a.c).link ? menuItem('R', 'Remove Hyperlink', 'dset:key:R') : '');
 }
 

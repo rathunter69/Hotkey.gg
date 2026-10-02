@@ -91,7 +91,7 @@ test('the solved workbook ties: cubes to the export, roll-up to the cubes, KPIs 
 test('the chapter states tie on the chapter export: the cube reads 4,245 washes for Domain and the window the last seven days', () => {
   const ses = live(stateOf('S463'));
   const sm = sheetIn(ses, 'Summary');
-  const total = ROWS.reduce((t, r) => t + (r.retail || 0) + (r.member || 0), 0);
+  const total = ROWS.reduce((t, r) => t + (r.retail || 0) + (r.member || 0), 0) + (wb.PIVOT_FIX.value - ROWS[0].member);   // 4.4.3's correction to Domain's first day stays in the file
   assert.equal(sm.value('F' + S.cubeTotal), total);
   assert.equal(sm.value('H' + S.totalRow), total);
   for (const r of S.checkRows) assert.equal(sm.value('C' + r), 0, `check row ${r}`);
@@ -111,11 +111,13 @@ test('Scenarios: the live case, the sensitivities, break-even and the side-by-si
   assert.equal(sc.value('A1'), 'Base case: Clearcoat Express forecast, FY27');
   for (const k of ['washesYr', 'revenue', 'cow', 'retail', 'siteCosts', 'contrib', 'ho', 'ebitda']) assert.ok(near(sc.value('C' + C.outputs[k]), base[k]), `${k}: ${sc.value('C' + C.outputs[k])} vs ${base[k]}`);
   // the ticket row at $14 is the live EBITDA; the two-way grid at 50% and $14 too; the downside column of the case table is the downside model
-  assert.ok(near(sc.value('E' + C.oneWay.ebitda), base.ebitda));
-  assert.ok(near(sc.value('E' + C.twoWay.rows[2]), base.ebitda));
-  assert.ok(near(sc.value('C' + C.twoWay.rows[0]), wb.model({ ...wb.caseOf(1), ticket: 12, share: 0.4 }).ebitda));
-  [0, 1, 2].forEach(i => assert.ok(near(sc.value('CDE'[i] + C.cases.ebitda), wb.model(wb.caseOf(i)).ebitda), 'case ' + i));
-  assert.ok(sc.value('C' + C.cases.ebitda) > sc.value('D' + C.cases.ebitda) && sc.value('D' + C.cases.ebitda) > sc.value('E' + C.cases.ebitda), 'Management above Base above Downside');
+  // (the sensitivities are Data Tables: the edges in row and column C, the results in D:H)
+  assert.ok(near(sc.value('F' + C.oneWay.ebitda), base.ebitda));
+  assert.ok(near(sc.value('F' + C.twoWay.rows[2]), base.ebitda));
+  assert.ok(near(sc.value('D' + C.twoWay.rows[0]), wb.model({ ...wb.caseOf(1), ticket: 12, share: 0.4 }).ebitda));
+  [0, 1, 2].forEach(i => assert.ok(near(sc.value('DEF'[i] + C.cases.ebitda), wb.model(wb.caseOf(i)).ebitda), 'case ' + i));
+  assert.ok(sc.value('D' + C.cases.ebitda) > sc.value('E' + C.cases.ebitda) && sc.value('E' + C.cases.ebitda) > sc.value('F' + C.cases.ebitda), 'Management above Base above Downside');
+  assert.equal(sc.value('D' + C.cases.name), 'Management');
   assert.ok(near(sc.value('C' + C.breakEven.hand), BREAK_EVEN.hand)); assert.equal(sc.value('C' + C.breakEven.goalSeek), BREAK_EVEN.goalSeek);
   assert.equal(sc.value('C' + C.breakEven.daily), 250 * BREAK_EVEN.cpw - SITES[0].costs);
   for (const r of C.checkRows) assert.equal(sc.value('C' + r), 0, `check row ${r}`);
@@ -191,12 +193,19 @@ test('each state carries what its lesson reads', () => {
   assert.match(sc('S451').G5.formula, /^=CHOOSE\(\$C\$11,C5,D5,E5\)$/); assert.match(sc('S451').G6.formula, /^=INDEX\(C6:E6,\$C\$11\)$/);
   assert.match(sc('S451')['C' + C.outputs.revenue].formula, /\*G6$/); assert.equal(sc('S451').C6.value, 14.5);
   assert.equal(stateOf('S451').sheets.find(s => s.name === 'Scenarios').condFmt.length, 1); assert.match(sc('S451').A1.formula, /^=\$C\$10&/);
-  assert.equal(sc('S452')['G' + C.oneWay.ebitda].formula.includes('G28'), true); assert.equal(sc('S452')['C' + C.twoWay.vals], undefined);
-  assert.equal(sc('S453')['B' + C.twoWay.rows[0]].value, 0.4); assert.equal(stateOf('S453').sheets.find(s => s.name === 'Scenarios').condFmt.length, 2);
+  assert.equal(sc('S452')['G' + C.oneWay.ebitda].table, '{=TABLE(G6,)}'); assert.equal(sc('S452')['C' + C.twoWay.vals], undefined);
+  assert.equal(sc('S453')['C' + C.twoWay.rows[0]].value, 0.4); assert.equal(sc('S453')['E' + C.twoWay.rows[1]].table, '{=TABLE(G6,G7)}'); assert.equal(stateOf('S453').sheets.find(s => s.name === 'Scenarios').condFmt.length, 2);
+  assert.equal(sc('S455')['E' + C.twoWay.rows[1]].table, '{=TABLE(C13,G7)}'); assert.equal(sc('S456')['D' + C.cases.ebitda].table, '{=TABLE(C11,)}');
+  assert.equal(sc('S45C')['D' + C.cases.ebitda].table, undefined); assert.equal(sc('S45C')['D' + C.cases.ebitda].value, undefined); assert.equal(sc('S45C')['C' + C.switch].value, undefined); assert.equal(stateOf('S45C').sheets.find(s => s.name === 'Scenarios').dataTables, undefined);
+  // 4.4: the pivot on Cuts, rearranged three ways; the correction and the GETPIVOTDATA reader
+  const cuts = id => stateOf(id).sheets.find(s => s.name === wb.CUTS);
+  assert.equal(cuts('S44'), undefined); assert.deepEqual(cuts('S441').pivots[0].spec, { ...wb.PIVOTS.S441 });
+  assert.equal(cuts('S442').cells.A4.value, 'AUS-AIR'); assert.equal(cuts('S443').cells.A3.value, 'Sum of Total washes');
+  assert.equal(cells('S443', 'Export').D5.value, wb.PIVOT_FIX.value); assert.equal(cells('S443', 'Domain').C6.value, cells('S442', 'Domain').C6.value + 10); assert.match(sm('S443').I14.formula, /^=GETPIVOTDATA\("Total washes",Cuts!\$A\$3,"Site","AUS-DOM"\)$/);
   assert.match(sc('S454')['C' + C.breakEven.cpw].formula, /^=G6-/); assert.equal(sc('S454')['C' + C.breakEven.goalSeek].value, BREAK_EVEN.goalSeek);
   assert.equal(cells('S454', 'Inputs').C15, undefined); assert.equal(cells('S455', 'Inputs').C15.value, 14);
   assert.match(sc('S455').C6.formula, /^=Inputs!\$C\$15$/); assert.match(sc('S455')['C' + C.ticketModel].formula, /^=IF\(C13="",Inputs!\$C\$15,C13\)$/); assert.match(sc('S455')['C' + C.outputs.revenue].formula, /\*C14$/);
-  assert.match(sc('S456')['C' + C.cases.ebitda].formula, /^=C53\+\$C\$23$/); assert.match(sc('S456')['C' + C.checkRows[0]].formula, /\$C\$11\)-C24$/); assert.equal(qa('S456').E13.value, 'Answered');
+  assert.match(sc('S456')['C' + C.cases.ebitda].formula, /^=C24$/); assert.match(sc('S456')['C' + C.checkRows[0]].formula, /\$C\$11\)-C24,0\)$/); assert.equal(qa('S456').E13.value, 'Answered');
   // 4.6: the names, the stray, the rename, the list on Inputs
   assert.deepEqual(Object.keys(stateOf('S461').names), ['Case', 'Ticket', 'CostPerWash']); assert.match(sc('S461').G6.formula, /,Case\)$/);
   assert.deepEqual(stateOf('S462start').names.OldTicket, 'Scenarios!$G$6');
