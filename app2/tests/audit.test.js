@@ -53,3 +53,14 @@ test('Go To Special: Row differences lights the cell that breaks a row\'s patter
   S.select('A1:D2'); s.run('Alt H F D S M Enter'); assert.equal(S.selectionText(), 'A2,B2,C2,D2', 'Column differences against row 1 (the active cell\'s row): every formula differs from the value above it');
   S.select('A2:B2'); s.run('Alt H F D S W Enter'); assert.equal(s.dialog, 'gotospecial', 'no difference: Excel\'s No cells were found');
 });
+
+test('the Watch Window (Alt M W): Add Watch on the selection, the values live as the sheet changes, Delete Watch; the watches outlast the window', () => {
+  const s = new Session(new Sheet({ cells: { A1: { value: 2 }, A2: { value: 3 }, B1: { formula: '=A1*A2' } } })); s.renameSheet(0, 'Inputs'); s.addSheet('IS'); s.switchSheet(0);
+  const S = s.sheet; S.goTo(1, 2);
+  s.run('Alt M W'); assert.equal(s.dialog, 'watch'); s.run('Alt+A'); assert.equal(s.dlg.add, '=Inputs!$B$1'); s.run('Enter');
+  s.run('Alt+A "=Inputs!A1:A2" Enter');
+  assert.deepEqual(s.watchView().map(w => [w.sheet, w.cell, w.value, w.formula]), [['Inputs', 'B1', '6', '=A1*A2'], ['Inputs', 'A1', '2', ''], ['Inputs', 'A2', '3', '']]);
+  s.run('Escape'); assert.equal(s.dialog, null); S.commitInput('10', 1, 1);
+  assert.equal(s.watchView()[0].value, '30', 'the window reads the cell live'); s.switchSheet(1); assert.equal(s.watchView()[0].value, '30', 'from any sheet');
+  s.run('Alt M W Down Alt+D'); assert.deepEqual(s.watchView().map(w => w.cell), ['B1', 'A2']);
+});

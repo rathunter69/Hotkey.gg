@@ -35,9 +35,9 @@ export const STYLE_PARTS = { number: ['fmtStyle', 'decimals', 'numFmt', 'scale']
 const STYLE_KEYS = { 'Alt+N': 'number', 'Alt+L': 'alignment', 'Alt+F': 'font', 'Alt+B': 'border', 'Alt+I': 'fill', 'Alt+R': 'protection' };
 
 /** The dialogs this module drives (keyboard.js routes their keys to toolKey). */
-export const TOOL_DIALOGS = new Set(['evalfx', 'errcheck', 'texttocols', 'removedup', 'validation', 'dvlist', 'editlinks', 'autofilter', 'sortdlg', 'goalseek', 'datatable', 'pivot', 'newstyle', 'hyperlink', 'ctxmenu']);
+export const TOOL_DIALOGS = new Set(['evalfx', 'errcheck', 'texttocols', 'removedup', 'validation', 'dvlist', 'editlinks', 'autofilter', 'sortdlg', 'goalseek', 'datatable', 'pivot', 'newstyle', 'hyperlink', 'ctxmenu', 'watch']);
 /** The dialogs with a text field that keeps the case typed. */
-export const TOOL_TYPED = new Set(['newstyle', 'hyperlink', 'editlinks', 'texttocols', 'validation', 'goalseek', 'datatable', 'sortdlg', 'autofilter']);
+export const TOOL_TYPED = new Set(['newstyle', 'hyperlink', 'editlinks', 'watch', 'texttocols', 'validation', 'goalseek', 'datatable', 'sortdlg', 'autofilter']);
 /** Excel's messages the tools show verbatim. */
 export const ERRCHECK_DONE_NOTE = 'The error check is complete for the entire sheet.';
 export const FLASH_FILL_NONE_NOTE = "We looked at all the data next to your selection and didn't see a pattern for filling in values for you.";
@@ -211,6 +211,7 @@ const methods = {
       case 'AWG': this.openGoalSeek(); return true;
       case 'AWT': this.openDataTable(); return true;
       case 'NVT': this.openPivot(); return true;
+      case 'MW': this.openWatchWindow(); return true;
     }
     return false;
   },
@@ -232,6 +233,7 @@ const methods = {
       case 'newstyle': return this.newCellStyleKey(key);
       case 'hyperlink': return this.hyperlinkKey(key);
       case 'ctxmenu': return this.contextMenuKey(key);
+      case 'watch': return this.watchKey(key);
     }
   },
   /** A typed character into the draft's focused text field (Backspace removes one). */
@@ -880,6 +882,47 @@ const methods = {
       if (touched) S.commit('edit');
     }
     this.recalcAll();
+  },
+
+  /* ---------------- the Watch Window (Alt M W) ---------------- */
+  /**
+   * Formulas › Watch Window: the watched cells of the workbook with their sheet, name, value and
+   * formula, live. Add Watch (Alt+A) opens its box on the selection (typing replaces it); Enter adds
+   * every cell of the reference; ↑ ↓ pick a watch, Delete Watch (Alt+D) removes it; Esc closes the
+   * window and the watches stay.
+   */
+  openWatchWindow() { this.startClock(); if (!this.watches) this.watches = []; this.openDialog('watch', []); this.dlg = { kind: 'watch', idx: 0, add: null, fresh: false }; },
+  watchKey(key) {
+    const d = this.dlg; if (!d) return; const S = this.sheet;
+    if (d.add !== null) {
+      if (key === 'Enter') { this.addWatch(d.add); d.add = null; d.idx = Math.max(0, this.watches.length - 1); return; }
+      if (d.fresh && key.length === 1) d.add = ''; d.fresh = false;
+      if (key === 'Backspace') { d.add = d.add.slice(0, -1); return; } if (key.length === 1) d.add += key; return;
+    }
+    if (key === 'Alt+A') { const r = S.selRange(); const nm = (this.sheets.find(e => e.sheet === S) || {}).name || 'Sheet1'; d.add = '=' + (/^[A-Za-z_][A-Za-z0-9_.]*$/.test(nm) ? nm : "'" + nm + "'") + '!$' + colLetter(r.c1) + '$' + r.r1 + (r.r1 === r.r2 && r.c1 === r.c2 ? '' : ':$' + colLetter(r.c2) + '$' + r.r2); d.fresh = true; return; }
+    if (key === 'Alt+D' || key === 'Delete') { if (this.watches.length) { this.watches.splice(d.idx, 1); d.idx = Math.max(0, Math.min(d.idx, this.watches.length - 1)); } return; }
+    if (key === 'ArrowDown') { d.idx = Math.min(this.watches.length - 1, d.idx + 1); return; } if (key === 'ArrowUp') { d.idx = Math.max(0, d.idx - 1); return; }
+    if (key === 'Enter' && this.watches[d.idx]) { const w = this.watches[d.idx]; this.exitRibbon(false); this.goToRef((/^[A-Za-z_][A-Za-z0-9_.]*$/.test(w.sheet) ? w.sheet : "'" + w.sheet + "'") + '!' + w.key); }   // a double-click on a watch goes to its cell
+  },
+  /** Watch the cells of a reference (Sheet!A1:B2, A1, a defined name); false when it is not one. Each cell is watched once. */
+  addWatch(text) {
+    let t = String(text || '').trim().replace(/^=/, ''); if (!this.watches) this.watches = [];
+    const nm = Object.entries(this.names || {}).find(([n]) => n.toLowerCase() === t.toLowerCase()); if (nm) t = nm[1];
+    let sheetName = (this.sheets.find(e => e.sheet === this.sheet) || {}).name; const bang = t.lastIndexOf('!');
+    if (bang > 0) { sheetName = t.slice(0, bang).replace(/^'|'$/g, '').replace(/''/g, "'"); t = t.slice(bang + 1); }
+    const e = this.sheets.find(x => x.name.toLowerCase() === String(sheetName).toLowerCase()); const rg = parseRange(t.replace(/\$/g, '').toUpperCase());
+    if (!e || !rg) { this.toast(GOALSEEK_REF_NOTE); return false; }
+    for (let r = rg.r1; r <= rg.r2; r++) for (let c = rg.c1; c <= rg.c2; c++) { const key = refKey(r, c); if (!this.watches.some(w => w.sheet === e.name && w.key === key)) this.watches.push({ sheet: e.name, key }); }
+    return true;
+  },
+  /** The window's rows, read live: { sheet, name, cell, value (as shown), formula }. A watch on a deleted sheet reads #REF!. */
+  watchView() {
+    return (this.watches || []).map(w => {
+      const e = this.sheets.find(x => x.name === w.sheet); if (!e) return { sheet: w.sheet, name: '', cell: w.key, value: '#REF!', formula: '' };
+      const p = parseRef(w.key); const cell = e.sheet.get(p.r, p.c);
+      const name = (this.definedNames ? this.definedNames() : []).find(n => n.refersTo.replace(/\$/g, '').toUpperCase() === ('=' + (/^[A-Za-z_][A-Za-z0-9_.]*$/.test(e.name) ? e.name : "'" + e.name + "'") + '!' + w.key).toUpperCase());
+      return { sheet: w.sheet, name: name ? name.name : '', cell: w.key, value: dispText(cell), formula: cell.formula || '' };
+    });
   },
 
   /* ---------------- references typed into a tool's box ---------------- */

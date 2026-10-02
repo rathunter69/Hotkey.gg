@@ -300,6 +300,7 @@ export const RIBBON_COMMANDS = {
   'MAP': C('Remove Precedent Arrows', 'Formula Auditing', 'M', ICON.removeArrows, tool('MAP')),
   'MAD': C('Remove Dependent Arrows', 'Formula Auditing', 'M', ICON.removeArrows, tool('MAD')),
   'MV': C('Evaluate Formula', 'Formula Auditing', 'M', ICON.evaluate, tool('MV')),
+  'MW': C('Watch Window', 'Formula Auditing', 'M', ICON.evaluate, tool('MW')),
   'MK': C('Error Checking', 'Formula Auditing', 'M', ICON.errorCheck, tool('MK')),
   'MXA': C('Automatic', 'Calculation', 'M', ICON.calc, tool('MXA')),
   'MXE': C('Automatic Except for Data Tables', 'Calculation', 'M', ICON.calc, tool('MXE')),
