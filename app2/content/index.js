@@ -222,6 +222,7 @@ import calendarization_ltm from './lessons/calendarization-ltm.js';
 import median_and_range from './lessons/median-and-range.js';
 import operating_multiples from './lessons/operating-multiples.js';
 import applying_the_range from './lessons/applying-the-range.js';
+import challenge_comps from './lessons/challenge-comps.js';
 
 export const CHAPTERS = [
   {
@@ -378,7 +379,7 @@ export const CHAPTERS = [
       { name: 'Project and assessment', blurb: 'The valuation summary for the board from a fresh set, then again against the clock.' },
     ],
     lessons: [
-      spreading_a_comp, calendarization_ltm, median_and_range, operating_multiples, applying_the_range,
+      spreading_a_comp, calendarization_ltm, median_and_range, operating_multiples, applying_the_range, challenge_comps,
     ],
   },
 ];

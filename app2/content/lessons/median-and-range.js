@@ -98,7 +98,7 @@ const LESSON = {
       keys: `Ctrl+G "Comps!${OSTAT[0]}" ↵ ${OSTAT.map(ref => q(F(ref))).join(' ↵ ↓ ')} ↵`, requires: ['quartile-range', 'sum-family', 'arrow-keys'],
       hintStuck: `pulse range ${OSTAT[0]}:${OSTAT[5]} · The labels in column B name each row.`,
       check: (s, ses) => settled(ses) && statsOk(ses) && liveOn(ses, OSTAT[0], 'C5') },
-    { id: 'side', text: `Beneath margin, growth and leverage: MEDIAN, AVERAGE, MIN and MAX of M, P and Q, rows ${STAT('stMed')}, ${STAT('stMean')}, ${STAT('stMin')} and ${STAT('stMax')}.`,
+    { id: 'side', text: `Under margin, growth and leverage, from M${STAT('stMed')}: MEDIAN, AVERAGE, MIN and MAX of M, P and Q in rows ${STAT('stMed')}, ${STAT('stMean')}, ${STAT('stMin')} and ${STAT('stMax')}.`,
       keys: `Ctrl+G "Comps!P${STAT('stMed')}:Q${STAT('stMed')}" ↵ ${q(F('P' + STAT('stMed')))} Ctrl+↵ ↓ Shift+→ ${q(F('P' + STAT('stMean')))} Ctrl+↵ ↓ ×3 Shift+→ ${q(F('P' + STAT('stMin')))} Ctrl+↵ ↓ Shift+→ ${q(F('P' + STAT('stMax')))} Ctrl+↵ `
         + `Ctrl+G "Comps!M${STAT('stMed')}" ↵ ${q(F('M' + STAT('stMed')))} ↵ ↓ ${q(F('M' + STAT('stMean')))} ↵ ↓ ×3 ${q(F('M' + STAT('stMin')))} ↵ ↓ ${q(F('M' + STAT('stMax')))} ↵`,
       requires: ['sum-family', 'ctrl-enter-fill', 'shift-arrow', 'arrow-keys'],
@@ -110,7 +110,7 @@ const LESSON = {
       hintStuck: `pulse range ${OSTAT[0]}:${MEAN} · The mean moves from 10.5x to 9.8x; the median from 10.5x to 10.3x.`,
       check: (s, ses) => settled(ses) && flipOk(ses) },
     { id: 'tie', closer: true, demo: { script: 'Ctrl+G "Comps!C10" Enter "20" Enter Ctrl+G "Comps!O11" Enter', cadence: 360 },
-      text: 'Does it tie? Watch Prairie’s price go from $15.60 to $20.00: its multiple climbs, and the median and the quartiles answer.', requires: [],
+      text: 'Does it tie? Watch Prairie’s price in C10 go from $15.60 to $20.00: its multiple climbs, and the median in O11 and the quartiles answer.', requires: [],
       hintStuck: `pulse range ${OSTAT[0]}:${OSTAT[3]} · The statistics read the helper, the helper reads the multiples.`,
       check: (s, ses) => ses.demoDone.has('tie') },
   ],

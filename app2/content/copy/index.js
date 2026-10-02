@@ -2403,6 +2403,66 @@ export const COPY = {
    "mac_note": "",
    "story_beat": ""
   },
+  "calendarization-ltm": {
+   "id": "calendarization-ltm",
+   "module": "trading-comps",
+   "order": "6.1.2",
+   "title": "Calendarization and LTM",
+   "brief": "Two of the six report to March, and a multiple on a year that ended six months apart isn’t comparable. LTM (the last twelve months) fixes it: the last four quarters, whatever the fiscal year, so every company is measured to the same date. Calendarization restates a fiscal year onto a calendar year by weighting two fiscal years by the months each contributes. Build LTM EBITDA from the quarters and calendarize the two March companies. The key is `SUM`.",
+   "closing": "Every company is measured to the same date, whatever its fiscal year. || Best practice: the LTM date is one input cell on the sheet, and every LTM formula reads it. Next quarter, one edit rolls the set forward.",
+   "wow": "",
+   "convention_line": "One input, one cell; formulas reference it; Inputs blue, formulas black; The check is a live difference → 0; Write once, fill right",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "median-and-range": {
+   "id": "median-and-range",
+   "module": "trading-comps",
+   "order": "6.1.3",
+   "title": "Sort the set, filter the outliers, take the median",
+   "brief": "A set of six multiples has a shape, and one of the six is a struggling operator at 6x that would drag an average down. Sort the set to see it, decide which comp to exclude and say why in a note, and take the median (the middle value, which an outlier can’t move) plus the 25th and 75th percentiles as the range. Mean, median, low and high sit on their own rows, with a switch to include or exclude each comp. The key is `MEDIAN`.",
+   "closing": "You have the middle of the set and a range an outlier can’t pull. || Best practice: exclude a comp in the open, with a flag and a reason, never by deleting its row. A reviewer can flip it back in and see what it costs.",
+   "wow": "",
+   "convention_line": "Inputs blue, formulas black; Label the source (\"per utility contract\"); Write once, fill right; Links green; external links avoided",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "operating-multiples": {
+   "id": "operating-multiples",
+   "module": "trading-comps",
+   "order": "6.1.4",
+   "title": "Operating multiples: EV per site, EV per wash",
+   "brief": "EBITDA can be dressed up; a site can’t. Car-wash buyers read enterprise value per site and per wash alongside EV / EBITDA, because a site is a unit anyone can count and a wash is what the site actually sells. Build both across the set, take their medians, and read where Clearcoat’s forty sites and 3.6m washes would sit. The key is `/`.",
+   "closing": "Six companies anyone can count gave you a price per site and per wash. || Best practice: three multiples on every comps page. When they disagree, the one built on the unit a buyer can count wins the argument.",
+   "wow": "",
+   "convention_line": "Write once, fill right; Links green; external links avoided; Inputs blue, formulas black",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "applying-the-range": {
+   "id": "applying-the-range",
+   "module": "trading-comps",
+   "order": "6.1.5",
+   "title": "Applying the range to Clearcoat",
+   "brief": "A range of multiples times Clearcoat’s EBITDA is a range of enterprise values: low, median, high. That’s the comps row of the football field, and it’s the first place the buyers will anchor. Build it for all three multiples, in one block that reads the statistics block. Trading multiples price minority stakes, and a control buyer pays more, which is where precedents come in. The key is `*`.",
+   "closing": "The first range on the board’s page came from six companies and a median. || Best practice: the range block reads the statistics block and never retypes a multiple, so a flag flipped on the set reaches the board’s page by itself.",
+   "wow": "",
+   "convention_line": "Write once, fill right; Know the four anchor states; Units live in the format, not typed text; Links green; external links avoided",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "challenge-comps": {
+   "id": "challenge-comps",
+   "module": "trading-comps",
+   "order": "6.1.C",
+   "title": "Challenge: three comps spread and a range applied",
+   "brief": "Three fresh comps arrive on Comps with their quarters and site counts. Build LTM, the EV build, calendarize the March company, take the median and quartiles, add EV per site, and apply the range to Clearcoat.",
+   "closing": "",
+   "wow": "",
+   "convention_line": "Write once, fill right; Read the page before anyone else does",
+   "mac_note": "",
+   "story_beat": ""
+  },
   "remix-format-on-the-pnl": {
    "id": "remix-format-on-the-pnl",
    "module": "remixes",
@@ -14985,6 +15045,304 @@ export const COPY = {
     "teach": "",
     "why": "",
     "hint_stuck": "pulse cell L5 · Each row reads only its own inputs."
+   }
+  ],
+  "calendarization-ltm": [
+   {
+    "lesson_id": "calendarization-ltm",
+    "goal_index": "0",
+    "text": "Date the quarters: D20:J20 =EOMONTH(C20,3), written once with Ctrl+Enter.",
+    "teach": "Below the spread, each comp’s last eight quarters of EBITDA sit by period end, with only the first end typed. The rest are formulas, each quarter end three months after the last.",
+    "why": "",
+    "hint_stuck": "pulse range D20:J20 · Each reads the date to its left."
+   },
+   {
+    "lesson_id": "calendarization-ltm",
+    "goal_index": "1",
+    "text": "Type the LTM date 6/30/2026 in C29, then C30 =EDATE($C$29,-12) and C31 =EDATE($C$29,-24).",
+    "teach": "LTM runs to one date, and that date is one input cell: every LTM formula reads it, so the set rolls forward in one edit. The window opens twelve months before it, and the year before opens twenty-four months before.",
+    "why": "",
+    "hint_stuck": "pulse range C29:C31 · The date is typed and blue; the two below it count back from it."
+   },
+   {
+    "lesson_id": "calendarization-ltm",
+    "goal_index": "2",
+    "text": "LTM EBITDA in P21:P26: a SUMIFS of each row’s quarters dated after C30 and up to C29.",
+    "teach": "LTM EBITDA is the sum of the quarters that end after the window opens and on or before the LTM date. A SUMIFS on the date row picks them, so the same formula works for a December year and a March one.",
+    "why": "",
+    "hint_stuck": "pulse range P21:P26 · The dates row is anchored with $, the quarters row is not."
+   },
+   {
+    "lesson_id": "calendarization-ltm",
+    "goal_index": "3",
+    "text": "The year before in Q21:Q26: the same SUMIFS on the window from C31 to C30.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range Q21:Q26 · Next lesson reads growth from this column."
+   },
+   {
+    "lesson_id": "calendarization-ltm",
+    "goal_index": "4",
+    "text": "Calendarize: N21:N26 =MONTH(M21)/12, and calendar 2025 in O21:O26 =K21*N21+L21*(1-N21).",
+    "teach": "A March company’s fiscal 2026 holds nine months of calendar 2025, so calendar 2025 is three twelfths of fiscal 2025 plus nine twelfths of fiscal 2026. The weight comes from the year end cell, never typed into the formula, so a December year gets twelve twelfths and the two weights always total 100%.",
+    "why": "",
+    "hint_stuck": "pulse range N22:O22 · Riverbend’s year ends March 31, so its weight is 25%."
+   },
+   {
+    "lesson_id": "calendarization-ltm",
+    "goal_index": "5",
+    "text": "Replace the given LTM: J5:J10 =P21, then copy H5:H10 and paste its formats over J5 with Ctrl+Alt+V, T.",
+    "teach": "The spread now reads the built LTM instead of the typed one. A formula is black, so the blue goes: Paste Special, Formats from column H carries the page’s look without touching the formulas.",
+    "why": "",
+    "hint_stuck": "pulse range J5:J10 · The multiples in L5:L10 update as the links land."
+   },
+   {
+    "lesson_id": "calendarization-ltm",
+    "goal_index": "6",
+    "text": "The filings route for Pinnacle: R21 =K21+(I21+J21)-(E21+F21), and S21 =ROUND(R21-P21,2) reads 0.",
+    "teach": "Filings give LTM another way: the last full fiscal year, plus this year’s quarters so far, less the same quarters a year earlier. For Pinnacle that is fiscal 2025 plus the March and June quarters of 2026, less the same two of 2025, and a live difference against the SUMIFS reads zero.",
+    "why": "",
+    "hint_stuck": "pulse range R21:S21 · K21 is fiscal 2025; I and J hold 2026’s two quarters, E and F 2025’s."
+   },
+   {
+    "lesson_id": "calendarization-ltm",
+    "goal_index": "7",
+    "text": "Does it tie? Watch the LTM date in C29 move back a quarter to 3/31/2026: every LTM figure, and every multiple above, shifts.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range P21:P26 · One input cell rolls the whole set."
+   }
+  ],
+  "median-and-range": [
+   {
+    "lesson_id": "median-and-range",
+    "goal_index": "0",
+    "text": "Flag the set in N5:N10: a 1 for each comp, then a 0 for Harbor in N9.",
+    "teach": "Exclude a comp in the open, with a flag and a reason, never by deleting its row. The Include column holds a typed 1 or 0 for each comp, blue like any input.",
+    "why": "",
+    "hint_stuck": "pulse range N5:N10 · Harbor trades at about 6x while the rest sit near 10x."
+   },
+   {
+    "lesson_id": "median-and-range",
+    "goal_index": "1",
+    "text": "Sort the copy by EV / EBITDA, largest first: select C35:C40, press Alt, A, S, D, and expand the selection.",
+    "teach": "Below the set sits a values copy of it, so the sort can’t scramble a formula. Sorted by multiple, the shape shows at once: five companies between 8.7x and 12.0x and one at 6.1x.",
+    "why": "",
+    "hint_stuck": "pulse range B35:E40 · Expanding the selection carries each company’s name and figures with its multiple."
+   },
+   {
+    "lesson_id": "median-and-range",
+    "goal_index": "2",
+    "text": "LTM growth in P5:P10 =J5/Q21-1, and net debt / EBITDA in Q5:Q10 =(F5-G5)/J5.",
+    "teach": "Two columns say why a multiple is high or low. Growth compares this LTM with the four quarters before it; net debt over EBITDA is leverage, and a net-cash comp like Summit reads negative.",
+    "why": "",
+    "hint_stuck": "pulse range P5:Q10 · Q21 is the year before, built last lesson."
+   },
+   {
+    "lesson_id": "median-and-range",
+    "goal_index": "3",
+    "text": "Clearcoat on row 17: link I17:J17 to IS, then its margin, growth and leverage in M17, P17 and Q17.",
+    "teach": "Clearcoat goes on its own row under the set, linked green from the model: FY26E stands in for LTM, as the note in AA17 says. Its margin, growth and leverage then read against the set’s.",
+    "why": "",
+    "hint_stuck": "pulse range I17:Q17 · FY26E sits in column E on IS; leverage reads net debt from Schedules."
+   },
+   {
+    "lesson_id": "median-and-range",
+    "goal_index": "4",
+    "text": "Write why Harbor is out in AB9: its growth, its margin and its leverage against the rest of the set.",
+    "teach": "The reason for an exclusion comes from the columns, not from the multiple: a comp is out because it isn’t a peer, never because its number is inconvenient.",
+    "why": "",
+    "hint_stuck": "pulse cell AB9 · Harbor’s EBITDA is falling, its margin is the lowest and its leverage the highest."
+   },
+   {
+    "lesson_id": "median-and-range",
+    "goal_index": "5",
+    "text": "The helper in O5:O10: =IF(N5=1,L5,\"\").",
+    "teach": "MEDIAN, AVERAGE, MIN and MAX skip text in a range, so a helper column that shows the multiple for an included comp and \"\" for an excluded one drops the outlier out instead of counting it as zero. You’ll also see =MEDIAN(IF(include=1,multiples)) on other people’s sheets; the helper is the standard here.",
+    "why": "",
+    "hint_stuck": "pulse range O5:O10 · Harbor’s row shows nothing; the other five show their multiple."
+   },
+   {
+    "lesson_id": "median-and-range",
+    "goal_index": "6",
+    "text": "Under the helper, O11:O16: MEDIAN, AVERAGE, QUARTILE.INC 1 and 3, MIN and MAX, each on O5:O10.",
+    "teach": "The median is the middle value, and the 25th and 75th percentiles from QUARTILE.INC are the low and high of the range: half the included set sits between them.",
+    "why": "",
+    "hint_stuck": "pulse range O11:O16 · The labels in column B name each row."
+   },
+   {
+    "lesson_id": "median-and-range",
+    "goal_index": "7",
+    "text": "Under margin, growth and leverage, from M11: MEDIAN, AVERAGE, MIN and MAX of M, P and Q in rows 11, 12, 15 and 16.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range M11:Q16 · These describe the whole set, Harbor included, so they read the columns directly."
+   },
+   {
+    "lesson_id": "median-and-range",
+    "goal_index": "8",
+    "text": "Flip Harbor in: type 1 in N9, read the mean in O12 and the median in O11, then type 0 again.",
+    "teach": "The outlier’s pull shows when it comes back in: the mean drops by about seven tenths of a turn, the median by a quarter. That is why the range is built on the median.",
+    "why": "",
+    "hint_stuck": "pulse range O11:O12 · The mean moves from 10.5x to 9.8x; the median from 10.5x to 10.3x."
+   },
+   {
+    "lesson_id": "median-and-range",
+    "goal_index": "9",
+    "text": "Does it tie? Watch Prairie’s price in C10 go from $15.60 to $20.00: its multiple climbs, and the median in O11 and the quartiles answer.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range O11:O14 · The statistics read the helper, the helper reads the multiples."
+   }
+  ],
+  "operating-multiples": [
+   {
+    "lesson_id": "operating-multiples",
+    "goal_index": "0",
+    "text": "EBITDA before rent in V5:V10: =J5+U5, so a comp that rents compares with one that owns.",
+    "teach": "Sites and washes now sit beside each comp in R and S, typed and sourced, with whether it owns or rents its land. A comp that rents pays rent above the EBITDA line, so for the same washes it shows less EBITDA than one that owns; adding the rent back (EBITDAR) compares them evenly.",
+    "why": "",
+    "hint_stuck": "pulse range V5:V10 · An owner’s rent cell is empty, so its EBITDAR is its EBITDA."
+   },
+   {
+    "lesson_id": "operating-multiples",
+    "goal_index": "1",
+    "text": "EV per site in W5:W10 =H5/R5/1000, and EV per wash in X5:X10 =H5/S5.",
+    "teach": "EV per site is in millions of dollars, so the thousands divide by a thousand more; EV per wash is thousands over thousands, already in dollars.",
+    "why": "",
+    "hint_stuck": "pulse range W5:X10 · Enterprise value is in H; sites in R, washes in S."
+   },
+   {
+    "lesson_id": "operating-multiples",
+    "goal_index": "2",
+    "text": "The helpers: Y5:Y10 =IF(N5=1,W5,\"\"), and Z5:Z10 =IF(N5=1,X5,\"\").",
+    "teach": "Each operating multiple gets its own helper column, read off the same Include flags, so Harbor drops out of these statistics too.",
+    "why": "",
+    "hint_stuck": "pulse range Y5:Z10 · The flags are in N, as for the EV / EBITDA helper in O."
+   },
+   {
+    "lesson_id": "operating-multiples",
+    "goal_index": "3",
+    "text": "The statistics on both helpers, Y11:Z16: median, mean, the two quartiles, minimum and maximum, one row at a time across Y and Z.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range Y11:Z16 · The rows follow the labels in column B, as in O."
+   },
+   {
+    "lesson_id": "operating-multiples",
+    "goal_index": "4",
+    "text": "Clearcoat’s row: R17:S17 from Schedules, Rents in T17, its rent in U17 =-IS!$E$14, and EBITDAR in V17.",
+    "teach": "Clearcoat’s own counts come from the model: forty sites and 3.6m washes in FY26E on Schedules, and its rent from IS, turned positive to add back. Clearcoat rents its land, so its EBITDAR sits well above its EBITDA.",
+    "why": "",
+    "hint_stuck": "pulse range R17:V17 · Sites and washes are column E of Schedules, rows 9 and 15."
+   },
+   {
+    "lesson_id": "operating-multiples",
+    "goal_index": "5",
+    "text": "Does it tie? Watch Pinnacle’s site count go from 400 to 500: its EV per site falls, and the median in Y11 moves with it.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell Y11 · Pinnacle is the middle of the included set on EV per site."
+   }
+  ],
+  "applying-the-range": [
+   {
+    "lesson_id": "applying-the-range",
+    "goal_index": "0",
+    "text": "The EV / EBITDA range: C44:E44 read O13, O11 and O14, and C45:E45 =C44*$J$17 across.",
+    "teach": "A multiple and the figure it multiplies cover the same period, so an LTM multiple belongs on LTM EBITDA. Clearcoat’s row uses FY26E as the proxy, flagged in AA17: this set carries no forward estimates. The block reads the statistics block, so it follows every flag.",
+    "why": "",
+    "hint_stuck": "pulse range C44:E45 · $J$17 is Clearcoat’s EBITDA, anchored so it holds across the row."
+   },
+   {
+    "lesson_id": "applying-the-range",
+    "goal_index": "1",
+    "text": "The same on EV per site: C46:E46 read Y13, Y11 and Y14, and C47:E47 =C46*$R$17*1000 across.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C46:E47 · EV per site is in millions, so times a thousand brings it back to thousands."
+   },
+   {
+    "lesson_id": "applying-the-range",
+    "goal_index": "2",
+    "text": "And on EV per wash: C48:E48 read Z13, Z11 and Z14, and C49:E49 =C48*$S$17 across.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C48:E49 · Dollars a wash times thousands of washes is thousands of dollars."
+   },
+   {
+    "lesson_id": "applying-the-range",
+    "goal_index": "3",
+    "text": "Net debt in C50:E50 =-DCF!$C$43, then each equity range in rows 51 to 53: its EV plus that row.",
+    "teach": "Enterprise value belongs to everyone who funds the business; the owners get what is left after net debt (5.6.5). The same net debt comes off each range, linked green from the DCF page.",
+    "why": "",
+    "hint_stuck": "pulse range C50:E53 · Net debt is negative here, so each equity line adds it."
+   },
+   {
+    "lesson_id": "applying-the-range",
+    "goal_index": "4",
+    "text": "Bold the median column, D44:D53, with Ctrl+B.",
+    "teach": "The block prints the way the book does: USD millions to one decimal from the format, and the median bold, because the median is the number the page leads with.",
+    "why": "",
+    "hint_stuck": "pulse range D44:D53 · The totals are bold already; the rest follow."
+   },
+   {
+    "lesson_id": "applying-the-range",
+    "goal_index": "5",
+    "text": "Does it tie? Watch Harbor’s flag in N9 go from 0 to 1: the median falls, and the whole range in C44:E53 moves with it.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C45:E45 · The block reads the statistics, the statistics read the flags."
+   }
+  ],
+  "challenge-comps": [
+   {
+    "lesson_id": "challenge-comps",
+    "goal_index": "0",
+    "text": "LTM EBITDA in J5:J7: each comp’s last four quarters, from its row in the quarters block.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-comps",
+    "goal_index": "1",
+    "text": "The EV build in E5:E7, H5:H7 and L5:L7: market cap, EV, and EV / EBITDA with NM where EBITDA isn’t positive.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-comps",
+    "goal_index": "2",
+    "text": "Calendarize Bayline Auto Spa: its weight in N19 from its year end in M19, and calendar 2025 in O19.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-comps",
+    "goal_index": "3",
+    "text": "The median of EV / EBITDA in L8, and the low and high quartiles in L10 and L11.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-comps",
+    "goal_index": "4",
+    "text": "EV per site in $m in W5:W7, and its median in W8.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-comps",
+    "goal_index": "5",
+    "text": "Apply the range: low, median and high in C35:E35, times Clearcoat’s FY26E EBITDA (IS!E24) in C36:E36.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
    }
   ]
  },

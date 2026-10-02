@@ -252,7 +252,7 @@ function pageComps(comps) {
       { title: 'Quarterly EBITDA by period end, the fiscal years and LTM', headerDates: Array.from({ length: 8 }, (_, i) => FIRST_QUARTER_END + i * 91),
         header: [...Array(8).fill(null), 'Fiscal year ended in 2025', 'Fiscal year ended in 2026', 'Fiscal year end', 'Weight on the 2025 year', 'Calendar 2025', 'LTM EBITDA', 'LTM a year earlier', 'LTM from the filings', 'Difference'],
         kinds: [...Array(8).fill('money'), 'money', 'money', 'count', 'unit', 'money', 'money', 'money', 'money', 'count'],
-        colFmt: { [Q_COLS.fye]: DATE_FMT, [Q_COLS.w]: { fmtStyle: 'percent', decimals: 0 } },
+        colFmt: { [Q_COLS.fye]: DATE_FMT, [Q_COLS.w]: { fmtStyle: 'percent', decimals: 0, it: true } },
         rows: comps.map((cp, i) => {
           const q = quartersFor(cp);
           return { key: qk(i), label: cp.name, fill: (col, r) => {
