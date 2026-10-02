@@ -90,7 +90,7 @@ export function arrowLabelTell(s) {
 
 /** Text typed into a cell is exempt: strip quoted cell contents ("…" right after a cell ref or "type"). */
 export function stripCellText(s) {
-  return String(s || '').replace(/(?:type|types|typed|reads|read|enter|entered)\s+[“"][^”"]*[”"]/gi, ' ').replace(/=[^\s,.;]+/g, ' ');
+  return String(s || '').replace(/(?:type|types|typed|reads|read|enter|entered)\s+[“"][^”"]*[”"]/gi, ' ').replace(/=(?:[^\s,.;]|\.(?=[A-Za-z]))+/g, ' ');   // a dot inside a name (NETWORKDAYS.INTL) stays in the formula
 }
 
 /** Every tell in one displayed string, as a list of reasons (empty when clean). */
