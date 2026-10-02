@@ -63,7 +63,17 @@ export function catalogEntry(drill, lessons = LESSONS) {
     route: { secs: Number.isFinite(drill.route) ? drill.route : null, keys: drill.optimalKeys || null, solution: drill.solution || (drill.lesson && drill.lesson.solution) || null },
     goals: Array.isArray(drill.goals) ? drill.goals.length : (drill.lesson && Array.isArray(drill.lesson.goals) ? drill.lesson.goals.length : 0),
     dailyEligible: !tags.has('stretch') && !tags.has('long') && mode === 'drill',
+    ruleLine: typeof drill.ruleLine === 'string' ? drill.ruleLine : null,   // a stretch drill's one rule, on its card (M85)
+    pickers: hasPickers(drill),
   };
+}
+
+/** The lesson that teaches drop-downs (4.2.4): a drill with pickers says so on its Ready beat until it is done (M85). */
+export const PICKER_LESSON = 'data-validation-dropdowns';
+/** Does a drill's start sheet carry validated-list cells (pickers, M85)? */
+export function hasPickers(drill) {
+  const sheets = [drill && drill.sheet, ...((drill && drill.sheets) || [])].filter(Boolean);
+  return sheets.some(sh => sh.validation && Object.values(sh.validation).some(v => v && v.allow === 'list'));
 }
 
 export function validateCatalogEntry(e) {

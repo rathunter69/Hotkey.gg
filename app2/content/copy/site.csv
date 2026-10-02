@@ -118,7 +118,6 @@ level_reward_crimson,Crimson and the Top Bucket frame
 level_reward_profile_frame,The profile frame
 level_reward_ghost_trail,The ghost trail
 level_reward_keycap_skin,A keycap skin
-level_reward_sound_set,A sound set
 level_reward_board_flair,Board flair
 level_reward_cursor_color,A cursor color
 level_reward_panel_style,A panel style
@@ -690,7 +689,7 @@ learn_reward,Finish {module} to earn it
 learn_reward_earned,Earned
 practice_chapter_coming,Chapter {n} is being written. Its drills land here as its lessons do.
 learn_keys_n,{n} keys
-home_xp_why,"Lessons, drills and the Daily pay XP. Every level opens a reward."
+home_xp_why,"Lessons, drills, the Daily and quests pay XP. Every level opens a piece of flair."
 save_title,Save your progress
 save_line,Your progress lives in this browser for now. A free account keeps it on any device and puts your times on the boards.
 save_go,Make a free account
@@ -700,9 +699,9 @@ rapid_keys_hint,"Press 1, 2 or 3 to play"
 rapid_deck,The deck
 rapid_deck_n,{n} commands
 rapid_how,How a round works
-rapid_how_1,We name a command. Press its keys; they show only if you stall.
-rapid_how_2,"Every hit scores, and every fifth hit in a row scores more."
-rapid_how_3,"When the clock runs out, your hits and best combo are your score."
+rapid_how_1,"We name a command on a fresh sheet. Press its keys, which show only if you stall."
+rapid_how_2,"Every hit fills a segment of the combo meter, and a wrong chord drains it."
+rapid_how_3,"When the clock runs out, you see the three commands you were slowest on, ready to drill."
 challenges_intro,"Each module ends on a challenge: the whole module on a fresh file, against the clock."
 challenges_passed,{n} of {m} passed
 boards_clean_runs_one,One clean run
@@ -749,7 +748,7 @@ col_title,Title
 col_reward,What it pays
 profile_levels,Level titles
 profile_you_are,"You: level {n}, {title}"
-profile_levels_line,"Every level pays something: a theme every third level, keycap skins, sounds and board flair between."
+profile_levels_line,"Every level pays something: a theme, a keycap skin, a cursor, a trail, a panel style or board flair. Click one you own to wear it."
 profile_account_link,"Account details, and export or delete your data"
 cert_next_done,"All six chapters are Verified, and your certificate is issued."
 cert_next_writing,Chapter {n} is being written. It opens on Learn when it lands.
@@ -845,3 +844,390 @@ about_paid_title,Free and Full Access
 about_paid,Chapter 1 is free in full. Full Access opens Chapters 2 to 6.
 about_paid_link,See pricing
 about_independence_title,Independence
+quest_d-lesson,Complete a lesson.
+quest_d-drills-2,Finish two drills.
+quest_d-daily,Play the Daily.
+quest_d-pass,Pass any drill.
+quest_d-expert,Expert on any drill.
+quest_d-rapid-30,Land 30 hits in one rapid-fire round.
+quest_d-clean-lesson,"Finish a lesson clean, with no mouse and no help."
+quest_d-again,Run the {module} challenge again.
+quest_d-pb,Set a new personal best on any drill.
+quest_d-rapid-3,Play three rapid-fire rounds.
+quest_k-ctrl-shift-down,Press Ctrl+Shift+↓ ten times.
+quest_k-paste-special,Open Paste Special five times.
+quest_k-f4,Press F4 fifteen times.
+quest_k-fill,Fill down or fill right ten times.
+quest_k-autosum,AutoSum with Alt+= three times.
+quest_k-alt-chord,Run five commands by Alt chord.
+quest_k-trace,Follow the trail with Ctrl+[ five times.
+quest_k-sheets,Switch sheets by keyboard twenty times.
+quest_k-no-mouse,Finish a whole lesson without touching the mouse.
+quest_k-ghost,Beat your own ghost on any drill.
+quest_k-no-waste,Finish a drill with no wasted keys.
+quest_k-early-daily,Play the Daily before 9am.
+quest_w-drills-10,Finish ten drills.
+quest_w-dailies-5,Play five Dailies.
+quest_w-expert-3,Reach Expert on three drills.
+quest_w-rapid-10,Play ten rapid-fire rounds.
+quest_w-pb-2,Set two new personal bests.
+quest_w-clean-5,Finish five lessons clean.
+quest_w-challenges-3,Run three challenges.
+quest_w-ctrl-shift-100,Press Ctrl+Shift and an arrow a hundred times.
+quest_w-f4-100,Press F4 a hundred times.
+quest_w-chapter-drills,Play every drill in one chapter.
+quest_today,Today
+quest_this_week,This week
+quest_xp,+{xp}
+quest_count,{d} of {k}
+quest_bonus_daily,Bonus for all three
+quest_bonus_weekly,Weekly clear
+quest_bonus_xp,+{xp} XP
+quest_week_line,This week: {d} of 3
+quest_roll,{reward} is yours.
+quest_new_at,"New quests at midnight UTC, with the Daily."
+ach_first-open,Clocked In
+ach_first-open_desc,Open your first lesson
+ach_account,On the Roster
+ach_account_desc,Make a free account
+ach_first-lesson,First Steps
+ach_first-lesson_desc,Complete your first lesson
+ach_scenic-route,Scenic Route
+ach_scenic-route_desc,Finish a drill with twice the keys its route needs
+ach_mod-setup,Through the Door
+ach_mod-setup_desc,Finish Open and set up
+ach_mod-move,Navigator
+ach_mod-move_desc,Finish Move and select
+ach_mod-edit,Editor
+ach_mod-edit_desc,"Finish Enter, edit, copy and fill"
+ach_mod-structure,Structural
+ach_mod-structure_desc,Finish Structure
+ach_mod-format,By the Book
+ach_mod-format_desc,Finish Format
+ach_mod-formulas,Calculator
+ach_mod-formulas_desc,Finish Formulas
+ach_mod-present,Signed Off
+ach_mod-present_desc,Finish Present and audit
+ach_ch1-project,Report Builder
+ach_ch1-project_desc,Complete the Chapter 1 project
+ach_ch1-verified,Verified: Foundations
+ach_ch1-verified_desc,Pass the Chapter 1 assessment
+ach_ch2-verified,Verified: Formatting
+ach_ch2-verified_desc,Pass the Chapter 2 assessment
+ach_ch3-verified,Verified: Formulas
+ach_ch3-verified_desc,Pass the Chapter 3 assessment
+ach_ch4-verified,Verified: Data and Lookups
+ach_ch4-verified_desc,Pass the Chapter 4 assessment
+ach_ch5-verified,Verified: Finance and Accounting
+ach_ch5-verified_desc,Pass the Chapter 5 assessment
+ach_ch6-verified,Verified: Valuation
+ach_ch6-verified_desc,Pass the Chapter 6 assessment
+ach_ch1-testout,Tested Out
+ach_ch1-testout_desc,Pass the Chapter 1 assessment without finishing the lessons
+ach_ch1-complete,Foundations Poured
+ach_ch1-complete_desc,Complete every Chapter 1 lesson
+ach_ch2-complete,Book Ready
+ach_ch2-complete_desc,Complete Chapter 2
+ach_ch3-complete,Ties Out
+ach_ch3-complete_desc,Complete Chapter 3
+ach_ch4-complete,Data Room
+ach_ch4-complete_desc,Complete Chapter 4
+ach_ch5-complete,Three Statements
+ach_ch5-complete_desc,Complete Chapter 5
+ach_ch6-complete,The Bid
+ach_ch6-complete_desc,Complete Chapter 6
+ach_program,Certified
+ach_program_desc,All six chapters Verified
+ach_clean-1,Clean Sheet
+ach_clean-1_desc,Finish a lesson with no mouse and no help
+ach_clean-10,Hands Off
+ach_clean-10_desc,Ten clean lessons
+ach_clean-module,Untouched
+ach_clean-module_desc,"A whole module clean, challenge included"
+ach_timed-1,Against the Clock
+ach_timed-1_desc,Finish a timed run
+ach_drill-1,On the Range
+ach_drill-1_desc,Attempt a drill
+ach_drill-tour,Tourist
+ach_drill-tour_desc,Attempt every drill in a chapter
+ach_pb-1,On the Board
+ach_pb-1_desc,Set your first personal best
+ach_pb-all,Collector
+ach_pb-all_desc,A personal best on every drill in a chapter
+ach_keys-ch1,Keyring
+ach_keys-ch1_desc,Every key in Chapter 1 collected on the Reference page
+ach_keys-ch2,Keyring
+ach_keys-ch2_desc,Every key in Chapter 2 collected on the Reference page
+ach_keys-ch3,Keyring
+ach_keys-ch3_desc,Every key in Chapter 3 collected on the Reference page
+ach_keys-ch4,Keyring
+ach_keys-ch4_desc,Every key in Chapter 4 collected on the Reference page
+ach_keys-ch5,Keyring
+ach_keys-ch5_desc,Every key in Chapter 5 collected on the Reference page
+ach_keys-ch6,Keyring
+ach_keys-ch6_desc,Every key in Chapter 6 collected on the Reference page
+ach_tier-pass,Cleared
+ach_tier-pass_desc,Beat a Pass clock clean
+ach_tier-pro,Expert
+ach_tier-pro_desc,Beat an Expert clock clean
+ach_tier-legend,Legendary
+ach_tier-legend_desc,Beat a Legendary clock clean
+ach_legend-3,Heating Up
+ach_legend-3_desc,Legendary on three different drills
+ach_legend-all,Untouchable
+ach_legend-all_desc,Legendary on every drill in a chapter
+ach_daily-1,Showed Up
+ach_daily-1_desc,Finish a Daily
+ach_daily-7,Regular
+ach_daily-7_desc,Seven Dailies on seven days
+ach_daily-30,Fixture
+ach_daily-30_desc,Thirty Dailies on thirty days
+ach_streak-7,Momentum
+ach_streak-7_desc,Practice seven days in a row
+ach_no-waste,No Wasted Keys
+ach_no-waste_desc,Finish a drill clean at the optimal keystroke count
+ach_econ-10,Economist
+ach_econ-10_desc,Ten clean runs at or under optimal keys
+ach_rapid-1,Quick Draw
+ach_rapid-1_desc,Finish a rapid-fire round
+ach_rapid-500,Live Wire
+ach_rapid-500_desc,Reach Combo 20 in one rapid-fire round
+ach_combo-10,In the Zone
+ach_combo-10_desc,A ten-hit rapid-fire combo
+ach_rapid-perfect,Perfect Round
+ach_rapid-perfect_desc,A full rapid-fire round with no misses
+ach_quest-1,First Quest
+ach_quest-1_desc,Complete a quest
+ach_quest-25,Questing
+ach_quest-25_desc,Twenty-five quests
+ach_quest-week,Clean Sweep
+ach_quest-week_desc,Every quest in one week
+ach_runs-100,Volume Business
+ach_runs-100_desc,One hundred recorded runs
+ach_level-5,Warming Up
+ach_level-5_desc,Reach level 5
+ach_level-10,Committed
+ach_level-10_desc,Reach level 10
+ach_level-20,Seasoned
+ach_level-20_desc,Reach level 20
+ach_level-30,Top Bucket
+ach_level-30_desc,Reach level 30
+ach_blink,Blink
+ach_blink_desc,Finish a drill clean ten seconds or more under its Legendary par
+ach_night-shift,Goblin Hours
+ach_night-shift_desc,A clean run between midnight and 4am
+ach_early-bird,First One In
+ach_early-bird_desc,A clean run between 5 and 7am
+ach_weekend,Weekend Warrior
+ach_weekend_desc,A clean run on a Saturday or Sunday
+ach_old-habits,Old Habits
+ach_old-habits_desc,Ruin a timed run with the mouse
+flair_themes-start,"Workbook, High Contrast and Graphite"
+flair_kc-slate,Slate keycaps
+flair_theme-newsprint,Newsprint theme
+flair_cur-blue,Blue ghost
+flair_panel-ruled,Ruled panel header
+flair_theme-terminal,Terminal theme
+flair_board-key,Keycap board mark
+flair_kc-amber,Amber keycaps
+flair_kc-ink,Ink keycaps
+flair_frame-ledger,Ledger profile frame
+flair_cur-violet,Violet ghost
+flair_panel-tape,Adding machine header
+flair_board-bolt,Bolt board mark
+flair_kc-mint,Mint keycaps
+flair_board-flame,Flame board mark
+flair_cur-amber,Amber ghost
+flair_panel-stamp,Stamped panel header
+flair_cur-red,Red pen ghost
+flair_kc-paper,Paper keycaps
+flair_trail,Ghost trail
+flair_panel-double,Double rule header
+flair_board-gem,Gem board mark
+flair_cur-green,Green ghost
+flair_kc-gold,Gold keycaps
+flair_panel-ticker,Ticker panel header
+flair_board-crown,Crown board mark
+flair_board-clock,Stopwatch board mark
+flair_kc-crimson,Crimson keycaps
+flair_cur-ink,Ink ghost
+flair_top-bucket,"Crimson, with the Top Bucket frame"
+ach_shelf_label,Achievements: {n} of {m} earned
+ach_banner,Achievement
+orientation_home_level,"Lessons, drills, the Daily and quests all pay XP, and every level opens a piece of flair, drawn here."
+orientation_home_today,"Three quests a day and three a week each pay XP, with a bonus when all three land."
+panel_equipped,Equipped
+profile_xp_head,Where XP comes from
+profile_xp_line,"XP counts how much you practice, and the boards count how fast you are."
+col_run,Run
+col_xp,XP
+xp_row_lesson,"A lesson, the first time"
+xp_val_lesson,"{n}, and {c} more if clean"
+xp_row_challenge,A challenge passed
+xp_val_challenge,"{n}, then {e} at Expert and {l} at Legendary"
+xp_row_drill,"A drill, the first clean pass"
+xp_val_drill,"{n}, then {r} a repeat"
+xp_row_daily,The Daily
+xp_val_n,{n}
+xp_row_rapid,A rapid-fire round
+xp_row_quest_daily,A daily quest
+xp_val_quest,"{n}, and {b} for all three"
+xp_row_quest_weekly,A weekly quest
+xp_val_quest_weekly,"{n}, and {b} with a reward for all three"
+xp_row_ach,An achievement
+xp_val_ach,"Nothing, the shelf is its own reward"
+flair_head,Flair
+flair_line,"Every level opens a piece, and a weekly clear rolls one you haven't got. Nothing here is ever sold."
+flair_plain,Plain
+flair_at_level,Level {n}
+flair_slot_keycap,Keycaps
+flair_slot_cursor,Ghost
+flair_slot_trail,Ghost trail
+flair_slot_panel,Result panel
+flair_slot_board,Board mark
+flair_slot_frame,Profile frame
+panel_pickers,"The class cells are drop-downs: Alt+↓ opens one, ↑ and ↓ move, Enter picks."
+whatif_why,An answer is typed where it should be worked out: change the input and it stays put.
+rapid_ready,Start the round
+rapid_ready_focus,Drill your three slowest
+rapid_back,Back
+rapid_hits,{n} hits
+rapid_hits_one,1 hit
+rapid_combo,Combo {n}
+rapid_combo_none,No combo yet
+rapid_synthwave,The Synthwave theme is yours.
+rapid_best_combo,Best combo {c}
+rapid_accuracy,{a}% accuracy
+rapid_slowest,Your three slowest
+rapid_slowest_few,The commands you were slowest on
+rapid_slow_none,No hits this round. Play again and the slowest show here.
+rapid_drill_these,Drill these
+rapid_again,Play again
+rapid_xp,+{n} XP
+rapid_xp_none,No XP this round
+rapid_deck_ch1,{n} commands from Chapter 1
+rapid_deck_chs,{n} commands from Chapters 1 to {k}
+rapid_deck_focus,{n} commands
+rapid_esc_note,Esc leaves the round.
+rapid_secs,{s} s
+col_chapter,Chapter
+col_average,Average
+rapid_practice_line,"One command at a time on a fresh sheet, with the keys hidden until you stall."
+rapid_practice_len,{len} rounds
+rapid_cmd_edge-down,Jump down to the edge of the data
+rapid_cmd_edge-right,Jump right to the edge of the data
+rapid_cmd_edge-up,Jump up to the edge of the data
+rapid_cmd_edge-left,Jump left to the edge of the data
+rapid_cmd_go-home,Go to A1
+rapid_cmd_go-last,Go to the last used cell
+rapid_cmd_row-start,Go to the start of the row
+rapid_cmd_select-down,Extend the selection down to the edge
+rapid_cmd_select-right,Extend the selection right to the edge
+rapid_cmd_select-up,Extend the selection up to the edge
+rapid_cmd_select-row,Select the entire row
+rapid_cmd_select-column,Select the entire column
+rapid_cmd_select-region,Select the current region
+rapid_cmd_select-to-last,Select to the last used cell
+rapid_cmd_go-to,Go To
+rapid_cmd_find,Find
+rapid_cmd_replace,Replace
+rapid_cmd_special-blanks,Go To Special: blanks
+rapid_cmd_special-constants,Go To Special: constants
+rapid_cmd_special-formulas,Go To Special: formulas
+rapid_cmd_edit-cell,Edit the active cell
+rapid_cmd_clear-contents,Clear contents
+rapid_cmd_undo,Undo
+rapid_cmd_redo,Redo
+rapid_cmd_copy,Copy
+rapid_cmd_cut,Cut
+rapid_cmd_paste,Paste
+rapid_cmd_fill-down,Fill Down
+rapid_cmd_fill-right,Fill Right
+rapid_cmd_paste-values,Paste Values
+rapid_cmd_paste-formats,Paste Formats
+rapid_cmd_transpose,Paste Special: Transpose
+rapid_cmd_insert-row,Insert Row
+rapid_cmd_delete-row,Delete Row
+rapid_cmd_insert-column,Insert Column
+rapid_cmd_delete-column,Delete Column
+rapid_cmd_autofit-column,AutoFit Column Width
+rapid_cmd_wrap-text,Wrap Text
+rapid_cmd_hide-rows,Hide Rows
+rapid_cmd_hide-columns,Hide Columns
+rapid_cmd_unhide-rows,Unhide Rows
+rapid_cmd_unhide-columns,Unhide Columns
+rapid_cmd_group-rows,Group
+rapid_cmd_ungroup-rows,Ungroup
+rapid_cmd_hide-detail,Hide Detail
+rapid_cmd_show-detail,Show Detail
+rapid_cmd_freeze-panes,Freeze Panes
+rapid_cmd_bold,Bold
+rapid_cmd_italic,Italic
+rapid_cmd_underline,Underline
+rapid_cmd_number-format,Number Format
+rapid_cmd_currency,Currency Format
+rapid_cmd_percent,Percent Style
+rapid_cmd_comma-style,Comma Style
+rapid_cmd_decrease-decimal,Decrease Decimal
+rapid_cmd_increase-decimal,Increase Decimal
+rapid_cmd_font-color,Font Color
+rapid_cmd_fill-color,Fill Color
+rapid_cmd_bottom-border,Bottom Border
+rapid_cmd_top-border,Top Border
+rapid_cmd_all-borders,All Borders
+rapid_cmd_outside-borders,Outside Borders
+rapid_cmd_thick-box-border,Thick Box Border
+rapid_cmd_double-bottom-border,Bottom Double Border
+rapid_cmd_top-bottom-border,Top and Bottom Border
+rapid_cmd_no-border,No Border
+rapid_cmd_align-left,Align Left
+rapid_cmd_center,Center
+rapid_cmd_align-right,Align Right
+rapid_cmd_increase-indent,Increase Indent
+rapid_cmd_decrease-indent,Decrease Indent
+rapid_cmd_increase-font,Increase Font Size
+rapid_cmd_format-cells,Format Cells
+rapid_cmd_repeat,Repeat Last Action
+rapid_cmd_gridlines,Gridlines
+rapid_cmd_autosum,AutoSum
+rapid_cmd_show-formulas,Show Formulas
+rapid_cmd_absolute-ref,Absolute Reference
+rapid_cmd_select-precedents,Select Precedents
+rapid_cmd_select-dependents,Select Dependents
+rapid_cmd_landscape,Landscape Orientation
+rapid_cmd_page-setup,Page Setup
+rapid_cmd_excel-options,Excel Options
+rapid_cmd_fill-series,Fill Series
+rapid_cmd_general-format,General Format
+rapid_cmd_todays-date,Insert Today’s Date
+rapid_cmd_data-bars,Data Bars
+rapid_cmd_color-scale,Color Scales
+rapid_cmd_clear-rules,Clear Rules from Selected Cells
+rapid_cmd_new-rule,New Formatting Rule
+rapid_cmd_new-note,New Note
+rapid_cmd_hyperlink,Insert Link
+rapid_cmd_print-area,Set Print Area
+rapid_cmd_page-break,Insert Page Break
+rapid_cmd_page-break-preview,Page Break Preview
+rapid_cmd_normal-view,Normal View
+rapid_cmd_trace-precedents,Trace Precedents
+rapid_cmd_trace-dependents,Trace Dependents
+rapid_cmd_remove-arrows,Remove Arrows
+rapid_cmd_evaluate-formula,Evaluate Formula
+rapid_cmd_error-checking,Error Checking
+rapid_cmd_watch-window,Watch Window
+rapid_cmd_text-to-columns,Text to Columns
+rapid_cmd_flash-fill,Flash Fill
+rapid_cmd_sort-ascending,Sort A to Z
+rapid_cmd_sort-descending,Sort Z to A
+rapid_cmd_sort-dialog,Custom Sort
+rapid_cmd_filter,Filter
+rapid_cmd_filter-menu,Open the Filter Menu
+rapid_cmd_remove-duplicates,Remove Duplicates
+rapid_cmd_data-validation,Data Validation
+rapid_cmd_data-table,Data Table
+rapid_cmd_goal-seek,Goal Seek
+rapid_cmd_name-manager,Name Manager
+rapid_cmd_define-name,Define Name
+rapid_cmd_pivot-table,PivotTable
+rapid_cmd_calc-except-tables,Automatic Except for Data Tables

@@ -85,6 +85,17 @@ test('clipboard: copy/paste translates, tiles, cut moves, values-only, drop', ()
   s.select('E1'); s.copy(); s.select('E2:E3'); s.paste('all', 'multiply'); assert.equal(s.value('E2'), 100);
 });
 
+test('clipboard: paste arithmetic lands on every area of a multiple selection, formulas untouched (Go To Special, Constants, then Divide)', () => {
+  const s = new Sheet();
+  s.commitInput('2000', 1, 1); s.commitInput('4000', 2, 1); s.commitInput('=SUM(A1:A2)', 3, 1); s.commitInput('6000', 4, 1); s.commitInput('1000', 1, 3);
+  s.select('C1'); s.copy();
+  s.select('A1:A4'); assert.equal(s.selectSpecial('constants'), true);
+  assert.equal(s.selRects().length, 2, 'the constants are two areas, the formula between them left out');
+  s.paste('values', 'divide');
+  assert.deepEqual([s.value('A1'), s.value('A2'), s.value('A4')], [2, 4, 6]);
+  assert.equal(s.formula('A3'), '=SUM(A1:A2)', 'the formula is not rewritten'); assert.equal(s.value('A3'), 6);
+});
+
 test('fill down/right, series and autosum', () => {
   const s = new Sheet();
   s.commitInput('5', 1, 4); s.select('D1:D5'); s.fill('down'); assert.equal(s.value('D5'), 5);

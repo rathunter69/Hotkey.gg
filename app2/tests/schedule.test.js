@@ -3,10 +3,10 @@
 // reference solution replayed through the lesson runner.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { grade, review, freshItem, strength, applyEvent, dueItems, dueToday, rapidOrder, normaliseState, demoState, MICRO, MICRO_IDS, microLesson, DAY, RAPID_CONCEPT, RAPID_UNSCORED, COLD_DAYS } from '../app/schedule.js';
+import { grade, review, freshItem, strength, applyEvent, dueItems, dueToday, rapidOrder, normaliseState, demoState, MICRO, MICRO_IDS, microLesson, DAY, RAPID_CONCEPT, COLD_DAYS } from '../app/schedule.js';
 import { LessonRun } from '../app/runner.js';
 import { parseKeyScript } from '../engine/keyboard.js';
-import { RAPID_DECK } from '../app/rapid-fire.js';
+import { RAPID_DECK } from '../content/rapid-deck.js';
 import { CONCEPTS } from '../content/schema.js';
 
 const T0 = Date.UTC(2026, 8, 21, 9, 0, 0);
@@ -106,12 +106,13 @@ test('dueToday: a whole cold module becomes one Keep-sharp challenge', () => {
   assert.ok(q3.items.every(i => i.kind === 'micro'));
 });
 
-test('rapid-fire: every prompt scores into a micro-drill the queue knows, or is named as unscored', () => {
-  for (const p of RAPID_DECK) {
-    if (RAPID_UNSCORED.includes(p.id)) continue;
-    assert.ok(RAPID_CONCEPT[p.id], 'rapid prompt ' + p.id + ' maps to no concept');
-    assert.ok(MICRO[RAPID_CONCEPT[p.id]], 'rapid prompt ' + p.id + ' maps to ' + RAPID_CONCEPT[p.id] + ', which has no micro-drill');
+test('rapid-fire: every prompt the queue scores maps to a micro-drill it knows', () => {
+  const ids = new Set(RAPID_DECK.map(p => p.id));
+  for (const id in RAPID_CONCEPT) {
+    assert.ok(ids.has(id), 'RAPID_CONCEPT names ' + id + ', which is not in the deck');
+    assert.ok(MICRO[RAPID_CONCEPT[id]], 'rapid prompt ' + id + ' maps to ' + RAPID_CONCEPT[id] + ', which has no micro-drill');
   }
+  assert.ok(Object.keys(RAPID_CONCEPT).length >= 40, 'most of the first chapter feeds the queue');
 });
 
 test('rapidOrder: weakest first, unseen in the middle, strong last; seeded ties; a permutation', () => {

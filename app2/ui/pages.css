@@ -93,7 +93,7 @@
 .btn2-primary .key{color:var(--on-fill); background:transparent; border-color:var(--on-fill); box-shadow:none}
 .btn2-quiet{background:var(--chrome)}
 .btn2:focus-visible{outline:var(--cursor-w) solid var(--mode); outline-offset:var(--bw-2)}
-.key{display:inline-block; font-family:var(--mono); font-weight:var(--fw-key); font-size:var(--fs-key); line-height:1; color:var(--ink); background:var(--sheet); border:1px solid var(--edge); border-bottom-width:var(--key-edge); border-radius:var(--r-btn); padding:var(--s1) var(--s2); white-space:nowrap}
+.key{display:inline-block; font-family:var(--mono); font-weight:var(--fw-key); font-size:var(--fs-key); line-height:1; color:var(--key-ink); background:var(--key-face); border:1px solid var(--key-rim); border-bottom-width:var(--key-edge); border-radius:var(--r-btn); padding:var(--s1) var(--s2); white-space:nowrap}
 .link-btn{font:inherit; font-size:inherit; color:var(--mode-ink); background:none; border:0; padding:0; cursor:pointer; text-decoration:underline; font-weight:var(--fw-semi)}
 .picker{display:inline-flex; align-items:center; gap:var(--s2); font-size:var(--fs-label); font-weight:var(--fw-semi); color:var(--ink-2)}
 .picker select{font-family:var(--font); font-size:var(--fs-body); font-weight:var(--fw-semi); color:var(--ink); background-color:var(--sheet); border:1px solid var(--edge); border-radius:var(--r-btn); padding:var(--s3) var(--s8) var(--s3) var(--s4)}
@@ -433,3 +433,40 @@ a.pn:focus-visible{outline:var(--cursor-w) solid var(--mode); outline-offset:var
 .tbl-sheet tr.sh-blank td{height:var(--row-h)}
 .tbl-board.tbl-sheet tr.mine > td.sh-row{color:var(--mode-ink); font-weight:var(--fw-bold)}
 .tbl.tbl-sheet tr.sh-labels td[data-col]{font-family:var(--cellfont); font-size:var(--fs-label); font-weight:var(--fw-bold); color:var(--ink)}
+
+/* Today's quest rows (6.6, 6.10): a quest's line may wrap, its bar sits under it; the bonus row in the lesson green; the week folds open on Enter */
+.tbl-today tr.row-quest .row-name{white-space:normal}
+.tbl-today .bar-quest{display:block; margin-top:var(--s1); height:var(--seg-h)}
+.tbl-today tr.row-bonus td{background:var(--learn-tint); color:var(--learn-ink)}
+.tbl-today tr.row-bonus .row-name, .tbl-today tr.row-bonus td.xp{color:var(--learn-ink); font-weight:var(--fw-semi)}
+.tbl-today tr.row-week .row-name{font-weight:var(--fw-semi)}
+.tbl-today tr.row-week-q td:nth-child(2){padding-left:var(--s4)}
+.week-caret{display:inline-block; width:0; height:0; border-left:var(--s1) solid var(--ink-2); border-top:var(--s1) solid transparent; border-bottom:var(--s1) solid transparent; transition:transform var(--d-menu)}
+.week-caret.open{transform:rotate(90deg)}
+
+/* a flair item, drawn (6.10; ui/components/flair.js) */
+.flair-tile{display:inline-grid; place-items:center; width:var(--level-tile); height:var(--level-tile); flex:none}
+.flair-tile.flair-locked{opacity:.45; filter:grayscale(1)}
+.flair-ghost{display:block; width:calc(var(--level-tile) - var(--s3)); height:calc(var(--s5) + var(--s1)); border:var(--bw-2) dashed var(--ghost); border-radius:var(--bw-3)}
+.flair-trail{box-shadow:0 0 0 var(--s1) color-mix(in srgb, var(--ghost) 18%, transparent), calc(-1 * var(--s2)) 0 0 var(--s1) color-mix(in srgb, var(--ghost) 10%, transparent)}
+.flair-frame{display:block; width:calc(var(--level-tile) - var(--s2)); height:calc(var(--level-tile) - var(--s2)); background:var(--chrome); box-shadow:inset 0 0 0 var(--frame-w) var(--frame); border-radius:var(--r-btn)}
+.flair-panel{display:block; width:calc(var(--level-tile) - var(--s1)); height:calc(var(--s5) + var(--s1)); background:var(--clock-tint); border-radius:var(--bw-2)}
+.flair-panel-ruled{border-bottom:var(--bw-3) double var(--clock-ink)}
+.flair-panel-tape{background:var(--sheet); border-top:var(--bw-2) dashed var(--edge); border-bottom:var(--bw-2) dashed var(--edge)}
+.flair-panel-stamp{box-shadow:inset 0 0 0 var(--bw-2) var(--clock-ink)}
+.flair-panel-double{border-top:var(--bw-3) double var(--clock-ink); border-bottom:var(--bw-3) double var(--clock-ink)}
+.flair-panel-ticker{border-left:var(--s2) solid var(--clock-ink)}
+.flair-swatch{display:block; width:calc(var(--level-tile) - var(--s2)); height:calc(var(--level-tile) - var(--s2)); background:linear-gradient(90deg, var(--sw-rail, var(--rail)) 0 30%, var(--sw-paper, var(--paper)) 30%); border:1px solid var(--edge); border-radius:var(--r-btn); position:relative}
+.flair-swatch::after{content:''; position:absolute; left:45%; right:12%; bottom:22%; height:var(--s1); background:var(--sw-mark, var(--learn))}
+/* the profile's Flair panel: one row a slot, the items as tiles, the one in use outlined */
+.flair-slots{display:flex; flex-direction:column; gap:var(--s3)}
+.flair-slot{display:flex; flex-direction:column; gap:var(--s1)}
+.flair-row{display:flex; flex-wrap:wrap; gap:var(--s1)}
+.flair-pick{display:inline-grid; place-items:center; padding:var(--s1); background:var(--sheet); border:1px solid var(--line); border-radius:var(--r-btn); cursor:pointer; font:inherit; color:inherit}
+.flair-pick[aria-pressed="true"]{border-color:var(--learn); box-shadow:inset 0 0 0 1px var(--learn)}
+.flair-pick:disabled{cursor:default}
+.flair-pick .flair-none{display:grid; place-items:center; width:var(--level-tile); height:var(--level-tile); font-size:var(--fs-min); color:var(--ink-2)}
+/* the profile's frame around the level key */
+.prof-lvl-key{box-shadow:0 0 0 var(--frame-w) var(--frame)}
+/* where XP comes from (the profile) */
+.tbl-xp td.num{white-space:nowrap}

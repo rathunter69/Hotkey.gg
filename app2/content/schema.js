@@ -48,6 +48,7 @@
 // goals leave something on the sheet (a format, a border) should restate it in endState. The
 // runner shows a failing endState as the pending item once every goal has landed.
 
+import { validateWhatIf } from '../app/what-if.js';
 import { Sheet } from '../engine/sheet.js';
 import { Session } from '../engine/keyboard.js';
 import { parseRef } from '../engine/refs.js';
@@ -667,6 +668,9 @@ export function validateDrill(d) {
   const ends = Array.isArray(d.endState) ? d.endState.filter(isObject) : [];
   for (const e of ends) { need(typeof e.text === 'string', 'endState entries need text'); need(typeof e.check === 'function', 'endState entries need a check'); }
   need(typeof d.solution === 'string' && d.solution.trim(), 'solution keystrokes missing');
+  for (const e of validateWhatIf(d.whatIf)) errs.push(e);   // M84: the what-if over the answer block
+  need(d.ruleLine === undefined || (typeof d.ruleLine === 'string' && sentenceCount(d.ruleLine) === 1), 'ruleLine (a stretch drill\'s one rule) must be one sentence');
+  need(!d.stretch || typeof d.ruleLine === 'string', 'a stretch drill carries its one rule line (M85)');
   if (onWorkbook) validateStartingSheet(d, goals, ends, need, { moduleLesson: true, kind: 'drill' });
   else if (isObject(d.sheet)) validateStartingSheet(d, goals, ends, need);
   return errs;

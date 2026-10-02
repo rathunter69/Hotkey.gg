@@ -206,7 +206,7 @@ kbd{font-family:var(--mono); font-size:11.5px; color:var(--text); background:var
 
 .drill-host{position:relative}
 
-.ghost-cursor{position:absolute; z-index:6; border:2px dashed color-mix(in srgb, var(--accent) 55%, transparent); border-radius:3px; pointer-events:none; opacity:.7; transition:left .1s linear, top .1s linear, width .1s, height .1s}
+.ghost-cursor{position:absolute; z-index:6; border:2px dashed color-mix(in srgb, var(--ghost) 70%, transparent); border-radius:3px; pointer-events:none; opacity:.7; transition:left .1s linear, top .1s linear, width .1s, height .1s}
 
 /* ---------- rapid-fire ---------- */
 .rf-head{display:flex; align-items:center; gap:18px; flex-wrap:wrap; padding:14px 4px 10px}
@@ -255,3 +255,6 @@ kbd{font-family:var(--mono); font-size:11.5px; color:var(--text); background:var
 .stat-cell span{color:var(--muted); font-size:11.5px}
 .stats-improve,.stats-keys{font-size:13px; color:var(--muted)}
 .stats-improve b{font-family:var(--mono); font-weight:600; color:var(--ink)}
+
+/* the ghost trail (6.10, level 20): the ghost eases behind its route with a soft wake */
+html[data-trail="on"] .ghost-cursor{transition:left var(--d-trail) ease-out, top var(--d-trail) ease-out, width var(--d-trail), height var(--d-trail); box-shadow:0 0 0 var(--s1) color-mix(in srgb, var(--ghost) 18%, transparent)}

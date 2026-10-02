@@ -73,7 +73,7 @@ export const SITE_KEYS = [
   'level_title_arrow_keys', 'level_title_ctrl_arrow', 'level_title_mouse_retired', 'level_title_alt_native', 'level_title_chord_player',
   'level_title_live_links', 'level_title_ties_out', 'level_title_model_owner', 'level_title_hard_clock', 'level_title_top_bucket',
   'level_reward_themes_start', 'level_reward_theme', 'level_reward_crimson', 'level_reward_profile_frame', 'level_reward_ghost_trail',
-  'level_reward_keycap_skin', 'level_reward_sound_set', 'level_reward_board_flair', 'level_reward_cursor_color', 'level_reward_panel_style',
+  'level_reward_keycap_skin', 'level_reward_board_flair', 'level_reward_cursor_color', 'level_reward_panel_style',
   'level_up_title', 'level_up_reward', 'level_next', 'settings_group_keyboard', 'settings_group_lessons', 'settings_group_practice',
   'settings_group_appearance', 'settings_group_sound', 'settings_group_email', 'settings_group_account', 'setting_keyLabels',
   'setting_keyLabels_help', 'setting_keyLabels_win', 'setting_keyLabels_mac', 'setting_layout', 'setting_layout_us', 'setting_layout_uk',

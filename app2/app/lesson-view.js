@@ -32,6 +32,8 @@ import { fitZoomFor, opensFitted } from './zoom.js';
 import { pace } from './run-record.js';
 import { createChecklist, landTo, assist as assistTask } from './checklist.js';
 import { titleAt, rewardAt } from '../content/levels.js';
+import { recordRun } from './quest-loop.js';
+import { equipReward } from './cosmetics.js';
 import { createChrome, confirmDialog, lessonRows, isExitKey, EXIT_KEY, sheetKeys, noteSheetKey, sheetKeysDelivered, canFullscreen, fullscreenKeys } from '../ui/components/chrome.js';
 import { createTaskCard, placeCard, routeTokens, routeProgress, liveLine, stuckLine, SIDES, alternates, offRoute, tryLine, worksToo, worksTooLine } from '../ui/components/task-card.js';
 import { paintTarget, paintNote, paintPen, paintCheck, clearMarks, pingMark, paintBeacon } from '../ui/components/sheet-marks.js';
@@ -125,6 +127,7 @@ export function mountLessonView(root, lesson, { mode = 'guided', seed: seedOpt, 
   let timerH = null, scrollRaf = 0;
   let checklist = timed ? createChecklist(lesson.goals) : null;
   let showKeysTimed = false;   // F1 in a challenge: the current task's keys in the panel (no time posted)
+  let lastReward = null, lastQuests = { quests: [], bonus: [] };
   let lastClean = false, lastTier = null, lastTimedOut = false, xpGained = 0, deliveredNow = false, firstEver = false, saveState = '', installOffer = false;
   let glowObs = null;
 
@@ -566,7 +569,8 @@ export function mountLessonView(root, lesson, { mode = 'guided', seed: seedOpt, 
   function levelUpRow(earned) {
     if (!earned || !(earned.levelTo > earned.levelFrom)) return null;
     const lv = earned.levelTo; const reward = rewardAt(lv);
-    return { level: lv, title: titleAt(lv), reward: reward ? reward.label : '', equip: !!reward && reward.kind !== 'themes_start' };
+    lastReward = reward;
+    return { level: lv, title: titleAt(lv), reward: reward ? reward.label : '', item: reward, equip: !!reward && reward.kind !== 'themes_start' };
   }
   function finish() {
     phase = 'done';
@@ -621,6 +625,14 @@ export function mountLessonView(root, lesson, { mode = 'guided', seed: seedOpt, 
     // Chapter 6, the last, finished by a subscriber: the course-complete email is due (E-checkout section 6; logged until an email path exists)
     { const ch = chapterOf(lesson); if (ch && CHAPTERS.indexOf(ch) === 5) import('./billing.js').then(b => b.noteCourseComplete(ch.lessons.map(l => l.id), store.all())).catch(() => {}); }
     saveState = saved ? '' : 'Couldn’t save on this device (storage blocked); the lesson still counts for this visit';
+    // the quest loop (6.10): the run ticks its quests before the XP is read, so their XP lands in this result
+    {
+      const newPbQ = timed && lastClean && (!pbBefore || run.elapsed < pbBefore.secs);
+      const base = { ref: lesson.id, clean: lastClean, tier: lastTier || 'none', pb: newPbQ, ghost: newPbQ && !!pbBefore, noMouse: !run.mouseCount, used };
+      const a = recordRun({ ...base, kind: isChallenge ? 'challenge' : 'lesson' });
+      const b = isChallenge && dailyOpt ? recordRun({ ...base, kind: 'daily', used: [] }) : { quests: [], bonus: [] };
+      lastQuests = { quests: [...a.quests, ...b.quests], bonus: [...a.bonus, ...b.bonus] };
+    }
     const ctxAfter = gameCtx();
     xpGained = Math.max(0, ctxAfter.xp - ctxBefore.xp);
     effects.finish(chrome.stage);
@@ -651,7 +663,7 @@ export function mountLessonView(root, lesson, { mode = 'guided', seed: seedOpt, 
         note: lastTimedOut ? siteCopy(timedOnly ? 'over_limit_assessment' : 'over_limit', timedOnly ? 'Over The Limit. Run It Again. The page is built, but the chapter isn’t Verified yet, and the clock is hard from here.' : 'Over the limit: no tier, but the module counts.')
           : !lastClean ? (assisted() ? siteCopy('panel_no_time_help', 'Help was used, so no time is posted. It still counts as practice.') : siteCopy('panel_no_time_mouse', 'The mouse touched the sheet, so no time is posted. It still counts as practice.')) : deliveredNow ? pageDelivered(at) : '',
         xp, board: placeNow_ ? { title: dailyOpt ? siteCopy('panel_board_today', 'Today’s board') : siteCopy('panel_board', 'Your board'), place: placeNow_.place, of: placeNow_.of, move: null } : null,
-        levelUp, extra: extra + lines.map(l => `<div class="rp-note rp-quiet">${esc(l)}</div>`).join(''),
+        levelUp, quests: lastQuests.quests, bonus: lastQuests.bonus, extra: extra + lines.map(l => `<div class="rp-note rp-quiet">${esc(l)}</div>`).join(''),
         buttons: [
           { act: 'next', label: nxt ? siteCopy('panel_next_lesson', 'Next lesson') : siteCopy('panel_back_learn', 'Back to Learn'), key: 'Enter', primary: true },
           { act: 'again', label: isChallenge ? siteCopy('panel_run_again_fresh', 'Run it again on a fresh file') : siteCopy('panel_run_again', 'Run it again'), key: 'R' },
@@ -665,7 +677,7 @@ export function mountLessonView(root, lesson, { mode = 'guided', seed: seedOpt, 
       panel.complete({
         title: doneTitle(), line: lesson.wow || '', paras: lesson.closing || [], marks: marks.filter(Boolean), shortcuts: used,
         mouse: run.mouseCount ? siteCopy('lesson_mouse', 'Mouse: {clicks}. It’s allowed in a lesson, but the keyboard is what you’re practicing.').replace(/\{clicks\}/g, run.mouseCount + (run.mouseCount === 1 ? ' click' : ' clicks')) : '',
-        xp, levelUp, lines, extra,
+        xp, levelUp, lines, extra, quests: lastQuests.quests, bonus: lastQuests.bonus,
         buttons: [
           { act: 'next', label: nxt ? (nxt.kind === 'challenge' ? siteCopy('panel_next_lesson', 'Next lesson') : siteCopy('panel_next_lesson', 'Next lesson')) : siteCopy('panel_back_learn', 'Back to Learn'), key: 'Enter', primary: true },
           { act: 'again', label: siteCopy('panel_run_again', 'Run it again'), key: 'R' },
@@ -683,7 +695,7 @@ export function mountLessonView(root, lesson, { mode = 'guided', seed: seedOpt, 
     if (act === 'learn') { location.hash = '#/learn'; return; }
     if (act === 'home') { location.hash = '#/'; return; }
     if (act === 'due-next') { const q = dueToday(schedule.state(), {}).items.filter(i => i.id !== lesson.concept); const n = q[0]; location.hash = n ? (n.kind === 'challenge' ? '#/lesson/' + n.id : '#/due/' + n.id) : '#/'; return; }
-    if (act === 'equip') { location.hash = '#/account'; return; }
+    if (act === 'equip') { const g = gameCtx(); if (equipReward(lastReward, { level: g.level, rolled: g.rolled })) showToast(siteCopy('panel_equipped', 'Equipped')); return; }
     if (act === 'story-go') { closeStory(); return; }
     if (act === 'install') { const stamp = () => { if (!prefs.get().installPromptAt) prefs.set({ installPromptAt: Date.now() }); }; stamp(); promptInstall().then(r => track('install_prompt', { outcome: r })); const c = panel.el.querySelector('.rp-install'); if (c) c.remove(); return; }
     if (act === 'install-no') { if (!prefs.get().installPromptAt) prefs.set({ installPromptAt: Date.now() }); track('install_prompt', { outcome: 'dismissed' }); const c = panel.el.querySelector('.rp-install'); if (c) c.remove(); }

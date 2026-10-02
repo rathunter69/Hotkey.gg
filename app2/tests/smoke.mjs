@@ -272,6 +272,46 @@ try {
     await guardText('the get-around board');
   }
 
+  // rapid-fire (M100): one round on its own stage. The command is read off the page and its reference chord pressed
+  // in the browser; then the round's clock is run to its end, the result names the slowest, and the round is recorded
+  {
+    t('rapid-fire');
+    const { RAPID_BY_ID, chordScript } = await import('../content/rapid-deck.js');
+    const rp = await context.newPage();
+    rp.on('pageerror', e => errors.push('rapid pageerror: ' + e.message));
+    const guardRapid = async label => { for (const p of textProblems(await rp.evaluate(readableText))) fail(`${label}: text: ${p.rule}: ${p.line.slice(0, 140)}`); };
+    await rp.clock.install();
+    await rp.goto(base + '#/rapid?len=30');
+    if (!(await rp.waitForSelector('.rf-ready', { timeout: 8000 }).catch(() => null))) fail('rapid: the stage shows no Ready');
+    else {
+      await guardRapid('rapid Ready');
+      await rp.keyboard.press('Enter');
+      let hits = 0;
+      for (let i = 0; i < 6; i++) {
+        const id = await rp.waitForFunction(() => { const p = document.querySelector('#rfPrompt'); return p && !document.querySelector('.rf-frag.hit, .rf-frag.miss') && p.dataset.id; }, null, { timeout: 4000 }).then(h => h.jsonValue()).catch(() => null);
+        if (!id || !RAPID_BY_ID[id]) { fail('rapid: no command on the stage'); break; }
+        for (const step of parseKeyScript(chordScript(RAPID_BY_ID[id].keys))) { if (step.type === 'text') await rp.keyboard.type(step.text); else await rp.keyboard.press(pwKey(step.spec)); }
+        if (await rp.waitForSelector('.rf-frag.hit', { timeout: 2000 }).catch(() => null)) hits++;
+        else fail(`rapid: the reference chord for ${id} did not land in the browser`);
+      }
+      await guardRapid('rapid round');
+      await rp.clock.fastForward(31000);
+      if (!(await rp.waitForSelector('.rf-result .rf-slow-t td', { timeout: 4000 }).catch(() => null))) fail('rapid: the result shows no slowest commands');
+      else {
+        await guardRapid('rapid result');
+        const rec = await rp.evaluate(() => { try { return JSON.parse(localStorage.getItem('hk2_records_v1')); } catch (e) { return null; } });
+        const att = rec && rec.attempts && rec.attempts.find(a => a.kind === 'rapid' && a.ref === 'rapid-30');
+        if (!att) fail('rapid: the round was not recorded');
+        else if (att.splits[0] !== hits) fail(`rapid: recorded ${att.splits[0]} hits, played ${hits}`);
+        if (rec && rec.pbs && Object.keys(rec.pbs).some(k => /^rapid/.test(k))) fail('rapid: a round set a best');
+        await rp.keyboard.press('Escape');
+        await rp.waitForTimeout(200);
+        if (!/#\/practice\/rapid/.test(rp.url())) fail('rapid: Esc on the result does not lead back to Rapid-fire');
+      }
+    }
+    await rp.close();
+  }
+
   // failure paths, in their own context so the module map starts clean: a page file that
   // fails shows Retry and Retry mounts it; a failed dependency (which the browser keeps failing) recovers through the
   // reload Retry falls back to; a landing whose demo player never arrives keeps a still with a way in

@@ -1,5 +1,5 @@
 // app2/ui/themes.js — the hotkey.gg palettes and the theme switch (screenplay 3.0, Color; M87).
-// Workbook is the default theme and the one 3.0's table describes; six more, each clearly its own,
+// Workbook is the default theme and the one 3.0's table describes; seven more, each clearly its own,
 // are themes a learner picks or earns (6.9; pruned from 28, Wolf 2026-10-02). Every theme supplies the same tokens (ui/tokens.css):
 // the ground and the ink, the rail's four, the note's two, the red, and the six mode colors with
 // their ink and tint. An older palette states its legacy keys (bg, surface, text, accent …) and
@@ -74,12 +74,18 @@ export const THEMES = {
     bg: '#120A0B', surface: '#1E1113', surface2: '#2B181B', line: '#55282E',
     text: '#F7E8E8', muted: '#D2A9A9', faint: '#9A6A70', bad: '#FF6A5A' },
     tokens: { rail: '#0A0506', 'rail-hi': '#2B181B', learn: '#FF6B5B', 'learn-ink': '#FF9A8E' } },
+  // Synthwave: neon pink and cyan on a violet night. Earned with the first ten-hit rapid-fire combo (M100).
+  synthwave: { name: 'Synthwave', dark: true, vars: {
+    bg: '#140A24', surface: '#1F1035', surface2: '#2C1748', line: '#5A2F7A',
+    text: '#F7ECFF', muted: '#D3B8F2', faint: '#A385C6', bad: '#FF6B6B' },
+    tokens: { rail: '#0B0516', 'rail-hi': '#2C1748', 'rail-text': '#F7ECFF', 'rail-sub': '#D3B8F2',
+      learn: '#FF4FB8', 'learn-ink': '#FF8AD0', drills: '#3ED8F0', 'drills-ink': '#8BEAF7' } },
 };
 
-/* Picker order: the three light sheets, then the four dark ones. Any theme missing from the list
+/* Picker order: the three light sheets, then the five dark ones. Any theme missing from the list
    still shows (appended), so a new theme can't vanish. Wolf, 2026-10-02 (point 24): a few themes,
    each one clearly different, each one high contrast. */
-export const THEME_ORDER = ['workbook', 'contrast', 'newsprint', 'default', 'terminal', 'bloomberg', 'crimson'];
+export const THEME_ORDER = ['workbook', 'contrast', 'newsprint', 'default', 'terminal', 'bloomberg', 'crimson', 'synthwave'];
 
 /** [[key, theme], …] in picker order. */
 export function themeList() {

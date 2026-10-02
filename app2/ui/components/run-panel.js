@@ -14,6 +14,7 @@
 //   factsLine(parts)                        the facts row (each fact its own place)             pure
 //   marksHtml(tier, pop), trackHtml(model)  the result's tier marks and its time track (the landing's drill plate draws them too)
 //   createRunPanel(host, opts)              → panel.ready(d) .run(d) .result(d) .complete(d) .story(d) .timesUp(d) .hide() .keyFor(key)
+import { flairTileHtml } from './flair.js';
 import { EXIT_KEY } from './chrome.js';
 import { siteCopy } from '../../content/copy/apply.js';
 import { keyLabel } from '../../app/prefs.js';
@@ -119,9 +120,24 @@ function xpHtml(xp, animate) {
 }
 function levelUpHtml(lv, platform) {
   if (!lv) return '';
-  return `<div class="rp-levelup"><div class="rp-levelup-text"><div><b>${esc(t('level_up_title', 'Level {n}', { n: lv.level }))}</b>${lv.title ? ` <span class="rp-levelup-title">${esc(lv.title)}</span>` : ''}</div>` +
+  return `<div class="rp-levelup">${lv.item ? flairTileHtml(lv.item) : ''}<div class="rp-levelup-text"><div><b>${esc(t('level_up_title', 'Level {n}', { n: lv.level }))}</b>${lv.title ? ` <span class="rp-levelup-title">${esc(lv.title)}</span>` : ''}</div>` +
     (lv.reward ? `<div class="rp-levelup-reward">${esc(t('level_up_reward', '{reward} is yours.', { reward: lv.reward }))}</div>` : '') + '</div>' +
     (lv.equip ? `<button type="button" class="rp-btn rp-small" data-act="equip" data-key="E"><span>${esc(siteCopy('panel_equip', 'Equip'))}</span>${kbd('E', platform)}</button>` : '') + '</div>';
+}
+
+/**
+ * The quests a run moved (6.10, the quest loop): one row each, its bar filling to where the run
+ * left it, ticked when done, the XP at its right; then the bonus row when all three landed.
+ *   quests: [{ title, have, target, done, xp }], bonus: [{ period, xp, reward }]
+ */
+export function questRowsHtml(quests, bonus) {
+  const rows = (quests || []).map(q => {
+    const pct = Math.round(100 * Math.min(1, (q.have || 0) / (q.target || 1)));
+    return `<div class="rp-row rp-quest${q.done ? ' done' : ''}"><span class="rp-tickbox${q.done ? ' on' : ''}" aria-hidden="true"></span><span class="rp-quest-name">${esc(q.title)}</span>` +
+      `<span class="rp-quest-bar" aria-hidden="true"><i style="--rp-w:${pct}%"></i></span><b>${esc(q.done ? t('quest_xp', '+{xp}', { xp: q.xp }) : t('quest_count', '{d} of {k}', { d: q.have, k: q.target }))}</b></div>`;
+  }).join('');
+  const bon = (bonus || []).map(b => `<div class="rp-row rp-bonus m-quests-done"><span>${esc(siteCopy(b.period === 'weekly' ? 'quest_bonus_weekly' : 'quest_bonus_daily', b.period === 'weekly' ? 'Weekly clear' : 'Bonus for all three'))}${b.reward ? `<span class="rp-bonus-reward">${esc(t('quest_roll', '{reward} is yours.', { reward: b.reward }))}</span>` : ''}</span><b>${esc(t('quest_bonus_xp', '+{xp} XP', { xp: b.xp }))}</b></div>`).join('');
+  return rows + bon;
 }
 
 /* ---------------- the component ---------------- */
@@ -156,6 +172,7 @@ export function createRunPanel(host, opts = {}) {
     const best = d.best && Number.isFinite(d.best.secs) ? t('panel_best', 'Best {t}, {tier}', { t: fmtPar(d.best.secs), tier: tierLabel(d.best.tier) }) : '';
     const html = `<div class="rp-title">${esc(d.title)}</div>` +
       factsHtml([t('panel_tasks', '{n} tasks', { n: d.tasks.length }), d.length ? t('panel_about', 'About {m}', { m: d.length }) : '', best]) +
+      (d.notes || []).filter(Boolean).map(n => `<div class="rp-note">${esc(n)}</div>`).join('') +
       `<ol class="rp-tasks">${d.tasks.map((x, i) => `<li><i>${i + 1}</i><span>${esc(x)}</span></li>`).join('')}</ol>` +
       (d.pars ? `<div class="rp-pars">${TIER_ORDER.map(tier => `<span><b>${esc(tierLabel(tier))}</b> ${esc(fmtPar(d.pars[tier]))}</span>`).join('')}</div>` : '') +
       `<div class="rp-start">${esc(siteCopy('panel_press_any', 'Press any key to start'))}</div>` +
@@ -211,6 +228,7 @@ export function createRunPanel(host, opts = {}) {
       `<div class="rp-m rp-m6">${xpHtml(d.xp, anim)}</div>` +
       (d.board ? `<div class="rp-row rp-m rp-m5"><span>${esc(d.board.title || siteCopy('panel_board', 'Your board'))}</span><b>${esc(boardLine(d.board.place, d.board.of, d.board.move))}</b></div>` : '') +
       `<div class="rp-m rp-m7">${levelUpHtml(d.levelUp, platform())}</div>` +
+      ((d.quests && d.quests.length) || (d.bonus && d.bonus.length) ? `<div class="rp-m rp-m8 rp-quests">${questRowsHtml(d.quests, d.bonus)}</div>` : '') +
       (d.quest ? `<div class="rp-row rp-quest rp-m rp-m8"><span class="rp-tickbox on" aria-hidden="true"></span><span>${esc(d.quest.done ? t('panel_quest_done', '{quest}. Done, +{xp} XP', { quest: d.quest.title, xp: d.quest.xp }) : t('panel_quest', '{quest}, {d} of {k}', { quest: d.quest.title, d: d.quest.d, k: d.quest.k }))}</span></div>` : '') +
       (d.extra || '');
     el.classList.toggle('rp-animate', anim);
@@ -238,6 +256,7 @@ export function createRunPanel(host, opts = {}) {
       (rows ? `<div class="rp-h"><span>${esc(siteCopy('panel_shortcuts', 'Shortcuts used'))}</span><span class="rp-h-fact">${esc(t('panel_shortcuts_n', '{n}', { n: d.shortcuts.length }))}</span></div><div class="rp-used-list">${rows}</div>` : '') +
       (d.mouse ? `<div class="rp-note">${esc(d.mouse)}</div>` : '') +
       xpHtml(d.xp, true) + levelUpHtml(d.levelUp, platform()) +
+      ((d.quests && d.quests.length) || (d.bonus && d.bonus.length) ? `<div class="rp-quests">${questRowsHtml(d.quests, d.bonus)}</div>` : '') +
       (d.lines || []).map(l => `<div class="rp-note rp-quiet">${esc(l)}</div>`).join('') +
       (d.extra || '');
     swap('complete', html, d.buttons);

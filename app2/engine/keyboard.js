@@ -537,6 +537,8 @@ export class Session {
     const k = e.key;
     // a held Alt+Shift+→ / ← (Group / Ungroup): the Alt press already opened the KeyTips, the chord closes them and acts
     if (!this.dialog && !this.path.length && e.altKey && e.shiftKey && !e.ctrlKey && (k === 'ArrowRight' || k === 'ArrowLeft')) { this.exitRibbon(false); this.groupChord(k === 'ArrowRight'); return true; }
+    // the other held Alt chords (Alt+↓ the drop-down, Alt+; visible cells, Alt+PgDn the next sheet): the same, the chord closes the KeyTips and acts
+    if (!this.dialog && !this.path.length && e.altKey && !e.ctrlKey && /^(ArrowDown|ArrowRight|ArrowLeft|PageDown|PageUp|;)$/.test(k)) { this.exitRibbon(false); return this.dispatch(e); }
     if (DIALOGS_WB.has(this.dialog)) return this.dialogKey(e);
     if (k === 'Escape') {
       if (this.dialog) { this.dialog = null; this.pasteKind = null; this.note = ''; this.sortPend = null; this.colwBuf = ''; this.rowhBuf = ''; if (this.path.length) return true; this.exitRibbon(false); return true; }

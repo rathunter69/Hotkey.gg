@@ -270,7 +270,7 @@ export function startApp({ navEl, rootEl, footEl }) {
       try { nav.setPro(entitlement.entitled()); } catch (e) { /* no entitlement read: Go Pro shows */ }
     };
     if (stats) set();
-    else statsMod().then(([st, b, c]) => { stats = { gameCtx: st.gameCtx, earnedSet: b.earnedSet, themeStates: c.themeStates }; set(); }).catch(() => { /* retried on the next route */ });
+    else statsMod().then(([st, b, c]) => { stats = { gameCtx: st.gameCtx, earnedSet: b.earnedSet, themeStates: c.themeStates }; try { c.applyFlair(); } catch (e) { /* the plain look */ } set(); }).catch(() => { /* retried on the next route */ });
   }
 
   // ---- accounts: boot auth (PKCE ?code= returns are exchanged inside ready(); the hash

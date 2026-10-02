@@ -10,9 +10,15 @@ import { siteCopy } from '../../content/copy/apply.js';
 
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-/** Each mark: the rail element it points at (a selector inside the rail) and its site.csv row. */
+/**
+ * Each mark: the element it points at and its site.csv row. A rail mark's selector is inside the
+ * rail and the card sits to its right; a page mark (`page: true`, Wolf 2026-10-02 point 20: explain
+ * levels, XP and quests) points at a panel on Home and the card sits to its left.
+ */
 export const COACH_MARKS = [
   { key: 'home', at: '.rail-item[data-page="home"]', copy: 'orientation_home', fallback: 'Home picks up where you left off, with today’s quests on the right.' },
+  { key: 'home_level', at: '.home-level', page: true, copy: 'orientation_home_level', fallback: 'Lessons, drills, the Daily and quests all pay XP, and every level opens a piece of flair, drawn here.' },
+  { key: 'home_today', at: '.home-today', page: true, copy: 'orientation_home_today', fallback: 'Three quests a day and three a week each pay XP, with a bonus when all three land.' },
   { key: 'learn', at: '.rail-item[data-page="learn"]', copy: 'orientation_learn', fallback: 'Learn is the course: six chapters of short modules, each ending in a timed challenge on a fresh file.' },
   { key: 'practice', at: '.rail-item[data-page="practice"]', copy: 'orientation_practice', fallback: 'Drills, the Daily, rapid-fire and the challenges all live under Practice, on the clock.' },
   { key: 'leaderboard', at: '.rail-item[data-page="leaderboard"]', copy: 'orientation_leaderboard', fallback: 'Each drill and challenge has a board, the Daily too, and only a run with no help and no mouse posts a time.' },
@@ -30,11 +36,11 @@ export function coachMarksDue(p, lessonsDone) {
 
 /** The marks whose rail element exists (a guest with no level has no level or streak row). Pure over a lookup. */
 export function visibleMarks(find, marks = COACH_MARKS) {
-  return marks.filter(m => { const el = find(m.at); return !!el && !el.hidden; });
+  return marks.filter(m => { const el = find(m.at, m); return !!el && !el.hidden; });
 }
 
 export function mountCoachMarks({ railEl, onDone, marks = COACH_MARKS, signedIn = false } = {}) {
-  const find = sel => (railEl ? railEl.querySelector(sel) : null);
+  const find = (sel, m) => (m && m.page ? (typeof document !== 'undefined' ? document.querySelector(sel) : null) : railEl ? railEl.querySelector(sel) : null);
   const list = visibleMarks(find, marks.filter(m => !(m.guest && signedIn)));
   let i = -1;
   const card = document.createElement('div');
@@ -47,7 +53,9 @@ export function mountCoachMarks({ railEl, onDone, marks = COACH_MARKS, signedIn 
   function place() {
     if (!target) return;
     const r = target.getBoundingClientRect();
-    card.style.left = Math.round(r.right) + 'px';
+    const m = list[i];
+    card.classList.toggle('coach-left', !!(m && m.page));
+    card.style.left = Math.round(m && m.page ? r.left - card.offsetWidth : r.right) + 'px';
     const half = card.offsetHeight / 2, pad = 8;   // kept inside the window: the account mark sits at the rail's foot
     card.style.top = Math.round(Math.max(half + pad, Math.min(window.innerHeight - half - pad, r.top + r.height / 2))) + 'px';
   }
@@ -56,7 +64,7 @@ export function mountCoachMarks({ railEl, onDone, marks = COACH_MARKS, signedIn 
     i = k;
     const m = list[i];
     if (!m) { finish(); return; }
-    target = find(m.at); if (target) target.classList.add('coach-target');
+    target = find(m.at, m); if (target) target.classList.add('coach-target');
     card.innerHTML = `<p class="coach-line">${esc(siteCopy(m.copy, m.fallback))}</p><div class="coach-foot"><span class="label">${esc(siteCopy('coach_count', '{n} of {m}').replace('{n}', i + 1).replace('{m}', list.length))}</span><button type="button" class="btn btn-primary btn-small" data-act="next">${esc(i + 1 < list.length ? siteCopy('coach_next', 'Next') : siteCopy('coach_done', 'Done'))}<kbd class="key key-on-fill">Enter</kbd></button></div>`;
     card.querySelector('[data-act="next"]').onclick = next;
     place();

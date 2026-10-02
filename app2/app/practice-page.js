@@ -48,13 +48,29 @@ export const DRILL_MODULE = {
   'format-the-weekly-page': 'format',
   'insert-and-amend': 'formulas', 'formula-sprint': 'formulas', 'combine-two-tabs': 'formulas',
   'before-you-send': 'present-and-audit', 'weekly-sales-report': 'present-and-audit',
+  // Chapter 2 (script-ch2.md's module ids)
+  'ch2-format-sprint': 'number-formats', 'ch2-to-thousands': 'number-formats', 'ch2-flip-and-tie': 'number-formats',
+  'ch2-custom-code': 'custom-number-formats', 'ch2-the-divider': 'the-page-a-buyer-reads', 'ch2-top-and-bottom': 'the-page-a-buyer-reads',
+  'ch2-flag-it': 'conditional-formatting', 'ch2-print-it': 'printing-and-page-layout', 'ch2-pnl-to-standard': 'printing-and-page-layout', 'puzzle-ch2': 'custom-number-formats',
+  // Chapter 3 (script-ch3.md's module ids)
+  'ch3-if-ladder': 'logic', 'ch3-override': 'logic', 'ch3-date-math': 'dates', 'ch3-sumifs-sprint': 'math-and-aggregation', 'ch3-bands': 'math-and-aggregation',
+  'ch3-text-split': 'text', 'ch3-loan-schedule': 'time-value-of-money', 'ch3-trace-the-error': 'auditing', 'ch3-tie-it-out': 'auditing', 'puzzle-ch3': 'dates',
+  // Chapter 4 (script-ch4.md's module ids)
+  'ch4-lookup-relay': 'lookups', 'ch4-two-pickers': 'lookups', 'ch4-sort-and-filter': 'lists-and-tables',
+  'ch4-cube-it': 'summaries-from-raw-rows', 'ch4-six-tabs': 'summaries-from-raw-rows', 'puzzle-ch4': 'summaries-from-raw-rows',
+  'ch4-pivot-in-90': 'pivot-tables', 'ch4-data-table': 'scenarios-and-sensitivity', 'ch4-goal-seek': 'scenarios-and-sensitivity', 'ch4-name-it': 'names-and-structure',
   // Chapter 5 (script-ch5.md's module ids)
   'ch5-statement-link': 'linking-the-statements', 'ch5-schedule-fill': 'schedules', 'ch5-balance-it': 'linking-the-statements',
   'ch5-discount-it': 'dcf', 'ch5-sweep': 'linking-the-statements', 'ch5-checks': 'auditing-a-model',
   'ch5-revenue-build': 'model-speed', 'puzzle-ch5': 'linking-the-statements',
+  'ch5-is-it-revenue': 'the-three-statements', 'ch5-four-rungs': 'the-three-statements', 'ch5-two-balance-sheets': 'the-three-statements',
+  'ch5-two-landings': 'the-three-statements', 'ch5-name-the-driver': 'schedules', 'ch5-dep-waterfall': 'schedules', 'ch5-breaker': 'schedules',
+  'ch5-circle-hunt': 'auditing-a-model', 'ch5-normalize-the-year': 'dcf', 'ch5-dcf-read-back': 'dcf',
   // Chapter 6 (script-ch6.md's module ids)
   'ch6-spread-a-comp': 'trading-comps', 'ch6-median-and-range': 'trading-comps', 'ch6-sources-and-uses': 'lbo', 'ch6-irr-sprint': 'lbo',
   'ch6-waterfall': 'bids-and-waterfall', 'ch6-football-field': 'bids-and-waterfall', 'ch6-paper-lbo': 'lbo', 'puzzle-ch6': 'bids-and-waterfall',
+  'ch6-three-ways-to-a-price': 'trading-comps', 'ch6-ltm-two-ways': 'trading-comps', 'ch6-napkin': 'lbo', 'ch6-cap-the-amort': 'lbo',
+  'ch6-lenders-return': 'lbo', 'ch6-ceiling-price': 'lbo',
 };
 
 /** A drill's teaching module ({ id, n, title, lessons }) or null. */
@@ -199,13 +215,16 @@ function drillsPage(el, ctx) {
     const g = groups.find(x => x.id === chapterKey) || { id: tab.key, n: tab.n, title: tab.title, rows: [], passed: 0, of: 0 };
     const chLocked = tab.access === 'paid' && !pro;
     const nextId = (g.rows.find(r => r.open && !r.pro && r.best == null) || {}).id;
-    const tiles = drillSheetHtml(g.rows.map(r => ({ id: r.id, title: r.title, keys: keysOf(r.id), length: fmtLength(r.length), best: r.best != null ? fmtClock(r.best) : '', tier: r.tier, open: r.open, after: r.after, pro: r.pro, href: '#/drill/' + r.id, next: r.id === nextId })), g.title);
+    const tiles = drillSheetHtml(g.rows.map(r => ({ id: r.id, title: r.title, sub: (DRILLS_BY_ID[r.id] && DRILLS_BY_ID[r.id].ruleLine) || undefined, keys: keysOf(r.id), length: fmtLength(r.length), best: r.best != null ? fmtClock(r.best) : '', tier: r.tier, open: r.open, after: r.after, pro: r.pro, href: '#/drill/' + r.id, next: r.id === nextId })), g.title);
     const main = panelHtml({ heading: esc(t('chapter_heading', { n: g.n, name: g.title })), facts: g.of ? esc(t('practice_chapter_fact', { done: g.passed, of: g.of })) : '', body: g.rows.length ? tiles : `<p class="panel-line">${esc(t('practice_chapter_coming', { n: g.n }))}</p>`, cls: 'catalog', stretch: true });
     // the set, inline: what Start drilling plays, in order, and why each is in it
     const setRows = set.ids.map((id, i) => { const e = CATALOG.find(x => x.id === id); return `<a class="set-row" href="#/drill/${esc(id)}"><kbd class="key set-n">${i + 1}</kbd><span class="set-main"><span class="row-name">${esc(e.title)}</span><span class="row-sub">${esc(t('reason_' + String(set.reasons[id]).replace('-', '_')))}</span></span><span class="set-len">${esc(fmtLength(e.length))}</span></a>`; }).join('');
-    const setPanel = panelHtml({ heading: esc(t('practice_set_heading')), facts: set.ids.length ? esc(fmtLength(set.secs)) : '', body: set.ids.length ? `<div class="set-list">${setRows}</div>` : `<p class="panel-line">${esc(t('practice_set_none'))}</p>`, cls: 'set-panel', stretch: true });
+    const setPanel = panelHtml({ heading: esc(t('practice_set_heading')), facts: set.ids.length ? esc(fmtLength(set.secs)) : '', body: set.ids.length ? `<div class="set-list">${setRows}</div>` : `<p class="panel-line">${esc(t('practice_set_none'))}</p>`, cls: 'set-panel' });
+    // rapid-fire, one click from here (Wolf): the last length played, straight to the stage, where Enter starts it
+    const rlen = lastRapidLen();
+    const rapidPanel = panelHtml({ heading: esc(t('rapid_title')), mode: 'rapid', body: `<p class="panel-line">${esc(t('rapid_practice_line'))}</p>${buttonHtml({ label: t('rapid_start_len', { len: t('rapid_len_' + rlen) }), href: '#/rapid?len=' + rlen, id: 'practiceRapid', cls: 'rapid-go' })}`, cls: 'rapid-panel', stretch: true });
     const paywallPanel = paywall || chLocked ? paywallHtml({ heading: paywall ? paywall.title : t('paywall_chapter', { n: tab.n, name: tab.title }), signedIn: auth.state() === 'in', mode: 'drills', ids: { go: 'practiceGoPro', notNow: 'practiceNotNow' } }) : '';   // the one paywall panel (M105)
-    el.innerHTML = `${header}${chapterCardsHtml(cards, t('rail_practice'))}<div class="pg-two"><div class="pg-main">${main}</div><div class="pg-side">${paywallPanel || setPanel}</div></div>`;
+    el.innerHTML = `${header}${chapterCardsHtml(cards, t('rail_practice'))}<div class="pg-two"><div class="pg-main">${main}</div><div class="pg-side">${paywallPanel || setPanel + rapidPanel}</div></div>`;
     const len = el.querySelector('#setLen'); if (len) len.onchange = () => { minutes = Number(len.value); settings.set({ setLength: String(minutes) }); render(); };
     const nn = el.querySelector('#practiceNotNow'); if (nn) nn.onclick = () => { if (!paywall) chapterKey = chapterTabs()[0].key; paywall = null; render(); };
     el.querySelectorAll('[data-pro]').forEach(r => r.addEventListener('click', () => { const e = CATALOG.find(x => x.id === r.dataset.pro); paywall = { title: e ? e.title : '' }; render(); }));
@@ -213,7 +232,7 @@ function drillsPage(el, ctx) {
     if (unwire) unwire();
     unwire = wireRows(el);
     if (focusTab) { const on = el.querySelector('.tab.on'); if (on) on.focus(); }
-    if (ctx.keytips) ctx.keytips.register([{ id: 'start', label: t('practice_start'), el: el.querySelector('#startDrilling') }, ...chapterTabs().map(x => ({ id: x.key, label: t('learn_tab', { n: x.n }), el: el.querySelector(`.tab[data-tab="${x.key}"]`) }))].filter(i => i.el));
+    if (ctx.keytips) ctx.keytips.register([{ id: 'start', label: t('practice_start'), el: el.querySelector('#startDrilling') }, { id: 'rapid', label: t('rapid_title'), el: el.querySelector('#practiceRapid') }, ...chapterTabs().map(x => ({ id: x.key, label: t('learn_tab', { n: x.n }), el: el.querySelector(`.tab[data-tab="${x.key}"]`) }))].filter(i => i.el));
     if (ctx.cursor) ctx.cursor.refresh();
   }
   render();
@@ -258,7 +277,7 @@ function dailyPage(el, ctx) {
 export function bestRounds(attempts) {
   const by = {};
   for (const a of attempts || []) {
-    if (a.kind !== 'rapid') continue;
+    if (a.kind !== 'rapid' || String(a.ref || '') === 'rapid-focus') continue;   // a focus round (Drill these) is no length's best
     const len = Number(String(a.ref || '').replace('rapid-', '')) || a.secs;
     const hits = (a.splits && a.splits[0]) || 0, combo = (a.splits && a.splits[2]) || 0;
     if (!by[len] || hits > by[len].hits) by[len] = { secs: len, hits, combo };
@@ -278,20 +297,20 @@ const keepRapidLen = n => { try { localStorage.setItem(RAPID_LEN_KEY, String(n))
  */
 function rapidPage(el, ctx) {
   let len = lastRapidLen();
-  let RAPID_DECK = [];   // the round's module loads the sheet engine, so the deck arrives after the page draws
+  let deck = [], deckFact = '';   // the round's module loads the sheet engine, so the deck arrives after the page draws
   const go = n => { keepRapidLen(n); location.hash = '#/rapid?len=' + n; };
   function render() {
     const rounds = bestRounds(store.attempts({ kind: 'rapid' }));
     // the lengths as Monkeytype's toolbar: the three numbers in a row, the chosen one lit, each on its key
     const lens = `<div class="rf-lens" role="radiogroup" aria-label="${esc(t('rapid_lengths'))}">${RAPID_LENS.map((n, i) => `<button type="button" role="radio" aria-checked="${n === len}" class="rf-len${n === len ? ' on' : ''}" data-len="${n}"><kbd class="key">${i + 1}</kbd><span>${esc(t('rapid_len_short_' + n))}</span></button>`).join('')}</div>`;
     // the deck as a sheet: each command, its keys, and your best at each length beside
-    const deck = tableHtml({ sheet: true, cls: 'tbl-deck', label: t('rapid_deck'), columns: [{ key: 'cmd', label: t('col_command') }, { key: 'keys', label: t('col_keys_press') }],
-      rows: RAPID_DECK.map(d => ({ cells: { cmd: esc(d.text), keys: keysRowHtml(d.keys.split(' '), { max: 3 }) }, cursor: false })) });
+    const deckTable = tableHtml({ sheet: true, cls: 'tbl-deck', label: t('rapid_deck'), columns: [{ key: 'cmd', label: t('col_command') }, { key: 'keys', label: t('col_keys_press') }, { key: 'ch', label: t('col_chapter'), align: 'right' }],
+      rows: deck.map(d => ({ cells: { cmd: esc(d.name), keys: keysRowHtml(d.keys, { max: 5 }), ch: String(d.ch) }, cursor: false })) });
     const best = tableHtml({ sheet: true, cls: 'tbl-rounds', columns: [{ key: 'len', label: t('col_length') }, { key: 'hits', label: t('col_hits'), align: 'right' }, { key: 'combo', label: t('col_combo'), align: 'right' }],
       rows: RAPID_LENS.map(n => { const r = rounds.find(x => x.secs === n); return { cells: { len: esc(t('rapid_len_' + n)), hits: r ? `<b>${r.hits}</b>` : '', combo: r ? String(r.combo) : '' }, cls: n === len ? 'next' : '', cursor: false }; }) });
     const how = ['rapid_how_1', 'rapid_how_2', 'rapid_how_3'].map((k, i) => `<li><kbd class="key set-n">${i + 1}</kbd><span>${esc(t(k))}</span></li>`).join('');
     el.innerHTML = `${headerBlockHtml({ title: t('rapid_title'), line: esc(siteCopy('rapid_intro', '')), control: lens, button: buttonHtml({ label: t('rapid_start'), key: 'Enter', href: '#/rapid?len=' + len, primary: true, id: 'startRound' }), cls: 'hdr-rapid' })}
-      <div class="pg-two"><div class="pg-main">${panelHtml({ heading: esc(t('rapid_deck')), facts: esc(t('rapid_deck_n', { n: RAPID_DECK.length })), body: deck, cls: 'rf-deck-panel', stretch: true })}</div>
+      <div class="pg-two"><div class="pg-main">${panelHtml({ heading: esc(t('rapid_deck')), facts: esc(deckFact), body: `<div class="rf-deck-scroll">${deckTable}</div>`, cls: 'rf-deck-panel', stretch: true })}</div>
       <div class="pg-side">${panelHtml({ heading: esc(t('rapid_best')), body: best, cls: 'rounds' })}${panelHtml({ heading: esc(t('rapid_how')), body: `<ol class="how-list">${how}</ol><p class="panel-line ink-2">${esc(siteCopy('rapid_fine', ''))}</p>`, cls: 'rf-how', stretch: true })}</div></div>`;
     const startBtn = el.querySelector('#startRound'); if (startBtn) startBtn.onclick = e => { e.preventDefault(); go(len); };
     el.querySelectorAll('.rf-len').forEach(b => { b.onclick = () => { len = Number(b.dataset.len); keepRapidLen(len); render(); }; });
@@ -299,7 +318,12 @@ function rapidPage(el, ctx) {
     if (ctx.cursor) ctx.cursor.refresh();
   }
   render();
-  import('./rapid-fire.js').then(m => { RAPID_DECK = m.RAPID_DECK || []; if (el.isConnected || el.parentNode) render(); }).catch(() => {});
+  import('./rapid-fire.js').then(m => {
+    const ch = m.reachedChapter(store.all());
+    deck = m.deckRows(ch, prefs.get().platform);
+    deckFact = m.deckLine(deck.length, ch, false);
+    if (el.isConnected || el.parentNode) render();
+  }).catch(() => {});
   const onKey = e => {
     if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey || /^(INPUT|TEXTAREA|SELECT)$/.test((e.target && e.target.tagName) || '')) return;
     if (/^[123]$/.test(e.key)) { e.preventDefault(); go(RAPID_LENS[Number(e.key) - 1]); }

@@ -1241,6 +1241,8 @@ export class Sheet {
    */
   paste(kind = 'all', op = 'none', { skipBlanks = false } = {}) {
     const cb = this.clipboard; if (!cb) return false;
+    // paste arithmetic lands on every area of a multiple selection (Go To Special, Constants, then one Divide), each tiled from its own corner; any other paste takes the active area
+    const areas = op && op !== 'none' && this.multi && this.multi.length ? this.selRects() : null;
     this.multi = null;
     const sr = this.selRange(); const r0 = sr.r1, c0 = sr.c1;
     if (!(op && op !== 'none')) {   // Excel refuses a paste whose footprint would run off the sheet (the arithmetic ops only write inside the selection)
@@ -1251,8 +1253,8 @@ export class Sheet {
     }
     this.pushUndo();
     if (op && op !== 'none') {
-      for (let rr = sr.r1; rr <= sr.r2; rr++) for (let cc = sr.c1; cc <= sr.c2; cc++) {
-        const s = cb.data[(rr - sr.r1) % cb.h][(cc - sr.c1) % cb.w];
+      for (const ar of areas || [sr]) for (let rr = ar.r1; rr <= ar.r2; rr++) for (let cc = ar.c1; cc <= ar.c2; cc++) {
+        const s = cb.data[(rr - ar.r1) % cb.h][(cc - ar.c1) % cb.w];
         if (typeof s.value !== 'number') continue;
         const cell = this.ensure(rr, cc); const k = s.value;
         if (op === 'divide' && !k) continue;

@@ -12,6 +12,36 @@ import formula_sprint from './drills/formula-sprint.js';
 import combine_two_tabs from './drills/combine-two-tabs.js';
 import before_you_send from './drills/before-you-send.js';
 import weekly_sales_report from './drills/weekly-sales-report.js';
+import ch2_format_sprint from './drills/ch2-format-sprint.js';
+import ch2_to_thousands from './drills/ch2-to-thousands.js';
+import ch2_flip_and_tie from './drills/ch2-flip-and-tie.js';
+import ch2_custom_code from './drills/ch2-custom-code.js';
+import ch2_the_divider from './drills/ch2-the-divider.js';
+import ch2_top_and_bottom from './drills/ch2-top-and-bottom.js';
+import ch2_flag_it from './drills/ch2-flag-it.js';
+import ch2_print_it from './drills/ch2-print-it.js';
+import ch2_pnl_to_standard from './drills/ch2-pnl-to-standard.js';
+import puzzle_ch2 from './drills/puzzle-ch2.js';
+import ch3_if_ladder from './drills/ch3-if-ladder.js';
+import ch3_override from './drills/ch3-override.js';
+import ch3_date_math from './drills/ch3-date-math.js';
+import ch3_sumifs_sprint from './drills/ch3-sumifs-sprint.js';
+import ch3_bands from './drills/ch3-bands.js';
+import ch3_text_split from './drills/ch3-text-split.js';
+import ch3_loan_schedule from './drills/ch3-loan-schedule.js';
+import ch3_trace_the_error from './drills/ch3-trace-the-error.js';
+import ch3_tie_it_out from './drills/ch3-tie-it-out.js';
+import puzzle_ch3 from './drills/puzzle-ch3.js';
+import ch4_lookup_relay from './drills/ch4-lookup-relay.js';
+import ch4_sort_and_filter from './drills/ch4-sort-and-filter.js';
+import ch4_pivot_in_90 from './drills/ch4-pivot-in-90.js';
+import ch4_data_table from './drills/ch4-data-table.js';
+import ch4_goal_seek from './drills/ch4-goal-seek.js';
+import ch4_name_it from './drills/ch4-name-it.js';
+import ch4_cube_it from './drills/ch4-cube-it.js';
+import ch4_six_tabs from './drills/ch4-six-tabs.js';
+import ch4_two_pickers from './drills/ch4-two-pickers.js';
+import puzzle_ch4 from './drills/puzzle-ch4.js';
 import ch5_statement_link from './drills/ch5-statement-link.js';
 import ch5_schedule_fill from './drills/ch5-schedule-fill.js';
 import ch5_balance_it from './drills/ch5-balance-it.js';
@@ -19,7 +49,17 @@ import ch5_discount_it from './drills/ch5-discount-it.js';
 import ch5_sweep from './drills/ch5-sweep.js';
 import ch5_checks from './drills/ch5-checks.js';
 import ch5_revenue_build from './drills/ch5-revenue-build.js';
+import ch5_is_it_revenue from './drills/ch5-is-it-revenue.js';
 import puzzle_ch5 from './drills/puzzle-ch5.js';
+import ch5_four_rungs from './drills/ch5-four-rungs.js';
+import ch5_two_balance_sheets from './drills/ch5-two-balance-sheets.js';
+import ch5_two_landings from './drills/ch5-two-landings.js';
+import ch5_name_the_driver from './drills/ch5-name-the-driver.js';
+import ch5_dep_waterfall from './drills/ch5-dep-waterfall.js';
+import ch5_breaker from './drills/ch5-breaker.js';
+import ch5_circle_hunt from './drills/ch5-circle-hunt.js';
+import ch5_normalize_the_year from './drills/ch5-normalize-the-year.js';
+import ch5_dcf_read_back from './drills/ch5-dcf-read-back.js';
 import ch6_spread_a_comp from './drills/ch6-spread-a-comp.js';
 import ch6_median_and_range from './drills/ch6-median-and-range.js';
 import ch6_sources_and_uses from './drills/ch6-sources-and-uses.js';
@@ -28,6 +68,12 @@ import ch6_waterfall from './drills/ch6-waterfall.js';
 import ch6_football_field from './drills/ch6-football-field.js';
 import ch6_paper_lbo from './drills/ch6-paper-lbo.js';
 import puzzle_ch6 from './drills/puzzle-ch6.js';
+import ch6_three_ways_to_a_price from './drills/ch6-three-ways-to-a-price.js';
+import ch6_ltm_two_ways from './drills/ch6-ltm-two-ways.js';
+import ch6_napkin from './drills/ch6-napkin.js';
+import ch6_cap_the_amort from './drills/ch6-cap-the-amort.js';
+import ch6_lenders_return from './drills/ch6-lenders-return.js';
+import ch6_ceiling_price from './drills/ch6-ceiling-price.js';
 import { LESSONS } from './index.js';
 
 /**
@@ -46,6 +92,39 @@ export const DRILLS = [
   combine_two_tabs,
   before_you_send,
   weekly_sales_report,
+  // Chapter 2 (screenplay 6.2, script-drills Wave 1): the planned set on the P&L book in teaching order, the benchmark and the puzzle
+  ch2_format_sprint,
+  ch2_to_thousands,
+  ch2_flip_and_tie,
+  ch2_custom_code,
+  ch2_the_divider,
+  ch2_top_and_bottom,
+  ch2_flag_it,
+  ch2_print_it,
+  ch2_pnl_to_standard,
+  puzzle_ch2,
+  // Chapter 3 (screenplay 6.2, script-drills Wave 1): the planned set on the KPI databook in teaching order, the benchmark and the puzzle
+  ch3_if_ladder,
+  ch3_override,
+  ch3_date_math,
+  ch3_sumifs_sprint,
+  ch3_bands,
+  ch3_text_split,
+  ch3_loan_schedule,
+  ch3_trace_the_error,
+  ch3_tie_it_out,
+  puzzle_ch3,
+  // Chapter 4 (screenplay 6.2): the planned set on the diligence pack with sort and filter, the benchmark, the two Wave 1 sketches and the puzzle
+  ch4_lookup_relay,
+  ch4_sort_and_filter,
+  ch4_pivot_in_90,
+  ch4_data_table,
+  ch4_goal_seek,
+  ch4_name_it,
+  ch4_cube_it,
+  ch4_six_tabs,
+  ch4_two_pickers,
+  puzzle_ch4,
   // Chapter 5 (screenplay 6.2): the planned set on the operating model, the benchmark and the puzzle
   ch5_statement_link,
   ch5_schedule_fill,
@@ -55,6 +134,17 @@ export const DRILLS = [
   ch5_checks,
   ch5_revenue_build,
   puzzle_ch5,
+  // Chapter 5's Wave 1 sketches (script-drills): the accounting of 5.1 on pages of their own, then the model and the DCF
+  ch5_is_it_revenue,   // also the proof of pickers and what-if grading (M84, M85; script-drills D01)
+  ch5_four_rungs,
+  ch5_two_balance_sheets,
+  ch5_two_landings,
+  ch5_name_the_driver,
+  ch5_dep_waterfall,
+  ch5_breaker,
+  ch5_circle_hunt,
+  ch5_normalize_the_year,
+  ch5_dcf_read_back,
   // Chapter 6 (screenplay 6.2): the planned set on the valuation pack, the benchmark and the puzzle
   ch6_spread_a_comp,
   ch6_median_and_range,
@@ -63,6 +153,13 @@ export const DRILLS = [
   ch6_waterfall,
   ch6_football_field,
   ch6_paper_lbo,
+  // Chapter 6's Wave 1 sketches (script-drills.md)
+  ch6_three_ways_to_a_price,
+  ch6_ltm_two_ways,
+  ch6_napkin,
+  ch6_cap_the_amort,
+  ch6_lenders_return,
+  ch6_ceiling_price,
   puzzle_ch6,
 ];
 
