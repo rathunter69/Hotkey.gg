@@ -270,6 +270,8 @@ export class Session {
     const st = this.settings;
     const cap = Math.max(2, st.iterative ? (st.maxIterations | 0) || 100 : this.sheets.length + 4);
     const tol = st.iterative ? Math.max(0, +st.maxChange || 0) : 0;
+    // a circle inside one sheet (an LBO's interest on the average balance) iterates under the same limits; off, it reads 0 as Excel shows it
+    for (const e of this.sheets) e.sheet.iterCalc = st.iterative ? { maxIterations: cap, maxChange: tol } : null;
     try {
       for (let pass = 0; pass < cap; pass++) {
         let delta = 0;

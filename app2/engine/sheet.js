@@ -348,6 +348,7 @@ export class Sheet {
     this.groups = { rows: [], cols: [] };  // the outline (C2 gap 4): [{r1,r2,collapsed}] / [{c1,c2,collapsed}], one level
     this.condFmt = [];                     // conditional formatting rules in priority order (normCondFmt)
     this._cfMap = null;                    // condFmtMap() memoised until the cells or the rules change (recalc / restore / setCell drop it)
+    this.iterCalc = null;                  // { maxIterations, maxChange } while the workbook's iterative calculation is on (the Session sets it): a circle on this sheet is iterated, not read as 0
     this.multi = null;                     // Go To Special: an explicit list of cell keys, or null
     this.names = {};                       // defined names that point at this sheet (M40): { UPPER: { name, ref: '$B$4' | '$B$4:$B$9' } }, workbook-wide through the Session
     this.zoom = ZOOM_DEFAULT;              // the sheet's zoom, % (M99): a property of the sheet, as in Excel; the view scales by it
@@ -679,8 +680,25 @@ export class Sheet {
     // fold the reads of the last evaluation into deps; true when the graph gained an edge
     const merge = () => { let added = false; for (const k of keys) { if (!reads[k]) continue; for (const d of reads[k]) if (!deps[k].has(d)) { deps[k].add(d); added = true; } } return added; };
     let { cyclic, order } = detect();
-    // a cell that depends on a cyclic cell inherits nothing special — it just reads the 0
-    const evalAll = () => { for (const k of order) { const c = this.cells[k]; c.value = cyclic.has(k) ? 0 : evalOne(k); } };
+    // a cell that depends on a cyclic cell inherits nothing special — it just reads the 0. With
+    // iterative calculation on (iterCalc), a circle is what Excel's Options make it: every cell is
+    // evaluated in order, starting from what it last held, until no member of the circle moves by
+    // more than the maximum change or the maximum iterations are used (interest on an average
+    // balance settles geometrically in a handful of passes).
+    const iter = this.iterCalc;
+    const evalAll = () => {
+      if (!iter || !cyclic.size) { for (const k of order) { const c = this.cells[k]; c.value = cyclic.has(k) ? 0 : evalOne(k); } return; }
+      const passes = Math.max(1, (iter.maxIterations | 0) || 100), tol = Math.max(0, +iter.maxChange || 0);
+      for (let pass = 0; pass < passes; pass++) {
+        let delta = 0;
+        for (const k of order) {
+          const c = this.cells[k]; const v = evalOne(k);
+          if (cyclic.has(k)) { const d = typeof v === 'number' && typeof c.value === 'number' ? Math.abs(v - c.value) : (v === c.value ? 0 : Infinity); if (d > delta) delta = d; }
+          c.value = v;
+        }
+        if (delta <= tol) break;
+      }
+    };
     evalAll();
     if (merge()) { ({ cyclic, order } = detect()); evalAll(); }
     // settle dynamic references (OFFSET etc.) with a short fixed-point pass; a loop that only
@@ -691,8 +709,8 @@ export class Sheet {
       const moved = [];
       for (const k of order) { if (cyclic.has(k)) continue; const c = this.cells[k]; const v = evalOne(k); if (v !== c.value) { c.value = v; moved.push(k); } }
       if (!moved.length) break;
-      if (merge()) { ({ cyclic, order } = detect()); for (const k of cyclic) this.cells[k].value = 0; continue; }
-      if (pass === CAP - 1) for (const k of moved) { cyclic.add(k); this.cells[k].value = 0; }
+      if (merge()) { ({ cyclic, order } = detect()); if (iter) evalAll(); else for (const k of cyclic) this.cells[k].value = 0; continue; }
+      if (pass === CAP - 1 && !iter) for (const k of moved) { cyclic.add(k); this.cells[k].value = 0; }
     }
   }
 

@@ -119,6 +119,20 @@ test('a circle across sheets settles with iterative calculation on (interest on 
   assert.ok(Math.abs(s.sheet.value('A2') - 2) < 0.0001, 'A2 = A2/2 + 1 settles at 2: ' + s.sheet.value('A2'));
 });
 
+test('a circle inside one sheet iterates with iterative calculation on (interest on the average balance), and reads 0 with it off', () => {
+  // B2 interest = 10% of the average of opening A2 and closing C2; C2 = A2 - B2: x = 0.05 * (200 - x), so x = 10 / 1.05
+  const cells = () => ({ A2: { value: 100 }, B2: { formula: '=0.1*(A2+C2)/2' }, C2: { formula: '=A2-B2' } });
+  const on = new Session(new Sheet({ cells: cells() }));
+  on.settings.iterative = true; on.settings.maxIterations = 100; on.settings.maxChange = 0.000001;
+  on.recalcAll();
+  assert.ok(Math.abs(on.sheet.value('B2') - 10 / 1.05) < 1e-5, 'settles: ' + on.sheet.value('B2'));
+  on.sheet.commitInput('200', 2, 1); on.recalcAll();
+  assert.ok(Math.abs(on.sheet.value('B2') - 20 / 1.05) < 1e-5, 'resettles after an edit: ' + on.sheet.value('B2'));
+  const off = new Session(new Sheet({ cells: cells() }));
+  off.settings.iterative = false; off.recalcAll();
+  assert.equal(off.sheet.value('B2'), 0, 'off, the circle reads 0 as Excel shows it');
+});
+
 test('INDEX and OFFSET over a range on another sheet read that sheet (the slice keeps its sheet)', () => {
   const s = book(); const S = s.sheet;   // Sales: B3 100, B4 200; Costs: B3 40, B4 70
   S.commitInput('=INDEX(Costs!B3:B4,2)', 7, 4);
