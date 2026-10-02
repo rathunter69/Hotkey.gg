@@ -24,6 +24,7 @@ export const MODULE_NUMBERS = {
   'names-and-structure': '4.6', 'ch4-project-and-assessment': '4.7',
   // Chapter 5 · Finance and Accounting (script-ch5.md)
   'the-three-statements': '5.1', 'model-setup': '5.2',
+  'schedules': '5.3', 'linking-the-statements': '5.4',
 };
 /** The catalogue section the chapter's project, assessment and test-out sit in (module 1.8). */
 export const FINAL_SECTION = 'Project and assessment';

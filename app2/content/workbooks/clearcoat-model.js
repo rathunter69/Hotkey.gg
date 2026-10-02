@@ -1100,6 +1100,8 @@ const SCH = {
   debt: [...span('Schedules', 'termOpen', 'termEff'), ...span('Schedules', 'ddOpen', 'ddEff'), 'totalDebt', 'totalInt', 'netDebt'],
   revolver: span('Schedules', 'revOpen', 'revEff'), tax: span('Schedules', 'ebt', 'effTax'),
 };
+/** A schedule's rows go with their helper labels in column A. */
+const SCH_COLS = ['A', ...COLS, 'K'];
 // B541 (= after 5.3.6): every schedule but the revolver built; the statements not yet linked
 const B541 = derive(B531, s => {
   const done = cellsOf(DONE, 'Schedules'), cells = cellsOf(s, 'Schedules');
@@ -1107,13 +1109,33 @@ const B541 = derive(B531, s => {
   unpend(s, ['rev']); for (const col of COLS) cellsOf(s, 'Checks')[col + rowOf('Checks', 'rev')] = clone(cellsOf(DONE, 'Checks')[col + rowOf('Checks', 'rev')]);
   for (const key of ['termEff', 'ddEff', 'revEff']) for (const col of COLS) cellsOf(s, 'Checks')[col + rowOf('Checks', key)] = clone(cellsOf(DONE, 'Checks')[col + rowOf('Checks', key)]);
 });
-const B536 = derive(B541, s => { strip(s, 'Schedules', SCH.tax); });
-const B535 = derive(B536, s => { strip(s, 'Schedules', SCH.debt); strip(s, 'Checks', ['termEff', 'ddEff', 'revEff']); });
-const B534 = derive(B535, s => { strip(s, 'Schedules', SCH.ppe); });
-const B533 = derive(B534, s => { strip(s, 'Schedules', SCH.wc); });
-const B532 = derive(B533, s => { strip(s, 'Schedules', SCH.costs); });
-// B531 is before 5.3.1 (defined above); B53C: inputs and a timeline and no schedules at all
-const B53C = derive(B531, s => { stripFigures(s, 'Schedules'); });
+// each lesson's schedule goes with its helper labels in column A (B531 has none), so a lesson builds only its own rows
+const B536 = derive(B541, s => { strip(s, 'Schedules', SCH.tax, SCH_COLS); });
+const B535 = derive(B536, s => { strip(s, 'Schedules', SCH.debt, SCH_COLS); strip(s, 'Checks', ['termEff', 'ddEff', 'revEff']); });
+const B534 = derive(B535, s => { strip(s, 'Schedules', SCH.ppe, SCH_COLS); });
+const B533 = derive(B534, s => { strip(s, 'Schedules', SCH.wc, SCH_COLS); });
+const B532 = derive(B533, s => { strip(s, 'Schedules', SCH.costs, SCH_COLS); });
+/** Clear the figures of keyed rows over `cols` and keep each cell's format: what a challenge leaves blank. */
+function blank(state, name, keys, cols = PROJ_COLS) {
+  const cells = cellsOf(state, name);
+  for (const key of keys) for (const col of cols) {
+    const ref = col + rowOf(name, key); const c = cells[ref]; if (!c) continue;
+    const { formula, value, ...fmt } = c;
+    if (Object.keys(fmt).length) cells[ref] = fmt; else delete cells[ref];
+  }
+}
+/**
+ * The module challenges' blanks: the projected years (FY27 to FY31) of the lines each one rebuilds,
+ * the actuals and every other line left in place. Ten schedule lines for 5.3.C; for 5.4.C the links
+ * from the schedules into the three statements, the revolver's draw and repayment, and the balance check.
+ */
+export const CHALLENGE_BLANKS = {
+  'challenge-schedules': { Schedules: ['closeSites', 'retailRev', 'clubRev', 'labor', 'rent', 'rec', 'pay', 'wf1', 'ppeClose', 'termInt'] },
+  'challenge-linked-statements': { IS: ['dep', 'int', 'tax'], CF: ['dep', 'capex'], BS: ['cash', 'ppe', 'check'], Schedules: ['revDrawn', 'revRepaid'] },
+};
+const blankAll = (s, id) => { for (const [name, keys] of Object.entries(CHALLENGE_BLANKS[id])) blank(s, name, keys); };
+// B531 is before 5.3.1 (defined above); B53C: every schedule built (the revolver waits for 5.4.4), ten projected lines blank
+const B53C = derive(B541, s => blankAll(s, 'challenge-schedules'));
 
 /* ---------------- module 5.4: linking the statements ---------------- */
 
@@ -1126,7 +1148,7 @@ const B545 = derive(DONE, s => {
   delete s.names.WACC;
 });
 // B544: before 5.4.4, the revolver block is empty (its links on the CF and BS read zero)
-const B544 = derive(B545, s => { strip(s, 'Schedules', SCH.revolver); });
+const B544 = derive(B545, s => { strip(s, 'Schedules', SCH.revolver, SCH_COLS); });
 // B543: before 5.4.3, the balance sheet is typed history and empty projection; debt and PP&E ties pending
 const B543 = derive(B544, s => { typeStatementHist(s, 'BS', BS_HIST); pend(s, ['debt', 'ppe']); });
 // B542: before 5.4.2, the cash flow statement too
@@ -1144,8 +1166,8 @@ export const BREAKS = [
 const plantAll = (s, list) => { for (const [name, ref, cell] of list) plant(s, name, ref, cell); };
 // B545 is before 5.4.5 only once the breaks are planted
 const B545broken = derive(B545, s => plantAll(s, BREAKS));
-// B54C: schedules done, statements empty
-const B54C = derive(B544, s => { for (const name of ['IS', 'CF', 'BS']) stripFigures(s, name); });
+// B54C: the linked model (the breaks of 5.4.5 fixed) with its links into the statements, the revolver's draw and repayment and the balance check blank
+const B54C = derive(B545, s => blankAll(s, 'challenge-linked-statements'));
 
 /* ---------------- module 5.5: auditing ---------------- */
 
@@ -1284,45 +1306,64 @@ export function stateOf(id) {
   return clone(s);
 }
 
-/* ---------------- the replay's state shape, and the module challenges' seeds ---------------- */
+/* ---------------- the replay's state shape (one pair every caller shares) ---------------- */
 
 const byName = o => (o ? Object.fromEntries(Object.entries(o).sort(([a], [b]) => a.toUpperCase().localeCompare(b.toUpperCase()))) : o);
-/** The settings a state compares on: the runner sets calculation, iteration, the QAT and Enter; the iteration limits ride along unread. */
+/** The settings a state compares on, in one key order: the iteration limits are the engine's own and never differ by lesson, so they ride along unread. */
 const normState = st => {
   const { maxIterations, maxChange, ...settings } = st.settings || {}; void maxIterations; void maxChange;
   return { ...st, settings: byName(settings), ...(st.names ? { names: byName(st.names) } : {}) };
 };
 /** What differs between two states (clearcoat-weekly's diff), with the names and settings compared whatever their key order. */
 export function diffStates(a, b) { return diffCells(normState(a), normState(b)); }
-/** A live session in the authored-state shape (clearcoat-weekly's extraction). */
-export function sessionToState(ses) { return sessionCells(ses); }
+/** A live session in the authored-state shape: clearcoat-weekly's extraction, with the iteration limits the model carries. */
+export function sessionToState(ses) {
+  const st = sessionCells(ses);
+  st.settings = { ...st.settings, maxIterations: ses.settings.maxIterations, maxChange: ses.settings.maxChange };
+  return st;
+}
+
+/* ---------------- the module challenges and their seeds (one table, one dispatcher) ---------------- */
 
 /** The module challenges and the states they start from (the seed dresses them; the workload never moves). */
 export const CHALLENGES = {
   'challenge-one-site-month': { before: 'B51C' },
   'challenge-model-shell': { before: 'B52C' },
+  'challenge-schedules': { before: 'B53C' },
+  'challenge-linked-statements': { before: 'B54C' },
 };
-/**
- * A module challenge's seed patch: content only, never workload. 5.1.C draws Mueller's month (washes,
- * ticket, the four site costs and the members) around SITE_CHALLENGE; 5.2.C draws the accountants'
- * FY26 retail and membership figures on Data, so the historicals the shell pulls differ run to run.
- */
-export function challengeSeed(id, rng) {
-  if (!CHALLENGES[id]) throw new Error('clearcoat-model: no challenge ' + id);
-  const p = {};
-  const step = (lo, hi, by) => lo + Math.floor(rng() * (Math.round((hi - lo) / by) + 1)) * by;
-  if (id === 'challenge-one-site-month') {
-    const cells = cellsOf(STATES.B51C, 'One site'), S = SITE_CHALLENGE;
+/** A draw on a grid: lo to hi in steps of `by`, rounded clear of float dust. */
+const drawStep = (rng, lo, hi, by) => Math.round((lo + Math.floor(rng() * (Math.round((hi - lo) / by) + 1)) * by) * 1e6) / 1e6;
+/** Fresh typed figures on Inputs, in the cells' own look. */
+function inputDraws(stateId, draws) {
+  const inp = cellsOf(STATES[stateId], 'Inputs');
+  return Object.fromEntries(draws.map(([key, value]) => { const ref = 'C' + rowOf('Inputs', key); return ['Inputs!' + ref, { ...inp[ref], value }]; }));
+}
+const SEEDS = {
+  // 5.1.C: Mueller's month (washes, ticket, the four site costs and the members) around SITE_CHALLENGE
+  'challenge-one-site-month': rng => {
+    const p = {}, cells = cellsOf(STATES.B51C, 'One site'), S = SITE_CHALLENGE, step = (lo, hi, by) => drawStep(rng, lo, hi, by);
     const draw = { washes: step(S.washes - 600, S.washes + 600, 50), ticket: step(130, 145, 1) / 10, rentIn: step(S.rent - 1000, S.rent + 1000, 250), laborIn: step(S.labor - 1500, S.labor + 1500, 500),
       utilIn: step(S.utilities - 400, S.utilities + 400, 100), maintIn: step(S.maintenance - 300, S.maintenance + 300, 100), members: step(S.members - 200, S.members + 200, 50) };
     for (const key in draw) { const ref = 'C' + rowOf('One site', key); p['One site!' + ref] = { ...cells[ref], value: draw[key] }; }
-  }
-  if (id === 'challenge-model-shell') {
-    const cells = sheetOf(STATES.B52C, 'Data').cells;
+    return p;
+  },
+  // 5.2.C: the accountants' FY26 retail and membership figures on Data, so the historicals the shell pulls differ run to run
+  'challenge-model-shell': rng => {
+    const p = {}, cells = sheetOf(STATES.B52C, 'Data').cells;
     for (const key of ['retail', 'club']) {
       const r = 5 + DATA_LINES.findIndex(([, k]) => k === key);
-      p['Data!F' + r] = { ...cells['F' + r], value: HIST[key][3] + step(-1000, 1000, 250) };
+      p['Data!F' + r] = { ...cells['F' + r], value: HIST[key][3] + drawStep(rng, -1000, 1000, 250) };
     }
-  }
-  return p;
+    return p;
+  },
+  // 5.3.C and 5.4.C: fresh inputs on Inputs, each in a band around the case's own, so every figure the
+  // challenge builds is new and the model still balances by construction
+  'challenge-schedules': rng => inputDraws('B53C', [['capexSite', drawStep(rng, 2300, 2800, 100)], ['newWash', drawStep(rng, 180, 220, 10)], ['labor', drawStep(rng, 240, 270, 5)], ['rent', drawStep(rng, 150, 175, 5)], ['payDays', drawStep(rng, 25, 35, 5)]]),
+  'challenge-linked-statements': rng => inputDraws('B54C', [['capexSite', drawStep(rng, 2300, 2800, 100)], ['minCash', drawStep(rng, 4000, 6000, 500)], ['termRate', drawStep(rng, 0.065, 0.075, 0.0025)]]),
+};
+/** A module challenge's seed patch: content only, never workload. */
+export function challengeSeed(id, rng) {
+  if (!CHALLENGES[id]) throw new Error('clearcoat-model: no challenge ' + id);
+  return SEEDS[id](rng);
 }

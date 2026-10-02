@@ -182,6 +182,20 @@ import checks_sheet_day_one from './lessons/checks-sheet-day-one.js';
 import populate_from_data from './lessons/populate-from-data.js';
 import drivers_block from './lessons/drivers-block.js';
 import challenge_model_shell from './lessons/challenge-model-shell.js';
+// Chapter 5 · Finance and Accounting (Run R5): 5.3 Schedules, 5.4 Linking the statements
+import revenue_build from './lessons/revenue-build.js';
+import cost_build from './lessons/cost-build.js';
+import working_capital_schedule from './lessons/working-capital-schedule.js';
+import ppe_and_depreciation from './lessons/ppe-and-depreciation.js';
+import debt_and_interest_circle from './lessons/debt-and-interest-circle.js';
+import tax_schedule from './lessons/tax-schedule.js';
+import challenge_schedules from './lessons/challenge-schedules.js';
+import is_from_schedules from './lessons/is-from-schedules.js';
+import cf_indirect from './lessons/cf-indirect.js';
+import bs_cash_not_a_plug from './lessons/bs-cash-not-a-plug.js';
+import cash_sweep_revolver from './lessons/cash-sweep-revolver.js';
+import when_it_doesnt_balance from './lessons/when-it-doesnt-balance.js';
+import challenge_linked_statements from './lessons/challenge-linked-statements.js';
 
 export const CHAPTERS = [
   {
@@ -307,8 +321,8 @@ export const CHAPTERS = [
     sections: [
       { name: 'The three statements', blurb: 'The income statement; accrual and cash; the cash flow statement; the balance sheet; how the three link; one week of one site through all three; reading a set the way a buyer does.' },
       { name: 'Model setup and efficiencies', blurb: 'Inputs, calculations and outputs, sheet order and a Cover; the timeline row with its flags and counters; the fill patterns at model speed; the checks sheet from day one; the statements populated from the data tab; the drivers block.' },
-      { name: 'Schedules', blurb: 'The revenue build, the cost build, working capital, PP&E, debt and interest with a breaker, and tax.' },
-      { name: 'Linking the statements', blurb: 'The income statement, the cash flow statement and the balance sheet from the schedules; the cash sweep and the revolver; the order to check when it doesn’t balance.' },
+      { name: 'Schedules', blurb: 'The revenue build, the cost build, working capital from days to balances, PP&E with its depreciation waterfall, debt and interest with the average-balance circle and a breaker, and tax.' },
+      { name: 'Linking the statements', blurb: 'The income statement from the schedules, the cash flow statement by the indirect method, the balance sheet with cash as the plug that isn’t a plug, the cash sweep and the revolver, and the order to check when it doesn’t balance.' },
       { name: 'Auditing a model', blurb: 'Tie-outs and cross-foots; error flags and the checks summary; the model-wide sweep; stress tests.' },
       { name: 'DCF', blurb: 'Unlevered free cash flow, the WACC block, terminal value both ways, discounting with the mid-year convention, and the sensitivity tables.' },
       { name: 'Model speed', blurb: 'The revenue build in three minutes, a block filled and formatted in one pass, the statements linked by keyboard.' },
@@ -316,6 +330,8 @@ export const CHAPTERS = [
     ],
     lessons: [
       the_income_statement, accrual_and_cash, the_cash_flow_statement, the_balance_sheet, how_the_statements_link, one_week_three_statements, read_like_a_buyer, challenge_one_site_month, model_architecture, timeline_flags_counters, fill_patterns, checks_sheet_day_one, populate_from_data, drivers_block, challenge_model_shell,
+      revenue_build, cost_build, working_capital_schedule, ppe_and_depreciation, debt_and_interest_circle, tax_schedule, challenge_schedules,
+      is_from_schedules, cf_indirect, bs_cash_not_a_plug, cash_sweep_revolver, when_it_doesnt_balance, challenge_linked_statements,
     ],
   },
 ];

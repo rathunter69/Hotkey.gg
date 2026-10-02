@@ -1,16 +1,21 @@
 // app2/content/lessons/lib/model-checks.js — what Chapter 5's lessons share on the clearcoat-model
-// workbook (modules 5.1 and 5.2): where a keyed line sits, the planting (a lesson's target cells
-// arrive formatted, so the learner types what the goal teaches), the One site and One week pages
-// worked out in JS from the learner's own inputs, and the keys helpers. Every check reads the
-// learner's sheets: a cell holds a formula (never a typed figure), it reads what the line should
-// read on the inputs as they stand, and the cell a goal names moves when an input moves (the shared
-// liveness rule). Any legitimate route passes.
-import { sheetIn, settled, calls, live, near, isNum, reads } from './databook-checks.js';
-import { ROW, STATES } from '../../workbooks/clearcoat-model.js';
+// workbook: where a keyed line sits, the plantings (a lesson's target cells arrive formatted, so the
+// learner types what the goal teaches), the One site and One week pages worked out from the
+// learner's own inputs (5.1), the model's lines graded against the reference formula evaluated in the
+// learner's sheet (5.2 to 5.4), the audit and DCF checks (5.5, 5.6), and the model-speed checks
+// (5.7, 5.8, the drills). Every check reads the learner's sheets: a cell holds a formula (never a
+// typed figure), it reads what the line should read on the inputs as they stand, and where a goal
+// asks for a live formula the cell moves when an input moves (the shared liveness rule). Any
+// legitimate route passes. Model states are built on first use, never at import.
+import { sheetIn, settled, calls, live, near, isNum, reads, onSheet } from './databook-checks.js';
+import { ROW, STATES, stateOf, COLS, PROJ_COLS } from '../../workbooks/clearcoat-model.js';
 import { Sheet } from '../../../engine/sheet.js';
 import { Session } from '../../../engine/keyboard.js';
+import { evalFormula } from '../../../engine/formula.js';
+import { parseRef } from '../../../engine/refs.js';
+import { isLiveFormula } from '../../../engine/live.js';
 
-export { sheetIn, settled, calls, live, near, isNum, reads };
+export { sheetIn, settled, calls, live, near, isNum, reads, onSheet, ROW, COLS, PROJ_COLS };
 
 /** The row a keyed line landed on; `at('One site', 'rev')` is its cell in column C. */
 export const rowOf = (sheet, key) => { const r = ROW[sheet] && ROW[sheet][key]; if (!r) throw new Error(`no row ${sheet}.${key}`); return r; };
@@ -109,8 +114,6 @@ export function weekLines(sh, keys, model = sh && weekModel(sh)) {
 
 /** The keys pressed since the current goal began, as the key log writes them. */
 export const windowKeys = ses => (ses.keyLog || []).slice(ses.goalMark || 0).map(e => e.k);
-/** The active sheet is `name`. */
-export const onSheet = (ses, name) => !!ses.sheets[ses.sheetIndex] && ses.sheets[ses.sheetIndex].name === name;
 
 /* ---------------- the model (5.2 on): the learner's cells against the state the lesson ends on ---------------- */
 
@@ -152,3 +155,86 @@ export function nameIs(ses, name, ref) {
 }
 /** The tabs read in this order from the first. */
 export const tabsAre = (ses, names) => names.every((n, i) => ses.sheets[i] && ses.sheets[i].name === n);
+
+/* ---------------- the model lines (5.3, 5.4): graded on the reference formula, in the learner's sheet ---------------- */
+
+const STATE_CACHE = {};
+const stateCached = id => (STATE_CACHE[id] || (STATE_CACHE[id] = stateOf(id)));
+/** A named state's cells on one sheet (read only; cached). */
+export const cellsAt = (id, name) => stateCached(id).sheets.find(s => s.name === name).cells;
+/** The cells of keyed lines over `cols`, as refs. */
+export const refsOf = (name, keys, cols = COLS) => keys.flatMap(k => cols.map(c => c + rowOf(name, k)));
+/** An Inputs cell by key ('Inputs!C43'), column C unless named. */
+export const inputRef = (key, col = 'C') => `Inputs!${col}${rowOf('Inputs', key)}`;
+
+/** What the reference formula gives at `ref` on the learner's sheet. */
+export function expected(sh, ref, formula) {
+  const p = parseRef(ref);
+  try { return evalFormula(formula, sh.evalCtx({ cell: { r: p.r, c: p.c } })); } catch (e) { return '#ERR'; }
+}
+const close = (a, b) => (isNum(b) ? isNum(a) && Math.abs(a - b) <= 0.01 + 1e-6 * Math.abs(b) : a === b);
+
+/**
+ * Every cell of `refs` on sheet `name` holds a formula and reads what the reference formula (from
+ * state `refId`) gives there. True when the learner's line is the model's line, by any route.
+ */
+export function built(ses, name, refs, refId) {
+  const sh = sheetIn(ses, name); if (!sh) return false;
+  const ref0 = cellsAt(refId, name);
+  for (const ref of refs) {
+    const want = ref0[ref] && ref0[ref].formula;
+    if (!want) continue;
+    if (!sh.formula(ref)) return false;
+    if (!close(sh.value(ref), expected(sh, ref, want))) return false;
+  }
+  return true;
+}
+/** Keyed lines over `cols` are built (see built). */
+export const linesBuilt = (ses, name, keys, refId, cols = COLS) => built(ses, name, refsOf(name, keys, cols), refId);
+/** The cell moves when one of `inputs` ('Inputs!C43') moves: the shared liveness rule, the inputs named. */
+export const liveVia = (ses, name, ref, inputs) => { const sh = sheetIn(ses, name); return !!sh && isLiveFormula(sh, ref, { inputs }); };
+
+/* ---------------- the planting: formats waiting, labels in the helper column ---------------- */
+
+/**
+ * The planting for lines a lesson builds: each target cell's format from the after state (so the
+ * learner types the formula and the look is already the model's), and the accountants' label in
+ * column A where the line reads Data by name. Returns state-patch entries.
+ */
+export function plantLines(afterId, name, keys, cols = COLS) {
+  const cells = cellsAt(afterId, name); const out = {};
+  for (const key of keys) {
+    const r = rowOf(name, key);
+    for (const col of cols) { const f = formatOnly(cells[col + r]); if (f) out[`${name}!${col}${r}`] = f; }
+    const a = cells['A' + r]; if (a && cols.includes('C')) out[`${name}!A${r}`] = JSON.parse(JSON.stringify(a));
+  }
+  return out;
+}
+
+/* ---------------- hints: Go To the line, type its formula once, Ctrl+Enter across ---------------- */
+
+/** A formula as a typed run in a hint: double quotes unless it carries one. */
+export const quoted = f => (f.includes('"') ? `'${f}'` : `"${f}"`);
+/**
+ * The hint that builds a keyed line: Go To its cells on the sheet, type the first cell's formula
+ * from the after state, Ctrl+Enter writes it across (the references shift column by column).
+ */
+export function fillLine(afterId, name, key, cols = COLS) {
+  const r = rowOf(name, key); const first = cols[0], last = cols[cols.length - 1];
+  const f = cellsAt(afterId, name)[first + r].formula;
+  const target = first === last ? `${name}!${first}${r}` : `${name}!${first}${r}:${last}${r}`;
+  return `Ctrl+G "${target}" ↵ ${quoted(f)} ${first === last ? '↵' : 'Ctrl+↵'}`;
+}
+/** Several lines in one hint. */
+export const fillLines = (afterId, name, keys, cols = COLS) => keys.map(k => fillLine(afterId, name, k, cols)).join(' ');
+/** A reference formula (the after state's, at the line's first column). */
+export const formulaAt = (afterId, name, key, col = 'C') => cellsAt(afterId, name)[col + rowOf(name, key)].formula;
+
+/** A hint as a replayable script (the solution is the hints in order): glyphs become key names, quoted runs stay. */
+export function toScript(hint) {
+  return (String(hint).match(/"[^"]*"|'[^']*'|\S+/g) || [])
+    .map(t => (t.startsWith('"') || t.startsWith("'") ? t : t.replace(/↑/g, 'Up').replace(/↓/g, 'Down').replace(/←/g, 'Left').replace(/→/g, 'Right').replace(/↵/g, 'Enter')))
+    .join(' ');
+}
+/** A lesson's solution: every goal's hint in order (a demo goal plays itself). */
+export const solutionOf = goals => goals.filter(g => g.keys).map(g => toScript(g.keys)).join(' ');
