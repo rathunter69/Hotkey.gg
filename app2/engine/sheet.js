@@ -1578,23 +1578,37 @@ export class Sheet {
     if (!full) return false;
     return this.groupSpan(axis, axis === 'r' ? r.r1 : r.c1, axis === 'r' ? r.r2 : r.c2);
   }
-  /** Group rows / columns a..b on an axis (the Group dialog's Rows / Columns answer over a cell range takes this route). */
-  groupSpan(axis, a, b) {
+  /**
+   * The outline as Excel keeps it: every row / column has a level (0 = not grouped, up to 7); a
+   * group of level k is a run of neighbours whose level is k or more. `groups` lists those runs
+   * ({r1, r2, collapsed}, with `level` when it is 2 or more), outer before inner.
+   */
+  outlineLevels(axis) { const key = axis === 'r' ? 'rows' : 'cols', k1 = axis === 'r' ? 'r1' : 'c1', k2 = axis === 'r' ? 'r2' : 'c2'; const lv = new Map(); for (const g of this.groups[key]) for (let n = g[k1]; n <= g[k2]; n++) lv.set(n, Math.max(lv.get(n) || 0, g.level || 1)); return lv; }
+  /** Rebuild an axis's bands from levels, keeping each surviving band's collapsed state (a band that grew keeps the state of the one it grew from). */
+  setOutline(axis, lv) {
     const key = axis === 'r' ? 'rows' : 'cols', k1 = axis === 'r' ? 'r1' : 'c1', k2 = axis === 'r' ? 'r2' : 'c2';
-    if (this.groups[key].some(g => g[k1] <= a && g[k2] >= b)) return false;   // already inside a group: one level, nothing to add
-    this.pushUndo();
-    let lo = a, hi = b, keep = this.groups[key].slice();
-    for (let merged = true; merged;) {   // every band touching the new one joins it, however the joins chain
-      merged = false; const rest = [];
-      for (const g of keep) { if (g[k2] < lo - 1 || g[k1] > hi + 1) rest.push(g); else { lo = Math.min(lo, g[k1]); hi = Math.max(hi, g[k2]); merged = true; } }
-      keep = rest;
+    const old = this.groups[key]; const out = []; const ns = [...lv.keys()].filter(n => lv.get(n) > 0).sort((x, y) => x - y);
+    const max = ns.reduce((m, n) => Math.max(m, lv.get(n)), 0);
+    for (let L = 1; L <= max; L++) {
+      let a = null, prev = null;
+      const close = () => { if (a === null) return; const was = old.find(g => (g.level || 1) === L && g[k1] <= prev && g[k2] >= a); const band = { [k1]: a, [k2]: prev, collapsed: !!(was && was.collapsed) }; if (L > 1) band.level = L; out.push(band); a = null; };
+      for (const n of ns) { if (lv.get(n) >= L) { if (a !== null && n !== prev + 1) close(); if (a === null) a = n; prev = n; } else close(); }
+      close();
     }
-    keep.push({ [k1]: lo, [k2]: hi, collapsed: false });
-    keep.sort((x, y) => x[k1] - y[k1]);
-    this.groups[key] = keep;
+    out.sort((x, y) => (x[k1] - y[k1]) || ((x.level || 1) - (y.level || 1)));
+    this.groups[key] = out;
+  }
+  /** Group rows / columns a..b on an axis (the Group dialog's Rows / Columns answer over a cell range takes this route): each one goes a level deeper, up to Excel's seven. */
+  groupSpan(axis, a, b) {
+    const lv = this.outlineLevels(axis);
+    let any = false; for (let n = a; n <= b; n++) if ((lv.get(n) || 0) < 7) any = true;
+    if (!any) return false;
+    this.pushUndo();
+    for (let n = a; n <= b; n++) lv.set(n, Math.min(7, (lv.get(n) || 0) + 1));
+    this.setOutline(axis, lv);
     this.commit('layout'); return true;
   }
-  /** Ungroup (Alt+Shift+←, Data › Ungroup): the selection's whole rows / columns leave whatever group they are in; a group cut in two survives as two. False when nothing changed. */
+  /** Ungroup (Alt+Shift+←, Data › Ungroup): the selection's whole rows / columns come up one level; a group cut in two survives as two. False when nothing changed. */
   ungroup(axis) {
     const r = this.selRange();
     const full = axis === 'r' ? (r.c1 === 1 && r.c2 === this.cols) : (r.r1 === 1 && r.r2 === this.rows);
@@ -1603,18 +1617,22 @@ export class Sheet {
   }
   /** Ungroup rows / columns a..b on an axis (the Ungroup dialog's answer over a cell range). */
   ungroupSpan(axis, a, b) {
-    const key = axis === 'r' ? 'rows' : 'cols', k1 = axis === 'r' ? 'r1' : 'c1', k2 = axis === 'r' ? 'r2' : 'c2';
-    const out = []; let changed = false;
-    for (const g of this.groups[key]) {
-      if (g[k2] < a || g[k1] > b) { out.push(g); continue; }
-      changed = true;
-      if (g[k1] < a) out.push({ ...g, [k2]: a - 1 });
-      if (g[k2] > b) out.push({ ...g, [k1]: b + 1 });
-    }
-    if (!changed) return false;
+    const lv = this.outlineLevels(axis);
+    let any = false; for (let n = a; n <= b; n++) if (lv.get(n) > 0) any = true;
+    if (!any) return false;
     this.pushUndo();
-    this.groups[key] = out;
+    for (let n = a; n <= b; n++) if (lv.get(n) > 0) lv.set(n, lv.get(n) - 1);
+    this.setOutline(axis, lv);
     this.commit('layout'); return true;
+  }
+  /** The outline's depth on an axis (0 = none): the level buttons are 1 to depth + 1. */
+  outlineDepth(axis) { return this.groups[axis === 'r' ? 'rows' : 'cols'].reduce((m, g) => Math.max(m, g.level || 1), 0); }
+  /** A level button (1, 2, 3… at the outline's corner): level n shows the detail of levels below n and folds every group of level n or deeper. False when nothing changed. */
+  showOutlineLevel(axis, n) {
+    const list = this.groups[axis === 'r' ? 'rows' : 'cols']; if (!list.length) return false;
+    const want = list.map(g => (g.level || 1) >= n);
+    if (list.every((g, i) => !!g.collapsed === want[i])) return false;
+    this.pushUndo(); list.forEach((g, i) => { g.collapsed = want[i]; }); this.commit('layout'); return true;
   }
   /** Data › Ungroup › Clear Outline: every group on the sheet goes. False when there was none. */
   clearOutline() {
@@ -1624,7 +1642,7 @@ export class Sheet {
   /** The group (with its index) holding row / column `n` on an axis, or null. */
   groupAt(axis, n) {
     const key = axis === 'r' ? 'rows' : 'cols', k1 = axis === 'r' ? 'r1' : 'c1', k2 = axis === 'r' ? 'r2' : 'c2';
-    const i = this.groups[key].findIndex(g => n >= g[k1] && n <= g[k2]);
+    let i = -1; this.groups[key].forEach((g, j) => { if (n >= g[k1] && n <= g[k2] && (i < 0 || (g.level || 1) > (this.groups[key][i].level || 1))) i = j; });   // the innermost group holding it
     return i < 0 ? null : { i, g: this.groups[key][i] };
   }
   /** Fold (collapsed = true) or unfold one group by index; false when there is no such group or nothing changes. */
@@ -1646,7 +1664,7 @@ export class Sheet {
     return this.setGroupFold(hit[0], hit[1], collapsed);
   }
   /** Is row / column `n` inside a collapsed group (folded away in the view, never `hidden`)? */
-  isFolded(axis, n) { const h = this.groupAt(axis, n); return !!(h && h.g.collapsed); }
+  isFolded(axis, n) { const key = axis === 'r' ? 'rows' : 'cols', k1 = axis === 'r' ? 'r1' : 'c1', k2 = axis === 'r' ? 'r2' : 'c2'; return this.groups[key].some(g => g.collapsed && n >= g[k1] && n <= g[k2]); }
   /** Shift an axis's groups for an insert (delta > 0 at `at`) or a delete (delta < 0: the band at..at−delta−1 goes). */
   shiftGroups(axis, at, delta) {
     const list = this.groups[axis === 'r' ? 'rows' : 'cols'], k1 = axis === 'r' ? 'r1' : 'c1', k2 = axis === 'r' ? 'r2' : 'c2', max = axis === 'r' ? this.rows : this.cols;
@@ -1706,8 +1724,8 @@ export function zoomToFit(sheet, { width, height, floor = ZOOM_DEFAULT, max = 15
 
 /** A groups record with sane shapes: rows [{r1,r2,collapsed}], cols [{c1,c2,collapsed}], sorted, each band r1 ≤ r2. */
 export function normGroups(g) {
-  const band = (x, k1, k2) => { if (!x || typeof x !== 'object') return null; const a = x[k1] | 0, b = x[k2] | 0; if (a < 1 || b < a) return null; return { [k1]: a, [k2]: b, collapsed: x.collapsed === true }; };
-  const rows = (Array.isArray(g && g.rows) ? g.rows : []).map(x => band(x, 'r1', 'r2')).filter(Boolean).sort((x, y) => x.r1 - y.r1);
-  const cols = (Array.isArray(g && g.cols) ? g.cols : []).map(x => band(x, 'c1', 'c2')).filter(Boolean).sort((x, y) => x.c1 - y.c1);
+  const band = (x, k1, k2) => { if (!x || typeof x !== 'object') return null; const a = x[k1] | 0, b = x[k2] | 0; if (a < 1 || b < a) return null; const o = { [k1]: a, [k2]: b, collapsed: x.collapsed === true }; const L = x.level | 0; if (L >= 2 && L <= 7) o.level = L; return o; };
+  const rows = (Array.isArray(g && g.rows) ? g.rows : []).map(x => band(x, 'r1', 'r2')).filter(Boolean).sort((x, y) => (x.r1 - y.r1) || ((x.level || 1) - (y.level || 1)));
+  const cols = (Array.isArray(g && g.cols) ? g.cols : []).map(x => band(x, 'c1', 'c2')).filter(Boolean).sort((x, y) => (x.c1 - y.c1) || ((x.level || 1) - (y.level || 1)));
   return { rows, cols };
 }

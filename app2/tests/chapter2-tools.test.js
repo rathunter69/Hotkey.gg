@@ -33,3 +33,18 @@ test('Insert Hyperlink (Ctrl+K) to a place in this document: the text to display
   s.switchSheet(0); S.goTo(1, 1); s.run('Ctrl+K'); assert.equal(s.dlg.mode, 'place'); s.run('Alt+R'); assert.equal(S.cellAt('A1').link, undefined); assert.equal(S.cellAt('A1').uline, false);
   S.goTo(3, 1); s.run('Ctrl+K Alt+X "https://hotkey.gg" Enter'); assert.deepEqual(S.cellAt('A3').link, { url: 'https://hotkey.gg' }); assert.equal(S.value('A3'), 'https://hotkey.gg');
 });
+
+test('outline to a second level (Alt+Shift+Right twice): nested groups, the level buttons fold by level, Hide Detail folds the innermost', () => {
+  const s = fresh({}); const S = s.sheet;
+  S.select('A2:A9'); s.run('Shift+Space Alt+Shift+Right');   // rows 2 to 9: level 1
+  S.select('A3:A5'); s.run('Shift+Space Alt+Shift+Right'); S.select('A7:A8'); s.run('Shift+Space Alt+Shift+Right');   // two level-2 groups inside
+  assert.deepEqual(S.groups.rows, [{ r1: 2, r2: 9, collapsed: false }, { r1: 3, r2: 5, collapsed: false, level: 2 }, { r1: 7, r2: 8, collapsed: false, level: 2 }]);
+  assert.equal(S.outlineDepth('r'), 2, 'the buttons run 1 to 3');
+  assert.equal(S.showOutlineLevel('r', 2), true); assert.deepEqual(S.groups.rows.map(g => g.collapsed), [false, true, true], 'level 2: the inner detail folds');
+  assert.equal(S.isFolded('r', 4), true); assert.equal(S.isFolded('r', 6), false);
+  S.showOutlineLevel('r', 1); assert.equal(S.isFolded('r', 6), true, 'level 1: only the summary rows show');
+  S.showOutlineLevel('r', 3); assert.equal(S.groups.rows.some(g => g.collapsed), false, 'level 3: everything shows');
+  S.goTo(4, 1); s.run('Alt A H'); assert.deepEqual(S.groups.rows.map(g => g.collapsed), [false, true, false], 'Hide Detail folds the innermost group at the cell');
+  const back = new Sheet(JSON.parse(JSON.stringify(S.toJSON()))); assert.equal(back.groups.rows[1].level, 2);
+  S.select('A3:A5'); s.run('Shift+Space Alt+Shift+Left'); assert.deepEqual(S.groups.rows, [{ r1: 2, r2: 9, collapsed: false }, { r1: 7, r2: 8, collapsed: false, level: 2 }]);
+});
