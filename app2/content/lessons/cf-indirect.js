@@ -39,7 +39,7 @@ const goals = [
     check: (s, ses) => settled(ses) && lines(ses, REST) && revolverWired(ses) && live(ses, 'J22', 'dist', 'J') && live(ses, 'J25', 'termAmort') },
   { id: 'cash', text: 'Cash before the revolver in C23:J23, the net change in C28:J28, then opening and closing cash in C29:J30.',
     keys: fillLines(AFTER, S, CASH), requires: ['corkscrew', 'index-match', 'if-function', 'sum-family', 'go-to', 'ctrl-enter-fill'],
-    hintStuck: 'pulse range C28:J30 · Opening cash is last year’s closing; the first year reads Data.',
+    hintStuck: 'pulse range C28:J30 · Opening cash is last year’s closing; FY24 reads Data.',
     check: (s, ses) => settled(ses) && lines(ses, CASH) && live(ses, 'J30', 'capexSite') },
   { id: 'tie', closer: true, demo: { script: 'Ctrl+G "Schedules!F101" Enter "1000" Enter Ctrl+G "CF!F30" Enter', cadence: 320 },
     text: 'Does it tie? Watch a 1,000 revolver draw go into FY27 on the debt schedule, and closing cash rise by 1,000.', requires: [],
