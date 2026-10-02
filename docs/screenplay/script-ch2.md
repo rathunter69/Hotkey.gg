@@ -766,7 +766,7 @@ From screenplay 10.3, rows 2.1–2.7: Ctrl+1 and its Number, Alignment, Border a
 ## Built differently
 
 - Layout: buildPage puts the source in B36 and the checks block in B38:C40 (two checks, C39 and C40), not rows 37 and 40 to 42; the second check compares FY26E revenue to Monthly's full year.
-- Check labels read "Revenue: the total less its lines" and "FY26E revenue less Monthly", since the sheet standard reads a label that starts with Total as a total row.
+- Check labels read "Revenue less its lines" and "Last year less Monthly" (short enough to sit under the label column's fit in 2.3.5, and never starting with Total, which the sheet standard reads as a total row); the revenue check is wrapped in ROUND so the ledger's decimals never leave it a hair off zero.
 - 2.1.1: sites take the desk number format with F4 (washes with them) instead of Number without a separator; reading the formula bar is folded into the teach and the closer.
 - 2.1.2: the spare cell for the -1 is G19; site contribution C22 and EBITDA C24 are retyped as additions (C20 stays a SUM) rather than edited with F2; the confirm-C13 goal is dropped and "(4500)" lives in the closing.
 - 2.1.3: the $ rows take currency through Ctrl+1 then C, not Accounting; CAGR counts its periods with COLUMNS, since RRI is not in the engine.
@@ -777,3 +777,24 @@ From screenplay 10.3, rows 2.1–2.7: Ctrl+1 and its Number, Alignment, Border a
 - 2.2.4: the switch is Inputs B12, and the wrong-figure demo is the closer; General is taught here, bringing the hidden flags back.
 - 2.1.C: the cluster varies by seed across four Texas clusters, not always San Antonio. 2.2.C: seven goals (the $ rows split from the plain code), units on Inputs B15, and only the revenue check, since a cluster has no Monthly to tie to.
 - On the R1 engine, Format Cells walks replace the old Ctrl+1 letter picker (Number, Currency, Date mmm-yy, General, Custom), and revenue per wash in 2.1.1 takes Ctrl+Shift+1's #,##0.00, as Excel writes it.
+- 2.3.1: the codes are cleared from A4:A35 (the ACCOUNT header with them), the typed figures and memo counts turn blue, and the checks block takes the anatomy too (header bold, lines indented).
+- 2.3.2: the divider runs D4:D35 and the shade is the gray header swatch; the sheet standard now allows that one right border down one column.
+- 2.3.3: the planted grid is an all-borders on the lines of C7:E24; the thin bottom under the timeline is dropped, since the standard allows only a total's top border and the double bottom.
+- 2.3.4: the source line sits in B36 and the footnote in B37 (the checks start at B38); the source reads "Source: management accounts; FY24 and FY25 audited; FY26 per the September budget".
+- 2.3.5: B is fitted over B4:B35, and the panes freeze at C5 in the same lesson.
+- 2.3.6: Monthly arrives with the analyst's plain title, labels, sections, margins block, source and two checks (rows 31 to 35), costs already flipped; Paste Formats tiles P&L!C6:C24 across C:O and the full-year formulas go back to black; the Total cell style goal waits on an engine New Cell Style.
+- 2.4.1: the site-cost lines keep one indent (no second level), and the headers go bold as well as right.
+- 2.4.2: one outline level (the engine's outline has no second), so the 7:24 group and the level buttons are out; the groups are 13:19 and 33:35.
+- 2.4.3: the stray block is Monthly detail's top eighteen rows (title, headers, the Austin cluster) at P&L rows 41 to 58, cut onto a new sheet at A1.
+- 2.4.4: Monthly detail runs to 76 rows (four clusters, a company block, source, checks); the names cover the company block's revenue, site costs and EBITDA rows; the navigation column is Q4 (Go to) and Q5:Q7 as text, with no hyperlinks until the engine has Ctrl+K.
+- 2.5.1: the duplicate-values rule is not in the engine, so the duplicate label (B18 reads Marketing) is found by reading; the slow-month threshold is 3,800 with a yellow fill.
+- 2.5.2: the checks rule is on C39:C40 (=C39<>0, light red); the row rule reads an x planted in P&L!A8, and its Does it tie clears the x so the page keeps no flag.
+- 2.5.3: the bars stay on Monthly detail's company revenue row. 2.5.4: the row rule is the one deleted (no duplicate-values rule exists).
+- 2.6.1: the month names go in Monthly!C5:N5 (row 3 stays blank), the FY labels in Print!C4:E4 rather than a P&L row 3, and the TEXT headline in Inputs!B19.
+- 2.6.2: Monthly!C4 stays typed (1/31/2026, blue); the EDATE is Inputs!B18, the next update three months after the as-of date. 2.6.3: Print's period line is B4, over its labels.
+- 2.6.4: the clean labels are PROPER's Title Case (accepted for a working sheet), with EBITDA retyped by hand. 2.6.5: the units line lives on Inputs!B17, since B12 holds the switch; no P&L period line.
+- 2.7.1: Page Setup is one per workbook in the engine: landscape, one page wide by two tall, rows 1:5 repeating, the footer, centered horizontally; no print area, no portrait Print and no custom header.
+- 2.7.2: the engine has no Page Break Preview or manual breaks, so the lesson leaves the state as 2.7.1 left it and waits on that mechanic.
+- 2.7.3: Print's six lines are rows 5 to 10, with its own source and one check (EBITDA against the P&L), the divider and the shade.
+- Challenges 2.3.C to 2.7.C: a seeded Texas cluster's figures over S2d, S3f, S4d, S5d and S7C (the finished pack with no print set-up), plus each module's faults: the grid; the hidden margins and the stray block; three stray rules and an x flag; text month heads; nothing printed.
+- Project and assessment: the project is the same export a year on (FY25A, FY26A, FY27E, 46 sites); the assessment lays a seeded sister operator's figures over it. Both solve through one builder, with the navigation names on Monthly, since neither has a Monthly detail sheet.
