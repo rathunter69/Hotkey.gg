@@ -1971,6 +1971,18 @@ export const COPY = {
    "mac_note": "",
    "story_beat": ""
   },
+  "checks-sheet-day-one": {
+   "id": "checks-sheet-day-one",
+   "module": "model-setup",
+   "order": "5.2.4",
+   "title": "The checks sheet from day one",
+   "brief": "The Checks sheet is built before the model is, with a row for every check the model will need: the balance sheet balances, cash ties to the cash flow, the debt and PP&E schedules tie to the balance sheet, revenue ties to its build, the cost build cross-foots, equity rolls, and FY26 EBITDA ties to the Chapter 2 P&L. Each is a live difference (1.7.2), and the roll-up flag (3.6.4) sits on the Cover. As each schedule is built, its check goes live. The key is `=`.",
+   "closing": "Two of eight checks are live, and the other six have their rows waiting. || The model has a conscience before it has a schedule: every check you add from 5.3 on lands in a row already waiting for it, and the Cover says OK or CHECK the moment anything stops tying.",
+   "wow": "Two checks live across eight years, six waiting their turn, and the Cover reading the lot.",
+   "convention_line": "The check is a live difference → 0; Cash balances the sheet; nothing is forced",
+   "mac_note": "",
+   "story_beat": ""
+  },
   "remix-format-on-the-pnl": {
    "id": "remix-format-on-the-pnl",
    "module": "remixes",
@@ -12425,6 +12437,56 @@ export const COPY = {
     "teach": "",
     "why": "",
     "hint_stuck": "pulse cell C38 · The historical years read Data through the flag."
+   }
+  ],
+  "checks-sheet-day-one": [
+   {
+    "lesson_id": "checks-sheet-day-one",
+    "goal_index": "0",
+    "text": "On Checks, the balance check in C6, =ROUND(BS!C10-BS!C25,2), filled right to J6.",
+    "teach": "Best practice: wrap every check in ROUND(…,2). Floating-point arithmetic leaves 0.0000000001 where a zero belongs, and the flag would call that a fault.",
+    "why": "",
+    "hint_stuck": "pulse range C6:J6 · Total assets are BS row 10, total liabilities and equity row 25."
+   },
+   {
+    "lesson_id": "checks-sheet-day-one",
+    "goal_index": "1",
+    "text": "The cash tie in C7, =ROUND(BS!C6-CF!C30,2), filled right to J7.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C7:J7 · Cash on the balance sheet less the cash flow’s closing cash."
+   },
+   {
+    "lesson_id": "checks-sheet-day-one",
+    "goal_index": "2",
+    "text": "Type pending in K8:K14 in one entry, beside the six checks still to come.",
+    "teach": "A check whose schedule doesn’t exist yet stays empty with a note beside it, never a typed 0: a typed zero is a dead check that always passes, and the roll-up reads an empty cell as nothing.",
+    "why": "",
+    "hint_stuck": "pulse range K8:K14 · Ctrl+Enter fills the whole selection."
+   },
+   {
+    "lesson_id": "checks-sheet-day-one",
+    "goal_index": "3",
+    "text": "The roll-up in C44: =SUMPRODUCT(ABS(C6:J27)), which reads zero.",
+    "teach": "One number says whether everything ties: the sum of every check’s size, so a +5 and a -5 can’t cancel. The flag under it already reads OK or CHECK (3.6.4).",
+    "why": "",
+    "hint_stuck": "pulse cell C44 · ABS makes every difference count, whichever way it points."
+   },
+   {
+    "lesson_id": "checks-sheet-day-one",
+    "goal_index": "4",
+    "text": "On the Cover, C8 =Checks!C44, so the sum of the differences sits under the flag.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C8 · The Cover reads Checks, never the other way round."
+   },
+   {
+    "lesson_id": "checks-sheet-day-one",
+    "goal_index": "5",
+    "text": "Does it tie? Watch FY25 cash on the BS typed over: the cash tie leaves zero and the Cover flag turns to CHECK.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C7 · One check off zero is enough to turn the flag."
    }
   ]
  },

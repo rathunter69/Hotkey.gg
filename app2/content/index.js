@@ -178,6 +178,7 @@ import challenge_one_site_month from './lessons/challenge-one-site-month.js';
 import model_architecture from './lessons/model-architecture.js';
 import timeline_flags_counters from './lessons/timeline-flags-counters.js';
 import fill_patterns from './lessons/fill-patterns.js';
+import checks_sheet_day_one from './lessons/checks-sheet-day-one.js';
 
 export const CHAPTERS = [
   {
@@ -311,7 +312,7 @@ export const CHAPTERS = [
       { name: 'Project and assessment', blurb: 'The operating model with its DCF page, then one schedule and the links from it against the clock.' },
     ],
     lessons: [
-      the_income_statement, accrual_and_cash, the_cash_flow_statement, the_balance_sheet, how_the_statements_link, one_week_three_statements, read_like_a_buyer, challenge_one_site_month, model_architecture, timeline_flags_counters, fill_patterns,
+      the_income_statement, accrual_and_cash, the_cash_flow_statement, the_balance_sheet, how_the_statements_link, one_week_three_statements, read_like_a_buyer, challenge_one_site_month, model_architecture, timeline_flags_counters, fill_patterns, checks_sheet_day_one,
     ],
   },
 ];
