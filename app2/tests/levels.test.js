@@ -24,7 +24,8 @@ test('the table: thirty rows, eleven bands, one title and one reward each, every
     assert.deepEqual(tells(row.title), [], 'title reads clean: ' + row.title);
     assert.deepEqual(tells(row.reward.label), [], 'reward reads clean: ' + row.reward.label);
   }
-  for (const n of [3, 6, 9, 12, 15, 18, 21, 24, 27]) assert.equal(rewardKindAt(n), 'theme', 'a theme at ' + n);
+  for (const n of [3, 6]) assert.equal(rewardKindAt(n), 'theme', 'a theme at ' + n);   // seven themes in all (Wolf, 2026-10-02): the rest of the bands pay flair
+  for (const n of [9, 12, 15, 18, 21, 24, 27]) assert.notEqual(rewardKindAt(n), 'theme', 'flair at ' + n);
   assert.equal(rewardKindAt(1), 'themes_start'); assert.equal(rewardKindAt(10), 'profile_frame'); assert.equal(rewardKindAt(20), 'ghost_trail'); assert.equal(rewardKindAt(30), 'crimson');
   assert.equal(titleAt(1), 'New Workbook'); assert.equal(titleAt(30), 'Top Bucket'); assert.equal(titleAt(13), 'Alt Native');
   assert.equal(rewardAt(30).kind, 'crimson');

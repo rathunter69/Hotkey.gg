@@ -1,17 +1,15 @@
 // app2/app/cosmetics.js — cosmetic unlocks (SITE_SPEC §9): themes by level, achievement or
 // rank; frames and flair by rank tier. Everything here is pure lookup over a ctx of
 // { level, rank, earned (a Set of achievement ids) }; nothing cosmetic is ever pay-to-win and
-// nothing locked ever blocks the eight free themes.
+// nothing locked ever blocks the three free themes.
 import { THEME_ORDER } from '../ui/themes.js';
 
 /** The themes everyone has from the first visit. */
-export const FREE_THEMES = ['daylight', 'github', 'light', 'default', 'nord', 'dracula', 'gruvbox', 'solarized'];
+export const FREE_THEMES = ['workbook', 'contrast', 'default'];
 
 /** A few themes carry story unlocks instead of a level. */
 export const SPECIAL_THEMES = {
   bloomberg: { ach: 'ch1-complete', label: 'Complete Foundations' },
-  terminal: { ach: 'tier-legend', label: 'Beat a legendary clock' },
-  synthwave: { ach: 'combo-10', label: 'A ten-hit rapid-fire combo' },
   crimson: { rank: 6, label: 'Reach MD' },   // rank.js TIERS index
 };
 

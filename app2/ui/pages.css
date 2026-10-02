@@ -219,6 +219,8 @@
 .lc-place{font-size:var(--fs-label); font-weight:var(--fw-semi); color:var(--ink-2)}
 .learn-keys{display:flex}
 .xp-why{font-size:var(--fs-label)}
+/* a plain link in running text takes the page's mode ink, never the browser's blue */
+.pg a:not([class]), .page a:not([class]){color:var(--mode-ink); font-weight:var(--fw-semi)}
 .lc-sub{display:flex; flex-wrap:wrap; align-items:center; gap:var(--s3); font-size:var(--fs-label); font-weight:var(--fw-semi); color:var(--ink-2)}
 .learn-continue .btn2{padding:var(--s4) var(--s6); font-size:var(--fs-panel); flex:none}
 

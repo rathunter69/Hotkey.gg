@@ -4139,7 +4139,7 @@ export const COPY = {
   "level_title_model_owner": "Model Owner",
   "level_title_hard_clock": "Hard Clock",
   "level_title_top_bucket": "Top Bucket",
-  "level_reward_themes_start": "Workbook, Daylight and six more themes",
+  "level_reward_themes_start": "Workbook, High Contrast and Graphite",
   "level_reward_theme": "A theme",
   "level_reward_crimson": "Crimson and the Top Bucket frame",
   "level_reward_profile_frame": "The profile frame",
@@ -4772,7 +4772,14 @@ export const COPY = {
   "cert_earn_1": "A certificate with your name and the date, issued when all six chapters are Verified.",
   "cert_earn_2": "A public page anyone can check, with your assessment times.",
   "cert_earn_3": "One click to add it to your LinkedIn profile.",
-  "cert_how": "Each chapter ends in an assessment on a hard clock, no help and no mouse. Pass it and the chapter is Verified."
+  "cert_how": "Each chapter ends in an assessment on a hard clock, no help and no mouse. Pass it and the chapter is Verified.",
+  "settings_look_line": "How hotkey.gg looks. Nothing here changes how you play.",
+  "settings_game_head": "Game options",
+  "settings_game_line": "How lessons, drills and the keyboard behave.",
+  "setting_on": "On",
+  "setting_off": "Off",
+  "theme_light": "Light",
+  "theme_dark": "Dark"
  },
  "micro": {
   "enter-tab-direction": {

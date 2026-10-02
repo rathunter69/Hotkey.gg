@@ -221,21 +221,44 @@ body[data-route="landing"] > .app{padding:0 var(--content-side)}
 .kr-row[hidden]{display:none}
 .kr-group[hidden]{display:none}
 
-/* ---------- Settings (3.0, Account; M101) ---------- */
-.setting{padding:var(--s3) 0; border-bottom:1px solid var(--line); display:flex; flex-direction:column; gap:var(--s2)}
+/* ---------- Settings (3.0, Account; M101): the Theme band, then Game options ---------- */
+.settings{display:flex; flex-direction:column; gap:var(--s5)}
+.settings .h-row-title{margin:0}
+.setting{padding:var(--s2) 0; border-bottom:1px solid var(--grid); display:flex; flex-direction:column; gap:var(--s2)}
 .setting:last-child{border-bottom:0}
-.setting-row{display:flex; align-items:center; justify-content:space-between; gap:var(--s4)}
-.setting-name{font-size:var(--fs-name); font-weight:var(--fw-semi)}
-.setting-help{margin:0; font-size:var(--fs-label); line-height:var(--lh-body)}
+.setting-row{display:flex; align-items:center; justify-content:space-between; gap:var(--s4); min-height:var(--row-h)}
+.setting-words{display:flex; flex-direction:column; gap:var(--s1); min-width:0}
+.setting-name{font-size:var(--fs-name); font-weight:var(--fw-bold)}
+.setting-help{margin:0; font-size:var(--fs-label); line-height:var(--lh-body); color:var(--ink-2)}
 .setting-help:empty{display:none}
-.tiles{display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:var(--s3)}
-.tile{font-family:var(--font); background:transparent; border:0; padding:0; cursor:pointer; display:flex; flex-direction:column; gap:var(--s1); align-items:flex-start; text-align:left; color:var(--ink)}
-.tile-swatch{width:var(--theme-tile-w); height:var(--theme-tile-h); background:var(--tile-bg); border:1px solid var(--edge); border-radius:var(--r-btn); display:flex; align-items:center; padding-left:var(--s2); box-sizing:border-box}
-.tile-swatch i{width:var(--s6); height:var(--s1); background:var(--tile-accent); display:block}
-.tile.on .tile-swatch{outline:var(--cursor-w) solid var(--mode); outline-offset:var(--cursor-w)}
-.tile-name{font-size:var(--fs-label); font-weight:var(--fw-semi)}
-.tile.locked{opacity:.55; cursor:default}
-.tile-lock{font-weight:var(--fw-body)}
+.setting-control{flex:none}
+.set-group .panel-head{border-bottom:1px solid var(--line); padding-bottom:var(--s2); margin-bottom:var(--s1)}
+.set-guest .btn-row{margin-top:var(--s3)}
+.set-game-head{display:flex; align-items:baseline; gap:var(--s4); border-bottom:var(--bw-2) solid var(--ink); padding-bottom:var(--s2)}
+.set-game-h{margin:0; font-size:var(--fs-title); font-weight:var(--fw-heavy)}
+.set-game{align-items:start}
+.set-game .col{display:flex; flex-direction:column; gap:var(--s5)}
+.set-look .setting-wide{border-bottom:0; padding-top:var(--s3)}
+.set-look-row{display:flex; flex-wrap:wrap; gap:var(--s8); border-top:1px solid var(--grid); padding-top:var(--s3)}
+.setting-inline{flex-direction:row; align-items:center; gap:var(--s4); padding:0; border:0}
+.seg-onoff .seg-btn{min-width:var(--s12)}
+/* the theme cards: each one a corner of a sheet in that theme's own colours */
+.tiles{display:grid; grid-template-columns:repeat(auto-fill, minmax(var(--theme-card-w), 1fr)); gap:var(--s4)}
+.tile{font-family:var(--font); background:transparent; border:0; padding:0; cursor:pointer; display:flex; flex-direction:column; gap:var(--s1); align-items:stretch; text-align:left; color:var(--ink)}
+.tile-sheet{display:flex; height:var(--theme-card-h); background:var(--tile-bg); border:1px solid var(--edge); overflow:hidden}
+.ts-rail{flex:none; width:var(--s4); background:var(--tile-rail)}
+.ts-grid{flex:1 1 auto; display:grid; grid-template-columns:var(--s5) repeat(3, minmax(0,1fr)); grid-auto-rows:1fr; margin:var(--s2) var(--s2) var(--s2) var(--s2); background:var(--tile-sheet); border:1px solid var(--tile-grid)}
+.ts-grid i{font-family:var(--cellfont); font-style:normal; font-size:var(--fs-min); color:var(--tile-fg); display:flex; align-items:center; justify-content:flex-end; padding:0 var(--s1); border-right:1px solid var(--tile-grid); border-bottom:1px solid var(--tile-grid); min-width:0; overflow:hidden}
+.ts-grid i.ts-hd{background:var(--tile-chrome); color:var(--tile-fg2); justify-content:center}
+.ts-grid i.ts-cur{outline:var(--bw-2) solid var(--tile-accent); outline-offset:calc(-1 * var(--bw-2))}
+.ts-grid i.ts-tot{font-weight:var(--fw-bold); color:var(--tile-accent-ink); border-top:1px solid var(--tile-fg)}
+.tile.on .tile-sheet{outline:var(--cursor-w) solid var(--mode); outline-offset:var(--cursor-w)}
+.tile:not(.locked):hover .tile-sheet{border-color:var(--ink)}
+.tile-name{font-size:var(--fs-name); font-weight:var(--fw-bold); margin-top:var(--s1)}
+.tile-lock{font-size:var(--fs-label); color:var(--ink-2)}
+.tile.locked .tile-sheet{opacity:.6}
+.tile.locked{cursor:default}
+.tile.locked .tile-name{color:var(--ink-2)}
 
 /* ---------- the footer on every site page ---------- */
 .site-footer{border-top:1px solid var(--line); margin-top:var(--s12); padding:var(--s6) var(--content-side) var(--s8); font-family:var(--font); display:flex; flex-direction:column; gap:var(--s3); background:var(--paper)}
