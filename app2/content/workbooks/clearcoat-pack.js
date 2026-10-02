@@ -843,7 +843,7 @@ const S435 = derive(S434, s => { take(s, SOLVED, 'Summary', ['B' + PH.title, ...
 const RU = S.rollup;
 /** 4.3.6's roll-up lines as 3D references across the six tabs (Domain:CedarPark), and the check row typed once on the grouped tabs: one formula, the same on every tab. */
 export const ROLLUP_3D = { retail: 5, member: 6, revenue: 8 };
-export const TAB_CHECK = { B12: { value: 'Checks', bold: true }, B13: { value: 'Total washes tie to retail plus member', indent: 1 }, C13: { formula: '=F7-F5-F6', fmtStyle: 'comma' } };
+export const TAB_CHECK = { B12: { value: 'Checks', bold: true }, B13: { value: 'Total washes tie to retail plus member', indent: 1 }, C13: { formula: '=F7-F5-F6', fmtStyle: 'custom', numFmt: FMT.countDash } };
 const S436 = derive(S435, s => {
   take(s, SOLVED, 'Summary', ['B' + RU.title, ...rowRefs(RU.header, COLS('CDEF')), ...blockRefs([RU.retail, RU.member, RU.total, RU.revenue], COLS('BCDEF')), 'C' + S.checkRows[4]]);
   const c = sheetOf(s, 'Summary').cells;
