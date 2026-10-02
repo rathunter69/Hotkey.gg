@@ -52,7 +52,7 @@ export function checkCss(css, name) {
     const d = decls.replace(/url\([^)]*\)/g, 'url()');
     if (/letter-spacing\s*:\s*(?!normal|0\b|inherit)/.test(d)) out.push({ rule: 'C1', where, text: 'letter-spacing on text' });
     if (/text-transform\s*:\s*uppercase/.test(d)) out.push({ rule: 'C2', where, text: 'text-transform: uppercase' });
-    if (!isTokens && /font(?:-family)?\s*:[^;]*(?:var\(--mono\)|monospace|JetBrains)/i.test(d) && !MONO_OK.test(sel)) out.push({ rule: 'C3', where, text: 'the monospace face on something that is not a key, an address, a formula, a time or the wordmark' });
+    if (!isTokens && !/^@font-face/.test(sel) && /font(?:-family)?\s*:[^;]*(?:var\(--mono\)|monospace|JetBrains)/i.test(d) && !MONO_OK.test(sel)) out.push({ rule: 'C3', where, text: 'the monospace face on something that is not a key, an address, a formula, a time or the wordmark' });
     if (!isTokens) {
       const dc = d.replace(/var\([^)]*\)/g, 'var()');
       const col = dc.match(RAW_COLOR); if (col) out.push({ rule: 'C4', where, text: `a raw color: ${col[0]}` });

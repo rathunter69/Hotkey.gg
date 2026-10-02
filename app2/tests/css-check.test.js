@@ -10,6 +10,7 @@ test('css-check: each tell is caught', () => {
   assert.deepEqual(rules('.a{letter-spacing:var(--ls)}'), ['C1']);
   assert.deepEqual(rules('.a{text-transform:uppercase}'), ['C2']);
   assert.deepEqual(rules('.btn{font-family:var(--mono)}'), ['C3']);
+  assert.deepEqual(rules("@font-face{font-family:'JetBrains Mono'; src:url(jetbrains-mono-latin.woff2)}"), [], 'declaring the self-hosted face is not using it');
   assert.deepEqual(rules('.a{color:#17201B}'), ['C4']);
   assert.deepEqual(rules('.a{background:rgba(0,0,0,.3)}'), ['C4']);
   assert.deepEqual(rules('.a{padding:12px}'), ['C5']);
