@@ -220,6 +220,7 @@ import ch5_assessment from './lessons/ch5-assessment.js';
 import deal_multiples_premiums from './lessons/deal-multiples-premiums.js';
 import sort_and_decide from './lessons/sort-and-decide.js';
 import applying_precedents from './lessons/applying-precedents.js';
+import challenge_precedents from './lessons/challenge-precedents.js';
 
 export const CHAPTERS = [
   {
@@ -376,7 +377,7 @@ export const CHAPTERS = [
       { name: 'Project and assessment', blurb: 'The valuation summary for the board from fresh comps, deals and bids, then again on the clock.' },
     ],
     lessons: [
-      deal_multiples_premiums, sort_and_decide, applying_precedents,
+      deal_multiples_premiums, sort_and_decide, applying_precedents, challenge_precedents,
     ],
   },
 ];
