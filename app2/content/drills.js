@@ -20,6 +20,16 @@ import ch5_sweep from './drills/ch5-sweep.js';
 import ch5_checks from './drills/ch5-checks.js';
 import ch5_revenue_build from './drills/ch5-revenue-build.js';
 import puzzle_ch5 from './drills/puzzle-ch5.js';
+import ch5_is_it_revenue from './drills/ch5-is-it-revenue.js';
+import ch5_four_rungs from './drills/ch5-four-rungs.js';
+import ch5_two_balance_sheets from './drills/ch5-two-balance-sheets.js';
+import ch5_two_landings from './drills/ch5-two-landings.js';
+import ch5_name_the_driver from './drills/ch5-name-the-driver.js';
+import ch5_dep_waterfall from './drills/ch5-dep-waterfall.js';
+import ch5_breaker from './drills/ch5-breaker.js';
+import ch5_circle_hunt from './drills/ch5-circle-hunt.js';
+import ch5_normalize_the_year from './drills/ch5-normalize-the-year.js';
+import ch5_dcf_read_back from './drills/ch5-dcf-read-back.js';
 import ch6_spread_a_comp from './drills/ch6-spread-a-comp.js';
 import ch6_median_and_range from './drills/ch6-median-and-range.js';
 import ch6_sources_and_uses from './drills/ch6-sources-and-uses.js';
@@ -55,6 +65,17 @@ export const DRILLS = [
   ch5_checks,
   ch5_revenue_build,
   puzzle_ch5,
+  // Chapter 5's Wave 1 sketches (script-drills): the accounting of 5.1 on pages of their own, then the model and the DCF
+  ch5_is_it_revenue,
+  ch5_four_rungs,
+  ch5_two_balance_sheets,
+  ch5_two_landings,
+  ch5_name_the_driver,
+  ch5_dep_waterfall,
+  ch5_breaker,
+  ch5_circle_hunt,
+  ch5_normalize_the_year,
+  ch5_dcf_read_back,
   // Chapter 6 (screenplay 6.2): the planned set on the valuation pack, the benchmark and the puzzle
   ch6_spread_a_comp,
   ch6_median_and_range,
