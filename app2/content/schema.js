@@ -281,7 +281,12 @@ export const CONCEPTS = {
   'f9-part': 'in an open formula, F9 on a selected part shows that part’s value; Esc puts the formula back, Enter would keep the value for good',
   'goto-special-types': 'Go To Special’s Numbers, Text, Logicals and Errors boxes narrow Constants or Formulas to one kind of value',
   'edit-links': 'Edit Links (Alt A K) lists every other workbook the file reads; when no cell reads one, Excel says the workbook has no links',
-  'rollup-flag': 'a roll-up flag: COUNTIF counts the checks that are not zero and IF turns the count into OK or CHECK, so one cell says whether the book ties',
+  // Chapter 4 · 4.6 Names and structure (the diligence pack)
+  'names-sparingly': 'name the cells other sheets read and a reviewer hunts for (the case switch, the key inputs) and nothing else; a formula that reads Case reads like English',
+  'name-manager': 'the Name Manager (Ctrl+F3) lists every name with its value, its reference and its scope; Edit renames or re-points one and the formulas follow, Delete removes a stray',
+  'paste-list': 'Paste Name (F3) › Paste List writes every name and what it refers to from the active cell down, so the reviewer can read them on a sheet',
+  'name-driven-list': 'a drop-down whose Source is a name (=Cases) reads the named list wherever it sits, so the list can move and the picker keeps working',
+  'rollup-flag':'a roll-up flag: COUNTIF counts the checks that are not zero and IF turns the count into OK or CHECK, so one cell says whether the book ties',
 };
 
 /**

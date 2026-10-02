@@ -72,6 +72,11 @@ const BEATS_DEFAULT = {
     body: 'Before you built yours, someone started a Summary sheet and left. It has a SUMIF pointing at a range a row short, a typed number in a formula column, a text "12", and a total that agrees with nothing. Chapter 1 taught the three looks; this module adds the tools a reviewer uses on a sheet they didn’t build, and the checks block that says, in one cell, whether the databook ties.' },
   'ch3-project-and-assessment': { eyebrow: 'Module 3.7 · project and assessment', title: 'The databook, tied out.',
     body: 'A fresh export, a fresh site list, a Summary someone else abandoned. Rebuild it so every number reads the export and the flag reads OK, then value the next site on the list. Build it, then build it again on the clock. The assessment is the test-out.' },
+  // Chapter 4 · Data and Lookups (script-ch4.md story cards)
+  'names-and-structure': { eyebrow: 'Module 4.6 · names and structure', title: 'Name the switch, not everything.',
+    body: 'The pack is thirteen sheets now, and the case switch is read from all over it. A name turns Scenarios!$C$11 into Case, so a formula reads like English and a reviewer finds the switch by name. But a model with a hundred names is worse than one with none. Name the toggles and the key inputs, manage them, and let the picker read its list by name.' },
+  'ch4-project-and-assessment': { eyebrow: 'Module 4.7 · project and assessment', title: 'The diligence pack.',
+    body: 'A fresh export, a question log with eight questions open, a case sheet with three columns and no switch wired. Answer the log, build the KPI page, wire the case and name what deserves it. Build it, then build it again on another cluster’s export against the clock. The assessment is the test-out.' },
   'project-and-assessment': { eyebrow: 'Module 1.8 · project, assessment, test-out', title: 'Management’s next feed is in.',
     body: 'A fresh week, a blank Report, and everything the chapter taught. Build the page start to finish, then prove it against the clock on Monday morning; or test out of the chapter in five minutes.' },
 };

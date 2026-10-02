@@ -22,7 +22,7 @@ function live(st) {
   return ses;
 }
 // a Session of thirteen sheets costs most of a second to build, so the live check samples the run; every state still builds sheet by sheet
-const LIVE_SAMPLE = ['S0', 'S418', 'S42C', 'S436', 'S456', 'SPraw'];
+const LIVE_SAMPLE = ['S0', 'S418', 'S42C', 'S436', 'S456', 'SPraw', 'SAraw'];
 const sheetIn = (ses, name) => ses.sheets.find(x => x.name === name).sheet;
 const near = (a, b, eps = 1e-6) => Math.abs(a - b) < eps;
 const SHEETS = ['Q&A', 'Summary', 'Scenarios', 'Dashboard', 'Lists', 'Inputs', 'Export', ...SITES.map(s => s.tab)];
@@ -33,7 +33,7 @@ test('the workbook is registered and every state builds the thirteen-sheet pack 
   for (const id of STATE_ORDER) {
     const st = workbookState('clearcoat-pack', id);
     const names = st.sheets.map(s => s.name);
-    for (const n of SHEETS) assert.ok(names.includes(n), `${id} has ${n}`);
+    for (const n of id.startsWith('SA') ? SHEETS.slice(0, 7).concat(wb.DALLAS.map(s => s.tab)) : SHEETS) assert.ok(names.includes(n), `${id} has ${n}`);   // the assessment wears Dallas's site tabs
     for (const sh of st.sheets) for (const ref in sh.cells) assert.ok(/^[A-Z]\d+$/.test(ref) && ref.charCodeAt(0) - 64 <= 26 && +ref.slice(1) <= 100, `${id} ${sh.name}!${ref} inside the grid`);
     for (const sh of st.sheets) assert.ok(build(sh), `${id} ${sh.name} builds`);
     if (LIVE_SAMPLE.includes(id)) assert.equal(live(st).sheets.length, st.sheets.length, id);
@@ -195,12 +195,13 @@ test('each state carries what its lesson reads', () => {
   assert.match(sc('S455').C6.formula, /^=Inputs!\$C\$15$/); assert.match(sc('S455')['C' + C.ticketModel].formula, /^=IF\(C13="",Inputs!\$C\$15,C13\)$/); assert.match(sc('S455')['C' + C.outputs.revenue].formula, /\*C14$/);
   assert.match(sc('S456')['C' + C.cases.ebitda].formula, /^=C53\+\$C\$23$/); assert.match(sc('S456')['C' + C.checkRows[0]].formula, /\$C\$11\)-C24$/); assert.equal(qa('S456').E13.value, 'Answered');
   // 4.6: the names, the stray, the rename, the list on Inputs
-  assert.deepEqual(Object.keys(stateOf('S461').names), ['Case', 'Ticket', 'CostPerWash']); assert.match(sc('S461').G6.formula, /,Case\)$/);
+  assert.deepEqual(Object.keys(stateOf('S461').names), ['Case', 'CostPerWash', 'Ticket']); assert.match(sc('S461').G6.formula, /,Case\)$/);
   assert.deepEqual(stateOf('S462start').names.OldTicket, 'Scenarios!$G$6');
-  assert.deepEqual(Object.keys(stateOf('S462').names), ['Case', 'Ticket', 'Cost_Per_Wash']); assert.equal(cells('S462', 'Inputs').B19.value, 'Case'); assert.equal(cells('S462', 'Inputs').B20, undefined);
-  assert.deepEqual(stateOf('S463').names, wb.NAMES); assert.equal(cells('S463', 'Inputs').C20.value, '=Lists!$L$5:$L$7');
+  assert.deepEqual(Object.keys(stateOf('S462').names), ['Case', 'Cost_Per_Wash', 'Ticket']); assert.equal(cells('S462', 'Inputs').B19.value, 'Case'); assert.equal(cells('S462', 'Inputs').C21.value, '=Inputs!$C$15'); assert.equal(cells('S462', 'Inputs').B22, undefined);
+  assert.deepEqual(stateOf('S463').names, wb.sortNames(wb.NAMES)); assert.deepEqual(Object.keys(stateOf('S463').names), ['Case', 'Cases', 'Cost_Per_Wash', 'Sites', 'Ticket']); assert.equal(cells('S463', 'Inputs').C20.value, '=Lists!$L$5:$L$7');
   // 4.P: a fresh fortnight, the same shape
-  assert.equal(cells('SPraw', 'Export').A5.value, wb.EXPORT_NEXT.start); assert.equal(cells('SPraw', 'Summary').C15, undefined); assert.equal(cells('SPraw', 'Summary').B15, undefined);
+  assert.equal(cells('SPraw', 'Export').A5.value, wb.EXPORT_NEXT.start); assert.equal(cells('SPraw', 'Summary').C15.formula, undefined); assert.equal(cells('SPraw', 'Lists').N5, undefined); assert.equal(stateOf('SPraw').names, undefined);
+  assert.equal(cells('SAraw', 'Export').B5.value, wb.DALLAS[0].code); assert.equal(cells('SAdone', 'Scenarios').C40.value, wb.DALLAS[0].code);
   assert.equal(cells('SPdone', 'Export').A5.value, wb.EXPORT_NEXT.start); assert.notEqual(cells('SPdone', 'Export').C5.value, cells('S463', 'Export').C5.value);
 });
 

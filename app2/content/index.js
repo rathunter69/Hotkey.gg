@@ -121,6 +121,8 @@ import parse_the_memo from './lessons/parse-the-memo.js';
 import text_to_numbers from './lessons/text-to-numbers.js';
 import text_to_columns_flash_fill from './lessons/text-to-columns-flash-fill.js';
 import challenge_text_dump from './lessons/challenge-text-dump.js';
+// Chapter 4 · Data and Lookups (Run R4): 4.6 Names and structure, 4.7 Project and assessment
+import naming_sparingly from './lessons/naming-sparingly.js';
 
 export const CHAPTERS = [
   {
@@ -201,6 +203,25 @@ export const CHAPTERS = [
       pv_fv_pmt, npv_xnpv, irr_xirr, payment_schedule, challenge_new_site_case,
       trace_arrows_evaluate, f9_show_formulas_at_scale, hardcode_external_link_hunt, checks_block_rollup, challenge_six_faults,
       ch3_project, ch3_assessment,
+    ],
+  },
+  {
+    id: 'data-and-lookups',
+    title: 'Data and Lookups',
+    access: 'paid',
+    blurb: 'Lookups, lists and tables, summaries from raw rows, pivots, scenarios and names: the buyers’ question log answered from the POS export, and the management case with its sensitivities.',
+    // Chapter 4's sections in order (script-ch4.md): modules 4.1 to 4.6 and the closing project block (4.7).
+    sections: [
+      { name: 'Lookups', blurb: 'Why a model reads a dataset; VLOOKUP and HLOOKUP and how they fail; INDEX/MATCH, two-way and multi-criteria; XLOOKUP; bands; OFFSET and INDIRECT and why the standard avoids them.' },
+      { name: 'Lists and tables', blurb: 'Sort, AutoFilter and SUBTOTAL, Remove Duplicates, Data Validation, the filter tricks, and the dynamic array list tools.' },
+      { name: 'Summaries from raw rows', blurb: 'The SUMIFS cube, the KPI block, date windows, the KPI page linked and checked, a buyer’s question end to end, 3D references.' },
+      { name: 'Pivot tables', blurb: 'Build and rearrange a PivotTable, group dates and set the values, refresh and read it with GETPIVOTDATA.' },
+      { name: 'Scenarios and sensitivity', blurb: 'A case toggle, one-way and two-way data tables, Goal Seek for break-even, the pass-through driver, and the cases side by side.' },
+      { name: 'Names and structure', blurb: 'Naming the toggles and key inputs, sparingly; the Name Manager; a validation list driven by a name.' },
+      { name: 'Project and assessment', blurb: 'The diligence pack from a fresh export, then another cluster’s on the clock; the assessment is the test-out.' },
+    ],
+    lessons: [
+      naming_sparingly,
     ],
   },
 ];

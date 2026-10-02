@@ -16,6 +16,7 @@
 import { mulberry32 } from '../../engine/rng.js';
 import { dateToSerial } from '../../engine/format.js';
 import { buildPage, FMT } from './page.js';
+export { diffStates, sessionToState } from './clearcoat-weekly.js';
 
 export const CHAPTER = 4;
 export const UNITS = 'USD unless stated; costs shown as negatives';
@@ -45,6 +46,8 @@ export const EXPORT = { seed: 20260915, start: dateToSerial(2026, 9, 15), days: 
 export const EXPORT_NEXT = { seed: 20261001, start: dateToSerial(2026, 10, 1), days: 15, label: 'Oct 1 to 15, 2026', asOf: dateToSerial(2026, 10, 15), year: 'FY27' };
 /** The plantings: a site code misspelled on one row, and one site-day whose controller never reported (its figures blank; the row stays). */
 export const PLANT = { misspelt: { day: 9, site: 0, code: 'AUS-DMO' }, missing: { day: 7, site: 2 } };
+/** A code with its last two letters swapped: how the planted misspelling reads on any cluster (AUS-DOM → AUS-DMO). */
+export const misspell = code => code.slice(0, -2) + code.slice(-1) + code.slice(-2, -1);
 
 const r2 = v => Math.round(v * 100) / 100;
 const clone = v => (typeof structuredClone === 'function' ? structuredClone(v) : JSON.parse(JSON.stringify(v)));
@@ -103,9 +106,9 @@ const blue = c => { c.fontColor = 'blue'; };
 const green = c => { c.fontColor = 'green'; };
 
 /** The raw POS export (off the standard: a raw export, laid out by the feed). */
-function exportSheet(rows, label) {
+function exportSheet(rows, label, city = 'Austin') {
   const cells = {
-    A1: { value: `Clearcoat Express: POS export, Austin, ${label}`, bold: true },
+    A1: { value: `Clearcoat Express: POS export, ${city}, ${label}`, bold: true },
     A2: { value: 'One row per site and day from the tunnel controllers; retail revenue at the site POS; member washes carry no ticket' },
     A4: { value: 'Date', bold: true }, B4: { value: 'Site', bold: true }, C4: { value: 'Retail washes', bold: true }, D4: { value: 'Member washes', bold: true },
     E4: { value: 'Total washes', bold: true }, F4: { value: 'Retail revenue ($)', bold: true }, G4: { value: 'Hours open', bold: true },
@@ -138,7 +141,7 @@ function listsPage(weeks, sites) {
     name: 'Lists', chapter: CHAPTER, title: 'Clearcoat Express: lists for the diligence pack', units: UNITS, labelHeader: 'Code',
     headers: ['Site', 'Cluster', 'Opened', 'Capacity (cars an hour)', 'Hours open', 'Daily site costs ($)'], kinds: ['text', 'text', 'date', 'count', 'count', 'money'],
     blocks: [
-      { rows: sites.map(s => ({ key: s.code, label: s.code, dollar: false, values: [s.name, 'Austin', s.opened, s.capacity, s.hours, s.costs] })) },
+      { rows: sites.map(s => ({ key: s.code, label: s.code, dollar: false, values: [s.name, s.cluster || 'Austin', s.opened, s.capacity, s.hours, s.costs] })) },
       { title: 'Packages', header: ['Package', 'Retail price ($)', 'Monthly fee ($)'], kinds: ['text', 'unit', 'unit'],
         rows: PACKAGES.map(([code, name, price, fee]) => ({ key: 'pk-' + code, label: code, dollar: true, values: [name, price, fee] })) },
       { title: 'Weeks in the POS data', header: ['Starts', 'Ends', 'Days'], kinds: ['date', 'date', 'count'],
@@ -333,7 +336,7 @@ function summaryMap(at) {
 }
 
 /** Scenarios: the three cases, the picker and the switch, the live outputs, the sensitivities, break-even, and the cases side by side. */
-function scenariosPage(ex) {
+function scenariosPage(ex, sites = SITES) {
   const only = (colLetter, f) => (c, r, at) => c === colLetter ? f(r, at) : null;
   const C_ = f => only('C', f);
   const page = buildPage({
@@ -374,13 +377,13 @@ function scenariosPage(ex) {
         ...[0.4, 0.45, 0.5, 0.55, 0.6].map((sh, i) => ({ key: 'tw' + i, label: sh, dollar: i === 0, fill: (c, r, at) => `=$C$${at('washesYr')}*(${c}$${at('twVals')}-Inputs!$C$5-(1-$B${r})*Inputs!$C$7)+$C$${at('siteCosts')}+$C$${at('ho')}` })),
       ] },
       { title: 'Break-even washes a day', rows: [
-        { key: 'beSite', label: 'Site code', kind: 'text', values: ['AUS-DOM'] },
+        { key: 'beSite', label: 'Site code', kind: 'text', values: [sites[0].code] },
         { key: 'beCosts', label: 'Daily site costs ($)', dollar: true, fill: C_((r, at) => `=INDEX(Lists!$H$5:$H$10,MATCH(C${at('beSite')},Lists!$B$5:$B$10,0))`) },
         { key: 'beCpw', label: 'Contribution per wash ($)', kind: 'unit', dollar: true, fill: C_((r, at) => `=C${at('ticketModel')}-Inputs!$C$5-(1-G${at('share')})*Inputs!$C$7`) },
         { key: 'beWashes', label: 'Washes a day', kind: 'count', values: [250] },
         { key: 'beDaily', label: 'Daily site contribution ($)', dollar: false, fill: C_((r, at) => `=C${at('beWashes')}*C${at('beCpw')}-C${at('beCosts')}`) },
         { key: 'beHand', label: 'Break-even washes a day, by hand', kind: 'unit', fill: C_((r, at) => `=C${at('beCosts')}/C${at('beCpw')}`) },
-        { key: 'beGoalSeek', label: 'Break-even washes a day, per Goal Seek', kind: 'count', values: [BREAK_EVEN.goalSeek] },
+        { key: 'beGoalSeek', label: 'Break-even washes a day, per Goal Seek', kind: 'count', values: [breakEvenOf(sites[0]).goalSeek] },
       ] },
       { title: 'Cases side by side', rows: [
         { key: 'coNum', label: 'Case number', kind: 'count', values: [1, 2, 3] },
@@ -431,7 +434,8 @@ export function model({ washes, ticket, share, sites }, inp = INPUTS) {
 }
 export const caseOf = i => ({ washes: CASE_INPUTS.washes[i], ticket: INPUTS.ticket, share: CASE_INPUTS.share[i], sites: CASE_INPUTS.sites[i] });
 /** Domain's break-even: daily site costs over the contribution per wash (the Base case's share), and what Goal Seek writes (a whole wash). */
-export const BREAK_EVEN = (() => { const cpw = INPUTS.ticket - INPUTS.cost - (1 - CASE_INPUTS.share[1]) * INPUTS.retail; const hand = SITES[0].costs / cpw; return { cpw, hand, goalSeek: Math.round(hand) }; })();
+export function breakEvenOf(site) { const cpw = INPUTS.ticket - INPUTS.cost - (1 - CASE_INPUTS.share[1]) * INPUTS.retail; const hand = site.costs / cpw; return { cpw, hand, goalSeek: Math.round(hand) }; }
+export const BREAK_EVEN = breakEvenOf(SITES[0]);
 
 /** The dashboard: utilization and member share by site, and the washes cube, as tables with conditional formatting (no charts). */
 function dashboardPage(weeks, sites, ex) {
@@ -464,11 +468,11 @@ function dashboardPage(weeks, sites, ex) {
 }
 
 /** The buyers' question log: twelve questions, ten answered by a reference to a cell that reads the data. */
-export const questions = (S, C) => [
+export const questions = (S, C, sites = SITES) => [
   ['Sponsor A', 'What is the Deluxe retail price?', 'Finance', 'Answered', '=VLOOKUP("D",Lists!$B$14:$E$16,3,FALSE)', 'unit'],
-  ['Sponsor A', "What is Domain's utilization over the export?", 'Finance', 'Answered', `=Summary!I${S.siteRows[0]}`, 'pct'],
+  ['Sponsor A', `What is ${sites[0].name}'s utilization over the export?`, 'Finance', 'Answered', `=Summary!I${S.siteRows[0]}`, 'pct'],
   ['Sponsor A', 'What share of washes come from members, across the cluster?', 'Finance', 'Answered', `=Summary!M${S.totalRow}`, 'pct'],
-  ['Sponsor B', 'How many washes did South Lamar do on the first Saturday of the export?', 'Finance', 'Answered', `=Summary!C${S.multi.im}`, 'count'],
+  ['Sponsor B', `How many washes did ${sites[3].name} do on the first Saturday of the export?`, 'Finance', 'Answered', `=Summary!C${S.multi.im}`, 'count'],
   ['Sponsor B', 'How many washes did the six sites do over the export?', 'Finance', 'Answered', `=Summary!F${S.cubeTotal}`, 'count'],
   ['Sponsor B', 'What was the busiest single site-day, in washes?', 'Finance', 'Answered', `=Summary!J${S.totalRow}`, 'count'],
   ['Sponsor C', 'What was revenue per site per open hour in the last week, and which site led?', 'Finance', 'Answered', `=Summary!C${S.perHour.leader}&" at "&TEXT(Summary!D${S.perHour.leader},"$#,##0.00")&" an hour"`, 'text'],
@@ -478,8 +482,8 @@ export const questions = (S, C) => [
   ['Sponsor B', 'What is member churn by site?', 'Ops', 'Open', null, 'text'],
   ['Sponsor C', 'What is the rent per site under the current leases?', 'Ops', 'Open', null, 'text'],
 ];
-function qaPage(S, C) {
-  const QUESTIONS = questions(S, C);
+function qaPage(S, C, sites = SITES) {
+  const QUESTIONS = questions(S, C, sites);
   const page = buildPage({
     name: 'Q&A', chapter: CHAPTER, title: 'Clearcoat Express: buyer question log, Project Rinse', units: UNITS, labelHeader: 'Buyer',
     headers: ['Question', 'Owner', 'Status', 'Answer'], kinds: ['text', 'text', 'text', 'money'],
@@ -504,16 +508,16 @@ export const QA = { row: n => 4 + n, answerCol: 'F', statusCol: 'E', count: 12, 
 export function buildSolved({ ex = EXPORT, sites = SITES } = {}) {
   const rows = exportRows(ex, sites);
   const weeks = weeksOf(rows);
-  const summary = summaryPage(weeks, sites, ex), scenarios = scenariosPage(ex);
+  const summary = summaryPage(weeks, sites, ex), scenarios = scenariosPage(ex, sites);
   const S = summaryMap(summary.at), C = scenariosMap(scenarios.at);
-  const pages = { qa: qaPage(S, C), summary, scenarios, dashboard: dashboardPage(weeks, sites, ex), lists: listsPage(weeks, sites), inputs: inputsPage(ex) };
-  const exportSh = exportSheet(rows, ex.label);
+  const pages = { qa: qaPage(S, C, sites), summary, scenarios, dashboard: dashboardPage(weeks, sites, ex), lists: listsPage(weeks, sites), inputs: inputsPage(ex) };
+  const exportSh = exportSheet(rows, ex.label, ex.city);
   Object.assign(exportSh.cells, EXPORT_WORK.key, EXPORT_WORK.totals);
   const tabs = sites.map(s => siteTab(s, rows, weeks, ex.label).sheet);
   applyValidation({ sheets: [pages.summary.sheet, pages.scenarios.sheet] }, S, C, true);
   const state = {
     sheets: [pages.qa.sheet, pages.summary.sheet, pages.scenarios.sheet, pages.dashboard.sheet, pages.lists.sheet, pages.inputs.sheet, exportSh, ...tabs],
-    names: { ...NAMES },
+    names: sortNames(NAMES),
     settings: { calcMode: 'automatic', iterative: false, qat: ['save', 'undo', 'redo', 'fontColor', 'fillColor', 'borders', 'decDecimal'], pageSetup: clone(SUMMARY_PAGE_SETUP) },
   };
   return { state, rows, weeks, ex, sites, S, C };
@@ -855,37 +859,113 @@ const S45C = S456;
 
 /* ---------------- module 4.6: names and structure ---------------- */
 
-// 4.6.1 Naming toggles and key inputs: Case, Ticket and CostPerWash defined; the live column and the check read Case
+/** Names as a session lists them: alphabetical, case ignored (the order a state's names compare in). */
+export function sortNames(obj) { return Object.fromEntries(Object.entries(obj || {}).sort(([a], [b]) => a.toUpperCase().localeCompare(b.toUpperCase()))); }
+// 4.6.1 Naming toggles and key inputs: Case, CostPerWash and Ticket defined; the live column and the check read Case
 const S461 = derive(S456, s => {
-  s.names = { Case: NAMES.Case, Ticket: NAMES.Ticket, CostPerWash: NAMES.Cost_Per_Wash };
+  s.names = sortNames({ Case: NAMES.Case, Ticket: NAMES.Ticket, CostPerWash: NAMES.Cost_Per_Wash });
   take(s, SOLVED, 'Scenarios', [...blockRefs(Object.values(C.inputs), COLS('G')), 'C' + C.checkRows[0]]);
 });
-/** 4.6.2's strays: a name left pointing at the wrong cell (the ticket's old home on Scenarios). A #REF! name cannot be held in the engine's names. */
+/** 4.6.2's stray: a name left pointing at the ticket's old cell on Scenarios (a name reading #REF! cannot be held in the engine's names, so the stray points at a wrong cell instead). */
 export const STRAY_NAMES = { OldTicket: 'Scenarios!$G$6' };
-const S462start = derive(S461, s => { s.names = { ...s.names, ...STRAY_NAMES }; });
-// 4.6.2 The Name Manager: the stray gone, CostPerWash renamed Cost_Per_Wash, the list pasted on Inputs
+/** The names list on Inputs (Paste List, F3): its heading waits for the paste. */
+const NAMES_HEAD = ['B17', 'C18'];
+/** What Paste List writes from Inputs!B19 for a set of names: the names alphabetical in B, what they refer to (as text) in C. */
+export const pasteListCells = (names, at = 19) => Object.fromEntries(Object.entries(sortNames(names)).flatMap(([n, ref], i) => [['B' + (at + i), { value: n }], ['C' + (at + i), { value: '=' + ref }]]));
+const S462start = derive(S461, s => { s.names = sortNames({ ...s.names, ...STRAY_NAMES }); take(s, SOLVED, 'Inputs', NAMES_HEAD); });
+// 4.6.2 The Name Manager: the stray deleted, CostPerWash renamed Cost_Per_Wash, the list pasted on Inputs from B19
 const S462 = derive(S462start, s => {
-  s.names = { Case: NAMES.Case, Ticket: NAMES.Ticket, Cost_Per_Wash: NAMES.Cost_Per_Wash };
-  take(s, SOLVED, 'Inputs', ['B17', 'C18', ...blockRefs([19, 20, 21, 22, 23], COLS('BC'))]);
-  drop(s, 'Inputs', ['B20', 'C20', 'B22', 'C22']);   // Cases and Sites are 4.6.3's
+  s.names = sortNames({ Case: NAMES.Case, Ticket: NAMES.Ticket, Cost_Per_Wash: NAMES.Cost_Per_Wash });
+  plant(s, 'Inputs', pasteListCells(s.names));
 });
-// 4.6.3 A validation list driven by a name: Cases and Sites defined (the pickers read them); the names list complete
-const S463 = derive(S462, s => { s.names = { ...NAMES }; applyValidation(s, SUMMARY, SCENARIOS, true); take(s, SOLVED, 'Inputs', blockRefs([19, 20, 21, 22, 23], COLS('BC'))); });
-const S46C = S463;
+// 4.6.3 A validation list driven by a name: Cases and Sites defined (the pickers read them); the names list pasted again, whole
+const S463 = derive(S462, s => { s.names = sortNames(NAMES); applyValidation(s, SUMMARY, SCENARIOS, true); take(s, SOLVED, 'Inputs', blockRefs([19, 20, 21, 22, 23], COLS('BC'))); });
+/**
+ * 4.6.C: a model with typed switches and a broken name. The pack of 4.6.3 with no names but a Ticket
+ * pointing at a wrong cell and a stray left from a copied sheet; the live column and the check read
+ * $C$11, the case picker reads the range on Lists, the names list on Inputs is gone. The challenge
+ * ends on 4.6.3's pack less Sites (four names: Case, Cases, Cost_Per_Wash, Ticket): S46Cdone.
+ */
+export const CHALLENGE_46 = { names: { Ticket: 'Scenarios!$G$6', Ticket_old: 'Scenarios!$C$6' } };
+const S46C = derive(S463, s => {
+  s.names = sortNames(CHALLENGE_46.names);
+  const sc = sheetOf(s, 'Scenarios');
+  for (const ref of [...blockRefs(Object.values(C.inputs), COLS('G')), 'C' + C.checkRows[0]]) sc.cells[ref] = { ...sc.cells[ref], formula: sc.cells[ref].formula.replace('Case', '$C$11') };
+  applyValidation(s, SUMMARY, SCENARIOS, false);
+  drop(s, 'Inputs', [...NAMES_HEAD, ...blockRefs([19, 20, 21, 22, 23], COLS('BC'))]);
+});
+const S46Cdone = derive(S46C, s => {
+  s.names = sortNames({ Case: NAMES.Case, Cases: NAMES.Cases, Cost_Per_Wash: NAMES.Cost_Per_Wash, Ticket: NAMES.Ticket });
+  take(s, SOLVED, 'Scenarios', [...blockRefs(Object.values(C.inputs), COLS('G')), 'C' + C.checkRows[0]]);
+  sheetOf(s, 'Scenarios').validation['C' + C.picker].source = '=Cases';
+  take(s, SOLVED, 'Inputs', NAMES_HEAD); plant(s, 'Inputs', pasteListCells(s.names));
+});
 
 /* ---------------- 4.P and 4.A: the diligence pack on a fresh export ---------------- */
 
 const NEXT = buildSolved({ ex: EXPORT_NEXT });
-/** The project's start: the fortnight after, in the shape the chapter found its file in. */
-const SPraw = derive(cutStart(NEXT), s => {
-  const sm = sheetOf(s, 'Summary').cells;
-  // the project's cube is the learner's: only the title and the codes stay
-  for (const ref in sm) if (+ref.slice(1) >= 14 && ref[0] !== 'B') delete sm[ref];
-  for (const r of SUMMARY.cubeRows) delete sm['B' + r];
-});
+/**
+ * The cells the project (and the assessment) build, by sheet: the unique list and its proof, the
+ * site block's lookups and the KPI block, both cubes, the window's sums, the checks, the case switch,
+ * the pass-through driver, the outputs, break-even with the Goal Seek answer, and eight answers in
+ * the log. The page around them (labels, formats, the per-hour ranking, the roll-up, the
+ * sensitivity grids, the dashboard, the site tabs) arrives built and reads the fresh export.
+ */
+const QA_OPEN = [6, 7, 8, 9, 10, 12, 13, 14];
+export const PACK_WORK = {
+  Lists: [...refsIn('O5:O11'), 'C26'],
+  Summary: [...refsIn('C5:M11'), ...refsIn('C15:F21'), ...refsIn('C25:F31'), 'C50', 'C51', ...refsIn('C72:C77')],
+  Scenarios: ['C11', ...refsIn('G5:G8'), 'C14', ...refsIn('C17:C25'), 'C41', 'C42', 'C44', 'C45', 'C46', ...refsIn('C58:C60')],
+  'Q&A': QA_OPEN.map(r => 'F' + r),
+};
+/**
+ * The pack as the project and the assessment find it (4.P, 4.A): the solved pack on a fresh export
+ * with PACK_WORK's formulas and figures taken out (each cell keeps its format), the misspelling
+ * planted, the unique site list and the names list gone, no names, the pickers on the Lists ranges
+ * and eight of the log's questions open.
+ */
+function cutPack({ state: done, sites, S, C }) {
+  return derive(done, s => {
+    for (const name in PACK_WORK) {
+      const cells = sheetOf(s, name).cells;
+      for (const ref of PACK_WORK[name]) { const c = cells[ref]; if (!c) continue; delete c.formula; delete c.value; if (!Object.keys(c).length) delete cells[ref]; }
+    }
+    sheetOf(s, 'Export').cells['B' + exportRow(PLANT.misspelt.day, PLANT.misspelt.site)] = { value: misspell(sites[PLANT.misspelt.site].code) };
+    drop(s, 'Lists', refsIn('N5:N10'));
+    drop(s, 'Inputs', blockRefs([19, 20, 21, 22, 23], COLS('BC')));
+    const qa = sheetOf(s, 'Q&A').cells; for (const r of QA_OPEN) qa['E' + r] = { ...qa['E' + r], value: 'Open' };
+    delete s.names;
+    applyValidation(s, S, C, false);
+  });
+}
+const SPraw = cutPack(NEXT);
 const SPdone = NEXT.state;
 
-export const STATES = { S0, S411, S412, S413, S414, S415, S416, S417, S418, S41C, S41Cdone, S42, S421, S422, S423, S424, S425start, S425, S426, S42C, S43, S431, S432, S433, S434, S435, S436, S43C, S44, S441, S442, S443, S44C, S45, S451, S452, S453, S454, S455, S456, S45C, S461, S462start, S462, S463, S46C, SPraw, SPdone };
+/** The assessment's cluster: Dallas (the clusters pool's names), six sites on the same shape, its own fortnight's export. */
+export const DALLAS = [
+  { code: 'DAL-DEL', name: 'Deep Ellum', tab: 'DeepEllum', cluster: 'Dallas', opened: dateToSerial(2019, 6, 1), capacity: 120, hours: 14, costs: 1475, target: 265, ticket: 14.5 },
+  { code: 'DAL-UPT', name: 'Uptown', tab: 'Uptown', cluster: 'Dallas', opened: dateToSerial(2020, 2, 15), capacity: 120, hours: 14, costs: 1425, target: 255, ticket: 14.25 },
+  { code: 'DAL-OAK', name: 'Oak Lawn', tab: 'OakLawn', cluster: 'Dallas', opened: dateToSerial(2020, 10, 5), capacity: 100, hours: 14, costs: 1300, target: 215, ticket: 13.75 },
+  { code: 'DAL-BIS', name: 'Bishop Arts', tab: 'BishopArts', cluster: 'Dallas', opened: dateToSerial(2021, 7, 12), capacity: 100, hours: 14, costs: 1275, target: 205, ticket: 13.5 },
+  { code: 'DAL-LOV', name: 'Love Field', tab: 'LoveField', cluster: 'Dallas', opened: dateToSerial(2022, 9, 1), capacity: 140, hours: 14, costs: 1525, target: 295, ticket: 14 },
+  { code: 'DAL-KNO', name: 'Knox Park', tab: 'KnoxPark', cluster: 'Dallas', opened: dateToSerial(2026, 8, 24), capacity: 140, hours: 14, costs: 1250, target: 185, ticket: 13.5 },
+];
+export const EXPORT_DALLAS = { ...EXPORT_NEXT, seed: 20261002, city: 'Dallas' };
+/** The assessment's pack (4.A): Dallas on its own fortnight, cut the way the project's is. A seed reruns the export's figures over the same cells. */
+export const buildAssessment = (seed = EXPORT_DALLAS.seed) => buildSolved({ ex: { ...EXPORT_DALLAS, seed }, sites: DALLAS });
+const ASSESS = buildAssessment();
+const SAraw = cutPack(ASSESS);
+const SAdone = ASSESS.state;
+/** The cells a reseeded export changes: the export's typed figures (C, D, F, G; the codes and dates stay) and each site tab's weekly figures. */
+export function freshFigures(seed) {
+  const fresh = buildAssessment(seed).state; const patch = {};
+  const ex = sheetOf(fresh, 'Export').cells;
+  for (let r = 5; r <= EXPORT_LAST; r++) for (const c of COLS('CDFG')) patch[`Export!${c}${r}`] = ex[c + r] ? clone(ex[c + r]) : null;
+  for (const site of DALLAS) { const t = sheetOf(fresh, site.tab).cells; for (const ref of blockRefs([5, 6, 8, 9], COLS('CDE'))) patch[`${site.tab}!${ref}`] = t[ref] ? clone(t[ref]) : null; }
+  return patch;
+}
+
+export const STATES = { S0, S411, S412, S413, S414, S415, S416, S417, S418, S41C, S41Cdone, S42, S421, S422, S423, S424, S425start, S425, S426, S42C, S43, S431, S432, S433, S434, S435, S436, S43C, S44, S441, S442, S443, S44C, S45, S451, S452, S453, S454, S455, S456, S45C, S461, S462start, S462, S463, S46C, S46Cdone, SPraw, SPdone, SAraw, SAdone };
 /** The chain the lessons walk, in script order; SPraw and SPdone are the project's fresh fortnight. */
 export const STATE_ORDER = Object.keys(STATES);
 /** Which lesson each state serves: [stateId, lesson, 'start' | 'end']. */
@@ -895,7 +975,7 @@ export const STATE_LESSONS = [
   ['S43', '4.3.1', 'start'], ['S431', '4.3.1', 'end'], ['S432', '4.3.2', 'end'], ['S433', '4.3.3', 'end'], ['S434', '4.3.4', 'end'], ['S435', '4.3.5', 'end'], ['S436', '4.3.6', 'end'], ['S43C', '4.3.C', 'start'],
   ['S44', '4.4.1', 'start'], ['S441', '4.4.1', 'end'], ['S442', '4.4.2', 'end'], ['S443', '4.4.3', 'end'], ['S44C', '4.4.C', 'start'],
   ['S45', '4.5.1', 'start'], ['S451', '4.5.1', 'end'], ['S452', '4.5.2', 'end'], ['S453', '4.5.3', 'end'], ['S454', '4.5.4', 'end'], ['S455', '4.5.5', 'end'], ['S456', '4.5.6', 'end'], ['S45C', '4.5.C', 'start'],
-  ['S461', '4.6.1', 'end'], ['S462start', '4.6.2', 'start'], ['S462', '4.6.2', 'end'], ['S463', '4.6.3', 'end'], ['S46C', '4.6.C', 'start'], ['SPraw', '4.P', 'start'], ['SPdone', '4.P', 'end'],
+  ['S461', '4.6.1', 'end'], ['S462start', '4.6.2', 'start'], ['S462', '4.6.2', 'end'], ['S463', '4.6.3', 'end'], ['S46C', '4.6.C', 'start'], ['S46Cdone', '4.6.C', 'end'], ['SPraw', '4.P', 'start'], ['SPdone', '4.P', 'end'], ['SAraw', '4.A', 'start'], ['SAdone', '4.A', 'end'],
 ];
 
 /** The sheet standard (screenplay 5, M86): the finished pages, and the sheets off the standard on purpose. */

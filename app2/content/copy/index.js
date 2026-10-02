@@ -1359,6 +1359,18 @@ export const COPY = {
    "mac_note": "",
    "story_beat": ""
   },
+  "naming-sparingly": {
+   "id": "naming-sparingly",
+   "module": "names-and-structure",
+   "order": "4.6.1",
+   "title": "Naming toggles and key inputs, sparingly",
+   "brief": "You named one cell back in 1.3.5; now decide which cells deserve it. The rule is short: name the cells another sheet reads and a reviewer will hunt for, the case switch and the key inputs, and leave the cubes and the totals alone. Name the switch Case and two inputs, then rewrite the formulas that read the switch so they say Case instead of $C$11. The key is `Alt M M D`.",
+   "closing": "Three names, each on a cell a reviewer would go looking for: the switch every input reads, and two inputs the outputs lean on. The live column now says what it does, INDEX of the row by Case. || The rule for next time: if another sheet reads it and a reviewer would hunt for it, name it. The cube, the totals and the working cells stay as addresses, because a model with a hundred names is harder to read than one with none.",
+   "wow": "Three cells got names, and each is one a reviewer would look for.",
+   "convention_line": "Name toggles and key inputs only; A case toggle, never copies of the file",
+   "mac_note": "",
+   "story_beat": ""
+  },
   "remix-format-on-the-pnl": {
    "id": "remix-format-on-the-pnl",
    "module": "remixes",
@@ -8824,6 +8836,56 @@ export const COPY = {
     "why": "",
     "hint_stuck": ""
    }
+  ],
+  "naming-sparingly": [
+   {
+    "lesson_id": "naming-sparingly",
+    "goal_index": "0",
+    "text": "Name the case switch on Scenarios C11 Case with Define Name.",
+    "teach": "Define Name (Alt, M, M, D) names the selected cell. Pick the switch, not the picker beside it: C11 holds the case as a number, and that number is what every formula reads.",
+    "why": "",
+    "hint_stuck": "pulse cell C11 · The number under the picker is the switch; type Case over the suggested name."
+   },
+   {
+    "lesson_id": "naming-sparingly",
+    "goal_index": "1",
+    "text": "Name the blended ticket on Inputs C15 Ticket and the cost per wash in Inputs C5 CostPerWash.",
+    "teach": "Inputs that formulas on other sheets read are the next to earn a name. The ticket and the cost per wash both live on Inputs and both turn up in the outputs, the break-even and the sensitivities.",
+    "why": "",
+    "hint_stuck": "pulse cell C15 · Go To takes the sheet name first: Inputs!C15, then Inputs!C5."
+   },
+   {
+    "lesson_id": "naming-sparingly",
+    "goal_index": "2",
+    "text": "Rewrite the live column on Scenarios: =CHOOSE(Case,C5,D5,E5) in G5, then =INDEX(C6:E6,Case) down G6:G8.",
+    "teach": "A name goes anywhere an address goes, and it never needs a dollar sign: it always means the same cell. Read the new formula aloud and it says what it does.",
+    "why": "",
+    "hint_stuck": "pulse range G5:G8 · Case takes the place of $C$11; fill G6:G8 with one entry and Ctrl+Enter."
+   },
+   {
+    "lesson_id": "naming-sparingly",
+    "goal_index": "3",
+    "text": "Rewrite the check in C58 to read the switch by name: =INDEX($C$54:$E$54,Case)-C24.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C58 · The live case’s EBITDA in the side-by-side table, less the EBITDA above."
+   },
+   {
+    "lesson_id": "naming-sparingly",
+    "goal_index": "4",
+    "text": "Go To Case from the Inputs sheet and land on the switch.",
+    "teach": "Go To takes a name where it takes an address, so a reviewer who knows the switch is called Case lands on it from any sheet. That is the test for a name: would someone look for it?",
+    "why": "",
+    "hint_stuck": "pulse cell C11 · Ctrl+G, type the name, Enter."
+   },
+   {
+    "lesson_id": "naming-sparingly",
+    "goal_index": "5",
+    "text": "Does it tie? Watch the picker switch to Downside and the live column, which now reads Case, move with it.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range G5:G8 · Case is still C11; only the way the formulas say it changed."
+   }
   ]
  },
  "modules": {
@@ -8994,6 +9056,13 @@ export const COPY = {
    "objective": "Build the San Antonio databook end to end, then prove it against the clock; or test out of the chapter.",
    "story_beat": "The databook, tied out. || A fresh export, a fresh site list, a Summary someone else abandoned. Rebuild it so every number reads the export and the flag reads OK, then value the next site on the list. Build it, then build it again on the clock. The assessment is the test-out.",
    "page_name": "The KPI databook"
+  },
+  "names-and-structure": {
+   "id": "names-and-structure",
+   "name": "Names and structure",
+   "objective": "Naming the toggles and key inputs, sparingly; the Name Manager; a validation list driven by a name.",
+   "story_beat": "",
+   "page_name": ""
   }
  },
  "site": {
