@@ -2391,6 +2391,18 @@ export const COPY = {
    "mac_note": "",
    "story_beat": ""
   },
+  "bids-side-by-side": {
+   "id": "bids-side-by-side",
+   "module": "bids-and-waterfall",
+   "order": "6.4.1",
+   "title": "Three bids side by side: headline, structure, certainty",
+   "brief": "A bid is a headline price and a structure, and the structure changes what it’s worth. An earnout is paid later if a target is hit, so it’s worth its amount times the odds; a rollover keeps part of the owners’ equity in the new company, so it isn’t cash and it carries that company’s risk; a financing condition is a chance the deal never closes. The three term sheets are on Bids: price each one to an expected value and rank them. The key is `=`.",
+   "closing": "Each bid has three prices, and the order changes with each one: B leads on the headline, C on the priced value, A on the expected value. || Best practice: every probability is an input with its reason beside it. The board will argue with the odds, not the arithmetic, and a reason is what the argument starts from.",
+   "wow": "",
+   "convention_line": "Write once, fill right; Links green; external links avoided; Label the source (\"per utility contract\")",
+   "mac_note": "",
+   "story_beat": ""
+  },
   "remix-format-on-the-pnl": {
    "id": "remix-format-on-the-pnl",
    "module": "remixes",
@@ -14916,6 +14928,80 @@ export const COPY = {
     "why": "",
     "hint_stuck": ""
    }
+  ],
+  "bids-side-by-side": [
+   {
+    "lesson_id": "bids-side-by-side",
+    "goal_index": "0",
+    "text": "On Bids, build rows 11 to 13 across C:E: equity at the headline, the rollover amount, then cash at close.",
+    "teach": "Equity at the headline is the price less net debt at closing, which is repaid first. The rollover is the share of that equity the owners keep instead of cash, so cash at close is the headline less the earnout and the rollover.",
+    "why": "",
+    "hint_stuck": "pulse range C11:E13 · Net debt at closing is C48; anchor it with F4 so it holds as the row fills."
+   },
+   {
+    "lesson_id": "bids-side-by-side",
+    "goal_index": "1",
+    "text": "Type 50 in C58, the earnout odds, then its expected value in C16:E16 as =C7*$C$58.",
+    "teach": "An earnout is paid only if the target is hit, so today it is worth its amount times the odds. The odds are an input, typed once in blue, and every bid reads that one cell.",
+    "why": "",
+    "hint_stuck": "pulse cell C58 · A percent cell takes 50 as 50%; only bid B carries an earnout, so C and E read zero."
+   },
+   {
+    "lesson_id": "bids-side-by-side",
+    "goal_index": "2",
+    "text": "Link C59 to the LBO’s IRR, type 3 years in C60, and link C61 to the cost of equity on DCF.",
+    "teach": "The rolled stake grows with the sponsor’s own return, the LBO’s IRR, for the three years to the exit. A stake that risky is discounted back at the cost of equity, not at a deposit rate.",
+    "why": "",
+    "hint_stuck": "pulse range C59:C61 · The IRR is LBO C108 and the cost of equity DCF C54."
+   },
+   {
+    "lesson_id": "bids-side-by-side",
+    "goal_index": "3",
+    "text": "Price the rollover in C17:E17 on C59, C60 and C61, then total the priced value in C18:E18.",
+    "teach": "The priced value is cash at close plus what the earnout and the rollover are worth today. It is the figure to compare across bids, not the headline.",
+    "why": "",
+    "hint_stuck": "pulse range C17:E18 · The rollover amount times one plus the return to the years, over one plus the cost of equity to the years."
+   },
+   {
+    "lesson_id": "bids-side-by-side",
+    "goal_index": "4",
+    "text": "Show the rolled stake two ways in C19:E20: as a share of the old equity, then of the new company’s equity.",
+    "teach": "Debt funds nearly half the price, so a fifth of the old equity is about a quarter of the new company’s. The sponsor’s equity is on the LBO’s sources, row 43.",
+    "why": "",
+    "hint_stuck": "pulse range C19:E20 · The rollover amount over the sponsor’s equity plus the rollover, and zero where nothing rolls."
+   },
+   {
+    "lesson_id": "bids-side-by-side",
+    "goal_index": "5",
+    "text": "Type the odds each bid closes in C21:E21 (95, 85 and 75), then the expected value in C22:E22.",
+    "teach": "A financing condition is a chance the deal never closes. The expected value is the priced value times the odds it closes: the third way to read a bid.",
+    "why": "",
+    "hint_stuck": "pulse range C21:E22 · Tab moves right after each entry; the expected value is =C18*C21."
+   },
+   {
+    "lesson_id": "bids-side-by-side",
+    "goal_index": "6",
+    "text": "Rank the bids with RANK in C25:E27: on the headline, on the priced value, then on the expected value.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C25:E27 · =RANK(C6,$C$6:$E$6) on the headline; anchor the three bids with F4."
+   },
+   {
+    "lesson_id": "bids-side-by-side",
+    "goal_index": "7",
+    "text": "Type the reason beside the odds in F58: \"FY27 Base case EBITDA is below the target; the Management case clears it\".",
+    "teach": "Every probability on the page is an input with its reason beside it. The board will argue with the odds, not the arithmetic, so give them the reason to argue with.",
+    "why": "",
+    "hint_stuck": "pulse cell F58 · The notes column holds a reason for every input above it."
+   },
+   {
+    "lesson_id": "bids-side-by-side",
+    "goal_index": "8",
+    "text": "Does it tie? Watch the earnout odds in C58 go to 90%: bid B’s priced value overtakes bid C, and its rank in D26 moves to 1.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell D26 · Only bid B carries an earnout, so only its priced value moves."
+   }
   ]
  },
  "modules": {
@@ -15191,6 +15277,20 @@ export const COPY = {
    "objective": "The operating model with its DCF page; the assessment is one schedule and the links from it, timed.",
    "story_beat": "The operating model, end to end. || An empty shell with the inputs and the history in it. Build the schedules, link the statements, get the flag to OK and value the business. Build it, then build one schedule and its links again on the clock. The assessment is the test-out.",
    "page_name": "The operating model"
+  },
+  "bids-and-waterfall": {
+   "id": "bids-and-waterfall",
+   "name": "The bids and the waterfall",
+   "objective": "The bids and the waterfall: three bids side by side (headline, structure, certainty); from enterprise value to the owners’ proceeds; your stake under each bid; the football-field table and the one-page summary for the board.",
+   "story_beat": "Which bid is really highest? || Three bids: $185m in cash, $200m with $25m of it paid later if next year goes well, $195m with the owners rolling a fifth of their equity into the new company. The headline says one order; the proceeds say another. Price each structure, run the waterfall from enterprise value to what each owner takes home (your own options included), and put every range on one line for the board.",
+   "page_name": "The valuation summary for the board"
+  },
+  "ch6-project-and-assessment": {
+   "id": "ch6-project-and-assessment",
+   "name": "Project and assessment",
+   "objective": "The one-page valuation summary for the board, the last page of the pack; the assessment is the test-out.",
+   "story_beat": "The last page of the pack. || A fresh comp set, fresh precedents, a sponsor’s term sheet and three bids. Spread, apply, rebuild the LBO, price the bids, run the waterfall, assemble the page. Build it, then build it again on the clock. The assessment is the test-out, and passing it Verifies the last chapter, which makes the program certificate yours.",
+   "page_name": "The valuation summary"
   }
  },
  "site": {

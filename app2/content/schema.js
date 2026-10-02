@@ -380,6 +380,11 @@ export const CONCEPTS = {
   'speed-build': 'a build on the clock: each row’s formula written once in its first column and filled right, anchors set with F4 as the formula is typed, the check read at the end',
   'one-pass-format': 'a block filled with one Ctrl+R and formatted by whole-block actions, F4 repeating each one on the next range, so no cell is touched twice',
   'keyboard-linking': 'statement links made without the mouse: the reference typed, or pointed with Ctrl+PgDn and the arrows, then Ctrl+Enter across the row and F4 repeating the green',
+  // Chapter 6 · 6.4 the bids and the waterfall
+  'bid-pricing': 'a bid priced for its structure: cash at close, an earnout at its odds, a rollover at the new company’s return, and the odds the deal closes',
+  'proceeds-waterfall': 'the waterfall from enterprise value to the owners: each claim paid in order as a MIN of the claim and what is left, the rest split by ownership',
+  'option-value': 'an option’s value at a sale: the equity value less the strike, times the share, floored at zero with MAX',
+  'football-field': 'the football field as a table: every method’s low, mid and high on one line each, linked from the page that built it',
 };
 
 /**

@@ -107,6 +107,11 @@ const BEATS_DEFAULT = {
     body: 'Everything in this chapter you can now do; the question a desk asks is how fast. Three benchmarks, each a piece of the model against the clock: the revenue build in three minutes, a block filled and formatted in one pass, the cash flow statement linked without touching the mouse. They live in Practice as this chapter’s benchmarks, and here you run each once with the keys shown.' },
   'ch5-project-and-assessment': { eyebrow: 'Module 5.8 · project and assessment', title: 'The operating model, end to end.',
     body: 'An empty shell with the inputs and the history in it. Build the schedules, link the statements, get the flag to OK and value the business. Build it, then build one schedule and its links again on the clock. The assessment is the test-out.' },
+  // Chapter 6 · Valuation (script-ch6.md story cards)
+  'bids-and-waterfall': { eyebrow: 'Module 6.4 · the bids and the waterfall', title: 'Which bid is really highest?',
+    body: 'Three bids: $185m in cash, $200m with $25m of it paid later if next year goes well, $195m with the owners rolling a fifth of their equity into the new company. The headline says one order; the proceeds say another. Price each structure, run the waterfall from enterprise value to what each owner takes home (your own options included), and put every range on one line for the board.' },
+  'ch6-project-and-assessment': { eyebrow: 'Module 6.5 · project and assessment', title: 'The last page of the pack.',
+    body: 'A fresh comp set, fresh precedents, a sponsor’s term sheet and three bids. Spread, apply, rebuild the LBO, price the bids, run the waterfall, assemble the page. Build it, then build it again on the clock. The assessment is the test-out, and passing it Verifies the last chapter, which makes the program certificate yours.' },
   'project-and-assessment': { eyebrow: 'Module 1.8 · project, assessment, test-out', title: 'Management’s next feed is in.',
     body: 'A fresh week, a blank Report, and everything the chapter taught. Build the page start to finish, then prove it against the clock on Monday morning; or test out of the chapter in five minutes.' },
 };

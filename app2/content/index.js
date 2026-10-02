@@ -216,6 +216,8 @@ import keyboard_only_linking from './lessons/keyboard-only-linking.js';
 import challenge_model_speed from './lessons/challenge-model-speed.js';
 import ch5_project from './lessons/ch5-project.js';
 import ch5_assessment from './lessons/ch5-assessment.js';
+// Chapter 6 · Valuation (Run R6, the valuation pack on clearcoat-valuation): 6.4 The bids and the waterfall, 6.5 Project and assessment
+import bids_side_by_side from './lessons/bids-side-by-side.js';
 
 export const CHAPTERS = [
   {
@@ -356,6 +358,23 @@ export const CHAPTERS = [
       what_a_dcf_is, unlevered_free_cash_flow, wacc_block, terminal_value, discounting_mid_year, dcf_sensitivity, challenge_dcf,
       revenue_build_in_three, fill_and_format_block, keyboard_only_linking, challenge_model_speed,
       ch5_project, ch5_assessment,
+    ],
+  },
+  {
+    id: 'valuation',
+    title: 'Valuation',
+    access: 'paid',
+    blurb: 'Comps, precedents, the sponsor’s LBO, the three bids priced and the waterfall to each owner’s proceeds, on one page for the board: what Clearcoat is worth by every method, and which bid is really highest.',
+    // Chapter 6's sections in order (script-ch6.md): the four modules and the closing project block.
+    sections: [
+      { name: 'Trading comps', blurb: 'Spreading a comp; calendarization and LTM; the set sorted, the outliers out, the median; EV per site and per wash; the range applied to Clearcoat.' },
+      { name: 'Precedent transactions', blurb: 'Deal multiples and premiums; the set sorted by date and size and judged for comparability; the precedents range applied.' },
+      { name: 'LBO: the sponsor’s bid', blurb: 'Sources and uses; the debt tranches and the cash sweep; the sale-leaseback; IRR and MOIC; the returns bridge; what the sponsor can pay.' },
+      { name: 'The bids and the waterfall', blurb: 'Three bids priced for their structure and certainty; the waterfall from enterprise value to each owner’s proceeds; your own options under each bid; the football field and the one-page summary for the board.' },
+      { name: 'Project and assessment', blurb: 'The valuation summary for the board from a fresh set, then the bids and the board’s page again on the clock; the assessment is the test-out.' },
+    ],
+    lessons: [
+      bids_side_by_side,
     ],
   },
 ];
