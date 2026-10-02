@@ -2,7 +2,7 @@
 // rapid-fire round, timed lesson), the derived personal bests and the PB traces the ghost
 // replays. Same discipline as progress.js: every access try/catch, every stored shape
 // normalised on load — corrupt storage can never break a run. The account mirror is Phase B's
-// attempts table (see docs/REBUILD_PLAN.md §4): PBs, boards, XP and rank derive server-side.
+// attempts table (see docs/REBUILD_PLAN.md §4): PBs, boards and XP derive server-side.
 
 const KEY = 'hk2_records_v1';
 const MAX_ATTEMPTS = 500;   // a runaway history cannot eat localStorage

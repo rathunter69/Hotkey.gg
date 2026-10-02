@@ -69,7 +69,7 @@ export const THEMES = {
     text: '#FFB547', muted: '#E09A3A', faint: '#A0702A', bad: '#FF5A4D' },
     tokens: { rail: '#000000', 'rail-hi': '#1C150A', 'rail-text': '#FFB547', 'rail-sub': '#E09A3A',
       learn: '#FFB547', 'learn-ink': '#FFC978', drills: '#FFD580', 'drills-ink': '#FFE0A3' } },
-  // Crimson: the Managing Director's theme, deep red on black. Earned at MD.
+  // Crimson: deep red on black. Earned at Top Bucket, level 30 (M22; the rank ladder is retired).
   crimson: { name: 'Crimson', dark: true, vars: {
     bg: '#120A0B', surface: '#1E1113', surface2: '#2B181B', line: '#55282E',
     text: '#F7E8E8', muted: '#D2A9A9', faint: '#9A6A70', bad: '#FF6A5A' },

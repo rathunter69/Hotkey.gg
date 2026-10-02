@@ -26,7 +26,6 @@ export function gameCtx() {
     progress, attempts, pbs, xp,
     signedIn: (() => { try { return auth.state() === 'in'; } catch (e) { return false; } })(),
     level: lvl.lvl, levelInfo: lvl,
-    rank: store.rank(), rankIndex: 0,
     quests: questTotals(ledger), rolled: Object.values(ledger.rolls),
     chapters: Object.fromEntries(CHAPTERS.map(ch => { try { return [ch.id, store.chapter(ch.id)]; } catch (e) { return [ch.id, {}]; } })),
     streakDays: practiceStreak([...new Set(days)], dayOf()),

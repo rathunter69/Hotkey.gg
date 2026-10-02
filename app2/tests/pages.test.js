@@ -128,8 +128,8 @@ test('parseRoute: every documented route, with params and query', () => {
   assert.equal(parseRoute('#/lesson/Bad_Id').name, 'notfound');
   assert.equal(parseRoute('#/lesson/').name, 'notfound');
   assert.equal(parseRoute('#/practice').name, 'practice');
-  const d = parseRoute('#/drill/sandbox'); assert.equal(d.name, 'drill'); assert.equal(d.params.id, 'sandbox');
-  const old = parseRoute('#/sandbox'); assert.equal(old.name, 'drill'); assert.equal(old.params.id, 'sandbox');
+  assert.equal(parseRoute('#/drill/sandbox').name, 'practice', 'the sandbox is dropped (M21): its route opens Practice');
+  assert.equal(parseRoute('#/sandbox').name, 'practice', "the old shell's route too");
   for (const n of ['leaderboard', 'reference', 'pricing', 'teams', 'account', 'about', 'terms', 'privacy', 'eula', 'contact']) assert.equal(parseRoute('#/' + n).name, n);
   assert.equal(parseRoute('#/account?section=desks').query.section, 'desks');
   assert.equal(parseRoute('#/nope').name, 'notfound');

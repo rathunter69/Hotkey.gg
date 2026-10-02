@@ -3,7 +3,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { ACHIEVEMENTS, RARITIES, practiceStreak } from '../content/achievements.js';
-import { GLYPHS, RANK_EMBLEMS, glyphRows, glyphColours, renderPixel } from '../ui/pixel.js';
+import { GLYPHS, glyphRows, glyphColours, renderPixel } from '../ui/pixel.js';
 import { evaluateAchievements, earnedSet, badgesHtml } from '../ui/badges.js';
 import { FREE_THEMES, themeLock, themeStates, levelFor, ownedFlair, flairBySlot, rollReward } from '../app/cosmetics.js';
 import { SPRITES, spriteRows, spriteColours, spriteSvg } from '../ui/sprites.js';
@@ -81,12 +81,11 @@ test('practiceStreak counts consecutive UTC days and survives junk', () => {
   assert.equal(practiceStreak(null, 'nonsense'), 0);
 });
 
-test('pixel glyphs: 16×16, at most 6 colours, emblems for all eight tiers, SVG renders', () => {
-  for (const [name, g] of [...Object.entries(GLYPHS), ...Object.entries(RANK_EMBLEMS)]) {
+test('pixel glyphs: 16×16, at most 6 colours, SVG renders', () => {
+  for (const [name, g] of Object.entries(GLYPHS)) {
     assert.doesNotThrow(() => glyphRows(g), name + ' is 16×16');
     assert.ok(glyphColours(g).length <= 6, name + ': at most 6 colours');
   }
-  assert.equal(Object.keys(RANK_EMBLEMS).length, 8);
   const svg = renderPixel(GLYPHS.star, { b: '#f00' });
   assert.match(svg, /^<svg /);
   assert.match(svg, /crispEdges/);
