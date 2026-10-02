@@ -218,6 +218,7 @@ import ch5_project from './lessons/ch5-project.js';
 import ch5_assessment from './lessons/ch5-assessment.js';
 // Chapter 6 · Valuation (Run R6): 6.1 Trading comps
 import spreading_a_comp from './lessons/spreading-a-comp.js';
+import calendarization_ltm from './lessons/calendarization-ltm.js';
 
 export const CHAPTERS = [
   {
@@ -374,7 +375,7 @@ export const CHAPTERS = [
       { name: 'Project and assessment', blurb: 'The valuation summary for the board from a fresh set, then again against the clock.' },
     ],
     lessons: [
-      spreading_a_comp,
+      spreading_a_comp, calendarization_ltm,
     ],
   },
 ];
