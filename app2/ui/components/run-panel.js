@@ -118,7 +118,7 @@ function xpHtml(xp, animate) {
 }
 function levelUpHtml(lv, platform) {
   if (!lv) return '';
-  return `<div class="rp-levelup"><div class="rp-levelup-text"><div><b>${esc(t('level_up_title', 'Level {n}', { n: lv.level }))}</b>${lv.title ? `<span class="rp-levelup-title">${esc(lv.title)}</span>` : ''}</div>` +
+  return `<div class="rp-levelup"><div class="rp-levelup-text"><div><b>${esc(t('level_up_title', 'Level {n}', { n: lv.level }))}</b>${lv.title ? ` <span class="rp-levelup-title">${esc(lv.title)}</span>` : ''}</div>` +
     (lv.reward ? `<div class="rp-levelup-reward">${esc(t('level_up_reward', '{reward} is yours.', { reward: lv.reward }))}</div>` : '') + '</div>' +
     (lv.equip ? `<button type="button" class="rp-btn rp-small" data-act="equip" data-key="E"><span>${esc(siteCopy('panel_equip', 'Equip'))}</span>${kbd('E', platform)}</button>` : '') + '</div>';
 }

@@ -167,8 +167,11 @@ export function liveLine(progress, tokens, platform) {
   const label = tok => (tok.text != null ? '“' + tok.text + '”' : keyLabel(tok.key, platform));
   if (progress.wrong) return fill(siteCopy('card_live_wrong', 'That was {key}. Start again with {key1}.'), { key: keyLabel(progress.wrong, platform), key1: label(tokens[0]) });
   if (progress.done) return siteCopy('card_live_done', 'Every key is in.');
-  if (progress.matched === 0 && !progress.chars) return fill(siteCopy('card_live_start', 'Press {key}.'), { key: label(tokens[0]) });
+  // a typed token reads "Type “…”", a key "Press …": never "Press “Clearcoat …”"
+  const typed = tok => !!tok && tok.text != null;
+  if (progress.matched === 0 && !progress.chars) return typed(tokens[0]) ? fill(siteCopy('card_live_start_type', 'Type {text}.'), { text: label(tokens[0]) }) : fill(siteCopy('card_live_start', 'Press {key}.'), { key: label(tokens[0]) });
   const n = progress.matched;
+  if (typed(progress.next)) return n === 0 ? fill(siteCopy('card_live_typing', 'Keep typing {text}.'), { text: label(progress.next) }) : fill(siteCopy(n === 1 ? 'card_live_one_type' : 'card_live_keys_type', n === 1 ? 'One key in. Type {text}.' : '{n} keys in. Type {text}.'), { n: WORDS[n] || n, text: label(progress.next) });
   return fill(siteCopy(n === 1 ? 'card_live_one' : 'card_live_keys', n === 1 ? 'One key in. Press {key}.' : '{n} keys in. Press {key}.'), { n: WORDS[n] || n, key: label(progress.next) });
 }
 /** The stuck cue's subtle line: "pulse B5 · Ctrl+↓ jumps to the edge" → the part after the separator (the pulse is the target's). Pure. */

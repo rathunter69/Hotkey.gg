@@ -116,7 +116,7 @@ export function renderShortcutPage(e) {
 ${e.note ? `<p class="muted small">${esc(e.note)}</p>` : ''}${e.macNote ? `<p class="muted small">Mac: ${esc(e.macNote)}</p>` : ''}
 </div>
 ${lesson ? `<h2>Learn it</h2><p>Taught in <a href="../lessons/${esc(lesson.id)}.html">Lesson ${lessonNumber(lesson.id)}: ${esc(lesson.title)}</a>.</p>
-<div class="cta"><a class="btn" href="${app}#/lesson/${esc(lesson.id)}">Practise it in the lesson</a><a class="btn btn-ghost" href="${app}#/reference">Full reference</a></div>`
+<div class="cta"><a class="btn" href="${app}#/lesson/${esc(lesson.id)}">Practice it in the lesson</a><a class="btn btn-ghost" href="${app}#/reference">Full reference</a></div>`
   : `<h2>Learn it</h2><p class="muted">A lesson for this shortcut is coming with a later chapter.</p><div class="cta"><a class="btn btn-ghost" href="${app}#/reference">Full reference</a></div>`}
 ${e.addin ? `<p class="muted small">${esc(ADDIN_DISCLAIMER)}</p>` : ''}`;
   return frame({ title: `${e.name} (${e.win}) — Excel shortcut · hotkey.gg`, description: `${e.name}: ${e.win} on Windows, ${e.mac} on Mac. ${e.what}`, up, body });

@@ -31,6 +31,7 @@ import { titleAt, rewardAt } from '../content/levels.js';
 import { siteCopy } from '../content/copy/apply.js';
 import { createChrome, confirmDialog } from '../ui/components/chrome.js';
 import { createRunPanel, aboutLength } from '../ui/components/run-panel.js';
+const shortDay = d => { try { return new Date(d + 'T12:00:00Z').toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' }); } catch (e) { return String(d || ''); } };
 
 const fill = (s, vars) => String(s).replace(/\{(\w+)\}/g, (m, k) => (vars && vars[k] != null ? vars[k] : m));
 const t = (key, fb, vars) => fill(siteCopy(key, fb), vars);
@@ -64,7 +65,7 @@ export function mountDrillPage(root, ctx = {}) {
   const chapterNo = Math.max(1, CHAPTERS.findIndex(ch => ch.id === drill.chapter) + 1);
   const entry = catalogById(drill.id);
   const taught = entry && entry.lesson ? LESSONS.find(l => l.id === entry.lesson) : null;
-  const subtitle = daily ? t('ws_sub_daily', 'The Daily, {day}', { day: dayOf() })
+  const subtitle = daily ? t('ws_sub_daily', 'The Daily, {day}', { day: shortDay(dayOf()) })
     : taught ? t('ws_sub_drill', 'Chapter {n}, taught in {m}', { n: chapterNo, m: itemNumber(taught, moduleOf(taught)) || '' }) : '';
   const chrome = createChrome(root, {
     kind: daily ? 'daily' : 'drill', title: drill.title, subtitle, lessons: null, hasCard: false,

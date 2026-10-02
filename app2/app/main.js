@@ -106,7 +106,7 @@ export const HOME_TITLE = 'hotkey.gg: the better way to master Excel';
 /** The document title for a route. */
 export function titleFor(name, extra) {
   const T = { root: HOME_TITLE, landing: HOME_TITLE, home: 'Home · hotkey.gg', start: 'Get started · hotkey.gg', learn: 'Learn · hotkey.gg',
-    lesson: (extra ? extra + ' · ' : '') + 'hotkey.gg', locked: (extra ? extra + ' · ' : '') + 'Paid tier · hotkey.gg', practice: 'Practice · hotkey.gg', drill: (extra ? extra + ' · ' : '') + 'Practice · hotkey.gg', leaderboard: 'Leaderboards · hotkey.gg',
+    lesson: (extra ? extra + ' · ' : '') + 'hotkey.gg', locked: (extra ? extra + ' · ' : '') + 'Full Access · hotkey.gg', practice: 'Practice · hotkey.gg', drill: (extra ? extra + ' · ' : '') + 'Practice · hotkey.gg', leaderboard: 'Leaderboards · hotkey.gg',
     reference: 'Reference · hotkey.gg', pricing: 'Pricing · hotkey.gg', teams: 'Teams · hotkey.gg', account: 'Account · hotkey.gg', about: 'About · hotkey.gg',
     terms: 'Terms · hotkey.gg', privacy: 'Privacy · hotkey.gg', eula: 'EULA · hotkey.gg', contact: 'Contact · hotkey.gg', notfound: 'Page not found · hotkey.gg',
     due: 'Due today · hotkey.gg', checkout: 'Get full access · hotkey.gg' };

@@ -136,7 +136,7 @@ export function mountAccountPage(root, ctx = {}) {
             ${notice && notice.kind === 'error' ? `<p class="form-msg form-err" role="alert">${esc(notice.text)}</p>` : ''}
             <div class="data-actions"><button class="btn btn-primary" type="submit"${busy ? ' disabled' : ''}>Save handle</button></div>
           </form>
-          <label class="set set-check"><input id="pubToggle" type="checkbox"${prof && prof.public_profile ? ' checked' : ''}> Public profile<span class="set-note">Handle, level, rank and best times on boards and your profile page. Off = nothing public.</span></label>
+          <label class="set set-check"><input id="pubToggle" type="checkbox"${prof && prof.public_profile ? ' checked' : ''}> Public profile<span class="set-note">${esc(siteCopy('account_public_note', ''))}</span></label>
           <form id="redeemForm" class="acct-form">
             <label>Have a code?<input id="redeemInput" type="text" placeholder="XXXX-XXXX-XXXX" maxlength="32" autocomplete="off" spellcheck="false" style="text-transform:uppercase"></label>
             <p class="form-msg" id="redeemMsg" role="status" aria-live="polite"></p>
@@ -156,7 +156,7 @@ export function mountAccountPage(root, ctx = {}) {
     const improving = s.improvement.filter(r => r.first > r.best);
     return `<section class="panel acct-panel" id="sec-stats"><div class="panel-head"><h2 class="panel-h">Stats</h2></div>
       <div class="stats-grid">
-        <div class="stat-cell"><b>${s.ctx.level}</b><span>level, ${s.ctx.xp} XP</span></div>
+        <div class="stat-cell"><b>${s.ctx.level}</b><span>level (${s.ctx.xp} XP)</span></div>
         <div class="stat-cell"><b>${fmtDur(s.timePractised)}</b><span>timed practice</span></div>
         <div class="stat-cell"><b>${s.attempts}</b><span>recorded runs</span></div>
         <div class="stat-cell"><b>${s.keystrokes}</b><span>keystrokes in runs</span></div>
@@ -165,7 +165,7 @@ export function mountAccountPage(root, ctx = {}) {
       </div>
       ${improving.length ? `<p class="stats-improve">Improvement: ${improving.slice(0, 4).map(r => `${esc(r.title)} <b>${r.first.toFixed(1)}s → ${r.best.toFixed(1)}s</b>`).join(', ')}</p>` : ''}
       ${s.shortcuts.length ? `<p class="stats-keys">Most-used shortcuts (from your best runs): ${s.shortcuts.sort((a, b) => b.count - a.count).slice(0, 6).map(u => `<kbd>${esc(u.keys)}</kbd>${u.count > 1 ? '×' + u.count : ''}`).join(' ')}</p>` : ''}
-      ${s.timeSaved > 5 ? `<p class="fine">Estimated time saved vs a mouse-and-menus route: ~${fmtDur(s.timeSaved)}. An estimate: keystroke counts against a slow route at half a second an action.</p>` : ''}
+      ${s.timeSaved > 5 ? `<p class="fine">${esc(siteCopy('account_time_saved', '').replace('{d}', fmtDur(s.timeSaved)))}</p>` : ''}
       <div class="stats-badges">${badgesHtml(s.ctx)}</div>
     </section>`;
   }
