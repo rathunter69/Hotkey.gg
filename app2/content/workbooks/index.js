@@ -5,6 +5,7 @@ import * as clearcoatWeekly from './clearcoat-weekly.js';
 import * as clearcoatPnl from './clearcoat-pnl.js';
 import * as clearcoatModel from './clearcoat-model.js';
 import * as clearcoatValuation from './clearcoat-valuation.js';
+import * as clearcoatDatabook from './clearcoat-databook.js';
 
 export const WORKBOOKS = {
   'voltline-weekly': voltlineWeekly,
@@ -12,6 +13,7 @@ export const WORKBOOKS = {
   'clearcoat-pnl': clearcoatPnl,
   'clearcoat-model': clearcoatModel,
   'clearcoat-valuation': clearcoatValuation,
+  'clearcoat-databook': clearcoatDatabook,
 };
 
 /** The named state of a workbook, deep-cloned; throws on an unknown workbook or state. */
