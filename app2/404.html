@@ -8,7 +8,10 @@
 <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <script>try{var v=JSON.parse(localStorage.getItem('hk2_theme_vars'));if(v&&v.vars){var r=document.documentElement;for(var k in v.vars)r.style.setProperty('--'+k,v.vars[k]);r.setAttribute('data-dark',v.dark?'1':'0');}}catch(e){}</script>
-<link rel="stylesheet" href="/ui/fonts/fonts.css">
+<style>/* the two fonts, self-hosted (ui/fonts/fonts.css has every subset; the 404 page needs the latin ones). Absolute: this page answers any path */
+  @font-face{font-family:"Hanken Grotesk"; font-style:normal; font-weight:400 800; font-display:swap; src:url(/ui/fonts/hanken-grotesk-latin.woff2) format("woff2")}
+  @font-face{font-family:"JetBrains Mono"; font-style:normal; font-weight:400 700; font-display:swap; src:url(/ui/fonts/jetbrains-mono-latin.woff2) format("woff2")}
+</style>
 <style>
   :root{
     --bg:#dbd8d1; --surface:#ecebe6; --surface2:#e1dfd8; --line:#c6c2b8;
