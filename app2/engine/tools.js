@@ -42,6 +42,9 @@ export const GOALSEEK_FOUND = (cell) => `Goal Seeking with Cell ${cell} found a 
 export const GOALSEEK_NONE = (cell) => `Goal Seeking with Cell ${cell} may not have found a solution.`;
 export const DATATABLE_INPUT_NOTE = 'Input cell reference is not valid.';
 export const TABLE_CELL_NOTE = "Cannot change part of a data table.";
+export const GOALSEEK_FORMULA_NOTE = 'Cell must contain a formula.';
+export const GOALSEEK_VALUE_NOTE = 'Cell must contain a value.';
+export const GOALSEEK_REF_NOTE = 'Reference is not valid.';
 export const NO_LINKS_NOTE = 'This workbook contains no links to other files.';
 export const TTC_OVERWRITE_NOTE = "There's already data here. Do you want to replace it?";
 export const ALLOW = [['any', 'Any value'], ['whole', 'Whole number'], ['decimal', 'Decimal'], ['list', 'List'], ['date', 'Date'], ['time', 'Time'], ['textlen', 'Text length'], ['custom', 'Custom']];
@@ -579,6 +582,123 @@ const methods = {
     if (key === 'Home') { d.idx = 0; return; } if (key === 'End') { d.idx = d.items.length - 1; return; }
     if (key === 'Enter') { const p = parseRef(d.cell); const text = d.items[d.idx]; this.exitRibbon(false); S.commitInput(text[0] === '=' || text[0] === "'" ? "'" + text : text, p.r, p.c); return; }
     if (key.length === 1) { const K = key.toUpperCase(); for (let n = 1; n <= d.items.length; n++) { const i = (d.idx + n) % d.items.length; if (d.items[i].toUpperCase().startsWith(K)) { d.idx = i; return; } } }
+  },
+
+  /* ---------------- references typed into a tool's box ---------------- */
+  /** A single-cell reference typed in a dialog (B5, $B$5, Inputs!B5, 'Rate Card'!$B$5, a defined name): { sheet, key, name } or null. */
+  toolRef(text, { sameSheet = false } = {}) {
+    let t = String(text || '').trim().replace(/^=/, ''); if (!t) return null;
+    const nm = Object.entries(this.names || {}).find(([n]) => n.toLowerCase() === t.toLowerCase()); if (nm) t = nm[1];
+    let sheet = this.sheet, name = ((this.sheets || []).find(e => e.sheet === this.sheet) || {}).name || null;
+    const bang = t.lastIndexOf('!');
+    if (bang > 0) { let sn = t.slice(0, bang); if (sn[0] === "'" && sn.endsWith("'")) sn = sn.slice(1, -1).replace(/''/g, "'"); const e = (this.sheets || []).find(x => x.name.toLowerCase() === sn.toLowerCase()); if (!e) return null; if (sameSheet && e.sheet !== this.sheet) return null; sheet = e.sheet; name = e.name; t = t.slice(bang + 1); }
+    const m = /^\$?([A-Za-z]{1,3})\$?(\d+)$/.exec(t); if (!m) return null;
+    const p = parseRef(m[1].toUpperCase() + m[2]); if (!p || p.r < 1 || p.c < 1 || p.r > sheet.rows || p.c > sheet.cols) return null;
+    return { sheet, key: refKey(p.r, p.c), r: p.r, c: p.c, name };
+  },
+  /** Recalculate the workbook after a tool wrote a cell directly (the graph sees the change; nothing is emitted). */
+  toolRecalc(S) { if (this.book) this.book.recalc(S); else S.recalc(); },
+
+  /* ---------------- Goal Seek (Alt A W G) ---------------- */
+  /**
+   * Set cell (Alt+E, the active cell to start), To value (Alt+V), By changing cell (Alt+C); OK
+   * (Enter) searches; the status box then says whether a solution was found with the target and
+   * current values: OK (Enter) keeps the answer (one undo step), Cancel (Esc) puts the old value back.
+   */
+  openGoalSeek() {
+    const S = this.sheet; this.startClock(); const a = S.dispActive();
+    this.openDialog('goalseek', []);
+    this.dlg = { kind: 'goalseek', set: colLetter(a.c) + a.r, to: '', by: '', focus: 'set', fresh: true, status: null };
+  },
+  goalSeekKey(key) {
+    const d = this.dlg; if (!d) return;
+    if (d.status) { if (key === 'Enter') { this.exitRibbon(false); this.sheet.commit('edit'); } else if (key === 'Escape') this.toolEscape(); return; }
+    if (key === 'Alt+E') { d.focus = 'set'; d.fresh = true; return; } if (key === 'Alt+V') { d.focus = 'to'; d.fresh = true; return; } if (key === 'Alt+C') { d.focus = 'by'; d.fresh = true; return; }
+    if (key === 'Tab' || key === 'Shift+Tab') { this.toolTab(d, key, ['set', 'to', 'by', 'ok']); d.fresh = true; return; }
+    if (key === 'Enter') { this.runGoalSeek(); return; }
+    if (d.fresh && key.length === 1 && d.focus !== 'ok') { d[d.focus] = ''; }
+    if (this.toolType(d, key, ['set', 'to', 'by'])) d.fresh = false;
+  },
+  runGoalSeek() {
+    const d = this.dlg;
+    const set = this.toolRef(d.set), by = this.toolRef(d.by); const target = textToNumber(String(d.to).trim());
+    if (!set || !by) { this.toast(GOALSEEK_REF_NOTE); return; }
+    if (target === null) { this.toast('Invalid numeric value.'); d.focus = 'to'; return; }
+    const sc = set.sheet.get(set.r, set.c); if (!sc.formula) { this.toast(GOALSEEK_FORMULA_NOTE); d.focus = 'set'; return; }
+    const bc = by.sheet.get(by.r, by.c); if (bc.formula || (bc.value !== null && typeof bc.value !== 'number')) { this.toast(GOALSEEK_VALUE_NOTE); d.focus = 'by'; return; }
+    const B = by.sheet; B.pushUndo(); const before = clone(B.get(by.r, by.c)); const cell = B.ensure(by.r, by.c);
+    const f = x => { cell.value = x; this.toolRecalc(B); return set.sheet.get(set.r, set.c).value; };
+    let x = goalSeek(f, typeof before.value === 'number' ? before.value : 0, target);
+    if (x === null) f(typeof before.value === 'number' ? before.value : 0); else f(x);
+    const cur = set.sheet.get(set.r, set.c).value;
+    const label = (set.sheet === this.sheet ? '' : set.name + '!') + colLetter(set.c) + set.r;
+    d.status = { found: x !== null, note: x !== null ? GOALSEEK_FOUND(label) : GOALSEEK_NONE(label), target, current: cur, before, by };
+  },
+  /** Esc on a tool dialog: Goal Seek's status box puts the changing cell back; every tool then closes to the grid. */
+  toolEscape() {
+    const d = this.dlg;
+    if (d && d.kind === 'goalseek' && d.status) { const { by, before } = d.status; const B = by.sheet; B.cells[by.key] = clone(before); if (B.undoStack.length) B.undoStack.pop(); this.toolRecalc(B); B.emit('edit'); }
+    this.exitRibbon(false);
+  },
+
+  /* ---------------- Data Table (Alt A W T) ---------------- */
+  /**
+   * What-If Analysis › Data Table on the selected block: Row input cell (Alt+R), Column input cell
+   * (Alt+C), OK (Enter). Column input only: the input values run down the first column and the
+   * formulas across the top row; row input only, the other way; both: the formula sits in the
+   * corner. Every result cell holds {=TABLE(row,col)}, which Excel will not let an entry change.
+   */
+  openDataTable() {
+    const S = this.sheet; this.startClock(); const sr = S.selRange();
+    this.openDialog('datatable', []);
+    this.dlg = { kind: 'datatable', range: { r1: sr.r1, c1: sr.c1, r2: sr.r2, c2: sr.c2 }, row: '', col: '', focus: 'row' };
+  },
+  dataTableKey(key) {
+    const d = this.dlg; const S = this.sheet; if (!d) return;
+    if (key === 'Alt+R') { d.focus = 'row'; return; } if (key === 'Alt+C') { d.focus = 'col'; return; }
+    if (key === 'Tab' || key === 'Shift+Tab') { this.toolTab(d, key, ['row', 'col', 'ok']); return; }
+    if (key !== 'Enter') { this.toolType(d, key, ['row', 'col']); return; }
+    const rg = d.range; const row = d.row.trim() ? this.toolRef(d.row, { sameSheet: true }) : null, col = d.col.trim() ? this.toolRef(d.col, { sameSheet: true }) : null;
+    if ((!row && !col) || (d.row.trim() && !row) || (d.col.trim() && !col) || rg.r2 <= rg.r1 || rg.c2 <= rg.c1) { this.toast(DATATABLE_INPUT_NOTE); return; }
+    const inside = p => p && p.r >= rg.r1 && p.r <= rg.r2 && p.c >= rg.c1 && p.c <= rg.c2;
+    if (inside(row) || inside(col)) { this.toast(DATATABLE_INPUT_NOTE); return; }
+    this.exitRibbon(false); S.pushUndo();
+    if (!S.dataTables) S.dataTables = [];
+    S.dataTables = S.dataTables.filter(t => t.r2 < rg.r1 || t.r1 > rg.r2 || t.c2 < rg.c1 || t.c1 > rg.c2);
+    const t = { r1: rg.r1, c1: rg.c1, r2: rg.r2, c2: rg.c2, row: row ? row.key : null, col: col ? col.key : null };
+    S.dataTables.push(t);
+    const text = '{=TABLE(' + (row ? row.key : '') + ',' + (col ? col.key : '') + ')}';
+    for (let r = rg.r1 + 1; r <= rg.r2; r++) for (let c = rg.c1 + 1; c <= rg.c2; c++) { const cell = S.ensure(r, c); cell.formula = null; cell.value = null; cell.table = text; }
+    this.computeTables(S, true); S.commit('edit');
+  },
+  /**
+   * Fill every data table on the sheet (or the workbook): each result is its formula recalculated
+   * with the input cell(s) set to that row's / column's value, then the inputs go back. Runs after
+   * every change in Automatic, and only on F9 under Automatic except for Data Tables (Alt M X E).
+   */
+  computeTables(only, force) {
+    if (this._tables) return; const mode = this.settings.calcMode;
+    if (!force && mode !== 'automatic') return;
+    const list = only ? [only] : this.sheets.map(e => e.sheet);
+    this._tables = true;
+    try {
+      for (const S of list) for (const t of (S.dataTables || [])) {
+        const keys = [t.row, t.col].filter(Boolean); const saved = keys.map(k => clone(S.cells[k] || null));
+        const put = (k, v) => { const c = S.ensure(parseRef(k).r, parseRef(k).c); c.formula = null; c.value = v; };
+        const out = [];
+        for (let r = t.r1 + 1; r <= t.r2; r++) for (let c = t.c1 + 1; c <= t.c2; c++) {
+          let fr, fc;
+          if (t.row && t.col) { put(t.row, S.get(t.r1, c).value); put(t.col, S.get(r, t.c1).value); fr = t.r1; fc = t.c1; }
+          else if (t.col) { put(t.col, S.get(r, t.c1).value); fr = t.r1; fc = c; }
+          else { put(t.row, S.get(t.r1, c).value); fr = r; fc = t.c1; }
+          this.toolRecalc(S); out.push([r, c, S.get(fr, fc).value]);
+        }
+        keys.forEach((k, i) => { if (saved[i]) S.cells[k] = saved[i]; else delete S.cells[k]; });
+        this.toolRecalc(S);
+        for (const [r, c, v] of out) { const cell = S.ensure(r, c); cell.value = v; }
+        this.toolRecalc(S);
+      }
+    } finally { this._tables = false; }
   },
 
   /* ---------------- Evaluate Formula (Alt M V) ---------------- */

@@ -255,7 +255,7 @@ export class Session {
     if (!this.book) this.book = new CalcGraph(() => this.sheets);   // one calculation graph for the workbook: a commit on any sheet brings its readers everywhere up to date
     sh.book = this.book;
     sh.onChange(what => {
-      if (what !== 'select' && what !== 'clipboard') this.checkCircular();
+      if (what !== 'select' && what !== 'clipboard') { if (!this._tables && this.sheets.some(e => e.sheet.dataTables && e.sheet.dataTables.length)) this.computeTables(null, what === 'recalc'); this.checkCircular(); }
       this.emit('sheet');
     });
     this._circKnown = new Set(this.circularRefs());   // a circle a loaded sheet brings is not an entry: no warning until a new one appears
@@ -1356,7 +1356,7 @@ export class Session {
       if (k === 'Enter') { this.logKey('↵'); this.noteKey('Enter'); return true; }
     }
     if (k === 'Home' || k === 'End') { this.logKey(k); this.dlgKey(k); return true; }
-    if (k === 'Escape') { this.logKey('Esc'); if (TOOL_DIALOGS.has(this.dialog)) this.exitRibbon(false); else this.cancelDialog(); return true; }   // a tool dialog closes to the grid, as Excel's do
+    if (k === 'Escape') { this.logKey('Esc'); if (TOOL_DIALOGS.has(this.dialog)) this.toolEscape(); else this.cancelDialog(); return true; }   // a tool dialog closes to the grid, as Excel's do
     if (k === 'Enter') { this.logKey('↵'); this.dlgKey('Enter'); return true; }
     if (k === 'Tab') { const t = e.shiftKey ? 'Shift+Tab' : 'Tab'; this.logKey(t); this.dlgKey(t); return true; }
     if (ARROWS[k]) { this.logKey(ARROWSYM[k]); this.dlgKey(k); return true; }

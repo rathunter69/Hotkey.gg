@@ -347,6 +347,7 @@ export class Sheet {
     this.hiddenRows = new Set(); this.hiddenCols = new Set();
     this.filter = null;                    // the AutoFilter (Ctrl+Shift+L): { r1, c1, r2, c2, crit: { [col]: criterion } }; the header row is r1
     this.filterRows = new Set();           // the rows the AutoFilter hides (apart from hiddenRows: Unhide does not show them, SUBTOTAL 101+ skips them)
+    this.dataTables = null;                // What-If data tables (Alt A W T): [{ r1, c1, r2, c2, row, col }]
     this.validation = null;                // Data Validation rules by cell key: { allow, data, min, max, source, inCell, ignoreBlank, errTitle, errMsg, errStyle, inTitle, inMsg }
     this.freeze = { r: 0, c: 0 };          // rows/cols frozen above/left of the seam (0 = none)
     this.groups = { rows: [], cols: [] };  // the outline (C2 gap 4): [{r1,r2,collapsed}] / [{c1,c2,collapsed}], one level
@@ -373,6 +374,7 @@ export class Sheet {
     if (opts.names) for (const k in opts.names) { const n = opts.names[k]; if (n && n.ref) this.names[String(n.name || k).toUpperCase()] = { name: String(n.name || k), ref: String(n.ref) }; }
     if (opts.zoom) this.zoom = clampZoom(opts.zoom);
     if (opts.validation && typeof opts.validation === 'object') this.validation = clone(opts.validation);
+    if (Array.isArray(opts.dataTables)) this.dataTables = clone(opts.dataTables);   // What-If data tables: [{ r1, c1, r2, c2, row, col }] (the input cells' keys)
     if (opts.active) this.active = this.clamp(opts.active.r, opts.active.c);
     this.recalc();
   }
@@ -609,13 +611,13 @@ export class Sheet {
   /* ---------------- undo ---------------- */
   snapshot() { return { cells: clone(this.cells), colW: this.colW.slice(), colSet: this.colSet.slice(), rows: this.rows, active: { ...this.active }, sel: this.sel && { ...this.sel },
     rowH: this.rowH.slice(), hiddenRows: [...this.hiddenRows], hiddenCols: [...this.hiddenCols], freeze: { ...this.freeze }, groups: clone(this.groups), condFmt: clone(this.condFmt), names: clone(this.names),
-    filter: clone(this.filter), filterRows: [...this.filterRows], validation: clone(this.validation || null) }; }
+    filter: clone(this.filter), filterRows: [...this.filterRows], validation: clone(this.validation || null), dataTables: clone(this.dataTables || null) }; }
   /** Rewind cells AND the whole selection to one moment, so undo/redo re-select the range the operation touched (Excel). */
   restore(s) {
     this.cells = clone(s.cells); this.colW = s.colW.slice(); this.colSet = s.colSet.slice(); this.rows = s.rows;
     if (s.rowH) this.rowH = s.rowH.slice();
     this.hiddenRows = new Set(s.hiddenRows || []); this.hiddenCols = new Set(s.hiddenCols || []);
-    this.filter = s.filter ? clone(s.filter) : null; this.filterRows = new Set(s.filterRows || []); this.validation = s.validation ? clone(s.validation) : null;
+    this.filter = s.filter ? clone(s.filter) : null; this.filterRows = new Set(s.filterRows || []); this.validation = s.validation ? clone(s.validation) : null; this.dataTables = s.dataTables ? clone(s.dataTables) : null;
     this.freeze = s.freeze ? { ...s.freeze } : { r: 0, c: 0 };
     this.groups = s.groups ? normGroups(s.groups) : { rows: [], cols: [] };
     this.condFmt = s.condFmt ? normCondFmt(s.condFmt, this.today) : [];
@@ -1679,6 +1681,7 @@ export class Sheet {
     if (Object.keys(this.names).length) out.names = clone(this.names);
     if (this.zoom !== ZOOM_DEFAULT) out.zoom = this.zoom;
     if (this.validation && Object.keys(this.validation).length) out.validation = clone(this.validation);
+    if (this.dataTables && this.dataTables.length) out.dataTables = clone(this.dataTables);
     return out;
   }
 }
