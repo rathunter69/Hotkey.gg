@@ -4457,7 +4457,7 @@ export const COPY = {
   "pricing_term_1_name": "No trial",
   "pricing_term_1": "Chapter 1 is free in full, for as long as you like.",
   "pricing_term_2_name": "Cancel any time",
-  "pricing_term_2": "Cancel Monthly any time, and your access runs to the end of the month you paid for.",
+  "pricing_term_2": "Access runs to the end of the period you paid for.",
   "pricing_term_3_name": "Money back",
   "pricing_term_3": "A full refund on your first payment if you ask within 14 days.",
   "pricing_term_4_name": "Nothing cosmetic is sold",

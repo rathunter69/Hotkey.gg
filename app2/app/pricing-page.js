@@ -58,7 +58,7 @@ export function pricingHtml({ term = 'month', prices = PRICES } = {}) {
     <section class="panel" aria-label="${esc(t('pricing_terms_title', 'Terms'))}">
       <table class="tbl rows-only"><tbody>
         <tr><td class="name">${esc(t('pricing_term_1_name', 'No trial'))}</td><td>${esc(t('pricing_term_1', 'Chapter 1 is free in full, for as long as you like.'))}</td></tr>
-        <tr><td class="name">${esc(t('pricing_term_2_name', 'Cancel any time'))}</td><td>${esc(t('pricing_term_2', 'Cancel Monthly any time, and your access runs to the end of the month you paid for.'))}</td></tr>
+        <tr><td class="name">${esc(t('pricing_term_2_name', 'Cancel any time'))}</td><td>${esc(t('pricing_term_2', 'Access runs to the end of the period you paid for.'))}</td></tr>
         <tr><td class="name">${esc(t('pricing_term_3_name', 'Money back'))}</td><td>${esc(t('pricing_term_3', 'A full refund on your first payment if you ask within 14 days.'))}</td></tr>
         <tr><td class="name">${esc(t('pricing_term_4_name', 'Nothing cosmetic is sold'))}</td><td>${esc(t('pricing_term_4', 'Themes and flair are earned from your level and achievements.'))}</td></tr>
       </tbody></table>
