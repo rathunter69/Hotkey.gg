@@ -168,6 +168,7 @@ import ch4_project from './lessons/ch4-project.js';
 import ch4_assessment from './lessons/ch4-assessment.js';
 // Chapter 5 · Finance and Accounting (Run R5): 5.5 Auditing a model, 5.6 DCF
 import tie_outs_cross_foots from './lessons/tie-outs-cross-foots.js';
+import error_flags_checks_summary from './lessons/error-flags-checks-summary.js';
 
 export const CHAPTERS = [
   {
@@ -301,7 +302,7 @@ export const CHAPTERS = [
       { name: 'Project and assessment', blurb: 'The operating model with its DCF page, then one schedule and its links against the clock.' },
     ],
     lessons: [
-      tie_outs_cross_foots,
+      tie_outs_cross_foots, error_flags_checks_summary,
     ],
   },
 ];
