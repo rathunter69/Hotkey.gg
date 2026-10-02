@@ -1892,7 +1892,10 @@ export class Session {
     if (k === 'F9') {
       if (this.editSel && this.bufIsFormula()) {   // F9 on a selected part: the part becomes its value (Esc restores the formula)
         const { start, end } = this.editSel; const part = this.editBuf.slice(start, end);
-        try { const v = evalFormula('=' + part.replace(/^=/, ''), S.evalCtx({ cell: this.editCell() })); const t = valueText(v);
+        // a range turns into its whole array constant, {"a";"b";…}, as Excel's F9 writes it (the spill hook hands the block over)
+        try { const ctx = S.evalCtx({ cell: this.editCell() }); let block = null; ctx.onSpill = rows => { block = rows; };
+          const v = evalFormula('=' + part.replace(/^=/, ''), ctx);
+          const t = block ? '{' + block.map(r => r.map(valueText).join(',')).join(';') + '}' : valueText(v);
           this.editBuf = this.editBuf.slice(0, start) + t + this.editBuf.slice(end); this.editCaret = start + t.length; this.editSel = null; this.endPoint(); this.logKey('F9'); } catch (err) { /* keep buffer */ }
         return true;
       }
