@@ -195,7 +195,7 @@ test('the start states: each lesson finds its inputs, the empty cells it fills a
   assert.equal(cell(b61c, 'Comps', C6.ebitda + ar.Comps.c0), undefined); assert.ok(cell(b61c, 'Comps', 'J' + ar.Comps.q0));
   // 6.2.x: the deals typed, then the multiples, then the ages and flags, then the range
   assert.ok(cell(st('B621'), 'Precedents', D6.ev + R.Precedents.d0)); assert.equal(cell(st('B621'), 'Precedents', D6.type + R.Precedents.d0), undefined); assert.equal(cell(st('B621'), 'Precedents', D6.mult + R.Precedents.d0), undefined);
-  assert.ok(cell(st('B622'), 'Precedents', D6.mult + R.Precedents.d0)); assert.equal(cell(st('B622'), 'Precedents', D6.age + R.Precedents.d0), undefined); assert.equal(cell(st('B622'), 'Precedents', 'C' + R.Precedents.asOf), undefined);
+  assert.ok(cell(st('B622'), 'Precedents', D6.mult + R.Precedents.d0)); assert.ok(cell(st('B622'), 'Precedents', D6.age + R.Precedents.d0)); assert.ok(cell(st('B622'), 'Precedents', 'C' + R.Precedents.asOf)); assert.equal(cell(st('B622'), 'Precedents', D6.include + R.Precedents.d0), undefined); assert.equal(cell(st('B621'), 'Precedents', 'C' + R.Precedents.asOf), undefined);
   assert.ok(cell(st('B623'), 'Precedents', D6.include + R.Precedents.d0)); assert.equal(cell(st('B623'), 'Precedents', 'C' + R.Precedents.rgEV), undefined); assert.equal(cell(st('B623'), 'LBO', 'C' + R.LBO.entryEV), undefined);
   assert.equal(cell(st('B62C'), 'Precedents', 'B' + ar.Precedents.d4).value, 'Blue Ridge Car Care'); assert.equal(cell(st('B62C'), 'Precedents', D6.mult + ar.Precedents.d0), undefined);
   // 6.3.x: the LBO block by block; Sources equal uses goes live with 6.3.1

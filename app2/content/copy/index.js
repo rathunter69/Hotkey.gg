@@ -2463,6 +2463,138 @@ export const COPY = {
    "mac_note": "",
    "story_beat": ""
   },
+  "deal-multiples-premiums": {
+   "id": "deal-multiples-premiums",
+   "module": "precedent-transactions",
+   "order": "6.2.1",
+   "title": "Deal multiples and premiums",
+   "brief": "A precedent is a deal that closed: the enterprise value paid over the target’s LTM EBITDA at the time. Where the target was listed, the premium is the price paid over the share price before the deal was announced, the reason precedents run above trading comps. The six deals are typed on Precedents. Spread them the way you spread the comps, with the premium where it exists and every deal aged against one date. The key is `=`.",
+   "closing": "Six deals are spread, with the premium a control buyer paid on each listed one. || Best practice: the deal date is typed once and the age is a formula against the as-of date, so the page says how old each precedent is on the day it’s read.",
+   "wow": "",
+   "convention_line": "One input, one cell; formulas reference it; Write once, fill right",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "sort-and-decide": {
+   "id": "sort-and-decide",
+   "module": "precedent-transactions",
+   "order": "6.2.2",
+   "title": "Sort by date and size, and decide what’s comparable",
+   "brief": "Not every deal counts: one is four years old and priced in a different rate environment, one is a 200-site national chain, one is a strategic buying a competitor. Sort a copy by date, then by size, read each deal against Clearcoat, and set an include flag with a reason. Then the median and range on what’s left. Deciding what’s comparable is the judgment; the flag is how it’s made visible. The key is `Alt A S S`.",
+   "closing": "Four deals count, and the page says why each of the others doesn’t. || Best practice: flag, don’t delete. A deal taken out stays on the page with its reason, so the next reader can disagree with the judgment and flip one cell.",
+   "wow": "",
+   "convention_line": "One input, one cell; formulas reference it; Label the source (\"per utility contract\"); Write once, fill right; Values to snapshot, never over live formulas",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "applying-precedents": {
+   "id": "applying-precedents",
+   "module": "precedent-transactions",
+   "order": "6.2.3",
+   "title": "Applying the precedents range",
+   "brief": "The precedents row of the football field: the included deals’ low, median and high multiples times Clearcoat’s EBITDA, and the same on EV per site. It sits above the comps row, because control costs more, and the gap between the two is the first thing the board will ask about. Build it in the same block shape as the comps range, so the Summary can read both. The key is `*`.",
+   "closing": "The second range sits above the first, and the gap between them is the control premium. || Best practice: both ranges share one block shape, rows and columns, so the Summary reads them with the same formula and a reader compares them at a glance.",
+   "wow": "",
+   "convention_line": "One input, one cell; formulas reference it; Write once, fill right",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "challenge-precedents": {
+   "id": "challenge-precedents",
+   "module": "precedent-transactions",
+   "order": "6.2.C",
+   "title": "Challenge: precedents spread",
+   "brief": "Five fresh deals on Precedents. Multiples, premiums, ages, include flags with reasons, and the range applied to Clearcoat’s EBITDA.",
+   "closing": "",
+   "wow": "",
+   "convention_line": "One input, one cell; formulas reference it; Write once, fill right",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "sources-and-uses": {
+   "id": "sources-and-uses",
+   "module": "lbo",
+   "order": "6.3.1",
+   "title": "Sources and uses",
+   "brief": "Every buyout starts with one table: uses (the price paid for the company and the fees to do the deal) and sources (the debt raised against the company’s EBITDA and the equity the sponsor puts in, which is whatever the debt and the stake the owners keep don’t cover). Sources equal uses, always, and the equity line is where the balance lands. Build it from the bid and the leverage the lenders will allow. The key is `=`.",
+   "closing": "The table says where $198.9m comes from and where it goes, and the equity line is what the sponsor risks. || Best practice: the equity line is the plug in sources and uses, and it’s the one honest plug in finance, because it’s the sponsor’s choice. Every other line is sized on something a lender or a seller set.",
+   "wow": "",
+   "convention_line": "Inputs blue, formulas black; One input, one cell; formulas reference it; Write once, fill right; The check is a live difference → 0",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "tranches-and-sweep": {
+   "id": "tranches-and-sweep",
+   "module": "lbo",
+   "order": "6.3.2",
+   "title": "Debt tranches and the cash sweep",
+   "brief": "Two tranches, two rates, one rule, the cash sweep: every spare dollar repays the senior loan, while the mezzanine can’t be repaid early without a penalty and waits for the exit. Free cash flow comes from the model, linked; interest is on the average balance through the breaker; the sweep is MIN of cash available and the balance, floored at zero. Five years of it, and read how far net debt moved. The key is `MIN`.",
+   "closing": "Five years of cash ran through the debt, and net debt at the exit is what the equity gets after the lenders. || Best practice: one check proves the block, debt repaid plus cash built against the cash the business made after interest and tax. When the sweep, the revolver or a sign is wrong, it stops reading zero.",
+   "wow": "",
+   "convention_line": "One input, one cell; formulas reference it; Write once, fill right; The check is a live difference → 0",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "sale-leasebacks": {
+   "id": "sale-leasebacks",
+   "module": "lbo",
+   "order": "6.3.3",
+   "title": "Sale-leasebacks: how a rollout gets financed, and what it costs later",
+   "brief": "The land under twenty sites is worth $2.5m each to a landlord, and a sale-leaseback sells it and rents it back: $50m of cash today, $3.5m of rent a year forever, and EBITDA falls by the rent, so the same business is worth less on a multiple the day after. Sponsors use it to fund rollouts without more debt; the next buyer sees the rent and pays less. Model it as a switch and read both sides. The key is `IF`.",
+   "closing": "A sale-leaseback is cash today, rent forever and a lower EBITDA, and both switches sit on one page. || Best practice: an EBITDA lowered by rent, or lifted by owning the land, is labeled as such on every page. The rent is the number a later buyer finds.",
+   "wow": "",
+   "convention_line": "Inputs blue, formulas black; One input, one cell; formulas reference it; Write once, fill right",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "irr-moic": {
+   "id": "irr-moic",
+   "module": "lbo",
+   "order": "6.3.4",
+   "title": "Returns: IRR and MOIC",
+   "brief": "The sponsor puts equity in at entry and takes equity out at exit: exit enterprise value (11.0x FY31 EBITDA) less the debt still outstanding. MOIC is equity out over equity in; IRR is the annual return that turns one into the other over five years. It’s the house from the DCF chapter again: bought with a small down payment and a large mortgage, the same rise in value is a far bigger return on the down payment. Build both, and read them against the 20% a sponsor needs. The key is `IRR`.",
+   "closing": "You can see what the sponsor makes, as a multiple and as a rate, and whether it clears their bar: 1.77x and 12.1%, short of the 20% hurdle at this price. || Best practice: check an IRR two ways. IRR on the cash flows and RRI on the two ends agree to the decimal when the flows are only in and out, and a lender’s row near its coupon proves the debt side of the same page.",
+   "wow": "",
+   "convention_line": "Write once, fill right; The check is a live difference → 0",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "returns-bridge": {
+   "id": "returns-bridge",
+   "module": "lbo",
+   "order": "6.3.5",
+   "title": "The returns bridge",
+   "brief": "A return comes from three places, and a sponsor wants to see which: EBITDA growth (the rollout), multiple expansion (paying 11.7x and selling at 11.0x is a loss on this one), and debt paydown (the sweep). The bridge splits the equity gain into the three, takes off the fees paid on the way in, and the four lines sum to the gain. Build it, and read where this return really comes from. The key is `=`.",
+   "closing": "The return split into three effects and the fees: the rollout does all the work here, and the multiple and the debt the rollout needed both take some back. || Best practice: build the bridge on total equity, the sponsor’s and the rolled stake together, so the rollover doesn’t disturb it and the check reads zero whatever the split.",
+   "wow": "",
+   "convention_line": "Write once, fill right; The check is a live difference → 0",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "what-the-sponsor-can-pay": {
+   "id": "what-the-sponsor-can-pay",
+   "module": "lbo",
+   "order": "6.3.6",
+   "title": "Sensitivity on entry and exit: what the sponsor can pay",
+   "brief": "Turn the model around: at a 20% IRR, what’s the most the sponsor can pay? A grid of IRR against entry and exit multiples shows it; Goal Seek finds the 20% answer; a PV formula gives the top price at any hurdle and stays live. That price is the LBO row on the football field: the ceiling on what a sponsor can offer, whatever the comps say. The key is `Alt A W G`.",
+   "closing": "You know the most a sponsor can pay and still make 20%, about $164.5m, and it sits well below every bid on the table. || Best practice: the LBO range is a ceiling, and the sponsor knows it. A bid above it means they see something the model doesn’t, or they’re planning a sale-leaseback. Read it under the Downside case too: most of a buyout’s return rests on the operating plan.",
+   "wow": "",
+   "convention_line": "Inputs blue, formulas black; Write once, fill right; The check is a live difference → 0",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "challenge-paper-lbo": {
+   "id": "challenge-paper-lbo",
+   "module": "lbo",
+   "order": "6.3.C",
+   "title": "Challenge: a paper LBO",
+   "brief": "Fresh inputs, one sheet, one senior tranche. Sources and uses, the sweep over five years, exit equity, MOIC and IRR, the bridge, and the flag against 20%.",
+   "closing": "",
+   "wow": "",
+   "convention_line": "Write once, fill right; The check is a live difference → 0",
+   "mac_note": "",
+   "story_beat": ""
+  },
   "remix-format-on-the-pnl": {
    "id": "remix-format-on-the-pnl",
    "module": "remixes",
@@ -15344,6 +15476,644 @@ export const COPY = {
     "why": "",
     "hint_stuck": ""
    }
+  ],
+  "deal-multiples-premiums": [
+   {
+    "lesson_id": "deal-multiples-premiums",
+    "goal_index": "0",
+    "text": "Record each acquirer’s type in F5:F10: Sponsor or Strategic, read from the acquirer in column E.",
+    "teach": "A sponsor is a private equity fund buying with debt; a strategic is an operator buying a competitor. A strategic can often pay more, because it counts on savings from running two chains as one, so the type sits beside every deal.",
+    "why": "",
+    "hint_stuck": "pulse range F5:F10 · Pinnacle Wash Holdings is a listed operator; the other five buyers are funds."
+   },
+   {
+    "lesson_id": "deal-multiples-premiums",
+    "goal_index": "1",
+    "text": "The deal multiple in J5:J10: =IF(H5>0,G5/H5,\"NM\"), filled down the six deals.",
+    "teach": "A precedent is a deal that closed: the enterprise value paid over the target’s LTM EBITDA at the time. The IF keeps a loss-making target from showing a negative multiple.",
+    "why": "",
+    "hint_stuck": "pulse range J5:J10 · Enterprise value in G over LTM EBITDA in H, row by row."
+   },
+   {
+    "lesson_id": "deal-multiples-premiums",
+    "goal_index": "2",
+    "text": "EV per site in K5:K10, in $m: =G5/I5/1000.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range K5:K10 · Enterprise value over sites, then over 1,000 for millions."
+   },
+   {
+    "lesson_id": "deal-multiples-premiums",
+    "goal_index": "3",
+    "text": "The premium in O5:O10: =IF(L5=1,N5/M5-1,\"-\"), so an unlisted target shows a dash.",
+    "teach": "Where the target was listed, the premium is the offer over the share price before the deal was announced, less one: the price of control. It’s the reason precedents run above trading comps.",
+    "why": "",
+    "hint_stuck": "pulse range O5:O10 · Listed is column L; the two prices are M and N."
+   },
+   {
+    "lesson_id": "deal-multiples-premiums",
+    "goal_index": "4",
+    "text": "The as-of date in C19, linked to the valuation date on Inputs: =Inputs!$C$87.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C19 · One date for the whole page, read from Inputs, never typed twice."
+   },
+   {
+    "lesson_id": "deal-multiples-premiums",
+    "goal_index": "5",
+    "text": "Each deal’s age in years in P5:P10: =YEARFRAC(C5,$C$19).",
+    "teach": "The deal date is an input and the age is a formula against the as-of date, so how old is too old is read off the page, not worked out in your head. Move the valuation date and every age moves with it.",
+    "why": "",
+    "hint_stuck": "pulse range P5:P10 · YEARFRAC from the date in C to the as-of date, anchored with F4."
+   },
+   {
+    "lesson_id": "deal-multiples-premiums",
+    "goal_index": "6",
+    "text": "Does it tie? Watch Lakeside’s enterprise value go to $300,000k: its multiple and EV per site answer at once.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range Precedents!J8:K8 · Every figure on the row reads the typed deal terms."
+   }
+  ],
+  "sort-and-decide": [
+   {
+    "lesson_id": "sort-and-decide",
+    "goal_index": "0",
+    "text": "A values copy in C28:E33, oldest deal first and then by size: each deal’s date, enterprise value and multiple.",
+    "teach": "Sort a copy, never the spread itself, so every formula above keeps its row. The deals came in announced order already, so a sort by date (Alt, A, S, S) leaves them where they are, and size only breaks a tie.",
+    "why": "",
+    "hint_stuck": "pulse range C28:E33 · Copy C, G and J of the spread in turn and Paste Special Values beside each name."
+   },
+   {
+    "lesson_id": "sort-and-decide",
+    "goal_index": "1",
+    "text": "Include flags in Q5:Q10: 0 for Bluewater (four years old) and Nationwide (a national chain), 1 for the other four.",
+    "teach": "Deciding what is comparable is the judgment, and the flag is how it’s made visible. Bluewater was priced when rates were two points lower; Nationwide is five times Clearcoat’s size; Crestline stays in, noted, because its buyer was a strategic.",
+    "why": "",
+    "hint_stuck": "pulse range Q5:Q10 · A 1 keeps a deal in every statistic; a 0 takes it out."
+   },
+   {
+    "lesson_id": "sort-and-decide",
+    "goal_index": "2",
+    "text": "A reason beside every flag in R5:R10, so the page says why each deal is in or out.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range R5:R10 · Out and why for the two you dropped; In for the rest, with Crestline’s buyer noted."
+   },
+   {
+    "lesson_id": "sort-and-decide",
+    "goal_index": "3",
+    "text": "The helper columns in S5:S10 and T5:T10: the multiple and EV per site where the flag is 1, blank where it’s 0.",
+    "teach": "MEDIAN and QUARTILE.INC skip a blank text result, so a helper column of =IF(include=1,multiple,\"\") is how a screened deal drops out of every statistic without being deleted.",
+    "why": "",
+    "hint_stuck": "pulse range S5:T10 · =IF(Q5=1,J5,\"\") reads the flag in Q and the multiple in J."
+   },
+   {
+    "lesson_id": "sort-and-decide",
+    "goal_index": "4",
+    "text": "The median, mean, quartiles, minimum and maximum of the included deals in S11:T16, each row filled across.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range S11:T16 · MEDIAN, AVERAGE, QUARTILE.INC at 1 and 3, MIN and MAX of rows 5 to 10."
+   },
+   {
+    "lesson_id": "sort-and-decide",
+    "goal_index": "5",
+    "text": "In C20:C22, the trading median from Comps, the precedents median, and the control premium the gap implies.",
+    "teach": "Trading multiples price a slice of a company; a precedent prices the whole of it. The precedents median over the trading median, less one, is the premium a buyer paid for control.",
+    "why": "",
+    "hint_stuck": "pulse range C20:C22 · The trading median is Comps!D44; the precedents median is S11."
+   },
+   {
+    "lesson_id": "sort-and-decide",
+    "goal_index": "6",
+    "text": "Read the DCF’s exit multiple in C23 against both medians with the IF in C24.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C23:C24 · The exit multiple is on Inputs; it should sit between the two medians, or have a reason not to."
+   },
+   {
+    "lesson_id": "sort-and-decide",
+    "goal_index": "7",
+    "text": "Does it tie? Watch Nationwide’s flag in Q6 go to 1: the median in S11 and the quartiles in S13:S14 move.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range Precedents!S13:S14 · Every statistic reads the helper column, and the helper reads the flag."
+   }
+  ],
+  "applying-precedents": [
+   {
+    "lesson_id": "applying-precedents",
+    "goal_index": "0",
+    "text": "The multiples in C37:E37: the low quartile, the median and the high quartile of the included deals, from S13, S11 and S14.",
+    "teach": "The range is the middle half of the set, from the low quartile to the high, with the median between: the extremes are where the outliers live, so a range quoted on them says more about one deal than about the market.",
+    "why": "",
+    "hint_stuck": "pulse range C37:E37 · Low, median, high: rows 13, 11 and 14 of the helper column S."
+   },
+   {
+    "lesson_id": "applying-precedents",
+    "goal_index": "1",
+    "text": "Enterprise value in C38:E38: each multiple times Clearcoat’s FY26E EBITDA on Comps, =C37*Comps!$J$17.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C38:E38 · The EBITDA sits on Comps row 17, anchored so the fill keeps it."
+   },
+   {
+    "lesson_id": "applying-precedents",
+    "goal_index": "2",
+    "text": "The same on sites: EV per site in C39:E39 from column T, and enterprise value on Clearcoat’s sites in C40:E40.",
+    "teach": "A buyer of car washes checks the EBITDA answer against one any operator can count: what deals paid per site, times the sites Clearcoat runs. Two methods that land close together are a range the board can trust.",
+    "why": "",
+    "hint_stuck": "pulse range C39:E39 · The per-site statistics are in column T; the sites are on Comps, times 1,000 to bring $m back to thousands."
+   },
+   {
+    "lesson_id": "applying-precedents",
+    "goal_index": "3",
+    "text": "Net debt at the valuation date in C41:E41, as a negative from the DCF: =-DCF!$C$43.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C41:E41 · The DCF page holds net debt once; every range reads it there."
+   },
+   {
+    "lesson_id": "applying-precedents",
+    "goal_index": "4",
+    "text": "Equity value in C42:E42 on EBITDA and in C43:E43 on sites: enterprise value plus the net debt line.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C42:E43 · Net debt is already negative, so equity is a plus."
+   },
+   {
+    "lesson_id": "applying-precedents",
+    "goal_index": "5",
+    "text": "Does it tie? Watch Crestline’s flag go to 0: the strategic deal drops out and the whole range moves.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range Precedents!C38:E38 · The range reads the statistics, which read the flags."
+   }
+  ],
+  "challenge-precedents": [
+   {
+    "lesson_id": "challenge-precedents",
+    "goal_index": "0",
+    "text": "The deal multiple in J5:J9: enterprise value over LTM EBITDA.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-precedents",
+    "goal_index": "1",
+    "text": "The premium in O5:O9 where the target was listed, a dash where it wasn’t.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-precedents",
+    "goal_index": "2",
+    "text": "Each deal’s age in years in P5:P9, against the valuation date on Inputs.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-precedents",
+    "goal_index": "3",
+    "text": "Include flags in Q5:Q9 with a reason beside each in column R: the stale deal and the big strategic chain out.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-precedents",
+    "goal_index": "4",
+    "text": "The EV range in C36:E36: the included deals’ low quartile, median and high quartile times Clearcoat’s EBITDA on Comps.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "sources-and-uses": [
+   {
+    "lesson_id": "sources-and-uses",
+    "goal_index": "0",
+    "text": "FY26E EBITDA in C6 from IS, the $195,000k bid typed in C7, and the entry multiple it implies in C8.",
+    "teach": "A sponsor bids a price, and the multiple is what that price says about the business: the bid over FY26E EBITDA. The bid is the input and the multiple a formula, so moving the price moves every line below.",
+    "why": "",
+    "hint_stuck": "pulse range C6:C8 · EBITDA is IS row 24, column E; the multiple is =$C$7/$C$6."
+   },
+   {
+    "lesson_id": "sources-and-uses",
+    "goal_index": "1",
+    "text": "The deal terms in C9:C14: fees 2%, senior 4.5x at 8% with 5% a year amortized, mezzanine 1.0x at 12%.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C9:C14 · Percentages as decimals: 0.02, 0.08, 0.05, 0.12."
+   },
+   {
+    "lesson_id": "sources-and-uses",
+    "goal_index": "2",
+    "text": "Net debt at closing in C22 from Schedules, then uses in C35:C39: net debt repaid, equity purchased, fees and the total.",
+    "teach": "Uses are what the deal pays: the existing loan repaid, net of cash (lenders rarely let a loan carry over when control changes), the equity bought from the owners, and the fees on top.",
+    "why": "",
+    "hint_stuck": "pulse range C35:C39 · Equity purchased is the bid less net debt; fees are 2% of enterprise value."
+   },
+   {
+    "lesson_id": "sources-and-uses",
+    "goal_index": "3",
+    "text": "The 20% rollover in C16, then sources in C40:C44, with the sponsor’s equity as the plug.",
+    "teach": "Debt is sized on EBITDA, the owners keep 20% of their equity as a stake, and the sponsor wires whatever is left. The equity line is the one honest plug in finance, because it’s the sponsor’s choice.",
+    "why": "",
+    "hint_stuck": "pulse range C40:C44 · Senior is 4.5 times EBITDA; the plug is total uses less the debt and the rollover."
+   },
+   {
+    "lesson_id": "sources-and-uses",
+    "goal_index": "4",
+    "text": "The check in C45, and the same difference live on Checks!C14 with its pending note in K14 cleared.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell Checks!C14 · ROUND of total sources less total uses, reading the LBO page."
+   },
+   {
+    "lesson_id": "sources-and-uses",
+    "goal_index": "5",
+    "text": "Equity as a share of the price, debt as a multiple of EBITDA and the rolled stake’s share in C46:C48.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C46:C48 · A lender reads the debt multiple first; a sponsor reads its equity share."
+   },
+   {
+    "lesson_id": "sources-and-uses",
+    "goal_index": "6",
+    "text": "Does it tie? Watch the bid go to $207,500k, 12.5x: the sponsor’s equity rises and the debt doesn’t move.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range LBO!C40:C43 · Debt is sized on EBITDA, not on the price, so the plug takes the rest."
+   }
+  ],
+  "tranches-and-sweep": [
+   {
+    "lesson_id": "tranches-and-sweep",
+    "goal_index": "0",
+    "text": "EBITDA, adjusted EBITDA and free cash flow for FY27 to FY31 in D51:H54, linked from IS and DCF.",
+    "teach": "The LBO borrows its operating lines from the model, linked, so a change to the plan reaches the sponsor’s return without a second copy. Adjusted EBITDA waits for the sale-leaseback’s rent in the next lesson.",
+    "why": "",
+    "hint_stuck": "pulse range D51:H54 · EBITDA is IS row 24 and free cash flow DCF row 16, from column F."
+   },
+   {
+    "lesson_id": "tranches-and-sweep",
+    "goal_index": "1",
+    "text": "The senior loan in D72:H77: opening, mandatory amortization, the sweep, closing, the average and interest.",
+    "teach": "The 5% is of the original loan, as loan agreements quote it, so the closing balance at C is anchored with F4. MIN of that and the opening balance means a loan swept down early never goes below zero.",
+    "why": "",
+    "hint_stuck": "pulse range D72:H77 · Mandatory is −MIN(5% × the loan at C, the opening); interest reads Circ like the model’s tranches."
+   },
+   {
+    "lesson_id": "tranches-and-sweep",
+    "goal_index": "2",
+    "text": "The mezzanine in D80:H83: opening, closing, the average and interest at 12%, never swept.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range D80:H83 · Mezzanine can’t be repaid early without a penalty, so its balance waits for the exit."
+   },
+   {
+    "lesson_id": "tranches-and-sweep",
+    "goal_index": "3",
+    "text": "The cash rows in D58:H65: opening cash, free cash flow, interest net of tax, mandatory amortization, then cash available.",
+    "teach": "The model’s free cash flow was taxed as if there were no debt, so interest comes off net of the tax it saves. Minimum cash comes off once, in cash available, not out of every year.",
+    "why": "",
+    "hint_stuck": "pulse range D58:H65 · Interest is −total interest × (1 − tax); cash available is the subtotal less minimum cash."
+   },
+   {
+    "lesson_id": "tranches-and-sweep",
+    "goal_index": "4",
+    "text": "The revolver’s draw and repayment, the sweep floored with MAX and MIN, and closing cash in D66:H69.",
+    "teach": "The sweep is MAX(MIN(cash available, what the senior loan still owes), 0), the floored form from the model, so a short year can’t turn it into new senior borrowing; a short year draws the revolver instead.",
+    "why": "",
+    "hint_stuck": "pulse range D66:H69 · The draw is MAX(−cash available, 0); the repayment comes first, then the sweep."
+   },
+   {
+    "lesson_id": "tranches-and-sweep",
+    "goal_index": "5",
+    "text": "The revolver’s block in D86:H91: opening, drawn, repaid, closing, the average and interest.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range D86:H91 · Drawn and repaid read the two rows of the cash block."
+   },
+   {
+    "lesson_id": "tranches-and-sweep",
+    "goal_index": "6",
+    "text": "Total debt, total interest, cash, net debt and net debt paid down since closing in C94:H98.",
+    "teach": "Net debt paid down is what the sponsor’s equity is worth more by at the exit. Here the rollout’s capex takes the cash: the revolver draws every year and net debt ends the hold higher than it started.",
+    "why": "",
+    "hint_stuck": "pulse range C94:H98 · Paid down is net debt at closing, anchored, less each year’s."
+   },
+   {
+    "lesson_id": "tranches-and-sweep",
+    "goal_index": "7",
+    "text": "The check in D99:H99: debt repaid plus cash built, less the cumulative cash after interest and tax, reading zero.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range D99:H99 · ROUND of the change in cash less the change in debt, less the running sums from D."
+   },
+   {
+    "lesson_id": "tranches-and-sweep",
+    "goal_index": "8",
+    "text": "Does it tie? Watch FY28’s free cash flow halve: the revolver draws more and debt at the exit rises.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range LBO!D94:H94 · Every year’s debt reads the cash before it."
+   }
+  ],
+  "sale-leasebacks": [
+   {
+    "lesson_id": "sale-leasebacks",
+    "goal_index": "0",
+    "text": "The terms in C28:C30: 20 sites sold, $2,500k a site, and a 7% cap rate.",
+    "teach": "A sale-leaseback sells the land under a site to a landlord and rents it back. The landlord prices the rent as a cap rate on what they paid, so 7% on $2,500k is $175k a year, every year.",
+    "why": "",
+    "hint_stuck": "pulse range C28:C30 · Type 7 into the percent cell for 7%."
+   },
+   {
+    "lesson_id": "sale-leasebacks",
+    "goal_index": "1",
+    "text": "The switch in C26: type 0, so the land stays owned until a scenario sells it.",
+    "teach": "A switch is one typed cell that every formula multiplies or tests, so the whole sale-leaseback comes and goes with one keystroke and the base case never carries it by accident.",
+    "why": "",
+    "hint_stuck": "pulse cell C26 · 1 is on, 0 is off; the label says so."
+   },
+   {
+    "lesson_id": "sale-leasebacks",
+    "goal_index": "2",
+    "text": "Proceeds in C31, =$C$26*$C$28*$C$29, and the rent a year they cost in C32, =$C$31*$C$30.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C31:C32 · The switch times sites times value; the rent is the proceeds times the cap rate."
+   },
+   {
+    "lesson_id": "sale-leasebacks",
+    "goal_index": "3",
+    "text": "The rent as a cost in D52:H52, the proceeds in FY27 in D55:H55, and the cash they bring in D60:H60.",
+    "teach": "The rent comes off EBITDA from FY27 on, which is why adjusted EBITDA sits on its own labeled line. The proceeds land once, in FY27, through the COLUMNS counter, and the cash block reads them.",
+    "why": "",
+    "hint_stuck": "pulse range D52:H52 · The rent is −$C$32 every year; the proceeds only where the counter reads 1."
+   },
+   {
+    "lesson_id": "sale-leasebacks",
+    "goal_index": "4",
+    "text": "The second switch in C27: type 1 to repay the senior loan, then the proceeds held for new sites in D64:H64.",
+    "teach": "Proceeds can repay debt through the sweep or fund new sites. When they are held, the memo line keeps them out of cash available, so the sweep can’t spend money promised to the rollout.",
+    "why": "",
+    "hint_stuck": "pulse range D64:H64 · When the switch reads 2, last year’s held balance plus this year’s proceeds; otherwise 0."
+   },
+   {
+    "lesson_id": "sale-leasebacks",
+    "goal_index": "5",
+    "text": "Does it tie? Watch the switch go to 1: net debt at FY31 falls, and adjusted EBITDA falls by the rent for good.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range LBO!D53:H53 · $3,500k of rent a year comes off every year’s EBITDA."
+   }
+  ],
+  "irr-moic": [
+   {
+    "lesson_id": "irr-moic",
+    "goal_index": "0",
+    "text": "Exit enterprise value, net debt at the exit and equity at the exit in C102:C104.",
+    "teach": "The sponsor sells after five years at the exit multiple on FY31 adjusted EBITDA, repays whatever debt is left, and keeps the rest. That equity at the exit is the whole payoff.",
+    "why": "",
+    "hint_stuck": "pulse range C102:C104 · =$C$17*$H$53; net debt at FY31 is H97, as a negative."
+   },
+   {
+    "lesson_id": "irr-moic",
+    "goal_index": "1",
+    "text": "Equity at entry, the sponsor’s and the rolled stake together, in C105, and MOIC in C106.",
+    "teach": "MOIC is money out over money in. Entry equity counts the owners’ rolled stake beside the sponsor’s cheque, because both hold the new company on the same terms.",
+    "why": "",
+    "hint_stuck": "pulse range C105:C106 · Sponsor equity plus the rollover from sources and uses, then exit equity over it."
+   },
+   {
+    "lesson_id": "irr-moic",
+    "goal_index": "2",
+    "text": "The equity cash flows in C107:H107, in at closing and out in the hold’s last year, and IRR on them in C108.",
+    "teach": "IRR is the annual rate that turns the money in into the money out over the hold. The counter puts the exit in the year the hold names, so a four-year hold moves it.",
+    "why": "",
+    "hint_stuck": "pulse range C107:H107 · Entry equity as a negative at C, then the exit equity where the counter equals the hold."
+   },
+   {
+    "lesson_id": "irr-moic",
+    "goal_index": "3",
+    "text": "IRR by hand in C109 with RRI over the hold, and the difference from IRR in C110, reading zero.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C109:C110 · RRI(hold, equity in, equity out) is MOIC to the one over five, less one."
+   },
+   {
+    "lesson_id": "irr-moic",
+    "goal_index": "4",
+    "text": "The split in C111:C116: the sponsor’s share, both holders’ cash flows, their IRRs and the check between them.",
+    "teach": "Each holder gets its share of every cash flow, so the sponsor and the owners earn the deal’s rate exactly. A check reading zero proves the split and the return rows are wired the same way.",
+    "why": "",
+    "hint_stuck": "pulse range C111:C116 · The sponsor’s share is its equity over entry equity; the owners take one less that share."
+   },
+   {
+    "lesson_id": "irr-moic",
+    "goal_index": "5",
+    "text": "The senior lender’s row in C117:H117 and its IRR in C118, which lands close to the loan’s 8%.",
+    "teach": "The lender is out the loan at closing and gets interest and repayments back each year, the balance at the exit. Its IRR near the loan’s rate is the proof that no repayment is missing from the row.",
+    "why": "",
+    "hint_stuck": "pulse range C117:H117 · Interest less the amortization and the sweep (both negative on the loan), plus the balance in the exit year."
+   },
+   {
+    "lesson_id": "irr-moic",
+    "goal_index": "6",
+    "text": "The flag in C119: Clears when IRR is at least the 20% hurdle, Short when it isn’t.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C119 · IRR against the hurdle on the term sheet, never a typed 20%."
+   },
+   {
+    "lesson_id": "irr-moic",
+    "goal_index": "7",
+    "text": "Does it tie? Watch the exit multiple go to 12x: IRR and MOIC both rise, and the flag reads them.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range LBO!C106:C108 · Every return line reads the exit equity."
+   }
+  ],
+  "returns-bridge": [
+   {
+    "lesson_id": "returns-bridge",
+    "goal_index": "0",
+    "text": "The equity gain in C122: equity at the exit less equity at entry, =C104-C105.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C122 · Both ends are in the returns block just above."
+   },
+   {
+    "lesson_id": "returns-bridge",
+    "goal_index": "1",
+    "text": "The EBITDA growth effect in C123: FY31 adjusted EBITDA less FY26E EBITDA, times the entry multiple.",
+    "teach": "A return comes from three places, and a sponsor wants to see which. Growth is the rollout: every dollar of EBITDA added is worth the multiple paid for it.",
+    "why": "",
+    "hint_stuck": "pulse cell C123 · =($H$53-$C$6)*$C$8."
+   },
+   {
+    "lesson_id": "returns-bridge",
+    "goal_index": "2",
+    "text": "The multiple effect in C124: the exit multiple less the entry multiple, times FY31 adjusted EBITDA.",
+    "teach": "Paying 11.7x and selling at 11.0x loses the difference on every dollar of FY31 EBITDA, so on this deal the multiple works against the sponsor.",
+    "why": "",
+    "hint_stuck": "pulse cell C124 · =($C$17-$C$8)*$H$53."
+   },
+   {
+    "lesson_id": "returns-bridge",
+    "goal_index": "3",
+    "text": "The debt paydown effect in C125: net debt at closing less net debt at FY31.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C125 · Net debt is row 97: C at closing, H at FY31."
+   },
+   {
+    "lesson_id": "returns-bridge",
+    "goal_index": "4",
+    "text": "The fees in C126, as a negative: the 2% paid at entry that no buyer pays back.",
+    "teach": "Entry equity paid the fees, and nothing at the exit returns them, so without this line the three effects overshoot the gain by exactly the fees.",
+    "why": "",
+    "hint_stuck": "pulse cell C126 · The fees line of sources and uses, with its sign turned."
+   },
+   {
+    "lesson_id": "returns-bridge",
+    "goal_index": "5",
+    "text": "The four effects summed in C127, and the check against the gain in C128, reading zero.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C127:C128 · SUM of the four, then ROUND of the total less the gain."
+   },
+   {
+    "lesson_id": "returns-bridge",
+    "goal_index": "6",
+    "text": "Each effect as a share of the gain in C129:C132.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C129:C132 · Each effect over the gain in C122; the four add to 100%."
+   },
+   {
+    "lesson_id": "returns-bridge",
+    "goal_index": "7",
+    "text": "Does it tie? Watch the exit multiple in C17 set to the entry multiple: C124 reads zero and the check still holds.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell LBO!C124 · Sell at what you paid and the multiple adds nothing."
+   }
+  ],
+  "what-the-sponsor-can-pay": [
+   {
+    "lesson_id": "what-the-sponsor-can-pay",
+    "goal_index": "0",
+    "text": "Select D136:H140 and enter the IRR grid as one formula with Ctrl+Enter: entry multiples down, exit multiples across.",
+    "teach": "Each cell is the return on its own pair: equity at the exit on the column’s multiple, over equity at entry on the row’s, to the one over the hold, less one. $C on the entry edge and the row anchored on the exit edge let one formula fill the block.",
+    "why": "",
+    "hint_stuck": "pulse range D136:H140 · =((D$135*$H$53-$H$97)/($C136*$C$6*(1+$C$9)-$C$40-$C$41))^(1/$C$18)-1"
+   },
+   {
+    "lesson_id": "what-the-sponsor-can-pay",
+    "goal_index": "1",
+    "text": "A formula rule on D136:H140 that turns the text red wherever the IRR is below the hurdle in C19.",
+    "teach": "The rule reads the hurdle cell, so a sponsor with a 25% bar changes one input and the red moves with it.",
+    "why": "",
+    "hint_stuck": "pulse range D136:H140 · Alt, H, L, N, the formula for the top-left cell, then ↓ to Red Text."
+   },
+   {
+    "lesson_id": "what-the-sponsor-can-pay",
+    "goal_index": "2",
+    "text": "Goal Seek C108 to 0.2 by changing the bid in C7, read the price it finds, then type 195000 back.",
+    "teach": "Goal Seek finds the bid that gives exactly 20%, and writes it over the input. Read the price, then put the real bid back: a model never keeps a Goal Seek answer as an input.",
+    "why": "",
+    "hint_stuck": "pulse cell C108 · Set cell C108, to value 0.2, by changing C7; then the bid goes back to 195000."
+   },
+   {
+    "lesson_id": "what-the-sponsor-can-pay",
+    "goal_index": "3",
+    "text": "Three hurdles across C144:E144: 25%, 20% and 17.5%, the high, the usual and the low bar.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C144:E144 · Type 25, 20 and 17.5 into the percent cells."
+   },
+   {
+    "lesson_id": "what-the-sponsor-can-pay",
+    "goal_index": "4",
+    "text": "The most equity that still earns each hurdle in C145:E145: =PV(C144,$C$18,0,-$C$104), filled right.",
+    "teach": "The PV of the exit equity at the hurdle rate is the most a sponsor can put in and still earn that rate. One formula filled right stays live, where three Goal Seek answers pasted in would not.",
+    "why": "",
+    "hint_stuck": "pulse range C145:E145 · PV(hurdle, hold, 0, −exit equity), the hold and the exit anchored."
+   },
+   {
+    "lesson_id": "what-the-sponsor-can-pay",
+    "goal_index": "5",
+    "text": "The top price as enterprise value, its multiple of EBITDA and the room against the bid in C146:E148.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C146:E148 · Equity plus both tranches, over one plus fees; then over EBITDA, and less the bid."
+   },
+   {
+    "lesson_id": "what-the-sponsor-can-pay",
+    "goal_index": "6",
+    "text": "Does it tie? Watch senior leverage go to 5.5x: every cell of the grid shifts, and so does the top price.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range LBO!D136:H140 · More debt means less equity at entry, so every return moves."
+   }
+  ],
+  "challenge-paper-lbo": [
+   {
+    "lesson_id": "challenge-paper-lbo",
+    "goal_index": "0",
+    "text": "Sources and uses balancing: total uses in C39, the sponsor’s equity in C43 and total sources in C44.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-paper-lbo",
+    "goal_index": "1",
+    "text": "Five years of the senior loan with its sweep, closing FY31 at H75, and net debt at FY31 in H97.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-paper-lbo",
+    "goal_index": "2",
+    "text": "Equity at the exit in C104: the exit multiple on FY31 EBITDA, less net debt.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-paper-lbo",
+    "goal_index": "3",
+    "text": "MOIC in C106 and IRR on the equity cash flows in C108.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-paper-lbo",
+    "goal_index": "4",
+    "text": "The bridge in C122:C127: the gain, growth, multiple, paydown and fees, and their total.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-paper-lbo",
+    "goal_index": "5",
+    "text": "The flag in C119: Clears or Short against the 20% hurdle.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
   ]
  },
  "modules": {
@@ -15626,6 +16396,20 @@ export const COPY = {
    "objective": "Trading comps: spreading a comp (the enterprise value build); calendarization and LTM; sorting the set, filtering the outliers, taking the median; operating multiples (EV per site and per wash); applying the range to Clearcoat.",
    "story_beat": "What the market pays for a car wash. || Six listed operators do what Clearcoat does, and the market prices each of them every day. Turn those prices into multiples (what a dollar of car-wash EBITDA is worth), measure every company to the same date, take the middle of the set, and apply it to Clearcoat. That’s the first range on the board’s page, and the one the buyers will quote back.",
    "page_name": "Trading comps, spread"
+  },
+  "precedent-transactions": {
+   "id": "precedent-transactions",
+   "name": "Precedent transactions",
+   "objective": "Precedent transactions: deal multiples and premiums; sorting by date and size and deciding what’s comparable; applying the precedents range.",
+   "story_beat": "What buyers have actually paid. || Trading multiples are what the market pays for a slice; precedents are what a buyer paid for the whole thing, control included, in real deals over the last three years. They’re fewer, older and harder to compare, so the questions are which deals count, how old is too old, and what a control premium looks like when the target was listed.",
+   "page_name": "Precedents, spread"
+  },
+  "lbo": {
+   "id": "lbo",
+   "name": "LBO",
+   "objective": "The LBO: sources and uses; debt tranches and the cash sweep; sale-leasebacks and what they cost later; returns (IRR and MOIC); the returns bridge; sensitivity on entry and exit.",
+   "story_beat": "How a sponsor can pay what they’re offering. || The lead sponsor is offering $195m, and the way they can afford it is debt: borrow nearly half the price against Clearcoat’s own cash flow, use every spare dollar to pay it down, sell in five years at the same multiple, and keep what’s left. Rebuild their model to see what return that gives them and, once you can, what the most is they could pay and still hit it.",
+   "page_name": "The sponsor’s LBO"
   }
  },
  "site": {

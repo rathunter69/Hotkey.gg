@@ -223,6 +223,18 @@ import median_and_range from './lessons/median-and-range.js';
 import operating_multiples from './lessons/operating-multiples.js';
 import applying_the_range from './lessons/applying-the-range.js';
 import challenge_comps from './lessons/challenge-comps.js';
+// Chapter 6 · 6.2 Precedent transactions, 6.3 LBO
+import deal_multiples_premiums from './lessons/deal-multiples-premiums.js';
+import sort_and_decide from './lessons/sort-and-decide.js';
+import applying_precedents from './lessons/applying-precedents.js';
+import challenge_precedents from './lessons/challenge-precedents.js';
+import sources_and_uses from './lessons/sources-and-uses.js';
+import tranches_and_sweep from './lessons/tranches-and-sweep.js';
+import sale_leasebacks from './lessons/sale-leasebacks.js';
+import irr_moic from './lessons/irr-moic.js';
+import returns_bridge from './lessons/returns-bridge.js';
+import what_the_sponsor_can_pay from './lessons/what-the-sponsor-can-pay.js';
+import challenge_paper_lbo from './lessons/challenge-paper-lbo.js';
 
 export const CHAPTERS = [
   {
@@ -380,6 +392,9 @@ export const CHAPTERS = [
     ],
     lessons: [
       spreading_a_comp, calendarization_ltm, median_and_range, operating_multiples, applying_the_range, challenge_comps,
+      deal_multiples_premiums, sort_and_decide, applying_precedents, challenge_precedents,
+      sources_and_uses, tranches_and_sweep, sale_leasebacks, irr_moic, returns_bridge, what_the_sponsor_can_pay,
+      challenge_paper_lbo,
     ],
   },
 ];

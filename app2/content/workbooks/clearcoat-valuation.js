@@ -49,9 +49,9 @@ export const DEALS = [
   { date: [2023, 1, 17], target: 'Bluewater Wash', acquirer: 'Keystone Capital Partners', type: 'Sponsor', ev: 310000, ebitda: 23000, sites: 55, listed: 0, include: 0, reason: 'Out: four years old, priced when rates were two points lower' },
   { date: [2024, 6, 4], target: 'Nationwide Shine', acquirer: 'Atlas Infrastructure Partners', type: 'Sponsor', ev: 1450000, ebitda: 108000, sites: 200, listed: 1, pre: 21, offer: 27.3, include: 0, reason: "Out: a 200-site national chain, five times Clearcoat's scale" },
   { date: [2024, 11, 12], target: 'Crestline Car Wash', acquirer: 'Pinnacle Wash Holdings', type: 'Strategic', ev: 184000, ebitda: 14500, sites: 38, listed: 0, include: 1, reason: 'In, noted: a strategic buyer, so the price may carry synergies' },
-  { date: [2025, 3, 20], target: 'Lakeside Express', acquirer: 'Harborview Equity', type: 'Sponsor', ev: 262000, ebitda: 21000, sites: 52, listed: 1, pre: 12.4, offer: 15.5, include: 1, reason: 'In' },
-  { date: [2025, 9, 9], target: 'Goldline Auto Spa', acquirer: 'Cedar Ridge Capital', type: 'Sponsor', ev: 141000, ebitda: 12000, sites: 30, listed: 0, include: 1, reason: 'In' },
-  { date: [2026, 2, 26], target: 'Sunbelt Wash Co', acquirer: 'Northstar Partners', type: 'Sponsor', ev: 228000, ebitda: 19000, sites: 45, listed: 0, include: 1, reason: 'In' },
+  { date: [2025, 3, 20], target: 'Lakeside Express', acquirer: 'Harborview Equity', type: 'Sponsor', ev: 262000, ebitda: 21000, sites: 52, listed: 1, pre: 12.4, offer: 15.5, include: 1, reason: 'In: a sponsor buying a chain of Clearcoat’s size' },
+  { date: [2025, 9, 9], target: 'Goldline Auto Spa', acquirer: 'Cedar Ridge Capital', type: 'Sponsor', ev: 141000, ebitda: 12000, sites: 30, listed: 0, include: 1, reason: 'In: a sponsor buying a chain of Clearcoat’s size' },
+  { date: [2026, 2, 26], target: 'Sunbelt Wash Co', acquirer: 'Northstar Partners', type: 'Sponsor', ev: 228000, ebitda: 19000, sites: 45, listed: 0, include: 1, reason: 'In: a sponsor buying a chain of Clearcoat’s size' },
 ];
 /** The lead sponsor's term sheet (6.3): the bid is the input and the multiple a formula (195,000 over 16,600 is 11.75x; see source-checklist H). */
 export const TERMS = { entryEV: 195000, fee: 0.02, senLev: 4.5, senRate: 0.08, senAmort: 0.05, mezLev: 1, mezRate: 0.12, roll: 0.2, exitMult: 11, hold: 5, hurdle: 0.2,
@@ -163,9 +163,12 @@ function page(spec) {
   }
   if (spec.condFmt) sheet.condFmt = clone(spec.condFmt);
   if (spec.colWExtra) Object.assign(sheet.colW, spec.colWExtra);
-  // a page wider than Z (Comps runs to AB) widens its grid, or the last columns sit off the sheet
-  const widest = Math.max(...Object.keys(cells).filter(k => /^[A-Z]+\d+$/.test(k)).map(k => colNum(k.replace(/\d+$/, ''))));
-  if (widest > 26) sheet.cols = widest + 2;
+  // a page longer or wider than the default grid (100 rows, 26 columns) carries its size, so Go To reaches its last line
+  // and the last columns (Comps runs to AB) sit on the sheet; a page may also ask for more rows itself (spec.rows)
+  const used = Object.keys(cells).map(k => /^([A-Z]+)(\d+)$/.exec(k)).filter(Boolean);
+  const maxR = Math.max(...used.map(m => +m[2])), maxC = Math.max(...used.map(m => colNum(m[1])));
+  if (maxR > 90) sheet.rows = Math.max(sheet.rows || 0, Math.ceil((maxR + 20) / 10) * 10);
+  if (maxC > 24) sheet.cols = maxC + 4;
   return sheet;
 }
 function dryRows(spec) {
@@ -340,7 +343,7 @@ function pagePrecedents(deals) {
         { key: 'dcfRead', label: 'Where the exit multiple sits', kind: 'text', fill: firstCol(() => `=IF(AND(C${R(me, 'dcfExit')}>=MIN(C${R(me, 'tradMed')},C${R(me, 'precMed')}),C${R(me, 'dcfExit')}<=MAX(C${R(me, 'tradMed')},C${R(me, 'precMed')})),"Between the two medians","Outside the two medians: the DCF page says why")`) },
       ] },
       { title: 'The set sorted by date, then by enterprise value (a values copy)', header: ['Announced', 'Enterprise value', 'EV / EBITDA (x)'], kinds: ['count', 'money', 'mult'], colFmt: { C: DATE_FMT },
-        rows: sorted.map((d, i) => ({ key: 'sort' + i, label: d.target, values: [serial(...d.date), d.ev, Math.round(d.ev / d.ebitda * 100) / 100] })) },
+        rows: sorted.map((d, i) => ({ key: 'sort' + i, label: d.target, values: [serial(...d.date), d.ev, d.ev / d.ebitda] })) },   // the multiple unrounded: 6.2.2 pastes its values
       { title: `Applying the range to ${COMPANY} (USD millions)`, header: ['Low (25th percentile)', 'Median', 'High (75th percentile)'], rows: [
         rangeRow('rgMult', 'EV / EBITDA (x)', (col, r, st) => `=${DC.helper}${R(me, st)}`, { kind: 'mult' }),
         rangeRow('rgEV', 'Enterprise value on EBITDA', col => `=${col}${R(me, 'rgMult')}*Comps!$${CC.ebitda}$${R('Comps', 'cc')}`, { fmt: MILLIONS, green: true }),
@@ -742,8 +745,8 @@ const COMP_STAT_COLS = [CC.include, CC.helper, CC.growth, CC.lev];
 const COMP_OP_COLS = [CC.sites, CC.washes, CC.owns, CC.rent, CC.ebitdar, CC.evSite, CC.evWash, CC.siteHelper, CC.washHelper];
 const Q_INPUT_COLS = ['C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', Q_COLS.fy25, Q_COLS.fy26, Q_COLS.fye];
 const DEAL_INPUT_COLS = [DC.date, DC.target, DC.acquirer, DC.ev, DC.ebitda, DC.sites, DC.listed, DC.pre, DC.offer];
-const DEAL_621_COLS = [DC.type, DC.mult, DC.evSite, DC.premium];
-const DEAL_622_COLS = [DC.age, DC.include, DC.reason, DC.helper, DC.siteHelper];
+const DEAL_621_COLS = [DC.type, DC.mult, DC.evSite, DC.premium, DC.age];   // 6.2.1 ages the deals against the as-of date (its best practice)
+const DEAL_622_COLS = [DC.include, DC.reason, DC.helper, DC.siteHelper];
 const compKeys = (rows, n) => Array.from({ length: n }, (_, i) => 'c' + i);
 const qKeys = (rows, n) => Array.from({ length: n }, (_, i) => 'q' + i);
 const dealKeys = n => Array.from({ length: n }, (_, i) => 'd' + i);
@@ -816,8 +819,8 @@ const B61C = freshState(ALT_PACK, (s, rows) => { compsRaw(s, rows, ALT.comps, { 
 
 // module 6.2: precedents
 const B623 = derive(DONE, s => { strip(s, 'Precedents', Rw, span(Rw, 'Precedents', 'rgMult', 'rgEqSite')); after62(s, Rw); });
-const B622 = derive(B623, s => { keepCols(s, 'Precedents', Rw, dealKeys(6), [...DEAL_INPUT_COLS, ...DEAL_621_COLS]); strip(s, 'Precedents', Rw, [...STATS, ...span(Rw, 'Precedents', 'asOf', 'dcfRead'), ...span(Rw, 'Precedents', 'sort0', 'sort5')]); stripHeader(s, 'Precedents', Rw, 'sort0'); });
-const B621 = derive(B622, s => { keepCols(s, 'Precedents', Rw, dealKeys(6), DEAL_INPUT_COLS); });
+const B622 = derive(B623, s => { keepCols(s, 'Precedents', Rw, dealKeys(6), [...DEAL_INPUT_COLS, ...DEAL_621_COLS]); strip(s, 'Precedents', Rw, [...STATS, ...span(Rw, 'Precedents', 'tradMed', 'dcfRead'), ...span(Rw, 'Precedents', 'sort0', 'sort5')]); stripHeader(s, 'Precedents', Rw, 'sort0'); });
+const B621 = derive(B622, s => { keepCols(s, 'Precedents', Rw, dealKeys(6), DEAL_INPUT_COLS); strip(s, 'Precedents', Rw, ['asOf']); });
 const B62C = freshState(ALT_PACK, (s, rows) => { dealsRaw(s, rows, ALT.deals); withoutPages(s, ['LBO', 'Bids', 'Summary']); pendSu(s); });
 
 // module 6.3: the LBO
@@ -893,22 +896,44 @@ export function stateOf(id) {
   return clone(s);
 }
 
-/* ---------------- the replay's state shape and the module challenges' seeds ---------------- */
+/** The paper LBO solved (6.3.C's answer key): the whole page on its given inputs, as a one-sheet state. */
+export function paperState() {
+  const { sheet } = PAPER_PAGE();
+  return { sheets: [clone(sheet)], settings: { ...clone(M.stateOf('DONE').settings) } };
+}
 
-/** The pack is the Chapter 5 model plus five pages: its sessions and states compare as the model's do. */
+/* ---------------- the replay's state shape: the Chapter 5 model's pair, since the pack is that workbook grown ---------------- */
 export { diffStates, sessionToState } from './clearcoat-model.js';
+
+/* ---------------- the module challenges and their seeds (one table, one dispatcher) ---------------- */
 
 /** The module challenges and the states they start from (the seed dresses them; the workload never moves). */
 export const CHALLENGES = {
   'challenge-comps': { before: 'B61C' },
+  'challenge-precedents': { before: 'B62C' },
+  'challenge-paper-lbo': { before: 'B63C' },
 };
+/** A draw on a grid: lo to hi in steps of `by`, rounded clear of float dust. */
 const drawStep = (rng, lo, hi, by) => Math.round((lo + Math.floor(rng() * (Math.round((hi - lo) / by) + 1)) * by) * 1e6) / 1e6;
+/** A typed cell of a state re-typed at a fresh figure, in its own look. */
+const retyped = (st, name, ref, value) => ({ ...clone(cellsOf(st, name)[ref]), value });
 const SEEDS = {
   // 6.1.C: the three fresh comps' share prices, each within a tenth of its own, so every EV and multiple is new
   'challenge-comps': rng => {
-    const rows = ALT_ROWS().Comps, cells = cellsOf(STATES.B61C, 'Comps'), p = {};
-    ALT.comps.forEach((cp, i) => { const ref = CC.price + rows['c' + i]; p['Comps!' + ref] = { ...clone(cells[ref]), value: drawStep(rng, Math.round(cp.price * 90) / 100, Math.round(cp.price * 110) / 100, 0.05) }; });
+    const st = STATES.B61C, rows = ALT_ROWS().Comps, p = {};
+    ALT.comps.forEach((cp, i) => { const ref = CC.price + rows['c' + i]; p['Comps!' + ref] = retyped(st, 'Comps', ref, drawStep(rng, Math.round(cp.price * 90) / 100, Math.round(cp.price * 110) / 100, 0.05)); });
     return p;
+  },
+  // 6.2.C: each fresh deal's enterprise value moved by up to 5%, to the nearest $500k
+  'challenge-precedents': rng => {
+    const st = STATES.B62C, rows = ALT_ROWS().Precedents, p = {};
+    ALT.deals.forEach((d, i) => { const ref = DC.ev + rows['d' + i]; p['Precedents!' + ref] = retyped(st, 'Precedents', ref, Math.round(d.ev * drawStep(rng, 95, 105, 1) / 100 / 500) * 500); });
+    return p;
+  },
+  // 6.3.C: a fresh bid and exit multiple on the paper LBO
+  'challenge-paper-lbo': rng => {
+    const st = STATES.B63C, rows = PAPER_ROWS().LBO;
+    return { ['LBO!C' + rows.entryEV]: retyped(st, 'LBO', 'C' + rows.entryEV, drawStep(rng, 160000, 170000, 2500)), ['LBO!C' + rows.exitMult]: retyped(st, 'LBO', 'C' + rows.exitMult, drawStep(rng, 10, 11, 0.25)) };
   },
 };
 /** A module challenge's seed patch: content only, never workload. */

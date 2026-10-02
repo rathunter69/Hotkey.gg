@@ -110,6 +110,10 @@ const BEATS_DEFAULT = {
   // Chapter 6 · Valuation (script-ch6.md story cards)
   'trading-comps': { eyebrow: 'Module 6.1 · trading comps', title: 'What the market pays for a car wash.',
     body: 'Six listed operators do what Clearcoat does, and the market prices each of them every day. Turn those prices into multiples (what a dollar of car-wash EBITDA is worth), measure every company to the same date, take the middle of the set, and apply it to Clearcoat. That’s the first range on the board’s page, and the one the buyers will quote back.' },
+  'precedent-transactions': { eyebrow: 'Module 6.2 · precedent transactions', title: 'What buyers have actually paid.',
+    body: 'Trading multiples are what the market pays for a slice; precedents are what a buyer paid for the whole thing, control included, in real deals over the last three years. They’re fewer, older and harder to compare, so the questions are which deals count, how old is too old, and what a control premium looks like when the target was listed.' },
+  lbo: { eyebrow: 'Module 6.3 · LBO', title: 'How a sponsor can pay what they’re offering.',
+    body: 'The lead sponsor is offering $195m, and the way they can afford it is debt: borrow nearly half the price against Clearcoat’s own cash flow, use every spare dollar to pay it down, sell in five years at the same multiple, and keep what’s left. Rebuild their model to see what return that gives them and, once you can, what the most is they could pay and still hit it.' },
   'project-and-assessment': { eyebrow: 'Module 1.8 · project, assessment, test-out', title: 'Management’s next feed is in.',
     body: 'A fresh week, a blank Report, and everything the chapter taught. Build the page start to finish, then prove it against the clock on Monday morning; or test out of the chapter in five minutes.' },
 };
