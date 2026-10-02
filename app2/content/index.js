@@ -227,6 +227,7 @@ import sale_leasebacks from './lessons/sale-leasebacks.js';
 import irr_moic from './lessons/irr-moic.js';
 import returns_bridge from './lessons/returns-bridge.js';
 import what_the_sponsor_can_pay from './lessons/what-the-sponsor-can-pay.js';
+import challenge_paper_lbo from './lessons/challenge-paper-lbo.js';
 
 export const CHAPTERS = [
   {
@@ -385,6 +386,7 @@ export const CHAPTERS = [
     lessons: [
       deal_multiples_premiums, sort_and_decide, applying_precedents, challenge_precedents,
       sources_and_uses, tranches_and_sweep, sale_leasebacks, irr_moic, returns_bridge, what_the_sponsor_can_pay,
+      challenge_paper_lbo,
     ],
   },
 ];
