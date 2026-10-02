@@ -11,9 +11,10 @@ import { FLAIR, FLAIR_BY_ID, SLOTS, ROLLABLE } from '../content/flair.js';
 /** The themes everyone has from the first visit. */
 export const FREE_THEMES = ['workbook', 'contrast', 'default'];
 
-/** Amber is Chapter 1's: the theme for finishing it, whatever the level. */
+/** Amber is Chapter 1's, for finishing it, whatever the level; Synthwave is rapid-fire's, for the first Combo 10. */
 export const SPECIAL_THEMES = {
   bloomberg: { ach: 'ch1-complete', label: 'Complete Chapter 1' },
+  synthwave: { ach: 'combo-10', label: 'A ten-hit rapid-fire combo' },   // the meter's first Combo 10 (M100)
 };
 
 /** Level-locked themes, from the catalog: theme key → level. */

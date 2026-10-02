@@ -453,3 +453,72 @@ td.kr-state{display:table-cell}
 /* a coach mark on a page panel (Home's Level and Today): the card sits to the panel's left, its pointer on the right edge */
 .coach.coach-left{transform:translate(calc(-1 * var(--card-gap)), -50%); border-left:0; border-right:var(--mode-rule) solid var(--learn)}
 .coach.coach-left::before{left:auto; right:calc(-1 * var(--s2) - var(--mode-rule))}
+/* ---------- rapid-fire's stage (3.0, Rapid-fire; M100): its own page, a faintly rose ground, no rail and no footer ---------- */
+body[data-route="rapid"]{background:color-mix(in srgb, var(--rapid-tint) 55%, var(--paper))}
+body[data-route="rapid"] #footMount, body[data-route="rapid"] .site-footer{display:none}
+body[data-route="rapid"] > .app{padding:0; margin:0; max-width:none}
+.rf{max-width:var(--rf-max); margin:0 auto; padding:0 var(--content-side) var(--s8); font-family:var(--font); color:var(--ink); display:flex; flex-direction:column; min-height:100vh}
+.rf-top{display:flex; align-items:center; gap:var(--s6); height:var(--rf-top-h); border-bottom:1px solid var(--line)}
+.rf-back{padding:var(--s2) var(--s3); font-size:var(--fs-label)}
+.rf-dur{font-size:var(--fs-label); font-weight:var(--fw-semi); color:var(--ink-2)}
+.rf-hits{font-size:var(--fs-body); font-weight:var(--fw-bold); color:var(--ink)}
+.rf-clock{margin-left:auto; font-family:var(--mono); font-size:var(--fs-clock); font-weight:var(--fw-bold); font-variant-numeric:tabular-nums; color:var(--ink)}
+.rf-clock.low{color:var(--red)}
+.rf-meter{display:flex; align-items:center; justify-content:center; gap:var(--s4); padding:var(--s4) 0 0}
+.rf-segs{display:flex; gap:var(--s1)}
+.rf-segs i{display:block; width:var(--rf-seg-w); height:var(--rf-seg-h); border-radius:var(--s1); background:var(--sheet); border:1px solid var(--rapid)}
+.rf-segs i.on{background:var(--rapid)}
+.rf-combo{font-size:var(--fs-label); font-weight:var(--fw-semi); color:var(--rapid-ink); font-variant-numeric:tabular-nums}
+.rf[data-phase="ready"] .rf-meter, .rf[data-phase="done"] .rf-meter{display:none}
+.rf-main{flex:1 1 auto; display:flex; flex-direction:column; align-items:center; padding-top:var(--s6)}
+.rf[data-phase="run"] .rf-main{justify-content:center; padding-bottom:var(--s12)}
+
+/* the round: the command, the fragment, the caps */
+.rf-play{display:flex; flex-direction:column; align-items:center; gap:var(--s5); width:100%}
+.rf-prompt{margin:0; font-size:var(--fs-prompt); font-weight:var(--fw-heavy); line-height:var(--lh-tight); text-align:center; color:var(--ink); min-height:var(--fs-prompt)}
+.rf-frag{position:relative; background:var(--sheet); border:1px solid var(--line); border-radius:var(--r-card); overflow:hidden}
+.rf-frag .ribbon{border-bottom:1px solid var(--line)}
+.rf-sheet{width:min(var(--rf-frag-w), calc(100vw - var(--content-side) * 2 - var(--s1))); height:var(--rf-frag-h); overflow:hidden}
+.rf-sheet .fbar, .rf-sheet .sbar{display:none}
+.rf-sheet .gridwrap{overflow:hidden}
+.rf-target{position:absolute; pointer-events:none; border:var(--rf-target-w) dashed var(--rapid); border-radius:var(--s1); z-index:5}
+.rf-frag.hit .rf-target{border-style:solid; border-color:var(--learn)}
+.rf-frag.miss .rf-target{border-style:solid; border-color:var(--red)}
+.rf-keys{display:flex; gap:var(--s2); justify-content:center; min-height:var(--rf-cap)}
+.rf-keys .rf-cap{display:inline-flex; align-items:center; justify-content:center; min-width:var(--rf-cap); height:var(--rf-cap); padding:0 var(--s3); font-size:var(--rf-cap-fs); font-weight:var(--fw-bold)}
+.rf-keys .rf-cap.q{color:var(--ink-2); background:var(--chrome)}
+.rf-keys .rf-cap.on{color:var(--rapid-ink); background:var(--rapid-tint); border-color:var(--rapid)}
+.rf-keys .rf-cap.shown{color:var(--ink-2); border-style:dashed}
+.rf-keys .rf-cap.answer{color:var(--red); border-color:var(--red)}
+.rf-frag.hit ~ .rf-keys .rf-cap{color:var(--on-fill); background:var(--rapid); border-color:var(--rapid-ink)}
+.rf-note{margin:0; min-height:var(--s6); font-size:var(--fs-body); font-weight:var(--fw-bold); color:var(--rapid-ink)}
+
+/* Ready: what Enter starts */
+.rf-ready{display:flex; flex-direction:column; align-items:center; gap:var(--s5); padding-top:var(--s12); max-width:calc(var(--side-col) * 2); text-align:center}
+.rf-title{margin:0; font-size:var(--fs-prompt); font-weight:var(--fw-heavy); line-height:var(--lh-tight); color:var(--ink)}
+.rf-steps{margin:0; padding:0; list-style:none; counter-reset:rfstep; display:flex; flex-direction:column; gap:var(--s2); text-align:left; font-size:var(--fs-body); line-height:var(--lh-body); color:var(--ink)}
+.rf-steps li{counter-increment:rfstep; display:flex; gap:var(--s3); align-items:baseline}
+.rf-steps li::before{content:counter(rfstep); flex:none; width:var(--s6); height:var(--s6); display:inline-flex; align-items:center; justify-content:center; border-radius:50%; background:var(--rapid-tint); color:var(--rapid-ink); font-size:var(--fs-label); font-weight:var(--fw-bold)}
+.rf-go{--mode:var(--rapid); display:inline-flex; align-items:center; gap:var(--s3); padding:var(--s3) var(--s6); font-size:var(--fs-item); font-weight:var(--fw-bold)}
+.rf-pick{display:flex; gap:var(--s2)}
+.rf-pickbtn{display:inline-flex; align-items:center; gap:var(--s2); font:inherit; font-size:var(--fs-body); font-weight:var(--fw-bold); color:var(--ink); background:var(--sheet); border:1px solid var(--edge); border-radius:var(--r-btn); padding:var(--s2) var(--s4); cursor:pointer}
+.rf-pickbtn.on{color:var(--rapid-ink); background:var(--rapid-tint); border-color:var(--rapid)}
+.rf-deckline{margin:0; font-size:var(--fs-label); font-weight:var(--fw-bold); color:var(--rapid-ink)}
+.rf-focus{margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:var(--s1); font-size:var(--fs-panel); font-weight:var(--fw-bold)}
+.rf-fine{margin:0; font-size:var(--fs-label); line-height:var(--lh-body); color:var(--ink-2)}
+
+/* the round's result */
+.rf-result{display:flex; flex-direction:column; align-items:center; gap:var(--s5); padding-top:var(--s8); width:min(100%, calc(var(--side-col) * 2))}
+.rf-facts{margin:0; padding:0; list-style:none; display:flex; gap:var(--s6); font-size:var(--fs-body); font-weight:var(--fw-semi); color:var(--ink-2); font-variant-numeric:tabular-nums}
+.rf-unlock{margin:0; padding:var(--s2) var(--s4); border-radius:var(--r-btn); background:var(--rapid-tint); color:var(--rapid-ink); font-weight:var(--fw-bold)}
+.rf-slow{width:100%; background:var(--sheet); border-top:var(--mode-rule) solid var(--rapid); padding:var(--s4) var(--s5)}
+.rf-slow-h{margin:0 0 var(--s3); font-size:var(--fs-panel); font-weight:var(--fw-heavy)}
+.rf-slow-t td{font-size:var(--fs-name)}
+.rf-cmd{font-weight:var(--fw-semi)}
+.rf-ks{display:inline-flex; gap:var(--s1)}
+.rf-slow-t .rf-time{font-family:var(--mono)}
+.rf-acts{display:flex; gap:var(--s3); flex-wrap:wrap; justify-content:center}
+
+/* rapid-fire on the Practice pages: the deck scrolls inside its panel; the Practice side panel's one button sits at its natural width */
+.rf-deck-scroll{max-height:var(--rf-deck-h); overflow:auto}
+.rapid-panel .rapid-go{align-self:flex-start}
