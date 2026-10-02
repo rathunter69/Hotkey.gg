@@ -257,6 +257,7 @@ export const RIBBON_COMMANDS = {
   'HLHL': C('Less Than…', 'Styles', 'H', ICON.condFmt, s => { leaveRibbon(s); s.openCondFmt('<'); }),
   'HLHB': C('Between…', 'Styles', 'H', ICON.condFmt, s => { leaveRibbon(s); s.openCondFmt('between'); }),
   'HLHE': C('Equal To…', 'Styles', 'H', ICON.condFmt, s => { leaveRibbon(s); s.openCondFmt('='); }),
+  'HLHD': C('Duplicate Values…', 'Styles', 'H', ICON.condFmt, s => { leaveRibbon(s); s.openCondFmt('duplicate'); }),
   'HLN': C('New Formatting Rule…', 'Styles', 'H', ICON.newRule, s => { leaveRibbon(s); s.openCondFmt('formula'); }),
   'HLD': C('Data Bars', 'Styles', 'H', ICON.dataBar, s => { leaveRibbon(s); s.openCondGallery('databar'); }),
   'HLS': C('Color Scales', 'Styles', 'H', ICON.colorScale, s => { leaveRibbon(s); s.openCondGallery('colorscale'); }),

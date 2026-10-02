@@ -303,6 +303,7 @@ export function normCondFmt(list, today) {
       rule.style = CF_STYLES[x.style] ? x.style : 'lightred';
     }
     else if (x.kind === 'formula') { if (typeof x.formula !== 'string' || !x.formula.trim()) continue; const f = x.formula.trim(); rule.formula = normalizeFormula(f.startsWith('=') ? f : '=' + f); rule.style = CF_STYLES[x.style] ? x.style : 'lightred'; }
+    else if (x.kind === 'duplicate') { rule.unique = x.unique === true; rule.style = CF_STYLES[x.style] ? x.style : 'lightred'; }   // Highlight Cells › Duplicate Values (or Unique)
     else if (x.kind === 'dataBar') { rule.color = CF_BAR_COLORS.some(b => b.k === x.color) ? x.color : 'blue'; rule.stopIfTrue = false; }
     else if (x.kind === 'colorScale') { rule.scale = CF_SCALES.some(s => s.k === x.scale) ? x.scale : 'green-yellow-red'; rule.stopIfTrue = false; }
     else continue;
@@ -887,13 +888,18 @@ export class Sheet {
       } else if (rule.kind === 'formula') {
         const ast = astOf(rule.formula);
         holds = (r, c) => { const x = evalAt(ast, r, c, a); return x === true || (typeof x === 'number' && x !== 0); };
+      } else if (rule.kind === 'duplicate') {
+        // a value that appears more than once across the whole Applies-to (text case aside, a number by its value); blanks and errors never format
+        const keyOf = v => v === null || v === '' || isErrVal(v) ? null : (typeof v) + ':' + (typeof v === 'string' ? v.toLowerCase() : String(v));
+        const count = new Map(); for (const rg of rects) for (let r = rg.r1; r <= rg.r2; r++) for (let c = rg.c1; c <= rg.c2; c++) { const k = keyOf(this.raw(refKey(r, c))); if (k !== null) count.set(k, (count.get(k) || 0) + 1); }
+        holds = (r, c) => { const k = keyOf(this.raw(refKey(r, c))); if (k === null) return false; const n = count.get(k) || 0; return rule.unique ? n === 1 : n > 1; };
       } else holds = (r, c) => numAt(r, c) !== null;   // bars and scales apply to every number in the range
       for (const rg of rects) for (let r = rg.r1; r <= rg.r2; r++) for (let c = rg.c1; c <= rg.c2; c++) {
         const key = refKey(r, c);
         if (out[key] && out[key].stop) continue;
         if (!holds(r, c)) continue;
         const o = out[key] || (out[key] = {});
-        if (rule.kind === 'cellValue' || rule.kind === 'formula') {
+        if (rule.kind === 'cellValue' || rule.kind === 'formula' || rule.kind === 'duplicate') {
           const st = CF_STYLES[rule.style];
           if (st.fill && !o.fill) o.fill = st.fill;
           if (st.fontColor && !o.fontColor) o.fontColor = st.fontColor;

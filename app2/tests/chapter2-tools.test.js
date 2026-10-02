@@ -48,3 +48,13 @@ test('outline to a second level (Alt+Shift+Right twice): nested groups, the leve
   const back = new Sheet(JSON.parse(JSON.stringify(S.toJSON()))); assert.equal(back.groups.rows[1].level, 2);
   S.select('A3:A5'); s.run('Shift+Space Alt+Shift+Left'); assert.deepEqual(S.groups.rows, [{ r1: 2, r2: 9, collapsed: false }, { r1: 7, r2: 8, collapsed: false, level: 2 }]);
 });
+
+test('conditional formatting › Highlight Cells › Duplicate Values (Alt H L H D): every repeat across the range, text case aside, blanks never; Unique the other way', () => {
+  const s = fresh({ A1: { value: 'AUS-DOM' }, A2: { value: 'aus-dom' }, A3: { value: 'AUS-MUE' }, A4: { value: 250 }, A5: { value: 250 }, A6: { value: null }, A7: { value: null }, A8: { value: '250' } }); const S = s.sheet;
+  S.select('A1:A8'); s.run('Alt H L H D'); assert.equal(s.dialog, 'condfmt'); assert.equal(s.dlg.op, 'duplicate'); s.run('Enter');
+  assert.deepEqual(S.condFmt.map(r => [r.kind, r.unique, r.range]), [['duplicate', false, 'A1:A8']]);
+  const m = S.condFmtMap(); assert.deepEqual(['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A8'].map(k => !!m[k]), [true, true, false, true, true, false, false], 'text "250" is not the number 250');
+  S.select('B1:B3'); S.setCell('B1', { value: 1 }); S.setCell('B2', { value: 1 }); S.setCell('B3', { value: 2 }); S.recalc();
+  s.run('Alt H L H D Down Enter'); assert.equal(S.condFmt[0].unique, true); const m2 = S.condFmtMap(); assert.deepEqual(['B1', 'B2', 'B3'].map(k => !!m2[k]), [false, false, true]);
+  const back = new Sheet(JSON.parse(JSON.stringify(S.toJSON()))); assert.equal(back.condFmt[0].kind, 'duplicate');
+});

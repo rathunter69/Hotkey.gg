@@ -685,6 +685,7 @@ export class Session {
       case 'HLHL': this.openCondFmt('<'); return;
       case 'HLHB': this.openCondFmt('between'); return;
       case 'HLHE': this.openCondFmt('='); return;
+      case 'HLHD': this.openCondFmt('duplicate'); return;   // Duplicate Values…
       case 'HLN': this.openCondFmt('formula'); return;
       case 'HLD': this.openCondGallery('databar'); return;
       case 'HLS': this.openCondGallery('colorscale'); return;
@@ -1134,7 +1135,7 @@ export class Session {
     const d = this.dlg; if (!d) return [];
     if (d.kind === 'pagesetup') return ['tabs'].concat(d.tab === 'hf' ? ['footL', 'footC', 'footR'] : d.tab === 'sheet' ? ['titlesRows', 'printGrid'] : d.tab === 'margins' ? ['mTop', 'mLeft', 'mRight', 'mBottom', 'mHeader', 'mFooter', 'centerH', 'centerV'] : ['orient', 'adjustTo', 'fitWide', 'fitTall']);
     if (d.kind === 'find') return d.replace ? ['find', 'repl'] : ['find'];
-    if (d.kind === 'condfmt') return d.op === 'formula' ? ['formula', 'style'] : d.op === 'between' ? ['v1', 'v2', 'style'] : ['v1', 'style'];
+    if (d.kind === 'condfmt') return d.op === 'duplicate' ? ['which', 'style'] : d.op === 'formula' ? ['formula', 'style'] : d.op === 'between' ? ['v1', 'v2', 'style'] : ['v1', 'style'];
     if (d.kind !== 'options') return [];   // Rename Sheet, Delete Sheet and Move or Copy have one control each: nothing to Tab between
     if (d.page === 'formulas') return ['pages', 'calc', 'iter'].concat(d.iterative ? ['maxIter', 'maxChange'] : []);
     if (d.page === 'advanced') return ['pages', 'gridlines', 'enterMoves'];
@@ -1502,7 +1503,7 @@ export class Session {
   openCondFmt(op) {
     this.startClock();
     this.openDialog('condfmt', this.mode === 'ribbon' ? this.path : []);
-    this.dlg = { kind: 'condfmt', op, v1: '', v2: '', formula: '', styleIdx: 0, focus: op === 'formula' ? 'formula' : 'v1' };
+    this.dlg = { kind: 'condfmt', op, v1: '', v2: '', formula: '', styleIdx: 0, focus: op === 'formula' ? 'formula' : op === 'duplicate' ? 'which' : 'v1', unique: false };
   }
   condFmtKey(key) {
     const d = this.dlg; if (!d) return;
@@ -1513,7 +1514,8 @@ export class Session {
       // (a reference the re-base pushes past row 1 or column A runs round the sheet edge, as Excel's =$C1048575 does: the rule keeps working wherever the reference exists)
       const S = this.sheet, act = S.dispActive(), top = S.selRects()[0];
       const rebase = f => typeof f === 'string' && f.trimStart()[0] === '=' && (top.r1 !== act.r || top.c1 !== act.c) ? translateFormula(f, top.r1 - act.r, top.c1 - act.c, { rows: S.rows, cols: S.cols }) : f;
-      if (d.op === 'formula') {
+      if (d.op === 'duplicate') rule = { kind: 'duplicate', unique: d.unique, style };
+      else if (d.op === 'formula') {
         let f = d.formula.trim(); if (f && f[0] !== '=') f = '=' + f;   // typed without its '=': the same formula, gated and re-based like its '='-prefixed twin (never a formula read for the wrong cell)
         if (!f || !parses(f)) { this.note = CF_FORMULA_NOTE; d.focus = 'formula'; return; }
         rule = { kind: 'formula', formula: rebase(f), style };
@@ -1525,6 +1527,11 @@ export class Session {
       this.sheet.addCondFmt(rule); this.exitRibbon(true); return;
     }
     if (key === 'Tab' || key === 'Shift+Tab') { const o = this.dialogTabOrder(); const i = Math.max(0, o.indexOf(d.focus)); d.focus = o[(i + (key === 'Tab' ? 1 : o.length - 1)) % o.length]; return; }
+    if (d.op === 'duplicate' && d.focus === 'which') {   // Format cells that contain: Duplicate / Unique (↑ ↓ or the first letter); ← → still walk the styles
+      if (key === 'ArrowUp' || key === 'ArrowDown') { d.unique = !d.unique; return; }
+      if (key.length === 1 && /[du]/i.test(key)) { d.unique = key.toLowerCase() === 'u'; return; }
+      if (key.length === 1 || key === 'Backspace') return;
+    }
     if (key === 'ArrowLeft' || key === 'ArrowUp') { d.styleIdx = (d.styleIdx - 1 + CF_STYLE_KEYS.length) % CF_STYLE_KEYS.length; return; }
     if (key === 'ArrowRight' || key === 'ArrowDown') { d.styleIdx = (d.styleIdx + 1) % CF_STYLE_KEYS.length; return; }
     if (d.focus === 'style') return;

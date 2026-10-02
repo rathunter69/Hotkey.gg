@@ -27,7 +27,7 @@ export const MENUS = {
   'HU': [['S', 'Sum']],
   // Conditional Formatting (Chapter 2), Excel's KeyTips: H L H highlight presets, D data bars, S colour scales, N a formula rule, C clear, R manage
   'HL': [['H', 'Highlight Cells Rules'], ['D', 'Data Bars'], ['S', 'Color Scales'], ['N', 'New Rule…'], ['C', 'Clear Rules'], ['R', 'Manage Rules…']],
-  'HLH': [['G', 'Greater Than…'], ['L', 'Less Than…'], ['B', 'Between…'], ['E', 'Equal To…']],
+  'HLH': [['G', 'Greater Than…'], ['L', 'Less Than…'], ['B', 'Between…'], ['E', 'Equal To…'], ['D', 'Duplicate Values…']],
   'HLC': [['S', 'Clear Rules from Selected Cells'], ['E', 'Clear Rules from Entire Sheet']],
   'HA': [['L', 'Left'], ['C', 'Center'], ['R', 'Right'], ['N', '$ Accounting']],
   'HF': [['C', 'Font color'], ['G', 'Grow font'], ['K', 'Shrink font'], ['I', 'Fill'], ['D', 'Find & Select']],   // Excel shares the H F prefix between Font and Fill / Find & Select
@@ -192,7 +192,7 @@ export const COMMANDS = {
   'HOH': 'Row height…', 'HOUR': 'Hide rows', 'HOUC': 'Hide columns', 'HOUO': 'Unhide rows', 'HOUL': 'Unhide columns',
   'HEM': 'Clear comments and notes', 'MMD': 'Define Name…', 'WQ': 'Zoom…', 'WJ': 'Zoom to 100%',
   'WFF': 'Freeze panes', 'WFR': 'Freeze top row', 'WFC': 'Freeze first column',
-  'HLHG': 'Greater Than…', 'HLHL': 'Less Than…', 'HLHB': 'Between…', 'HLHE': 'Equal To…', 'HLN': 'New Formatting Rule…',
+  'HLHG': 'Greater Than…', 'HLHL': 'Less Than…', 'HLHB': 'Between…', 'HLHE': 'Equal To…', 'HLHD': 'Duplicate Values…', 'HLN': 'New Formatting Rule…',
   'HLD': 'Data Bars', 'HLS': 'Color Scales', 'HLCS': 'Clear Rules from Selected Cells', 'HLCE': 'Clear Rules from Entire Sheet', 'HLR': 'Manage Rules…',
   'MAA': 'Remove Arrows', 'MAP': 'Remove Precedent Arrows', 'MAD': 'Remove Dependent Arrows', 'MV': 'Evaluate Formula', 'MK': 'Error Checking',
   'MXA': 'Automatic', 'MXE': 'Automatic Except for Data Tables', 'MXM': 'Manual',

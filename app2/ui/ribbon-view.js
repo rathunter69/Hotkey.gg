@@ -371,11 +371,12 @@ export class RibbonView {
   static cfRuleDesc(r) {
     if (r.kind === 'cellValue') return 'Cell Value ' + (CF_OP_LABEL[r.op] || r.op).toLowerCase() + ' ' + RibbonView.cfValueText(r.v1) + (r.op === 'between' || r.op === 'notBetween' ? ' and ' + RibbonView.cfValueText(r.v2) : '');
     if (r.kind === 'formula') return 'Formula: ' + r.formula;
+    if (r.kind === 'duplicate') return r.unique ? 'Unique Values' : 'Duplicate Values';
     if (r.kind === 'dataBar') return 'Data Bar';
     return 'Graded Color Scale';
   }
   static cfRulePreview(r) {
-    if (r.kind === 'cellValue' || r.kind === 'formula') { const st = CF_STYLES[r.style] || CF_STYLES.lightred; return `<span class="cf-prev" style="${st.fill ? 'background:' + st.fill + ';' : ''}${st.fontColor ? 'color:' + st.fontColor + ';' : ''}${st.border ? 'box-shadow:inset 0 0 0 1px ' + st.border + ';' : ''}">AaBbCcYyZz</span>`; }
+    if (r.kind === 'cellValue' || r.kind === 'formula' || r.kind === 'duplicate') { const st = CF_STYLES[r.style] || CF_STYLES.lightred; return `<span class="cf-prev" style="${st.fill ? 'background:' + st.fill + ';' : ''}${st.fontColor ? 'color:' + st.fontColor + ';' : ''}${st.border ? 'box-shadow:inset 0 0 0 1px ' + st.border + ';' : ''}">AaBbCcYyZz</span>`; }
     if (r.kind === 'dataBar') { const b = CF_BAR_COLORS.find(x => x.k === r.color) || CF_BAR_COLORS[0]; return `<span class="cf-prev" style="background:linear-gradient(90deg, ${b.hex} 65%, transparent 65%)"></span>`; }
     const sc = CF_SCALES.find(x => x.k === r.scale) || CF_SCALES[0]; return `<span class="cf-prev" style="background:linear-gradient(90deg, ${sc.colors.join(', ')})"></span>`;
   }
