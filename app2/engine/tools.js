@@ -28,6 +28,7 @@ import { Sheet, CELL_STYLES } from './sheet.js';
 import { tokenize, evalFormula, formulaRefs, evaluateStepper, valueText, translateFormula, isErrVal, textToNumber, dateTextValue, parses } from './formula.js';
 import { refKey, parseRef, parseRange, rangeText, colLetter } from './refs.js';
 import { dispText } from './format.js';
+import { pivotCache, pivotLayout, PIVOT_FNS } from './pivot.js';
 const clone = x => JSON.parse(JSON.stringify(x));
 /** The Style dialog's tick boxes and the format fields each one carries (Style Includes, By Example). */
 export const STYLE_PARTS = { number: ['fmtStyle', 'decimals', 'numFmt', 'scale'], alignment: ['align', 'wrap', 'indent', 'ca'], font: ['bold', 'it', 'strike', 'uline', 'fontColor', 'fsz'],
@@ -37,7 +38,7 @@ const STYLE_KEYS = { 'Alt+N': 'number', 'Alt+L': 'alignment', 'Alt+F': 'font', '
 /** The dialogs this module drives (keyboard.js routes their keys to toolKey). */
 export const TOOL_DIALOGS = new Set(['evalfx', 'errcheck', 'texttocols', 'removedup', 'validation', 'dvlist', 'editlinks', 'autofilter', 'sortdlg', 'goalseek', 'datatable', 'pivot', 'newstyle', 'hyperlink', 'ctxmenu', 'watch']);
 /** The dialogs with a text field that keeps the case typed. */
-export const TOOL_TYPED = new Set(['newstyle', 'hyperlink', 'editlinks', 'watch', 'texttocols', 'validation', 'goalseek', 'datatable', 'sortdlg', 'autofilter']);
+export const TOOL_TYPED = new Set(['pivot', 'newstyle', 'hyperlink', 'editlinks', 'watch', 'texttocols', 'validation', 'goalseek', 'datatable', 'sortdlg', 'autofilter']);
 /** Excel's messages the tools show verbatim. */
 export const ERRCHECK_DONE_NOTE = 'The error check is complete for the entire sheet.';
 export const FLASH_FILL_NONE_NOTE = "We looked at all the data next to your selection and didn't see a pattern for filling in values for you.";
@@ -923,6 +924,80 @@ const methods = {
       const name = (this.definedNames ? this.definedNames() : []).find(n => n.refersTo.replace(/\$/g, '').toUpperCase() === ('=' + (/^[A-Za-z_][A-Za-z0-9_.]*$/.test(e.name) ? e.name : "'" + e.name + "'") + '!' + w.key).toUpperCase());
       return { sheet: w.sheet, name: name ? name.name : '', cell: w.key, value: dispText(cell), formula: cell.formula || '' };
     });
+  },
+
+  /* ---------------- PivotTable (Alt N V T), Refresh (Alt+F5), GETPIVOTDATA ---------------- */
+  /**
+   * Create PivotTable: Table/Range (Alt+T, the current region to start), New Worksheet (Alt+N) or
+   * Existing Worksheet (Alt+E) with its Location (Alt+L); OK (Enter) makes the pivot and opens the
+   * field list: ↑ ↓ pick a field, R puts it in Rows, C in Columns, V in Values, Delete takes it out,
+   * S steps the value's summary (Sum, Count, Average); the pivot redraws after each; Esc or Enter closes the list.
+   */
+  openPivot() {
+    const S = this.sheet; this.startClock(); const a = S.dispActive(); const sr = S.selRange();
+    const rg = sr.r1 === sr.r2 && sr.c1 === sr.c2 ? S.regionAround(a.r, a.c) : sr;
+    const nm = (this.sheets.find(e => e.sheet === S) || {}).name || 'Sheet1';
+    this.openDialog('pivot', []);
+    this.dlg = { kind: 'pivot', step: 'create', source: (/^[A-Za-z_][A-Za-z0-9_.]*$/.test(nm) ? nm : "'" + nm + "'") + '!$' + colLetter(rg.c1) + '$' + rg.r1 + ':$' + colLetter(rg.c2) + '$' + rg.r2, where: 'new', loc: '', focus: 'source', fresh: true };
+  },
+  pivotKey(key) {
+    const d = this.dlg; if (!d) return;
+    if (d.step === 'create') {
+      if (key === 'Alt+T') { d.focus = 'source'; d.fresh = true; return; } if (key === 'Alt+N') { d.where = 'new'; return; } if (key === 'Alt+E') { d.where = 'existing'; d.focus = 'loc'; d.fresh = true; return; } if (key === 'Alt+L') { d.focus = 'loc'; d.fresh = true; return; }
+      if (key !== 'Enter') { if (d.fresh && key.length === 1) d[d.focus] = ''; if (this.toolType(d, key, ['source', 'loc'])) d.fresh = false; return; }
+      const src = this.toolRange(d.source); if (!src || src.r2 <= src.r1) { this.toast(GOALSEEK_REF_NOTE); return; }
+      const heads = []; for (let c = src.c1; c <= src.c2; c++) heads.push(dispText(src.sheet.get(src.r1, c)));
+      if (heads.some(h => h === '')) { this.toast('The PivotTable field name is not valid. To create a PivotTable report, you must use data that is organized as a list with labeled columns.'); return; }
+      let at;
+      if (d.where === 'existing') { at = this.toolRef(d.loc); if (!at) { this.toast(GOALSEEK_REF_NOTE); return; } }
+      else { const i = this.addSheet(undefined, undefined, this.sheetIndex); at = { sheet: this.sheets[i].sheet, r: 3, c: 1 }; }
+      const T = at.sheet; if (!T.pivots) T.pivots = [];
+      const pv = { id: 'PivotTable' + (this.sheets.reduce((n, e) => n + (e.sheet.pivots ? e.sheet.pivots.length : 0), 0) + 1), source: { sheet: (this.sheets.find(e => e.sheet === src.sheet) || {}).name, range: rangeText(src) }, spec: { row: null, col: null, value: null, fn: 'sum' }, at: { r: at.r, c: at.c }, r1: at.r, c1: at.c, r2: at.r, c2: at.c };
+      T.pivots.push(pv);
+      if (this.sheet !== T) this.switchSheet(this.sheets.findIndex(e => e.sheet === T));
+      this.openDialog('pivot', []);
+      this.dlg = { kind: 'pivot', step: 'fields', pivot: pv.id, fields: heads, idx: 0 };
+      return;
+    }
+    // the field list
+    const pv = this.findPivot(d.pivot); if (!pv) { this.exitRibbon(false); return; }
+    if (key === 'Enter') { this.exitRibbon(false); return; }
+    if (key === 'ArrowDown') { d.idx = Math.min(d.fields.length - 1, d.idx + 1); return; } if (key === 'ArrowUp') { d.idx = Math.max(0, d.idx - 1); return; }
+    const f = d.fields[d.idx]; const K = key.length === 1 ? key.toUpperCase() : key; const sp = pv.pivot.spec;
+    const take = () => { for (const k of ['row', 'col', 'value']) if (sp[k] === f) sp[k] = null; };
+    if (K === 'R') { take(); sp.row = f; } else if (K === 'C') { take(); sp.col = f; }
+    else if (K === 'V') { take(); sp.value = f; sp.fn = this.pivotColumnNumeric(pv.pivot, f) ? 'sum' : 'count'; }
+    else if (K === 'S') { const i = PIVOT_FNS.findIndex(x => x[0] === sp.fn); sp.fn = PIVOT_FNS[(i + 1) % PIVOT_FNS.length][0]; }
+    else if (key === 'Delete' || key === 'Backspace') take();
+    else return;
+    this.refreshPivot(pv.sheet, pv.pivot);
+  },
+  /** A range typed in a dialog (Sheet!$A$1:$D$20, A1:D20): { sheet, r1, c1, r2, c2 } or null. */
+  toolRange(text) {
+    let t = String(text || '').trim().replace(/^=/, ''); let sheet = this.sheet; const bang = t.lastIndexOf('!');
+    if (bang > 0) { const sn = t.slice(0, bang).replace(/^'|'$/g, '').replace(/''/g, "'"); const e = this.sheets.find(x => x.name.toLowerCase() === sn.toLowerCase()); if (!e) return null; sheet = e.sheet; t = t.slice(bang + 1); }
+    const rg = parseRange(t.replace(/\$/g, '').toUpperCase()); return rg ? { sheet, ...rg } : null;
+  },
+  findPivot(id) { for (const e of this.sheets) for (const p of (e.sheet.pivots || [])) if (p.id === id) return { sheet: e.sheet, pivot: p }; return null; },
+  pivotColumnNumeric(p, field) { const src = this.toolRange("'" + p.source.sheet.replace(/'/g, "''") + "'!" + p.source.range); if (!src) return false; for (let c = src.c1; c <= src.c2; c++) if (dispText(src.sheet.get(src.r1, c)).toLowerCase() === String(field).toLowerCase()) { for (let r = src.r1 + 1; r <= src.r2; r++) { const v = src.sheet.get(r, c).value; if (v !== null && v !== '') return typeof v === 'number'; } } return false; },
+  /** Rebuild one pivot from its source as it stands now: the old block clears, the new one is written (values), GETPIVOTDATA readers follow. */
+  refreshPivot(T, p) {
+    const src = this.toolRange("'" + p.source.sheet.replace(/'/g, "''") + "'!" + p.source.range); if (!src) return false;
+    const table = []; for (let r = src.r1; r <= src.r2; r++) { const row = []; for (let c = src.c1; c <= src.c2; c++) row.push(src.sheet.get(r, c).value); table.push(row); }
+    T.pushUndo();
+    for (let r = p.r1; r <= p.r2; r++) for (let c = p.c1; c <= p.c2; c++) { const k = refKey(r, c); const cell = T.cells[k]; if (cell && cell.pivot === p.id) delete T.cells[k]; }
+    const cache = p.spec.row && p.spec.value ? pivotCache(table, p.spec) : null;
+    if (!cache) { Object.assign(p, { r1: p.at.r, c1: p.at.c, r2: p.at.r, c2: p.at.c, rowItems: null, colItems: null, valueHead: null }); T.commit('edit'); return true; }
+    const lay = pivotLayout(cache, p.at);
+    for (const k in lay.cells) { const pp = parseRef(k); const cell = T.ensure(pp.r, pp.c); cell.formula = null; cell.value = lay.cells[k]; cell.txt = false; cell.pivot = p.id; }
+    Object.assign(p, { r1: lay.r1, c1: lay.c1, r2: lay.r2, c2: lay.c2, rowItems: cache.rowItems, colItems: cache.colItems, valueHead: cache.valueHead });
+    T.commit('edit'); return true;
+  },
+  /** Alt+F5 (PivotTable Analyze › Refresh): the pivot under the active cell; Ctrl+Alt+F5 refreshes every pivot. False when there is none. */
+  refreshPivots(all) {
+    this.startClock(); const S = this.sheet; const a = S.dispActive(); let n = 0;
+    for (const e of this.sheets) for (const p of (e.sheet.pivots || [])) if (all || (e.sheet === S && a.r >= p.r1 && a.r <= p.r2 && a.c >= p.c1 && a.c <= p.c2)) { this.refreshPivot(e.sheet, p); n++; }
+    return n > 0;
   },
 
   /* ---------------- references typed into a tool's box ---------------- */

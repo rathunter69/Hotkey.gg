@@ -18,6 +18,7 @@
 
 import { colLetter, colIndex, refKey, parseRef, parseRange, rectRefs, rangeText } from './refs.js';
 import { CalcGraph } from './calc.js';
+import { pivotLocate } from './pivot.js';
 import { evalFormula, parseFormula, translateFormula, transposeFormula, normalizeFormula, autocorrectFormula, adjustFormulaStructure, isErrVal, formulaRefs, parses, dateTextValue, compareValues } from './formula.js';
 import { fmtNum, dispText, dispMarked, fitGeneral, serialToDate, HASHES, PAD_MARK } from './format.js';
 import { isValidFormat, normalizeCode, stepDecimals, codeDecimals } from './numfmt.js';
@@ -361,6 +362,7 @@ export class Sheet {
     this.dataTables = null;                // What-If data tables (Alt A W T): [{ r1, c1, r2, c2, row, col }]
     this.pageSetup = clone(PAGE_SETUP_DEFAULT);   // Page Setup (Alt P S P), the print area (Alt P R S, pageSetup.printArea), the custom header and footer
     this.breaks = { rows: [], cols: [] };  // manual page breaks (Alt P B I): a break above each listed row / left of each listed column
+    this.pivots = null;                    // PivotTables on this sheet (Alt N V T): [{ id, source: { sheet, range }, spec: { row, col, value, fn }, at, r1, c1, r2, c2, rowItems, colItems, valueHead }]
     this.tabColor = null;                  // Format › Tab Color (Alt H O T): a TAB_COLORS key, or null
     this.view = 'normal';                  // the sheet's view: 'normal' (Alt W L), 'pagebreak' (Page Break Preview, Alt W I), 'layout' (Page Layout, Alt W P)
     this.validation = null;                // Data Validation rules by cell key: { allow, data, min, max, source, inCell, ignoreBlank, errTitle, errMsg, errStyle, inTitle, inMsg }
@@ -392,6 +394,7 @@ export class Sheet {
     if (opts.pageSetup && typeof opts.pageSetup === 'object') this.pageSetup = { ...clone(PAGE_SETUP_DEFAULT), ...clone(opts.pageSetup) };
     if (opts.breaks) this.breaks = { rows: [...new Set((opts.breaks.rows || []).map(n => n | 0).filter(n => n > 1))].sort((a, b) => a - b), cols: [...new Set((opts.breaks.cols || []).map(n => n | 0).filter(n => n > 1))].sort((a, b) => a - b) };
     if (opts.view === 'pagebreak' || opts.view === 'layout') this.view = opts.view;
+    if (Array.isArray(opts.pivots)) this.pivots = clone(opts.pivots);
     if (opts.tabColor && TAB_COLORS.some(t => t.k === opts.tabColor)) this.tabColor = opts.tabColor;
     if (Array.isArray(opts.dataTables)) this.dataTables = clone(opts.dataTables);   // What-If data tables: [{ r1, c1, r2, c2, row, col }] (the input cells' keys)
     if (opts.active) this.active = this.clamp(opts.active.r, opts.active.c);
@@ -439,6 +442,8 @@ export class Sheet {
     return { raw: k => this.raw(k), rows: this.rows, cols: this.cols, today: this.today || undefined,
       // NAME!B3: another sheet of the workbook (the Session wires `resolver`); no workbook = #REF!
       sheetRaw: (name, key) => { const sh = this.resolver ? this.resolver(name) : null; return sh ? sh.raw(key) : this.externalRaw ? this.externalRaw(name, key) : '#REF!'; },
+      // GETPIVOTDATA: the cell of the pivot that holds a figure (null: no pivot there, or no such field / item)
+      pivotCell: (k, field, pairs) => { const sh = this.sheetOfKey(k); if (!sh) return null; const p = parseRef(sh.key); const pv = (sh.sheet.pivots || []).find(x => p.r >= x.r1 && p.r <= x.r2 && p.c >= x.c1 && p.c <= x.c2); if (!pv) return null; const loc = pivotLocate(pv, field, pairs); if (!loc) return null; const b = k.indexOf('!'); return b < 0 ? loc : k.slice(0, b + 1) + loc; },
       // a 3D reference's run of sheets, first to last in tab order (either end missing: null, #REF!)
       sheetSpan: (a, b) => { const names = this.workbook().map(e => e.name); const i = names.findIndex(n => n.toLowerCase() === String(a).toLowerCase()), j = names.findIndex(n => n.toLowerCase() === String(b).toLowerCase()); if (i < 0 || j < 0) return null; return names.slice(Math.min(i, j), Math.max(i, j) + 1); },
       // ISFORMULA: whether a cell holds a formula, here or on another sheet (null = no such sheet)
@@ -632,14 +637,14 @@ export class Sheet {
   /* ---------------- undo ---------------- */
   snapshot() { return { cells: clone(this.cells), colW: this.colW.slice(), colSet: this.colSet.slice(), rows: this.rows, active: { ...this.active }, sel: this.sel && { ...this.sel },
     rowH: this.rowH.slice(), hiddenRows: [...this.hiddenRows], hiddenCols: [...this.hiddenCols], freeze: { ...this.freeze }, groups: clone(this.groups), condFmt: clone(this.condFmt), names: clone(this.names),
-    filter: clone(this.filter), filterRows: [...this.filterRows], validation: clone(this.validation || null), dataTables: clone(this.dataTables || null), breaks: clone(this.breaks), printArea: this.pageSetup.printArea || null }; }
+    filter: clone(this.filter), filterRows: [...this.filterRows], validation: clone(this.validation || null), dataTables: clone(this.dataTables || null), breaks: clone(this.breaks), pivots: clone(this.pivots || null), printArea: this.pageSetup.printArea || null }; }
   /** Rewind cells AND the whole selection to one moment, so undo/redo re-select the range the operation touched (Excel). */
   restore(s) {
     this.cells = clone(s.cells); this.colW = s.colW.slice(); this.colSet = s.colSet.slice(); this.rows = s.rows;
     if (s.rowH) this.rowH = s.rowH.slice();
     this.hiddenRows = new Set(s.hiddenRows || []); this.hiddenCols = new Set(s.hiddenCols || []);
     this.filter = s.filter ? clone(s.filter) : null; this.filterRows = new Set(s.filterRows || []); this.validation = s.validation ? clone(s.validation) : null; this.dataTables = s.dataTables ? clone(s.dataTables) : null;
-    if (s.breaks) this.breaks = clone(s.breaks); if (s.printArea !== undefined) { if (s.printArea) this.pageSetup.printArea = s.printArea; else delete this.pageSetup.printArea; }
+    if (s.breaks) this.breaks = clone(s.breaks); if (s.pivots !== undefined) this.pivots = s.pivots ? clone(s.pivots) : null; if (s.printArea !== undefined) { if (s.printArea) this.pageSetup.printArea = s.printArea; else delete this.pageSetup.printArea; }
     this.freeze = s.freeze ? { ...s.freeze } : { r: 0, c: 0 };
     this.groups = s.groups ? normGroups(s.groups) : { rows: [], cols: [] };
     this.condFmt = s.condFmt ? normCondFmt(s.condFmt, this.today) : [];
@@ -1796,6 +1801,7 @@ export class Sheet {
     if (this.breaks.rows.length || this.breaks.cols.length) out.breaks = clone(this.breaks);
     if (this.view !== 'normal') out.view = this.view;
     if (this.tabColor) out.tabColor = this.tabColor;
+    if (this.pivots && this.pivots.length) out.pivots = clone(this.pivots);
     return out;
   }
 }

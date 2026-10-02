@@ -1653,6 +1653,7 @@ export class Session {
       return true;
     }
     if (k === 'F11' && e.shiftKey && !e.ctrlKey && !e.altKey) { this.startClock(); this.logKey('Shift+F11'); this.insertSheet(); return true; }
+    if (k === 'F5' && e.altKey && !e.shiftKey) { this.logKey(e.ctrlKey ? 'Ctrl+Alt+F5' : 'Alt+F5'); this.refreshPivots(e.ctrlKey); return true; }   // PivotTable › Refresh / Refresh All
     if (k === 'F9' && !e.ctrlKey && !e.altKey && !e.shiftKey) { this.startClock(); this.logKey('F9'); S.commit('recalc'); return true; }   // Calculate Now (every sheet is always current: recorded manual mode changes nothing)
     if (k === 'Delete' && !e.ctrlKey && !e.altKey) { this.startClock(); this.logKey('Delete'); S.deleteContents(); return true; }
     if (k === 'Backspace' && e.ctrlKey && !e.altKey) { this.startClock(); this.logKey('Ctrl+⌫'); this.sheet.emit('select'); return true; }   // scrolls the active cell into view (the view listens)
@@ -1671,7 +1672,6 @@ export class Session {
         this.startClock(); this.sheetStep(k === 'PageDown' ? 1 : -1, e.shiftKey); return true;
       }
       if (k === 'ArrowDown' && !e.shiftKey) { this.startClock(); this.logKey('Alt+↓'); this.openDropDown(); return true; }   // the in-cell drop-down: a validation list, or an AutoFilter header's menu
-      if (k === 'F5' && !e.shiftKey) { this.startClock(); this.logKey('Alt+F5'); this.refreshPivots(); return true; }
       return true;
     }
     if (k === 'Enter' && !e.ctrlKey && !e.altKey) {
