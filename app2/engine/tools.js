@@ -35,9 +35,9 @@ export const STYLE_PARTS = { number: ['fmtStyle', 'decimals', 'numFmt', 'scale']
 const STYLE_KEYS = { 'Alt+N': 'number', 'Alt+L': 'alignment', 'Alt+F': 'font', 'Alt+B': 'border', 'Alt+I': 'fill', 'Alt+R': 'protection' };
 
 /** The dialogs this module drives (keyboard.js routes their keys to toolKey). */
-export const TOOL_DIALOGS = new Set(['evalfx', 'errcheck', 'texttocols', 'removedup', 'validation', 'dvlist', 'editlinks', 'autofilter', 'sortdlg', 'goalseek', 'datatable', 'pivot', 'newstyle']);
+export const TOOL_DIALOGS = new Set(['evalfx', 'errcheck', 'texttocols', 'removedup', 'validation', 'dvlist', 'editlinks', 'autofilter', 'sortdlg', 'goalseek', 'datatable', 'pivot', 'newstyle', 'hyperlink', 'ctxmenu']);
 /** The dialogs with a text field that keeps the case typed. */
-export const TOOL_TYPED = new Set(['newstyle', 'texttocols', 'validation', 'goalseek', 'datatable', 'sortdlg', 'autofilter']);
+export const TOOL_TYPED = new Set(['newstyle', 'hyperlink', 'texttocols', 'validation', 'goalseek', 'datatable', 'sortdlg', 'autofilter']);
 /** Excel's messages the tools show verbatim. */
 export const ERRCHECK_DONE_NOTE = 'The error check is complete for the entire sheet.';
 export const FLASH_FILL_NONE_NOTE = "We looked at all the data next to your selection and didn't see a pattern for filling in values for you.";
@@ -222,6 +222,8 @@ const methods = {
       case 'datatable': return this.dataTableKey(key);
       case 'pivot': return this.pivotKey(key);
       case 'newstyle': return this.newCellStyleKey(key);
+      case 'hyperlink': return this.hyperlinkKey(key);
+      case 'ctxmenu': return this.contextMenuKey(key);
     }
   },
   /** A typed character into the draft's focused text field (Backspace removes one). */
@@ -626,6 +628,75 @@ const methods = {
       this.exitRibbon(false); S.pushUndo(); S.ensure(a.r, a.c).style = name; S.commit('format'); return;   // the example cell now carries the style
     }
     if (d.focus === 'name') { if (d.fresh && key.length === 1) d.name = ''; if (this.toolType(d, key, ['name'])) d.fresh = false; }
+  },
+
+  /* ---------------- Insert Hyperlink (Ctrl+K) and following a link ---------------- */
+  /**
+   * The Insert Hyperlink dialog. Link to: Existing File or Web Page (Alt+X) or Place in This
+   * Document (Alt+A); Text to display (Alt+T); in a place, Type the cell reference (Alt+E) and Or
+   * select a place in this document (Alt+C: ↑ ↓ walk the sheets, then the defined names); for a web
+   * page, Address (Alt+E). OK (Enter) writes the link; on a linked cell, Remove Link (Alt+R).
+   * The cell takes Excel's Hyperlink look (blue, underlined) and shows the text to display.
+   */
+  openHyperlink() {
+    const S = this.sheet; this.startClock(); const a = S.dispActive(); const cell = S.get(a.r, a.c); const old = cell.link || null;
+    const places = this.sheets.map(e => ({ kind: 'sheet', name: e.name })).concat(this.definedNames().map(n => ({ kind: 'name', name: n.name })));
+    this.openDialog('hyperlink', []);
+    const pi = old && old.sheet ? Math.max(0, places.findIndex(p => p.kind === 'sheet' && p.name === old.sheet)) : old && old.name ? Math.max(0, places.findIndex(p => p.name === old.name)) : this.sheetIndex;
+    this.dlg = { kind: 'hyperlink', cell: refKey(a.r, a.c), mode: old && old.url ? 'url' : old ? 'place' : 'url', text: dispText(cell), ref: old && old.ref ? old.ref : 'A1', url: old && old.url ? old.url : '', places, place: pi, focus: old ? (old.url ? 'url' : 'ref') : 'url', had: !!old };
+  },
+  hyperlinkKey(key) {
+    const d = this.dlg; const S = this.sheet; if (!d) return;
+    if (key === 'Alt+X') { d.mode = 'url'; d.focus = 'url'; d.fresh = true; return; }
+    if (key === 'Alt+A') { d.mode = 'place'; d.focus = 'ref'; d.fresh = true; return; }
+    if (key === 'Alt+T') { d.focus = 'text'; d.fresh = true; return; }   // a box reached by its key opens with its text selected: typing replaces it
+    if (key === 'Alt+E') { d.focus = d.mode === 'place' ? 'ref' : 'url'; d.fresh = true; return; }
+    if (key === 'Alt+C' && d.mode === 'place') { d.focus = 'place'; return; }
+    if (key === 'Alt+R' && d.had) { const p = parseRef(d.cell); this.exitRibbon(false); S.pushUndo(); const c = S.ensure(p.r, p.c); delete c.link; c.uline = false; c.fontColor = null; S.commit('format'); return; }
+    if (key === 'Tab' || key === 'Shift+Tab') { this.toolTab(d, key, d.mode === 'place' ? ['text', 'ref', 'place', 'ok'] : ['text', 'url', 'ok']); d.fresh = true; return; }
+    if (d.focus === 'place' && (key === 'ArrowDown' || key === 'ArrowUp')) { d.place = Math.max(0, Math.min(d.places.length - 1, d.place + (key === 'ArrowDown' ? 1 : -1))); return; }
+    if (key !== 'Enter') { if (d.fresh && key.length === 1 && ['text', 'ref', 'url'].includes(d.focus)) d[d.focus] = ''; if (this.toolType(d, key, ['text', 'ref', 'url'])) d.fresh = false; return; }
+    const p = parseRef(d.cell); let link;
+    if (d.mode === 'url') { const u = d.url.trim(); if (!u) return; link = { url: u }; }
+    else {
+      const pl = d.places[d.place];
+      if (pl.kind === 'name') link = { name: pl.name };
+      else { const rg = parseRange(d.ref.trim().replace(/\$/g, '').toUpperCase()); if (!rg) { this.toast(GOALSEEK_REF_NOTE); return; } link = { sheet: pl.name, ref: rangeText(rg) }; }
+    }
+    this.exitRibbon(false); S.pushUndo();
+    const c = S.ensure(p.r, p.c); c.link = link; c.uline = true; c.fontColor = 'blue';
+    const shown = d.text !== '' ? d.text : link.url || (link.name || ((/^[A-Za-z_][A-Za-z0-9_.]*$/.test(link.sheet) ? link.sheet : "'" + link.sheet + "'") + '!' + link.ref));
+    if (!c.formula && dispText(c) !== shown) { c.value = shown; c.txt = false; }
+    S.commit('edit');
+  },
+  /** Where a cell's link goes: its Insert Hyperlink target, or a HYPERLINK formula's "#Sheet!A1" location. Null for none. */
+  linkOf(r, c) {
+    const S = this.sheet; const cell = S.get(r, c);
+    if (cell.link) return cell.link;
+    if (cell.formula && /^=\s*HYPERLINK\s*\(/i.test(cell.formula)) {
+      const m = /^=\s*HYPERLINK\s*\(\s*"([^"]*)"/i.exec(cell.formula); if (!m) return null;
+      const loc = m[1]; if (loc[0] !== '#') return { url: loc };
+      const t = loc.slice(1); const bang = t.lastIndexOf('!');
+      return bang < 0 ? { name: t } : { sheet: t.slice(0, bang).replace(/^'|'$/g, ''), ref: t.slice(bang + 1) };
+    }
+    return null;
+  },
+  /** Follow the link on a cell (a click, Ctrl+click when Excel's option asks for it, or the context menu's Open Hyperlink): a place moves the selection there, switching sheets; a web address is handed to the page (opts.onOpenUrl). True when it went somewhere. */
+  followLink(r, c) {
+    const a = r === undefined ? this.sheet.dispActive() : { r, c }; const link = this.linkOf(a.r, a.c); if (!link) return false;
+    this.startClock();
+    if (link.url) { if (this.opts.onOpenUrl) this.opts.onOpenUrl(link.url); return true; }
+    if (link.name) return this.goToRef(link.name);
+    return this.goToRef((/^[A-Za-z_][A-Za-z0-9_.]*$/.test(link.sheet) ? link.sheet : "'" + link.sheet.replace(/'/g, "''") + "'") + '!' + link.ref);
+  },
+  /** Shift+F10 (or the Menu key): the cell's shortcut menu. Its Hyperlink items are what the engine acts on: Open Hyperlink (O), Edit Hyperlink (H), Remove Hyperlink (R); Esc closes. */
+  openContextMenu() { this.startClock(); this.openDialog('ctxmenu', []); this.dlg = { kind: 'ctxmenu' }; },
+  contextMenuKey(key) {
+    const K = key.toUpperCase(); const S = this.sheet; const a = S.dispActive(); const has = !!this.linkOf(a.r, a.c);
+    if (K === 'O' && has) { this.exitRibbon(false); this.followLink(a.r, a.c); return; }
+    if (K === 'H') { this.exitRibbon(false); this.openHyperlink(); return; }
+    if (K === 'R' && S.get(a.r, a.c).link) { this.exitRibbon(false); S.pushUndo(); const c = S.ensure(a.r, a.c); delete c.link; c.uline = false; c.fontColor = null; S.commit('format'); return; }
+    if (key === 'Enter') this.exitRibbon(false);
   },
 
   /* ---------------- references typed into a tool's box ---------------- */

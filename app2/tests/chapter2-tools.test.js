@@ -21,3 +21,15 @@ test('Cell Styles › New Cell Style (Alt H J N): saved By Example from the acti
   s.run('Ctrl+Z'); assert.equal(S.cellAt('B3').bold, false, 'one undo step');
   assert.equal(s.applyCellStyleByName('clearcoat input'), true); assert.equal(S.cellAt('B3').bold, true);
 });
+
+test('Insert Hyperlink (Ctrl+K) to a place in this document: the text to display, the sheet and cell; followed by Shift+F10 O or a click; Remove Link', () => {
+  const s = fresh({ A1: { value: 'Contents' } }); s.addSheet('Inputs'); const S = s.sheet;
+  s.run('Ctrl+K'); assert.equal(s.dialog, 'hyperlink');
+  s.run('Alt+A Alt+T "Go to inputs" Alt+C Down Alt+E "B5" Enter');
+  const c = S.cellAt('A1'); assert.deepEqual(c.link, { sheet: 'Inputs', ref: 'B5' }); assert.equal(c.value, 'Go to inputs'); assert.equal(c.uline, true); assert.equal(c.fontColor, 'blue');
+  s.run('Shift+F10 O'); assert.equal(s.sheet, s.sheets[1].sheet, 'followed to the Inputs sheet'); assert.deepEqual(s.sheet.active, { r: 5, c: 2 });
+  s.switchSheet(0); assert.equal(s.followLink(1, 1), true, 'a click follows it too'); assert.equal(s.sheetIndex, 1);
+  s.switchSheet(0); S.commitInput('=HYPERLINK("#Inputs!C7","Rates")', 2, 1); assert.equal(S.value('A2'), 'Rates'); s.followLink(2, 1); assert.deepEqual(s.sheet.active, { r: 7, c: 3 });
+  s.switchSheet(0); S.goTo(1, 1); s.run('Ctrl+K'); assert.equal(s.dlg.mode, 'place'); s.run('Alt+R'); assert.equal(S.cellAt('A1').link, undefined); assert.equal(S.cellAt('A1').uline, false);
+  S.goTo(3, 1); s.run('Ctrl+K Alt+X "https://hotkey.gg" Enter'); assert.deepEqual(S.cellAt('A3').link, { url: 'https://hotkey.gg' }); assert.equal(S.value('A3'), 'https://hotkey.gg');
+});

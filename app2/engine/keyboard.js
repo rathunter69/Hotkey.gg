@@ -57,7 +57,7 @@ const SHIFTED = { '1': '!', '2': '@', '3': '#', '4': '$', '5': '%', '6': '^', '7
 const KEY_ALIASES = { esc: 'Escape', escape: 'Escape', enter: 'Enter', return: 'Enter', tab: 'Tab', space: ' ', spacebar: ' ',
   up: 'ArrowUp', down: 'ArrowDown', left: 'ArrowLeft', right: 'ArrowRight', arrowup: 'ArrowUp', arrowdown: 'ArrowDown', arrowleft: 'ArrowLeft', arrowright: 'ArrowRight',
   home: 'Home', end: 'End', delete: 'Delete', del: 'Delete', backspace: 'Backspace', bs: 'Backspace', pageup: 'PageUp', pagedown: 'PageDown', pgup: 'PageUp', pgdn: 'PageDown',
-  alt: 'Alt', ctrl: 'Control', control: 'Control', shift: 'Shift', f1: 'F1', f2: 'F2', f4: 'F4', f5: 'F5', f9: 'F9', plus: '+', minus: '-', equals: '=', equal: '=' };
+  alt: 'Alt', ctrl: 'Control', control: 'Control', shift: 'Shift', f1: 'F1', f2: 'F2', f4: 'F4', f5: 'F5', f9: 'F9', f10: 'F10', f3: 'F3', menu: 'ContextMenu', plus: '+', minus: '-', equals: '=', equal: '=' };
 
 /** Physical-key code for a character (so Alt walks work on any layout, like the old codeToChar). */
 export function codeFor(key) {
@@ -1612,6 +1612,7 @@ export class Session {
       this.startEdit(initial, 'edit'); return true;
     }
     if (k === 'F2' && e.shiftKey && !e.ctrlKey && !e.altKey) { this.logKey('Shift+F2'); this.openNote(); return true; }
+    if ((k === 'F10' && e.shiftKey && !e.ctrlKey && !e.altKey) || k === 'ContextMenu') { this.logKey(k === 'F10' ? 'Shift+F10' : 'Menu'); this.openContextMenu(); return true; }   // the shortcut menu (its Hyperlink items)
     if (k === 'F5' && !e.ctrlKey && !e.altKey && !e.shiftKey) { this.logKey('F5'); this.openGoTo(); return true; }
     if (k === 'F4' && !e.ctrlKey && !e.altKey && !e.shiftKey) {   // repeat the last action on the current selection (Excel's F4 / Ctrl+Y outside Edit mode)
       if (S.lastAction) { this.startClock(); this.logKey('F4'); S.repeatLast(); }
@@ -1701,6 +1702,7 @@ export class Session {
       if (k === ']') { this.startClock(); this.logKey('Ctrl+]'); this.selectDependents(); return true; }
       if (lk === 'l' && e.shiftKey) { this.startClock(); this.logKey('Ctrl+Shift+L'); this.toggleAutoFilter(); return true; }   // Filter
       if (lk === 'e' && !e.shiftKey) { this.startClock(); this.logKey('Ctrl+E'); this.flashFill(); return true; }
+      if (lk === 'k' && !e.shiftKey) { this.logKey('Ctrl+K'); this.openHyperlink(); return true; }   // Insert Hyperlink
       if (lk === 'g' && !e.shiftKey) { this.logKey('Ctrl+G'); this.openGoTo(); return true; }
       if (lk === 'f' && !e.shiftKey) { this.logKey('Ctrl+F'); this.openFind(false); return true; }
       if (lk === 'h' && !e.shiftKey) { this.logKey('Ctrl+H'); this.openFind(true); return true; }
