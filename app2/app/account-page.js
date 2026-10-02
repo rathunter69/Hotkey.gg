@@ -15,9 +15,45 @@ import { statsFor } from './stats.js';
 import { records } from './records.js';
 import { badgesHtml } from '../ui/badges.js';
 import { siteCopy } from '../content/copy/apply.js';
+import { paymentsOn } from './config.js';
+import { buttonHtml } from '../ui/components/table.js';
+import { planDetails, openPortal, planDate } from './billing.js';
 
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const SECTIONS = ['stats', 'profile', 'data'];   // Settings is its own page (#/account?section=settings, settings-page.js)
+const SECTIONS = ['stats', 'profile', 'data', 'billing'];
+const fillIn = (s, vars) => String(s).replace(/\{(\w+)\}/g, (m, k) => (vars && vars[k] != null ? vars[k] : m));
+
+/**
+ * Plan and billing (3.0, Account; E-checkout section 6), behind the payments flag: the plan at the
+ * right of the heading, its renewal or end date, and for a subscriber Cancel subscription (straight
+ * to the portal's cancel confirmation; visible, never buried) and Manage billing (the portal home).
+ * `plan` is billing.js planSummary(), or null while it loads. Pure.
+ */
+export function billingPanelHtml(plan, { payments = true } = {}) {
+  const t = (k, fb) => siteCopy(k, fb);
+  const kind = plan ? plan.kind : 'loading';
+  const name = kind === 'subscription' || kind === 'granted' ? t('account_plan_full', 'Full Access') : kind === 'free' ? t('account_plan_free', 'Free') : '';
+  const rows = [];
+  let acts = '';
+  if (kind === 'subscription') {
+    if (plan.date) rows.push(fillIn(plan.renews ? t('account_plan_renews', 'Renews {date}') : t('account_plan_ends', 'Ends {date}'), { date: planDate(plan.date) }));
+    if (plan.student) rows.push(t('account_plan_student', 'Student price'));
+    acts = (plan.renews ? buttonHtml({ label: t('account_cancel', 'Cancel subscription'), id: 'billCancel' }) : '') + buttonHtml({ label: t('account_manage', 'Manage billing'), id: 'billManage' });
+    if (plan.renews) rows.push(t('account_cancel_note', 'Cancelling keeps your access to the end of the month you paid for.'));
+  } else if (kind === 'granted') {
+    rows.push(plan.endsAt ? fillIn(t('account_plan_granted_until', 'From a code or a grant, until {date}'), { date: planDate(plan.endsAt) }) : t('account_plan_granted', 'From a code or a grant'));
+    acts = buttonHtml({ label: t('account_manage', 'Manage billing'), id: 'billManage' });
+  } else if (kind === 'free') {
+    rows.push(t('account_plan_free_line', 'Chapter 1 is yours in full. Full Access opens Chapters 2 to 6.'));
+    acts = buttonHtml({ label: t('account_get', 'Get full access'), href: payments ? '#/checkout' : '#/pricing', primary: true, id: 'billGet' });
+  }
+  return `<section class="panel acct-panel acct-billing" id="sec-billing" aria-label="${esc(t('account_plan', 'Plan and billing'))}">
+      <div class="panel-head"><h2 class="panel-h">${esc(t('account_plan', 'Plan and billing'))}</h2>${name ? `<span class="panel-facts" id="billPlan">${esc(name)}</span>` : ''}</div>
+      ${rows.map(r => `<p class="panel-line">${esc(r)}</p>`).join('')}
+      <p class="co-err" id="billMsg" role="status" aria-live="polite"></p>
+      ${acts ? `<div class="btn-row">${acts}</div>` : ''}
+    </section>`;
+}   // Settings is its own page (#/account?section=settings, settings-page.js)
 
 /** Everything this device holds for the learner, as one JSON-able record (guest export). */
 export function exportRecord() {
@@ -41,7 +77,10 @@ export function mountAccountPage(root, ctx = {}) {
   let lastEmail = '';           // { kind: 'error'|'check', text }
   let destroyed = false;
   let confirmDelete = false;    // the typed delete confirmation is open
-  const offAuth = auth.onChange(() => { if (!destroyed) { notice = null; render(); } });
+  const payments = paymentsOn();
+  let plan = null;              // planSummary() of this account's rows, once read
+  const loadPlan = () => { if (!payments || auth.state() !== 'in') return; planDetails().then(p => { if (destroyed) return; plan = p || { kind: 'free' }; render(); }); };
+  const offAuth = auth.onChange(() => { if (!destroyed) { notice = null; plan = null; render(); loadPlan(); } });
   const onUser = () => { if (!destroyed) render(); };
   window.addEventListener('hk:user', onUser);
 
@@ -151,7 +190,7 @@ export function mountAccountPage(root, ctx = {}) {
     const ids = Object.keys(all);
     const secs = ids.reduce((n, id) => n + (all[id].best || 0), 0);
     el.innerHTML = `<div class="h-row h-row-title"><h1 class="h-title">${esc(siteCopy('account_title', 'Account'))}</h1><span class="label">${signedIn ? esc(store.saveText()) : esc(siteCopy('account_guest', 'You’re a guest, so everything here is saved on this device only.'))}</span></div>
-      <div class="pg-two"><div class="pg-main">${signedIn ? profileCard() : signinCard()}</div>
+      <div class="pg-two"><div class="pg-main">${signedIn ? profileCard() : signinCard()}${signedIn && payments ? billingPanelHtml(plan, { payments }) : ''}</div>
       <div class="pg-side">${statsCard()}
       <section class="panel acct-panel" id="sec-data">
         <div class="panel-head"><h2 class="panel-h">${esc(siteCopy('account_data', 'Your data'))}</h2></div>
@@ -271,6 +310,18 @@ export function mountAccountPage(root, ctx = {}) {
       } catch (err) { if (auth.current(t)) msg.textContent = 'Network error. Try again.'; }
     };
 
+    // plan and billing: the portal opens in this tab and returns to #/account
+    const billMsg = el.querySelector('#billMsg');
+    const portal = flow => async e => {
+      const b = e.currentTarget; b.disabled = true;
+      const r = await openPortal(flow);
+      if (destroyed) return;
+      b.disabled = false;
+      if (r && r.error && billMsg) billMsg.textContent = r.error === 'no_customer' ? siteCopy('account_billing_none', 'There is no subscription on this account yet.') : siteCopy('account_billing_err', 'Billing didn’t open. Try again in a minute.');
+    };
+    const bc = el.querySelector('#billCancel'); if (bc) bc.onclick = portal('cancel');
+    const bm = el.querySelector('#billManage'); if (bm) bm.onclick = portal(null);
+
     // data
     el.querySelector('#exportBtn').onclick = async () => {
       try {
@@ -329,6 +380,7 @@ export function mountAccountPage(root, ctx = {}) {
     if (want) { const s = el.querySelector('#sec-' + want); if (s) { s.classList.add('flash'); s.scrollIntoView({ block: 'center' }); const f = s.querySelector('select, input, button'); if (f) f.focus({ preventScroll: true }); } }
   }
   render();
+  loadPlan();
   root.appendChild(el);
   if (want) { const s = el.querySelector('#sec-' + want); if (s) s.scrollIntoView({ block: 'center' }); }
   return { destroy() { destroyed = true; offAuth(); window.removeEventListener('hk:user', onUser); el.remove(); } };

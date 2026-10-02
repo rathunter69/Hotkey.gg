@@ -11,7 +11,9 @@ import { auth } from './auth.js';
  * The experience pass adds landing_demo {where, outcome}, briefing_done {skipped} and
  * install_prompt {outcome}.
  */
-export const EVENTS = ['landing_view', 'lesson_start', 'lesson_complete', 'lesson_timeup', 'signup', 'sign_in', 'carry_over', 'drill_complete', 'goal_complete', 'challenge_result', 'landing_demo', 'briefing_done', 'install_prompt'];
+export const EVENTS = ['landing_view', 'lesson_start', 'lesson_complete', 'lesson_timeup', 'signup', 'sign_in', 'carry_over', 'drill_complete', 'goal_complete', 'challenge_result', 'landing_demo', 'briefing_done', 'install_prompt',
+  // Phase E checkout (docs/phases/E-checkout.md, section 6)
+  'pricing_view', 'checkout_view', 'checkout_signin', 'checkout_start', 'checkout_unlocked', 'checkout_timeout', 'cancel_click', 'course_complete_email'];
 export const EVENT_NAME_RE = /^[a-z_]{1,40}$/;
 
 const SESSION_KEY = 'hk2_session';
