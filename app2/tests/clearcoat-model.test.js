@@ -176,7 +176,9 @@ test('the plantings: breaks, faults, the #REF!, the sweep, the shell and the pro
   assert.equal(cell(WB.stateOf('B56C'), 'DCF', 'F' + WB.ROW.DCF.fcf).value, WB.FCF_GIVEN[0]);
   // 5.A: everything but the debt schedule and its links; 5.P: the shell with Inputs, Data and the case switch
   const a = WB.stateOf('B5A');
-  assert.equal(cell(a, 'Schedules', 'F' + WB.ROW.Schedules.termClose), undefined); assert.equal(cell(a, 'IS', 'F' + WB.ROW.IS.int), undefined); assert.ok(cell(a, 'IS', 'F' + WB.ROW.IS.rev));
+  const noFormula = c => !c || !c.formula;   // the shelling rule: an emptied cell keeps its format
+  assert.ok(noFormula(cell(a, 'Schedules', 'F' + WB.ROW.Schedules.termClose))); assert.ok(noFormula(cell(a, 'IS', 'F' + WB.ROW.IS.int))); assert.ok(cell(a, 'IS', 'F' + WB.ROW.IS.rev));
+  assert.ok(cell(a, 'Schedules', 'F' + WB.ROW.Schedules.termClose).bt, 'the closing balance keeps its top border');
   const p = session('B5P');
   assert.deepEqual(errors(p), [], 'the project shell is clean');
   assert.equal(sh(p, 'Inputs').value('F' + WB.ROW.Inputs.lNew), 6, 'the live block reads the case switch the shell keeps');

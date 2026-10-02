@@ -1839,6 +1839,18 @@ export const COPY = {
    "mac_note": "",
    "story_beat": ""
   },
+  "revenue-build-in-three": {
+   "id": "revenue-build-in-three",
+   "module": "model-speed",
+   "order": "5.7.1",
+   "title": "The revenue build in three minutes",
+   "brief": "Everything in this chapter you can now do; the question a desk asks is how fast. The revenue build on Schedules is cut back to each row’s FY24 column, and the job is to take it to a total that ties in three minutes: one formula a row filled right, anchors set with F4 as you type, the revenue check reading zero at the end. The keys are shown this once; in Practice the benchmark runs without them. The key is `F4`.",
+   "closing": "You built revenue in three minutes, and the revenue check held at zero as you finished. || Speed in a model comes from two habits more than from fast fingers: write a row’s formula once and fill it, and anchor as you type so the fill is right the first time. Best practice: read the check the moment a block is done, while you still remember what you changed.",
+   "wow": "You built revenue in three minutes, and the check reads zero.",
+   "convention_line": "Write once, fill right; Know the four anchor states",
+   "mac_note": "",
+   "story_beat": ""
+  },
   "remix-format-on-the-pnl": {
    "id": "remix-format-on-the-pnl",
    "module": "remixes",
@@ -11664,6 +11676,64 @@ export const COPY = {
     "why": "",
     "hint_stuck": ""
    }
+  ],
+  "revenue-build-in-three": [
+   {
+    "lesson_id": "revenue-build-in-three",
+    "goal_index": "0",
+    "text": "Select the rollout C6:J9 on Schedules and press Ctrl+R, so FY25 to FY31 take each row’s FY24 formula.",
+    "teach": "A benchmark is a build you already know, against the clock. Every row’s formula is written once, in its first column, and filled right in one press: the FY24 cells here already hold it, reading the history through the projection flag, so Ctrl+R carries it across the actuals and the estimates alike.",
+    "why": "",
+    "hint_stuck": "pulse range C6:J9 · The FY24 column holds the formula; one press copies it right."
+   },
+   {
+    "lesson_id": "revenue-build-in-three",
+    "goal_index": "1",
+    "text": "Type =AVERAGE(C6,C9) into C10:J10 with Ctrl+Enter, then fill the washes C15:J15 right with Ctrl+R.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C10:J10 · Average sites sits between the opening and the closing count."
+   },
+   {
+    "lesson_id": "revenue-build-in-three",
+    "goal_index": "2",
+    "text": "Fill the ticket, its growth and retail revenue right in one press: select C20:J22 and press Ctrl+R.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C20:J22 · Three rows, one selection, one Ctrl+R."
+   },
+   {
+    "lesson_id": "revenue-build-in-three",
+    "goal_index": "3",
+    "text": "Type =C19/(Inputs!C45*12) into C23:J23, pressing F4 right after C45, then fill membership revenue C24:J24 right.",
+    "teach": "F4 while the cursor sits just after a reference anchors it as you type, so the fill is right the first time: one press turns Inputs!C45 into Inputs!$C$45. A member washes two and a half times a month, so average members are member washes over thirty a year.",
+    "why": "",
+    "hint_stuck": "pulse range C23:J23 · Without the anchor, D23 would read Inputs!D45, an empty cell."
+   },
+   {
+    "lesson_id": "revenue-build-in-three",
+    "goal_index": "4",
+    "text": "Total revenue in C26:J26: =C22+C24+C25 with Ctrl+Enter, the three revenue lines and not the member count between them.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C26:J26 · Row 23 counts members, not dollars, so AutoSum down the block would add it in."
+   },
+   {
+    "lesson_id": "revenue-build-in-three",
+    "goal_index": "5",
+    "text": "Give the rollout C6:J9 the desk number format in Ctrl+1’s Custom box, then select the washes C15:J15 and press F4.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C6:J9 · The code is #,##0_);(#,##0);\"-\"_), and F4 repeats the last format on the next block."
+   },
+   {
+    "lesson_id": "revenue-build-in-three",
+    "goal_index": "6",
+    "text": "Does it tie? Watch FY31 new sites in Inputs J21 go from 6 to 10: revenue climbs and the revenue check, Checks J10, holds at 0.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell J10 · The check is the IS’s revenue less the build’s, so it reads 0 whatever the case says."
+   }
   ]
  },
  "modules": {
@@ -11883,6 +11953,13 @@ export const COPY = {
    "objective": "Build the weekly report end to end, then prove it against the clock; or test out of the chapter.",
    "story_beat": "The diligence pack. || A fresh export, a question log with eight questions open, a case sheet with three columns and no switch wired. Answer the log, build the KPI page, wire the case and name what deserves it. Build it, then build it again on another cluster’s export against the clock. The assessment is the test-out.",
    "page_name": "The diligence pack"
+  },
+  "model-speed": {
+   "id": "model-speed",
+   "name": "Model speed",
+   "objective": "The chapter’s three benchmarks with the keys shown once: the revenue build in three minutes, a block filled and formatted in one pass, the cash flow statement linked by keyboard alone.",
+   "story_beat": "Now do it fast. || Everything in this chapter you can now do; the question a desk asks is how fast. Three benchmarks, each a piece of the model against the clock: the revenue build in three minutes, a block filled and formatted in one pass, the cash flow statement linked without touching the mouse. They live in Practice as this chapter’s benchmarks, and here you run each once with the keys shown.",
+   "page_name": "The benchmarks"
   }
  },
  "site": {

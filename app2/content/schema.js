@@ -329,6 +329,10 @@ export const CONCEPTS = {
   'name-manager': 'the Name Manager (Ctrl+F3) lists every name with its value, its reference and its scope; Edit renames or re-points one and the formulas follow, Delete removes a stray',
   'paste-list': 'Paste Name (F3) › Paste List writes every name and what it refers to from the active cell down, so the reviewer can read them on a sheet',
   'name-driven-list': 'a drop-down whose Source is a name (=Cases) reads the named list wherever it sits, so the list can move and the picker keeps working',
+  // Chapter 5 · 5.7 Model speed (the operating model's benchmarks)
+  'speed-build': 'a build on the clock: each row’s formula written once in its first column and filled right, anchors set with F4 as the formula is typed, the check read at the end',
+  'one-pass-format': 'a block filled with one Ctrl+R and formatted by whole-block actions, F4 repeating each one on the next range, so no cell is touched twice',
+  'keyboard-linking': 'statement links made without the mouse: the reference typed, or pointed with Ctrl+PgDn and the arrows, then Ctrl+Enter across the row and F4 repeating the green',
 };
 
 /**
