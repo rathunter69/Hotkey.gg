@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 53: COUNTIF and COUNTIFS — Formulas and functions · hotkey.gg</title>
+<meta name="description" content="undefined">
+<meta name="generator" content="app2/tests/public-pages.js — generated from lesson data; do not edit by hand">
+<script>try{var v=JSON.parse(localStorage.getItem('hotkey_theme_vars'));if(v&&v.vars){var r=document.documentElement;for(var k in v.vars)r.style.setProperty('--'+k,v.vars[k]);r.setAttribute('data-dark',v.dark?'1':'0');}}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../ui/public.css">
+</head>
+<body>
+<nav class="top"><a class="brand" href="../index.html#/">hotkey<b>.gg</b></a><a href="../index.html#/learn">Learn</a><a href="../index.html#/practice">Practice</a><a href="../index.html#/leaderboard">Leaderboard</a><a href="../index.html#/reference">Reference</a></nav>
+<main>
+<div class="crumb"><a href="../index.html#/learn">Learn</a> › <a href="index.html">Formulas and functions</a> › Math and aggregation</div>
+<h1>Lesson 53: COUNTIF and COUNTIFS</h1>
+<div class="meta">Formulas and functions · Math and aggregation · medium · <span class="">Paid</span></div>
+<div class="card">
+<p style="margin:0">undefined</p>
+</div>
+<h2>What you will do</h2>
+<ol class="goals"><li><span class="muted">COUNTIF(range, criteria) counts the cells in the range that match the criteria, so =COUNTIF(Transactions!$B$5:$B$94,B15) counts the export rows whose site is the code in B15. Anchor the range with $ and leave B15 relative, and one formula serves all six sites.</span> Count the washes by site: select C15:C20, type =COUNTIF(Transactions!$B$5:$B$94,B15) and press Ctrl+Enter.</li><li>The same COUNTIF by package: C25:C27 =COUNTIF(Transactions!$C$5:$C$94,B25) with Ctrl+Enter, the package letters as the criteria.</li><li><span class="muted">COUNTIFS takes the pairs one after another and counts a row only when every pair matches. A criteria in quotes can compare: &quot;&lt;&gt;&quot; means not blank, so the member column with &quot;&lt;&gt;&quot; counts member washes.</span> In D15:D20 count each site’s member washes: COUNTIFS on the site, then the member column Transactions!$D$5:$D$94 with &quot;&lt;&gt;&quot;.</li><li>Retail washes with COUNTIFS: E15:E20 on the site with the amounts &quot;&gt;0&quot;, then D25:D27 on the package with the member column &quot;&quot;.</li><li><span class="muted">Two pairs on the same range make a band: &quot;&gt;=15&quot; with &quot;&lt;20&quot; counts the $15 tickets and leaves the $20 ones to the next band. The edges are where a band count goes wrong, because a &gt; where &gt;= belongs drops every ticket sitting exactly on the edge.</span> Count the tickets in C34:C36: &quot;&lt;15&quot;, then &quot;&gt;=15&quot; with &quot;&lt;20&quot;, then &quot;&gt;=20&quot;, and color the three green, since they read only Transactions.</li><li>Check the bands in C37: =SUM(C34:C36)-COUNT(Transactions!$E$5:$E$94) reads 0 when every numeric ticket sits in one band.</li><li><span class="muted">In a block, anchor the criteria both ways: $B41 keeps the column of site codes as the formula moves right, and C$40 keeps the row of package letters as it moves down. One formula then fills the whole block.</span> Fill the site by package block C41:E46 in one Ctrl+Enter: COUNTIFS on the site $B41 and the package C$40.</li><li>Total the three blocks with AutoSum: select each block with its empty total row, C41:E47, C25:D28 and C15:E21, and press Alt+=.</li><li>Write the checks: C80 =C21-C28 and C81 =C21-COUNTA(Transactions!$A$5:$A$94); both read (2), two washes the site codes miss.</li><li>Does it tie? Watch the first wash in Transactions!C5 change from B to U, and Basic and Ultimate in C25:C27 shift by one each.</li></ol>
+<div class="cta"><a class="btn" href="../index.html#/lesson/countif-countifs">Start this lesson</a><span class="path">Read → Guided → Try solo → Timed</span></div>
+
+<div class="prevnext"><span>← <a href="round-family.html">Lesson 52: ROUND, ROUNDUP, ROUNDDOWN, ABS, CEILING, FLOOR</a></span><span><a href="sumif-sumifs-averageifs.html">Lesson 54: SUMIF, SUMIFS and AVERAGEIFS</a> →</span></div>
+</main>
+<footer><a href="../index.html#/pricing">Pricing</a><a href="../index.html#/teams">Teams</a><a href="../index.html#/about">About</a><a href="../index.html#/terms">Terms</a><a href="../index.html#/privacy">Privacy</a><a href="../index.html#/contact">Contact</a><span>© hotkey.gg</span></footer>
+</body>
+</html>

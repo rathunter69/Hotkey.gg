@@ -603,6 +603,150 @@ export const COPY = {
    "mac_note": "",
    "story_beat": ""
   },
+  "round-family": {
+   "id": "round-family",
+   "module": "math-and-aggregation",
+   "order": "3.3.1",
+   "title": "ROUND, ROUNDUP, ROUNDDOWN, ABS, CEILING, FLOOR",
+   "brief": "A number format hides decimals; ROUND removes them, and the two are not the same thing: a page that adds up its displayed figures can land a dollar off its own total. ROUND(x,2) rounds to the cent, ROUND(x,0) to the dollar and ROUND(x,-3) to the thousand; ROUNDUP and ROUNDDOWN force the direction; CEILING and FLOOR round to a step, like the nearest $0.25 on a ticket; ABS drops the sign. Use them on the ticket figures in Summary, where the arithmetic has to be exact. The key is `ROUND`.",
+   "closing": "A format hides decimals; ROUND removes them, and the total knows the difference. || The ticket columns now read to the cent and to the quarter, the washes in thousands and the gap to target as a size. Best practice: round where a figure gets added up or printed as a price, and keep the full figure everywhere else, because every rounding throws a little away.",
+   "wow": "",
+   "convention_line": "One decimals setting per line · $ on the first and total rows",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "countif-countifs": {
+   "id": "countif-countifs",
+   "module": "math-and-aggregation",
+   "order": "3.3.2",
+   "title": "COUNTIF and COUNTIFS",
+   "brief": "A count with a condition is the first question anyone asks of an export: how many washes at Domain, how many Ultimate washes, how many member washes at Domain. COUNTIF takes one range and one condition; COUNTIFS takes as many range and condition pairs as you need. The condition can be a cell, a text, or a comparison in quotes, like \">=250\". Build the site and package count blocks on Summary from Transactions, rows 5 to 94. The key is `COUNTIFS`.",
+   "closing": "Ninety rows counted six ways, and the blocks agree with each other except where the export lies. || The package block counts all 90 washes and the site block finds 88, because two site codes in the export end in a space and match nothing in B15:B20. The checks in C80:C81 caught it before a buyer did; module 3.4 finds the two rows and fixes them. Best practice: write the criteria range once, anchor it, and fill; a range that slips by a row is the commonest wrong number in a databook.",
+   "wow": "",
+   "convention_line": "Alt+= once, across the block · The check is a live difference → 0 · Links green; external links avoided",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "sumif-sumifs-averageifs": {
+   "id": "sumif-sumifs-averageifs",
+   "module": "math-and-aggregation",
+   "order": "3.3.3",
+   "title": "SUMIF, SUMIFS and AVERAGEIFS",
+   "brief": "Counting says how many; summing says how much. SUMIF adds the rows that meet one condition, SUMIFS puts the range to add first and then the condition pairs, and AVERAGEIFS averages instead. A member wash carries $0 because the member paid on the first of the month, so membership revenue is active members times the fee, not a sum of rows, and the databook has to say so or a buyer will think member washes are free. Build the revenue columns on Summary. The key is `SUMIFS`.",
+   "closing": "The page now says how much, by site and by package, and what a member wash is worth. || Retail revenue is a sum of the export; membership revenue is members times the fee, and the note in C22 says so before a buyer asks. Best practice: a SUMIFS lists the range to add first, a SUMIF last, and mixing the two up is the commonest slip in a databook, so read one back with F2 before you fill.",
+   "wow": "",
+   "convention_line": "Alt+= once, across the block · Label the source (\"per utility contract\")",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "busiest-sites": {
+   "id": "busiest-sites",
+   "module": "math-and-aggregation",
+   "order": "3.3.4",
+   "title": "MAXIFS, MINIFS, LARGE, SMALL and RANK",
+   "brief": "\"Which site was busiest, and on which day?\" MAXIFS finds the biggest value that meets a condition and MINIFS the smallest; LARGE and SMALL find the nth biggest or smallest in a range; RANK places every site in order. Together they turn the site block into a league table without sorting anything, which matters because the block has to stay where every link expects it. The key is `LARGE`.",
+   "closing": "A league table with nothing sorted, so every link still points where it should. || MAXIFS and MINIFS read the busiest and quietest day straight off the day totals; LARGE, SMALL and RANK put the six sites in order beside them. Best practice: never sort a block that other cells link to; rank it in a column instead, and the links keep their rows.",
+   "wow": "",
+   "convention_line": "Ctrl+D down, Ctrl+R across",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "sumproduct-blended-ticket": {
+   "id": "sumproduct-blended-ticket",
+   "module": "math-and-aggregation",
+   "order": "3.3.5",
+   "title": "SUMPRODUCT: the blended ticket",
+   "brief": "The blended ticket is revenue over every wash, member washes included, so it sits well below the price list, and it is the number a buyer uses to value a wash. SUMPRODUCT multiplies two ranges pair by pair and adds the products in one call: retail washes by package times the price by package, with no helper column. It also does conditional sums the old way, before SUMIFS existed, and you will meet that in other people’s models. The key is `SUMPRODUCT`.",
+   "closing": "SUMPRODUCT summed washes times prices in one call, and the blended ticket is the number a buyer prices a wash from. || The check in C82 reads (60): three amounts in the export are text, and a row carries a site code with a trailing space, so the SUMIFs miss them while the price list does not. Leave it red; module 3.4 cleans the export and the check comes back to zero on its own. Best practice: when two routes to one number disagree, the check is doing its job, so fix the data, never the check.",
+   "wow": "",
+   "convention_line": "The check is a live difference → 0",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "the-reconciliation": {
+   "id": "the-reconciliation",
+   "module": "math-and-aggregation",
+   "order": "3.3.6",
+   "title": "The reconciliation: POS against the managers’ numbers",
+   "brief": "A reconciliation is two counts of the same thing from two sources, with the difference explained line by line until it reaches zero. The managers’ weekly tallies came in by email; the POS counts are the ones you built from the export. They won’t agree, because a manager counted a re-wash and another tallied a day the export doesn’t cover, and the databook shows each difference and what explains it. Build the block and drive the check to zero. The key is `=`.",
+   "closing": "Two counts of the same thing agree now, every difference is explained, and the check reads zero. || The POS is the truth; the managers’ number is adjusted to it, never the other way, and every adjustment says why in words. The same three columns (the reported figure, each adjustment explained, the adjusted figure) are how a buyer’s diligence team restates EBITDA for one-time items, and buyers price off the adjusted number.",
+   "wow": "",
+   "convention_line": "The check is a live difference → 0 · Cash balances the sheet; nothing is forced · Inputs blue, formulas black · Label the source (\"per utility contract\") · Alt+= once, across the block",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "challenge-site-package-summary": {
+   "id": "challenge-site-package-summary",
+   "module": "math-and-aggregation",
+   "order": "3.3.C",
+   "title": "Challenge: the export rolled up to a site × package summary",
+   "brief": "A fresh export from the San Antonio cluster. Count and sum it by site and package, rank the sites, price the blended ticket, and bring the reconciliation check to zero.",
+   "closing": "",
+   "wow": "",
+   "convention_line": "The check is a live difference → 0 · Inputs blue, formulas black · Alt+= once, across the block",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "split-the-codes": {
+   "id": "split-the-codes",
+   "module": "text",
+   "order": "3.4.1",
+   "title": "LEN, LEFT, RIGHT and MID: split the codes",
+   "brief": "A site code is two facts in one cell: AUS-DOM is the cluster and the site. LEFT takes characters from the start, RIGHT from the end, MID from a position, and LEN counts them, so the cluster is LEFT(B5,3) and the site is RIGHT(B5,3). Split the codes into their own columns on Transactions, so the cluster can be counted on, and let LEN find the two codes that have been hiding a space since the counts. The key is `LEFT`.",
+   "closing": "One code became two columns, and the trailing spaces gave themselves away. || LEN found what no eye could, LEFT and RIGHT split the code, and TRIM inside the formula means the next dirty export cannot break it. The reconciliation moved because two washes the managers never counted are on the POS now, and two lessons on they get their line in the reconciliation. Best practice: clean inside the formula when the export refreshes, and fix the source when it is yours to fix.",
+   "wow": "",
+   "convention_line": "The check is a live difference → 0 · The count, the proposal, the error code",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "parse-the-memo": {
+   "id": "parse-the-memo",
+   "module": "text",
+   "order": "3.4.2",
+   "title": "FIND, SEARCH and SUBSTITUTE: parse the memo",
+   "brief": "The memo packs three facts into one string: \"Wash D @ AUS-DOM (kiosk)\". FIND returns the position of a character, so the site code is whatever sits after \"@ \", and the channel is whatever sits between the brackets: MID with FIND tells it where to cut. SEARCH is FIND without caring about case, and SUBSTITUTE swaps text for text. Pull the site, the channel and the package out of the memo, and leave the memo itself alone. The key is `FIND`.",
+   "closing": "You pulled three facts out of one string, and the raw memo is still there for the audit. || FIND and SEARCH say where to cut, MID cuts, UPPER and SUBSTITUTE make the pieces read one way. Best practice: parse into helper columns and never overwrite the raw text, so anyone can check a parsed value against the string it came from.",
+   "wow": "",
+   "convention_line": "Inputs, calcs, outputs — in that order · The count, the proposal, the error code",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "text-to-numbers": {
+   "id": "text-to-numbers",
+   "module": "text",
+   "order": "3.4.3",
+   "title": "VALUE and DATEVALUE: a text export into numbers",
+   "brief": "Three amounts in the export sit on the left of their cells, which means they are text, not numbers, and every SUMIFS skips them. VALUE turns a text number into a number and DATEVALUE turns a text date into a date, and when you are in a hurry, multiplying by 1 does the same job. Paste the values over the originals, so the export holds numbers and the sums come out right. The key is `VALUE`.",
+   "closing": "Three text amounts became numbers, and the sums finally counted them. || Go To Special found the text, VALUE in a helper turned it into numbers, and Paste Special Values put them back where the formulas look. Best practice: convert in a helper you can read, paste values once you trust it, and delete the helper so nothing depends on it.",
+   "wow": "",
+   "convention_line": "Values to snapshot, never over live formulas · The check is a live difference → 0 · Inputs blue, formulas black",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "text-to-columns-flash-fill": {
+   "id": "text-to-columns-flash-fill",
+   "module": "text",
+   "order": "3.4.4",
+   "title": "Text to Columns and Flash Fill",
+   "brief": "When a whole column needs splitting once, a formula is more than the job needs. Text to Columns (Alt, A, E) splits by a delimiter, like the hyphen in AUS-DOM, or by a fixed width, in one pass; Flash Fill (Ctrl+E) watches you type the first result and fills the pattern down. Both write values, not formulas, so they are for a one-time clean, not a live model. Split a copy of the codes both ways. The key is `Alt A E`.",
+   "closing": "A whole column split in one pass, and you know why the result is values. || Text to Columns split ninety codes at the hyphen and Flash Fill copied a pattern from one example, both without a formula. Best practice: Text to Columns and Flash Fill for a one-time clean; LEFT, RIGHT and MID when the export refreshes, because only a formula follows the data.",
+   "wow": "",
+   "convention_line": "Name the tabs; outputs left, data right · Values to snapshot, never over live formulas",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "challenge-text-dump": {
+   "id": "challenge-text-dump",
+   "module": "text",
+   "order": "3.4.C",
+   "title": "Challenge: a text dump into a usable table",
+   "brief": "A raw dump from the San Antonio cluster: codes with stray spaces, memos with three facts, amounts as text. Make it a table the formulas can read, and bring the checks to zero.",
+   "closing": "",
+   "wow": "",
+   "convention_line": "Values to snapshot, never over live formulas · The check is a live difference → 0",
+   "mac_note": "",
+   "story_beat": ""
+  },
   "remix-format-on-the-pnl": {
    "id": "remix-format-on-the-pnl",
    "module": "remixes",
@@ -3814,6 +3958,790 @@ export const COPY = {
     "why": "",
     "hint_stuck": ""
    }
+  ],
+  "round-family": [
+   {
+    "lesson_id": "round-family",
+    "goal_index": "0",
+    "text": "Select the tickets in Q5:Q10 and read their Sum on the status bar: it adds every decimal the cells hide.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range Q5:Q10 · Revenue per wash is the column headed in Q4."
+   },
+   {
+    "lesson_id": "round-family",
+    "goal_index": "1",
+    "text": "Round Domain’s ticket to the cent in T5: =ROUND(Q5,2), and read it against the full figure in Q5.",
+    "teach": "ROUND(number, digits) changes the value itself, where a number format only changes what shows: =ROUND(Q5,2) holds 6.95, not 6.950381. ROUNDUP and ROUNDDOWN take the same digits but always go one way, whatever the next digit says.",
+    "why": "",
+    "hint_stuck": "pulse cell T5 · Two digits is the cent."
+   },
+   {
+    "lesson_id": "round-family",
+    "goal_index": "2",
+    "text": "Now every site: select T5:T10, type =ROUND(Q5,2) and press Ctrl+Enter, so the six tickets add up to the cent.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range T5:T10 · Select the six sites first, then one Ctrl+Enter writes them all."
+   },
+   {
+    "lesson_id": "round-family",
+    "goal_index": "3",
+    "text": "The same digits, one way: the Sep 15 washes in thousands, never rounded up, =ROUNDDOWN(C5/1000,1) into W5:W10 with Ctrl+Enter.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range W5:W10 · Divide by a thousand inside the ROUNDDOWN; a count rounded down never claims a wash the site did not do."
+   },
+   {
+    "lesson_id": "round-family",
+    "goal_index": "4",
+    "text": "Price the tickets up to the quarter: =CEILING(Q5,0.25) into U5:U10 with Ctrl+Enter.",
+    "teach": "CEILING(number, significance) rounds up to the next multiple of the step and FLOOR rounds down to it, so with a step of 0.25 a $6.95 ticket becomes $7.00 and $6.75. That is how a price list gets set from a ticket the arithmetic produced.",
+    "why": "",
+    "hint_stuck": "pulse range U5:U10 · Ceiling goes up to the step."
+   },
+   {
+    "lesson_id": "round-family",
+    "goal_index": "5",
+    "text": "And down to the quarter beside it: =FLOOR(Q5,0.25) into V5:V10 with Ctrl+Enter, so each ticket sits between two prices.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range V5:V10 · Floor goes down to the step."
+   },
+   {
+    "lesson_id": "round-family",
+    "goal_index": "6",
+    "text": "Domain’s gap to target as a size, not a sign, in X5: =ABS(C5-D5).",
+    "teach": "ABS returns a number without its sign, so a gap of 25 washes reads 25 whether the site is over the target or under it. Use it when the question is how far, not which way.",
+    "why": "",
+    "hint_stuck": "pulse cell X5 · The washes sit in C and the target in D."
+   },
+   {
+    "lesson_id": "round-family",
+    "goal_index": "7",
+    "text": "Every site’s gap in X5:X10: =ABS(C5-D5) with Ctrl+Enter, and the sites under target read as far off as the ones over it.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range X5:X10 · Select the six sites first, then one Ctrl+Enter."
+   },
+   {
+    "lesson_id": "round-family",
+    "goal_index": "8",
+    "text": "Does it tie? Watch Domain’s revenue in H5 change to 2000, and its rounded, ceiling and floor tickets in T5:V5 move together.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range T5:V5 · All three read the same ticket in Q5."
+   }
+  ],
+  "countif-countifs": [
+   {
+    "lesson_id": "countif-countifs",
+    "goal_index": "0",
+    "text": "Count the washes by site: select C15:C20, type =COUNTIF(Transactions!$B$5:$B$94,B15) and press Ctrl+Enter.",
+    "teach": "COUNTIF(range, criteria) counts the cells in the range that match the criteria, so =COUNTIF(Transactions!$B$5:$B$94,B15) counts the export rows whose site is the code in B15. Anchor the range with $ and leave B15 relative, and one formula serves all six sites.",
+    "why": "",
+    "hint_stuck": "pulse range C15:C20 · The site codes in B15:B20 are the criteria."
+   },
+   {
+    "lesson_id": "countif-countifs",
+    "goal_index": "1",
+    "text": "The same COUNTIF by package: C25:C27 =COUNTIF(Transactions!$C$5:$C$94,B25) with Ctrl+Enter, the package letters as the criteria.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C25:C27 · The package letters in B25:B27 are the criteria."
+   },
+   {
+    "lesson_id": "countif-countifs",
+    "goal_index": "2",
+    "text": "In D15:D20 count each site’s member washes: COUNTIFS on the site, then the member column Transactions!$D$5:$D$94 with \"<>\".",
+    "teach": "COUNTIFS takes the pairs one after another and counts a row only when every pair matches. A criteria in quotes can compare: \"<>\" means not blank, so the member column with \"<>\" counts member washes.",
+    "why": "",
+    "hint_stuck": "pulse range D15:D20 · A member wash has an id in column D of the export."
+   },
+   {
+    "lesson_id": "countif-countifs",
+    "goal_index": "3",
+    "text": "Retail washes with COUNTIFS: E15:E20 on the site with the amounts \">0\", then D25:D27 on the package with the member column \"\".",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range E15:E20 · A member wash carries 0 and a member id; a retail wash carries its price and no id."
+   },
+   {
+    "lesson_id": "countif-countifs",
+    "goal_index": "4",
+    "text": "Count the tickets in C34:C36: \"<15\", then \">=15\" with \"<20\", then \">=20\", and color the three green, since they read only Transactions.",
+    "teach": "Two pairs on the same range make a band: \">=15\" with \"<20\" counts the $15 tickets and leaves the $20 ones to the next band. The edges are where a band count goes wrong, because a > where >= belongs drops every ticket sitting exactly on the edge.",
+    "why": "",
+    "hint_stuck": "pulse range C34:C36 · The band labels in B34:B36 give the edges."
+   },
+   {
+    "lesson_id": "countif-countifs",
+    "goal_index": "5",
+    "text": "Check the bands in C37: =SUM(C34:C36)-COUNT(Transactions!$E$5:$E$94) reads 0 when every numeric ticket sits in one band.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C37 · COUNT counts the numbers in the amount column."
+   },
+   {
+    "lesson_id": "countif-countifs",
+    "goal_index": "6",
+    "text": "Fill the site by package block C41:E46 in one Ctrl+Enter: COUNTIFS on the site $B41 and the package C$40.",
+    "teach": "In a block, anchor the criteria both ways: $B41 keeps the column of site codes as the formula moves right, and C$40 keeps the row of package letters as it moves down. One formula then fills the whole block.",
+    "why": "",
+    "hint_stuck": "pulse range C41:E46 · The site codes run down B, the package letters across row 40."
+   },
+   {
+    "lesson_id": "countif-countifs",
+    "goal_index": "7",
+    "text": "Total the three blocks with AutoSum: select each block with its empty total row, C41:E47, C25:D28 and C15:E21, and press Alt+=.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C21:E21 · Select the empty total row and Alt+= sums what sits above it."
+   },
+   {
+    "lesson_id": "countif-countifs",
+    "goal_index": "8",
+    "text": "Write the checks: C80 =C21-C28 and C81 =C21-COUNTA(Transactions!$A$5:$A$94); both read (2), two washes the site codes miss.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C80:C81 · The checks block sits under the page, from B79."
+   },
+   {
+    "lesson_id": "countif-countifs",
+    "goal_index": "9",
+    "text": "Does it tie? Watch the first wash in Transactions!C5 change from B to U, and Basic and Ultimate in C25:C27 shift by one each.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C25:C27 · Every count reads the export, so the export leads."
+   }
+  ],
+  "sumif-sumifs-averageifs": [
+   {
+    "lesson_id": "sumif-sumifs-averageifs",
+    "goal_index": "0",
+    "text": "Retail revenue by site: select F15:F20, type =SUMIF(Transactions!$B$5:$B$94,B15,Transactions!$E$5:$E$94) and press Ctrl+Enter.",
+    "teach": "SUMIF(range, criteria, sum_range) adds the sum_range on every row where the range meets the criteria. The criteria range and the sum range run down the same rows, so anchor both and the formula fills.",
+    "why": "",
+    "hint_stuck": "pulse range F15:F20 · The amounts sit in column E of the export."
+   },
+   {
+    "lesson_id": "sumif-sumifs-averageifs",
+    "goal_index": "1",
+    "text": "The same SUMIF on another sheet: the fortnight’s washes from the POS day totals, O15:O20 =SUMIF(Daily!$B$5:$B$94,B15,Daily!$D$5:$D$94).",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range O15:O20 · Daily holds one row per site per day."
+   },
+   {
+    "lesson_id": "sumif-sumifs-averageifs",
+    "goal_index": "2",
+    "text": "Domain’s average retail ticket in G15: AVERAGEIFS of the amounts on the site, with the amounts \">0\" as a second pair.",
+    "teach": "AVERAGEIFS puts the range to average first, then the pairs. Member washes carry $0, so \">0\" on the amounts keeps them out, and the average is the retail ticket a customer actually paid.",
+    "why": "",
+    "hint_stuck": "pulse cell G15 · Without the \">0\" pair, every member wash drags the average down."
+   },
+   {
+    "lesson_id": "sumif-sumifs-averageifs",
+    "goal_index": "3",
+    "text": "Every site’s average retail ticket: the same AVERAGEIFS into G15:G20 with Ctrl+Enter, and compare the six.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range G15:G20 · Select the six sites first, then one Ctrl+Enter."
+   },
+   {
+    "lesson_id": "sumif-sumifs-averageifs",
+    "goal_index": "4",
+    "text": "Active members by site in L15:L20: COUNTIFS on Members!$C$5:$C$44 for the home site and Members!$F$5:$F$44 \"\" for not cancelled.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range L15:L20 · A cancelled member has a date in column F of Members."
+   },
+   {
+    "lesson_id": "sumif-sumifs-averageifs",
+    "goal_index": "5",
+    "text": "Membership revenue in M15:M20 =L15*Members!$L$2, then total revenue in N15:N20 =F15+M15.",
+    "teach": "Membership revenue is active members times the monthly fee, $30 in Members!L2 for now (the fee by plan is a lookup, Chapter 4). It sits beside retail revenue, because a member wash carries $0 in the export and the money came in on the first.",
+    "why": "",
+    "hint_stuck": "pulse range M15:N20 · Anchor the fee, so every site multiplies by the same cell."
+   },
+   {
+    "lesson_id": "sumif-sumifs-averageifs",
+    "goal_index": "6",
+    "text": "Total F15:F21 and L15:O21 with Alt+=, put G21 =F21/E21, and note in C22 that member washes carry $0 and why.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range F21:O21 · An average of averages is wrong, so G21 divides revenue by washes. The note: Member washes carry $0; membership revenue is the fee times active members."
+   },
+   {
+    "lesson_id": "sumif-sumifs-averageifs",
+    "goal_index": "7",
+    "text": "Basic retail revenue by site in F41:F46: =SUMIFS of the amounts on the site $B41 and the package F$40, with Ctrl+Enter.",
+    "teach": "SUMIFS(sum_range, criteria_range1, criteria1, criteria_range2, criteria2) takes the range to add first, which is the opposite of SUMIF. Anchor the site as $B41 and the package as F$40, and the one formula is right in every cell of the block.",
+    "why": "",
+    "hint_stuck": "pulse range F41:F46 · The package letters for revenue run across F40:H40."
+   },
+   {
+    "lesson_id": "sumif-sumifs-averageifs",
+    "goal_index": "8",
+    "text": "Fill the SUMIFS right across F41:H46 with Ctrl+R, then AutoSum F41:H47: the anchors hold, so D and U come out right too.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range G41:H46 · Select from F41 to H46 so Ctrl+R has the formula to copy."
+   },
+   {
+    "lesson_id": "sumif-sumifs-averageifs",
+    "goal_index": "9",
+    "text": "Does it tie? Watch a Domain wash in Transactions!E6 go from 20 to 30, and Domain’s revenue in F15 and N15 rise by 10.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell N15 · Retail revenue and total revenue both read the export."
+   }
+  ],
+  "busiest-sites": [
+   {
+    "lesson_id": "busiest-sites",
+    "goal_index": "0",
+    "text": "The top three site totals in J15:J17: =LARGE($C$15:$C$20,1), then 2, then 3.",
+    "teach": "LARGE(array, k) returns the kth biggest value in the range, so k of 1, 2 and 3 is a top three that rereads itself whenever a count moves. SMALL counts up from the smallest the same way. Anchor the range, since every line reads the same six sites.",
+    "why": "",
+    "hint_stuck": "pulse range J15:J17 · The fortnight’s washes by site sit in C15:C20."
+   },
+   {
+    "lesson_id": "busiest-sites",
+    "goal_index": "1",
+    "text": "And the bottom one under them in J18: =SMALL($C$15:$C$20,1).",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell J18 · SMALL counts up from the smallest."
+   },
+   {
+    "lesson_id": "busiest-sites",
+    "goal_index": "2",
+    "text": "Rank Domain in K15: =RANK(C15,$C$15:$C$20).",
+    "teach": "RANK(number, ref) gives a value’s place in the list, 1 for the biggest, and ties share a place. Read the order off K without sorting the block.",
+    "why": "",
+    "hint_stuck": "pulse cell K15 · C15 is Domain’s washes; the list is all six."
+   },
+   {
+    "lesson_id": "busiest-sites",
+    "goal_index": "3",
+    "text": "Rank every site in K15:K20: the same RANK with Ctrl+Enter, and read the league table down K.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range K15:K20 · C15 moves with the row; the list stays anchored."
+   },
+   {
+    "lesson_id": "busiest-sites",
+    "goal_index": "4",
+    "text": "Each site’s busiest day in H15:H20: =MAXIFS(Daily!$D$5:$D$94,Daily!$B$5:$B$94,B15) with Ctrl+Enter.",
+    "teach": "MAXIFS(max_range, criteria_range, criteria) returns the largest value on the rows that meet the criteria, the same pairs COUNTIFS takes, and MINIFS the smallest. Daily holds one row per site per day, so the site’s code finds its busiest day.",
+    "why": "",
+    "hint_stuck": "pulse range H15:H20 · The day totals are in column D of Daily."
+   },
+   {
+    "lesson_id": "busiest-sites",
+    "goal_index": "5",
+    "text": "Each site’s quietest day in I15:I20, the same pairs with MINIFS.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range I15:I20 · Cedar Park washed nothing on its first day."
+   },
+   {
+    "lesson_id": "busiest-sites",
+    "goal_index": "6",
+    "text": "Does it tie? Watch Airport’s washes in C19 change to 25, and its rank in K19 and the top three in J15:J17 reorder.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range J15:J17 · Nothing was sorted, so the links still point where they did."
+   }
+  ],
+  "sumproduct-blended-ticket": [
+   {
+    "lesson_id": "sumproduct-blended-ticket",
+    "goal_index": "0",
+    "text": "Select the retail washes and the price list side by side in D25:E27: the two ranges SUMPRODUCT pairs up.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range D25:E27 · The package block starts at B25."
+   },
+   {
+    "lesson_id": "sumproduct-blended-ticket",
+    "goal_index": "1",
+    "text": "Retail revenue at the price list in C29: =SUMPRODUCT(D25:D27,E25:E27).",
+    "teach": "SUMPRODUCT(array1, array2) multiplies the first pair, the second pair and the third, then adds the three products: 17 × $10 + 23 × $15 + 14 × $20. The two ranges must be the same shape, or it returns #VALUE!.",
+    "why": "",
+    "hint_stuck": "pulse cell C29 · Washes first, prices second, the same three rows each."
+   },
+   {
+    "lesson_id": "sumproduct-blended-ticket",
+    "goal_index": "2",
+    "text": "Use it again for the weighted average retail price in C31: =SUMPRODUCT(D25:D27,E25:E27)/SUM(D25:D27).",
+    "teach": "SUMPRODUCT over SUM is a weighted average: each price counts as many times as it was sold, where AVERAGE(E25:E27) would count each price once. The same shape weights anything, a ticket by washes or a rate by balance.",
+    "why": "",
+    "hint_stuck": "pulse cell C31 · Divide by the retail washes, not by three."
+   },
+   {
+    "lesson_id": "sumproduct-blended-ticket",
+    "goal_index": "3",
+    "text": "The blended ticket in C30: retail revenue over all washes, =F21/C21, and read it against the weighted price under it.",
+    "teach": "The blended ticket divides revenue by every wash, member washes included, so it reads well under the cheapest price on the list. That gap is the membership model: a member who washes four times a month pays one fee.",
+    "why": "",
+    "hint_stuck": "pulse cell C30 · Retail revenue totals in F21, washes in C21."
+   },
+   {
+    "lesson_id": "sumproduct-blended-ticket",
+    "goal_index": "4",
+    "text": "Tie the two routes in C82, =F21-C29: it reads (60), money the export sends in a form the SUMIFs cannot read yet.",
+    "teach": "Before SUMIFS existed, a conditional sum read =SUMPRODUCT((range=\"AUS-DOM\")*amounts): the test gives TRUE or FALSE, and TRUE times a number is the number. It still works, but SUMIFS says what it does, so write SUMIFS and read the old form when you inherit it.",
+    "why": "",
+    "hint_stuck": "pulse cell C82 · The checks block sits under the page, from B79."
+   },
+   {
+    "lesson_id": "sumproduct-blended-ticket",
+    "goal_index": "5",
+    "text": "Does it tie? Watch the Ultimate price in E27 change to 25, and revenue at the list in C29 and the weighted price in C31 answer.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C29:C31 · Both read the price list in E25:E27."
+   }
+  ],
+  "the-reconciliation": [
+   {
+    "lesson_id": "the-reconciliation",
+    "goal_index": "0",
+    "text": "Link the POS washes into C51:C56: select the block, type =C15 and press Ctrl+Enter.",
+    "teach": "A reconciliation sets two sources side by side: the POS export, which recorded every wash, and the managers’ tallies, which were typed by hand. The POS is the truth, so it goes first, as a link to the counts you already built.",
+    "why": "",
+    "hint_stuck": "pulse range C51:C56 · The site block’s washes sit in C15:C20."
+   },
+   {
+    "lesson_id": "the-reconciliation",
+    "goal_index": "1",
+    "text": "Type the managers’ tallies into D51:D56 (11, 10, 16, 15, 18, 21) and color them blue: they came in by email.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range D51:D56 · Blue says a number was typed, not calculated."
+   },
+   {
+    "lesson_id": "the-reconciliation",
+    "goal_index": "2",
+    "text": "The difference in E51:E56: managers less POS, =D51-C51 with Ctrl+Enter.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range E51:E56 · Riverside and Airport come out high."
+   },
+   {
+    "lesson_id": "the-reconciliation",
+    "goal_index": "3",
+    "text": "Type the reasons in F53 and F55: Re-wash counted twice, 9/22; and Sep 30 tallied, a day the POS rows do not cover.",
+    "teach": "Every difference gets its reason in words beside it, typed where a reader will see it. Riverside’s manager counted a re-wash twice on 9/22; Airport’s tallied Sep 30, a day the export does not cover.",
+    "why": "",
+    "hint_stuck": "pulse range F53:F55 · Two sites differ, so two reasons."
+   },
+   {
+    "lesson_id": "the-reconciliation",
+    "goal_index": "4",
+    "text": "Type the adjustments, -1 in G53 and -2 in G55, then color G53, F53, F55 and G55 blue with Font Color and F4.",
+    "teach": "The adjustment brings the managers’ number to the POS, never the other way: Riverside’s is -1 and Airport’s -2. Adjustments and their reasons are typed, so they are blue, and F4 repeats the color on each.",
+    "why": "",
+    "hint_stuck": "pulse range G53:G55 · The adjustment is the difference with its sign turned over."
+   },
+   {
+    "lesson_id": "the-reconciliation",
+    "goal_index": "5",
+    "text": "Adjusted in H51:H56 =D51+G51, then the check in I51:I56 =H51-C51, each with Ctrl+Enter.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range H51:I56 · Every row of the check should read a dash."
+   },
+   {
+    "lesson_id": "the-reconciliation",
+    "goal_index": "6",
+    "text": "Total the block with Alt+= on G51:I57 and on C51:E57, leaving the reasons in F out of it.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C57:I57 · Text has no total, so AutoSum the two number blocks."
+   },
+   {
+    "lesson_id": "the-reconciliation",
+    "goal_index": "7",
+    "text": "Put the reconciliation into the checks block: C83 =I57.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C83 · The label Reconciliation already sits in B83."
+   },
+   {
+    "lesson_id": "the-reconciliation",
+    "goal_index": "8",
+    "text": "Does it tie? Watch Riverside’s adjustment in G53 go to 0, and its check in I53 leave zero until the adjustment comes back.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell I53 · An unexplained difference is what the check is there to catch."
+   }
+  ],
+  "challenge-site-package-summary": [
+   {
+    "lesson_id": "challenge-site-package-summary",
+    "goal_index": "0",
+    "text": "Count the washes by site in C15:C20 with COUNTIF on Transactions!$B$5:$B$94, and total them in C21 with Alt+=.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-site-package-summary",
+    "goal_index": "1",
+    "text": "The average retail ticket by site in G15:G20: AVERAGEIFS of the amounts on the site, with the amounts \">0\".",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-site-package-summary",
+    "goal_index": "2",
+    "text": "Rank the sites by washes in K15:K20 with =RANK(C15,$C$15:$C$20).",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-site-package-summary",
+    "goal_index": "3",
+    "text": "Fill the site by package block: washes with COUNTIFS in C41:E46, retail revenue with SUMIFS in F41:H46.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-site-package-summary",
+    "goal_index": "4",
+    "text": "Retail washes by package in D25:D27, C29 =SUMPRODUCT(D25:D27,E25:E27), and the blended ticket in C30 =C29/C21.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-site-package-summary",
+    "goal_index": "5",
+    "text": "Two managers over-counted: type the adjustments in G53 and G55 that bring the check in I51:I56 to zero, in blue.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "split-the-codes": [
+   {
+    "lesson_id": "split-the-codes",
+    "goal_index": "0",
+    "text": "On Transactions, select S5:S94, type =LEFT(B5,3) and press Ctrl+Enter: the cluster of every wash.",
+    "teach": "LEFT(text, n) takes n characters from the start of a text and RIGHT(text, n) takes n from the end; MID(text, start, n) takes n from a position, so MID(F5,6,1) is the package letter in “Wash D @ …”. The cluster is the first three letters of the code.",
+    "why": "",
+    "hint_stuck": "pulse range S5:S94 · The codes sit in column B, from row 5 to row 94."
+   },
+   {
+    "lesson_id": "split-the-codes",
+    "goal_index": "1",
+    "text": "The site from the other end in T5:T94: =RIGHT(B5,3) with Ctrl+Enter, then read T25, where a trailing space leaves \"OM \".",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range T5:T94 · The site is the last three letters, after the hyphen."
+   },
+   {
+    "lesson_id": "split-the-codes",
+    "goal_index": "2",
+    "text": "Count every code’s characters in R5:R94: =LEN(B5) with Ctrl+Enter, and two rows read 8.",
+    "teach": "LEN(text) counts the characters, spaces included, so every clean code reads 7 and a code with a hidden space reads 8. No eye can see a trailing space; LEN can.",
+    "why": "",
+    "hint_stuck": "pulse range R5:R94 · LEN counts the code in B on its own row."
+   },
+   {
+    "lesson_id": "split-the-codes",
+    "goal_index": "3",
+    "text": "Retype the two codes where LEN reads 8 without the space: AUS-DOM in B25 and AUS-MUE in B66.",
+    "teach": "COUNTIF on Summary reads the raw code, and \"AUS-DOM \" is not AUS-DOM to a criteria, so the two rows LEN found are two washes the site counts have missed from the start. Fix the data at its source and every formula that reads it agrees.",
+    "why": "",
+    "hint_stuck": "pulse range R25:R66 · LEN reads 8 on the two rows that need it."
+   },
+   {
+    "lesson_id": "split-the-codes",
+    "goal_index": "4",
+    "text": "Make the site column survive the next dirty export: rewrite T5:T94 as =RIGHT(TRIM(B5),3) with Ctrl+Enter.",
+    "teach": "The next export may send the space again. TRIM (2.6.4) inside the RIGHT strips it before RIGHT counts, so RIGHT(TRIM(B5),3) reads DOM whatever the terminal sends.",
+    "why": "",
+    "hint_stuck": "pulse range T5:T94 · TRIM goes inside the RIGHT, around B5."
+   },
+   {
+    "lesson_id": "split-the-codes",
+    "goal_index": "5",
+    "text": "Read the checks on Summary in C80:C83: the two count checks are back to zero, and the reconciliation now reads (2).",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C80:C83 · Two washes joined the POS counts; the managers never had them."
+   },
+   {
+    "lesson_id": "split-the-codes",
+    "goal_index": "6",
+    "text": "Does it tie? Watch the code in B5 change to SAT-ALA, and its length, cluster and site in R5:T5 split it again.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range R5:T5 · All three read the code in B5."
+   }
+  ],
+  "parse-the-memo": [
+   {
+    "lesson_id": "parse-the-memo",
+    "goal_index": "0",
+    "text": "On Transactions, select U5:U94, type =FIND(\"@\",F5) and press Ctrl+Enter: the position of the @ in every memo.",
+    "teach": "FIND(find_text, within_text) returns the position of the first match, counting from 1, so FIND(\"@\",F5) reads 8 in “Wash B @ AUS-AIR”. It is case-sensitive, and it returns #VALUE! when the text is not there.",
+    "why": "",
+    "hint_stuck": "pulse range U5:U94 · The memos sit in column F."
+   },
+   {
+    "lesson_id": "parse-the-memo",
+    "goal_index": "1",
+    "text": "The site from the memo in V5:V94: =MID(F5,FIND(\"@\",F5)+2,7) with Ctrl+Enter, then compare it with column B.",
+    "teach": "MID needs a start, and FIND gives it one: the code starts two characters after the @, so MID(F5,FIND(\"@\",F5)+2,7) cuts it out wherever the @ falls. Nest FIND inside MID and the position is never typed.",
+    "why": "",
+    "hint_stuck": "pulse range V5:V94 · Two past the @ is where the code starts, and it is seven characters long."
+   },
+   {
+    "lesson_id": "parse-the-memo",
+    "goal_index": "2",
+    "text": "The channel in W5:W94: =MID(F5,FIND(\"(\",F5)+1,FIND(\")\",F5)-FIND(\"(\",F5)-1) with Ctrl+Enter.",
+    "teach": "The channel has no fixed length, so cut from one FIND to another: start one past the \"(\", and take as many characters as lie between the brackets. FIND and SEARCH also take a third argument, where to start looking, which finds the second space as easily as the first.",
+    "why": "",
+    "hint_stuck": "pulse range W5:W94 · The length is the close bracket’s position less the open bracket’s, less one."
+   },
+   {
+    "lesson_id": "parse-the-memo",
+    "goal_index": "3",
+    "text": "Row 37’s memo came through as “Wash d”: read its package in X37, case-blind, with =UPPER(MID(F37,SEARCH(\"wash \",F37)+5,1)).",
+    "teach": "SEARCH works like FIND but ignores case, so SEARCH(\"wash \",F37) finds “Wash ” and “wash ” alike. UPPER capitalizes every letter, so the package reads one way whatever the terminal typed.",
+    "why": "",
+    "hint_stuck": "pulse cell X37 · The letter sits five characters after the start of “wash ”."
+   },
+   {
+    "lesson_id": "parse-the-memo",
+    "goal_index": "4",
+    "text": "Now the package for every row in X5:X94: =UPPER(MID(F5,SEARCH(\"wash \",F5)+5,1)) with Ctrl+Enter.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range X5:X94 · The same formula, written from row 5."
+   },
+   {
+    "lesson_id": "parse-the-memo",
+    "goal_index": "5",
+    "text": "Row 34 is a kiosk wash: drop the tag in Y34 with =SUBSTITUTE(F34,\" (kiosk)\",\"\").",
+    "teach": "SUBSTITUTE(text, old_text, new_text) swaps every match for the new text, and a fourth argument changes only the nth. REPLACE swaps by position instead of by content. Parse into helper columns and keep the raw memo: it is the audit trail.",
+    "why": "",
+    "hint_stuck": "pulse cell Y34 · Swap the space and the tag for nothing at all."
+   },
+   {
+    "lesson_id": "parse-the-memo",
+    "goal_index": "6",
+    "text": "Every memo without the kiosk tag in Y5:Y94: =SUBSTITUTE(F5,\" (kiosk)\",\"\") with Ctrl+Enter; a memo with no tag passes through unchanged.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range Y5:Y94 · The same formula, written from row 5."
+   },
+   {
+    "lesson_id": "parse-the-memo",
+    "goal_index": "7",
+    "text": "Does it tie? Watch the memo in F5 change its channel to (app), and the channel in W5 follow it.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell W5 · Every parsed column reads the raw memo in F."
+   }
+  ],
+  "text-to-numbers": [
+   {
+    "lesson_id": "text-to-numbers",
+    "goal_index": "0",
+    "text": "On Transactions, select E5:E94 and light the text amounts with Go To Special: Constants, with only Text ticked.",
+    "teach": "A number stored as text sits on the left of its cell, and SUM, SUMIF and every criteria skip it without a word. Go To Special’s Constants comes with four boxes, Numbers, Text, Logicals and Errors: untick all but Text (U, G and E) and only the text lights.",
+    "why": "",
+    "hint_stuck": "pulse range E5:E94 · Three amounts sit on the left of their cells."
+   },
+   {
+    "lesson_id": "text-to-numbers",
+    "goal_index": "1",
+    "text": "A helper in Z5:Z94: =VALUE(E5) with Ctrl+Enter turns the three into numbers and leaves the rest as they were.",
+    "teach": "VALUE(text) reads a number stored as text and returns the number; a real number passes through unchanged. Build it in a helper column beside the data, so you can see every result before it replaces anything. Any arithmetic does the same in a hurry: =E5*1 is a number too.",
+    "why": "",
+    "hint_stuck": "pulse range Z5:Z94 · VALUE reads the amount in E on its own row."
+   },
+   {
+    "lesson_id": "text-to-numbers",
+    "goal_index": "2",
+    "text": "The quick route to the same answer in AB5: =E5*1, and read it beside Z5.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell AB5 · Any arithmetic makes Excel read a text number as a number."
+   },
+   {
+    "lesson_id": "text-to-numbers",
+    "goal_index": "3",
+    "text": "Put the helper to work: copy Z5:Z94 and paste it as values over E5:E94 with Paste Special Values.",
+    "teach": "Paste Special Values writes the helper’s numbers over the text and keeps the column’s formats, so the export holds real amounts and nothing points at the helper any more.",
+    "why": "",
+    "hint_stuck": "pulse range E5:E94 · Values only, so the amounts stop depending on the helper."
+   },
+   {
+    "lesson_id": "text-to-numbers",
+    "goal_index": "4",
+    "text": "The helper has done its job: select Z5:Z94 and delete it.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range Z5:Z94 · The amounts in E are numbers now, so the helper can go."
+   },
+   {
+    "lesson_id": "text-to-numbers",
+    "goal_index": "5",
+    "text": "A text date in AA5: =DATEVALUE(\"2026-09-15\"), and read the serial it returns.",
+    "teach": "DATEVALUE(date_text) does for a date what VALUE does for a number: \"2026-09-15\" becomes 46280, the serial Excel counts days in, and from then on it sorts and subtracts like any date.",
+    "why": "",
+    "hint_stuck": "pulse cell AA5 · The text goes inside the quotes, year first."
+   },
+   {
+    "lesson_id": "text-to-numbers",
+    "goal_index": "6",
+    "text": "Make AA5 read as a date: Ctrl+1, Number, Date, and the serial shows as 9/15/2026.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell AA5 · The value stays 46280; only the format changes."
+   },
+   {
+    "lesson_id": "text-to-numbers",
+    "goal_index": "7",
+    "text": "Read the SUMPRODUCT check on Summary in C82: with the three amounts counted, it reads zero.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C82 · The SUMIFs now see the amounts the price list always counted."
+   },
+   {
+    "lesson_id": "text-to-numbers",
+    "goal_index": "8",
+    "text": "Explain Domain and Mueller in F51:F52, adjust each by 1 in G51:G52, and color the four cells blue so C83 reads zero.",
+    "teach": "Fixing the two codes put two washes on the POS that the managers never counted, so the reconciliation moved. Explain each in words and adjust each by 1, in blue like every typed input.",
+    "why": "",
+    "hint_stuck": "pulse range F51:G52 · A wash the tally missed; the POS row carried a trailing space."
+   },
+   {
+    "lesson_id": "text-to-numbers",
+    "goal_index": "9",
+    "text": "Does it tie? Watch the amount in E13, a number now, change to 35, and the retail revenue total in Summary F21 count it.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell F21 · A number is summed; a text amount never was."
+   }
+  ],
+  "text-to-columns-flash-fill": [
+   {
+    "lesson_id": "text-to-columns-flash-fill",
+    "goal_index": "0",
+    "text": "Copy the codes in Transactions!B5:B94: the split happens on a copy, never on the export itself.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range B5:B94 · The codes run from row 5 to row 94 of column B."
+   },
+   {
+    "lesson_id": "text-to-columns-flash-fill",
+    "goal_index": "1",
+    "text": "Insert a sheet with Shift+F11, name it Scratch, and move it to the end of the workbook.",
+    "teach": "A scratch sheet holds a one-time job away from the model. Shift+F11 inserts it in front of the active sheet, so move it to the end, where a reader of the workbook never trips over it.",
+    "why": "",
+    "hint_stuck": "pulse cell A1 · In Move or Copy, (move to end) sits under the last sheet."
+   },
+   {
+    "lesson_id": "text-to-columns-flash-fill",
+    "goal_index": "2",
+    "text": "Paste the codes into Scratch at A1.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell A1 · The marquee is still on the codes, so the copy is waiting."
+   },
+   {
+    "lesson_id": "text-to-columns-flash-fill",
+    "goal_index": "3",
+    "text": "With A1:A90 selected, split the codes at the hyphen with Text to Columns, into B and C (Destination $B$1), so A keeps the code.",
+    "teach": "Text to Columns is a three-step wizard: Delimited (Alt+D), then the delimiter (Other, Alt+O, and the hyphen), then where the pieces land (Destination, Alt+E) and Finish (Alt+F). The last step also sets each column’s type: set a code column to Text, or its leading zeros are lost. Read the preview first, because a delimiter inside a field over-splits it.",
+    "why": "",
+    "hint_stuck": "pulse range B1:C1 · Leave the Destination at A1 and the codes are split in place."
+   },
+   {
+    "lesson_id": "text-to-columns-flash-fill",
+    "goal_index": "4",
+    "text": "Go to C90 and read it: the last code split too, all ninety in one pass, and the formula bar shows a value.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C90 · The ninetieth code sits in row 90."
+   },
+   {
+    "lesson_id": "text-to-columns-flash-fill",
+    "goal_index": "5",
+    "text": "Flash Fill: type AIR in D1 beside AUS-AIR, then press Ctrl+E in D2, and the rest of the sites fill down.",
+    "teach": "Flash Fill reads the example you typed, finds where it came from in the row, and writes the same for every row below. It only rearranges characters already in the row, so a site’s name, which is not in the code, stays a lookup.",
+    "why": "",
+    "hint_stuck": "pulse cell D1 · Type the first answer, then Ctrl+E on the cell below it."
+   },
+   {
+    "lesson_id": "text-to-columns-flash-fill",
+    "goal_index": "6",
+    "text": "Select D45 and read the formula bar: Flash Fill wrote a value, not a formula.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell D45 · No equals sign in the formula bar means nothing will update."
+   },
+   {
+    "lesson_id": "text-to-columns-flash-fill",
+    "goal_index": "7",
+    "text": "Does it tie? Watch the code in A1 change to SAT-ALA, and the split in B1:D1 stay exactly where it was.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range B1:D1 · Values do not follow; formulas do."
+   }
+  ],
+  "challenge-text-dump": [
+   {
+    "lesson_id": "challenge-text-dump",
+    "goal_index": "0",
+    "text": "Clean the codes at the source: =TRIM(B5) in a helper Z5:Z94, then paste its values over B5:B94.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-text-dump",
+    "goal_index": "1",
+    "text": "Parse the channel out of every memo into W5:W94 with MID and FIND.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-text-dump",
+    "goal_index": "2",
+    "text": "Turn the text amounts into numbers: =VALUE(E5) in Z5:Z94, paste its values over E5:E94, then clear the helper.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-text-dump",
+    "goal_index": "3",
+    "text": "Split the codes into the cluster in S5:S94 and the site in T5:T94 with one Text to Columns on the hyphen.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-text-dump",
+    "goal_index": "4",
+    "text": "Read the checks on Summary in C80:C83: with the dump clean, all four read zero.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
   ]
  },
  "modules": {
@@ -3893,6 +4821,20 @@ export const COPY = {
    "objective": "Chapter 1’s challenges re-clothed in this chapter’s material: the same keys on a new sheet, so old skills stay warm.",
    "story_beat": "",
    "page_name": "Old skills on the new page"
+  },
+  "math-and-aggregation": {
+   "id": "math-and-aggregation",
+   "name": "Math and aggregation",
+   "objective": "The ROUND family, COUNTIFS, SUMIFS and AVERAGEIFS, MAXIFS, LARGE and RANK, SUMPRODUCT, and the reconciliation driven to zero.",
+   "story_beat": "Ninety rows into one page. || The buyers want washes and revenue by site and by package, the busiest sites, the blended ticket, and the question that decides whether they believe anything: whether the POS export agrees with what the managers sent. Every one of those is a count or a sum with a condition on it. Build them, then build the reconciliation and drive its check to zero.",
+   "page_name": "The site × package summary"
+  },
+  "text": {
+   "id": "text",
+   "name": "Text",
+   "objective": "LEFT, RIGHT and MID to split the codes, FIND and SUBSTITUTE to parse the memo, VALUE for a text export, Text to Columns and Flash Fill.",
+   "story_beat": "The codes have to become words. || The POS writes AUS-DOM where a buyer wants Austin and Domain in their own columns, it packs the package and channel into one memo, and when the terminal hiccups it sends amounts as text. Text functions take a string apart and put it back together, Text to Columns does the same for a whole column at once, and nothing gets retyped.",
+   "page_name": "The export, in columns"
   }
  },
  "site": {
