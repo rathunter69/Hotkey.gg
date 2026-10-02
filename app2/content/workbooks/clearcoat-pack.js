@@ -890,7 +890,7 @@ export function pivotOn(rec, state, spec, id = 'PivotTable1') {
 export const PIVOTS = {
   S441: { row: 'Week', col: 'Site', value: 'Retail revenue ($)', fn: 'sum' },
   S442: { row: 'Site', col: null, value: 'Date', fn: 'count' },
-  S443: { row: 'Week', col: 'Site', value: 'Total washes', fn: 'sum' },
+  S443: { row: 'Site', col: 'Week', value: 'Total washes', fn: 'sum' },
 };
 /** 4.4.3's late correction: the controller resent Domain's first day, ten more retail washes. */
 export const PIVOT_FIX = { ref: 'C5', value: ROWS[0].retail + 10 };
