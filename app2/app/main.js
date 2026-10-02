@@ -10,6 +10,7 @@
 //   #/leaderboard  #/reference  #/pricing  #/teams  #/account
 //   #/about  #/terms  #/privacy  #/eula  #/contact
 //   #/due/<shortcut>   a refresher rep from today's queue (app/due-page.js)
+//   #/desk             a Teams desk; #/desk/join/<code> its join page (app/desk-page.js)
 //   #/checkout         Phase E checkout; #/checkout/done the return from Stripe (app/checkout-page.js)
 //   anything else      404
 //
@@ -72,6 +73,8 @@ export function parseRoute(hash) {
   else if (path === '/daily') { name = 'drill'; params.daily = true; }
   else if (path === '/rapid') name = 'rapid';
   else if ((m = /^\/due\/([a-z0-9-]+)$/.exec(path))) { name = 'due'; params.id = m[1]; }
+  else if (path === '/desk') name = 'desk';
+  else if ((m = /^\/desk\/join\/([A-Za-z0-9-]{1,32})$/.exec(path))) { name = 'desk'; params.join = true; params.code = m[1].toUpperCase(); }   // a Teams desk's invite link (Phase F)
   else if (path === '/checkout') name = 'checkout';
   else if (path === '/checkout/done') { name = 'checkout'; params.done = true; }
   else if (['/leaderboard', '/reference', '/pricing', '/teams', '/account', '/about', '/terms', '/privacy', '/eula', '/contact'].includes(path)) name = path.slice(1);
@@ -88,6 +91,7 @@ export function navKeyFor(name, params = {}) {
   if (name === 'rapid') return 'rapid';
   if (name === 'due') return 'practice';
   if (name === 'leaderboard' || name === 'reference') return name;
+  if (name === 'desk') return 'leaderboard';   // desks live on Leaderboards (3.0, Leaderboards: the Desks tab)
   return '';
 }
 
@@ -98,6 +102,7 @@ export function modeOf(name, params = {}) {
   if (name === 'rapid') return 'rapid';
   if (name === 'due') return 'drills';
   if (name === 'leaderboard') return 'daily';   // the page opens on The Daily's board
+  if (name === 'desk') return 'daily';           // a desk's board is a board: the same color as the Leaderboards page
   return 'learn';
 }
 
@@ -110,7 +115,7 @@ export function titleFor(name, extra) {
     lesson: (extra ? extra + ' · ' : '') + 'hotkey.gg', locked: (extra ? extra + ' · ' : '') + 'Full Access · hotkey.gg', practice: 'Practice · hotkey.gg', drill: (extra ? extra + ' · ' : '') + 'Practice · hotkey.gg', leaderboard: 'Leaderboards · hotkey.gg',
     reference: 'Reference · hotkey.gg', pricing: 'Pricing · hotkey.gg', teams: 'Teams · hotkey.gg', account: 'Account · hotkey.gg', about: 'About · hotkey.gg',
     terms: 'Terms · hotkey.gg', privacy: 'Privacy · hotkey.gg', eula: 'EULA · hotkey.gg', contact: 'Contact · hotkey.gg', notfound: 'Page not found · hotkey.gg',
-    due: 'Due today · hotkey.gg', checkout: 'Get Full Access · hotkey.gg' };
+    due: 'Due today · hotkey.gg', checkout: 'Get Full Access · hotkey.gg', desk: 'Your desk · hotkey.gg' };
   return T[name] || 'hotkey.gg';
 }
 
@@ -174,6 +179,7 @@ const LOADERS = {
   account: { file: './account-page.js', pick: m => m.mountAccountPage },
   profile: { file: './profile-page.js', pick: m => m.mountProfilePage },   // #/account (profile, certificate): the band, the shelf, the level titles; the certificate as progress
   checkout: { file: './checkout-page.js', pick: m => m.mountCheckoutPage },   // Phase E: the embedded form, behind the payments flag
+  desk: { file: './desk-page.js', pick: m => m.mountDeskPage },   // Phase F desks v1: #/desk and #/desk/join/<code>
   about: { file: './legal-pages.js', pick: m => m.mountAboutPage },
   terms: { file: './legal-pages.js', pick: m => r => m.mountLegalPage(r, 'terms') },
   privacy: { file: './legal-pages.js', pick: m => r => m.mountLegalPage(r, 'privacy') },
@@ -196,7 +202,7 @@ async function loadPage(entry) {
 export function pageLabel(name, params) {
   const L = { home: 'Home', landing: 'The front page', root: 'Home', start: 'Getting started', learn: 'Learn', lesson: 'This lesson',
     practice: 'Practice', drill: params && params.daily ? 'The Daily' : 'This drill', rapid: 'Rapid-fire', due: 'Due today',
-    leaderboard: 'The leaderboard', reference: 'The shortcut reference', pricing: 'Pricing', teams: 'Teams', account: 'Your account', checkout: 'Checkout' };
+    leaderboard: 'The leaderboard', reference: 'The shortcut reference', pricing: 'Pricing', teams: 'Teams', account: 'Your account', checkout: 'Checkout', desk: 'Your desk' };
   return L[name] || 'This page';
 }
 
@@ -292,6 +298,13 @@ export function startApp({ navEl, rootEl, footEl }) {
     // the account mirror of quest XP, the clean-lesson bonus and the key states (0012): wired once, it hydrates on every sign-in
     import('./award-sync.js').then(m => m.startAwardSync()).catch(() => { /* the device keeps them */ });
     if (auth.state() !== 'in') return;
+    // what the account opens (M58): the rail's Go Pro and the catalog's locks follow the server's answer
+    const had = JSON.stringify(entitlement.known());
+    entitlement.refresh().then(() => {
+      try { nav.setPro(entitlement.entitled()); } catch (e) { /* Go Pro shows */ }
+      const n = document.body.dataset.route;
+      if ((n === 'learn' || n === 'practice') && JSON.stringify(entitlement.known()) !== had) route();
+    }, () => { /* offline: the mirror stands */ });
     const before = snapshot();
     store.hydrate().then(() => {
       syncUser();
@@ -348,6 +361,11 @@ export function startApp({ navEl, rootEl, footEl }) {
       try { drill = (await import('../content/drills.js')).drillById(r.params.id); } catch (e) { if (myGen === gen) fetchFailed({ name, params: r.params }); return; }
       if (myGen !== gen) return;
       if (!drill) name = 'notfound';
+      // a paid drill (M58): the same door as a paid lesson, decided by its chapter
+      if (drill && entitlement.locked(drill)) {
+        if (auth.state() === 'in') { await entitlement.refresh(); if (myGen !== gen) return; }
+        if (entitlement.locked(drill)) name = 'locked';
+      }
     }
     nav.setLanding(name === 'landing');
     nav.setActive(navKeyFor(name, r.params));
@@ -377,7 +395,7 @@ export function startApp({ navEl, rootEl, footEl }) {
     if (myGen !== gen) return;
     if (rootEl.querySelector('.sk')) rootEl.innerHTML = '';
     try {
-      const ctx = { query: r.query, params: r.params, nav, lesson, keytips };
+      const ctx = { query: r.query, params: r.params, nav, lesson, drill, keytips };
       let res = name === 'lesson' ? mount(rootEl, lesson, { mode: r.query.mode || 'guided', panel: r.query.panel, seed: r.query.seed, daily: r.query.daily }) : mount(rootEl, ctx);
       // the cell cursor on a site page: the arrows move it over whatever the page marked data-cursor, Enter does the item
       if (!WORKSPACE_ROUTES.has(name)) { cursor = createCursor({ root: rootEl }); ctx.cursor = cursor; }

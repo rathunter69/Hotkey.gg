@@ -84,7 +84,7 @@ async function guardText(label) {
 
 try {
   // every route renders
-  for (const route of ['#/', '#/learn', '#/practice', '#/practice/daily', '#/practice/rapid', '#/practice/challenges', '#/leaderboard', '#/leaderboard?board=drills', '#/leaderboard?board=challenges', '#/reference', '#/pricing', '#/teams', '#/account', '#/account?section=settings', '#/about', '#/terms', '#/privacy', '#/contact', '#/checkout', '#/checkout/done', '#/nope']) {
+  for (const route of ['#/', '#/learn', '#/practice', '#/practice/daily', '#/practice/rapid', '#/practice/challenges', '#/leaderboard', '#/leaderboard?board=drills', '#/leaderboard?board=challenges', '#/reference', '#/pricing', '#/teams', '#/desk', '#/desk/join/TEAM-ABCD-EFGH', '#/leaderboard?board=desks', '#/account', '#/account?section=settings', '#/about', '#/terms', '#/privacy', '#/contact', '#/checkout', '#/checkout/done', '#/nope']) {
     await page.goto(base + route);
     await page.waitForTimeout(250);
     const text = await page.evaluate(() => document.body.innerText.trim().length);

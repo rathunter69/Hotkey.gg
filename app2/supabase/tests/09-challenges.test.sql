@@ -87,7 +87,7 @@ select is((select kind from public.game_attempts where id = pg_temp.att(60)), 'c
 select is((select seed from public.game_attempts where id = pg_temp.att(60)), 7::bigint, 'and its seed');
 select is((select secs from public.game_pbs where user_id = pg_temp.uid(1) and ref = 'challenge-inherited-file'), 80.00::numeric(8,2), 'the challenge PB derives');
 
--- ================================================= (b) boards: tier first, then time; p_seed filters
+-- ================================================= (b) boards: by time (0014 dropped 0008's tier-first order, M104); p_seed filters
 set local role authenticated;
 select pg_temp.actor(2);
 select lives_ok($p$select public.rpc_submit_game_attempt(jsonb_build_object(
@@ -96,7 +96,7 @@ select lives_ok($p$select public.rpc_submit_game_attempt(jsonb_build_object(
 reset role;
 set local role anon;
 select pg_temp.actor(null);
-select is((select tier from public.rpc_board('challenge-inherited-file') limit 1), 'legendary', 'a slower legendary outranks a faster pass');
+select is((select secs from public.rpc_board('challenge-inherited-file') limit 1), 80.00::numeric(8,2), 'the faster run leads whatever its tier (0014: boards rank by time)');
 select is((select count(*) from public.rpc_board('challenge-inherited-file')), 2::bigint, 'both players on the all-time board');
 select is((select count(*) from public.rpc_board('challenge-inherited-file', 100, 7)), 1::bigint, 'the seed filter narrows to that sheet');
 select is((select handle from public.rpc_board('challenge-inherited-file', 100, 7)), (select handle from public.profiles_public where id = pg_temp.uid(1)), 'and shows the player who played that seed');

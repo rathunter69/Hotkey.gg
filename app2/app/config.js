@@ -12,6 +12,8 @@ export const SUPABASE_ANON_KEY = 'sb_publishable__mSqNf5oG-y4MpXnbYShnQ_8MlO8Idj
 export const STRIPE_PUBLISHABLE_KEY = 'pk_test_51ULsWEDG83fIBduGsZTvM3ckPp0wymYL6qQ1Hzu8CSnIclhxEbQqEWuXc8nS4BxsniEy9pOl2YrJypSpixrEHeof0094PCgcSX';
 /** Where Stripe.js loads from: Stripe requires its own host; it can't be bundled. */
 export const STRIPE_JS_URL = 'https://js.stripe.com/dahlia/stripe.js';   // the Stripe.js release that matches API version 2026-08-26.dahlia
+/** Which checkout adapter serves the payment form (app/checkout.js; app/processors/). */
+export const CHECKOUT_PROCESSOR = 'stripe';
 /** The support address on the checkout pages (Link escalations must be answered within 48 hours). */
 export const SUPPORT_EMAIL = 'support@hotkey.gg';
 

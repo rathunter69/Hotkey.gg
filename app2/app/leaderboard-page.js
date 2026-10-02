@@ -17,6 +17,7 @@ import { panelHtml, tableHtml, tabsHtml, wireTabs, buttonHtml } from '../ui/comp
 import { barHtml, levelChipHtml } from '../ui/components/marks.js';
 import { saveNudgeHtml, wireSaveNudge } from '../ui/components/nudge.js';
 import { courseNow, certTeaserHtml } from '../ui/components/certificate.js';
+import { deskApi } from './desks.js';
 
 /** The boards' side, under your runs: the account step while signed out (your time joins the field), and the certificate the clean runs lead to. */
 const boardSide = () => `${saveNudgeHtml({ line: siteCopy('save_line_boards', '') })}${certTeaserHtml(courseNow())}`;
@@ -103,12 +104,13 @@ export function sidePanelHtml({ title, runs, where, drill, empty }) {
  * Mount one board with its side panel into `el`: { ref, seed, title, yours, mode }. The field is
  * read through the store when signed in; signed out it is the device's own runs. Returns { destroy }.
  */
-export function mountBoard(el, { ref, seed = null, title, yours, dayLabel = '', side = '' } = {}) {
+export function mountBoard(el, { ref, seed = null, title, yours, dayLabel = '', side = '', fetch = null, live: liveOpt = null } = {}) {
   let gone = false;
   const drill = DRILLS_BY_ID[ref] || null;
   const routeKeys = drill ? drill.optimalKeys : null;
   const key = ref + '|' + (seed == null ? '' : seed);
-  const live = store.liveBoards();
+  // fetch: another field than the global board's (a desk's board, through desks.js); it resolves like store.globalBoard
+  const live = liveOpt != null ? liveOpt : store.liveBoards();
   let state = live ? undefined : { rows: localRows(ref) };
   function draw() {
     let table, facts = '', line = '';
@@ -117,7 +119,8 @@ export function mountBoard(el, { ref, seed = null, title, yours, dayLabel = '', 
     else {
       const model = boardModel(state.rows, { prevPlace: seenPlaces()[key] });
       if (model.mine) rememberPlace(key, model.mine.place);
-      facts = esc(dayLabel ? t('boards_day_runs', { day: dayLabel, runs: runsText(model.count) }) : runsText(model.count));
+      const count = Number.isFinite(state.field) && state.field > model.count ? state.field : model.count;   // 0014: the server counts the whole field
+      facts = esc(dayLabel ? t('boards_day_runs', { day: dayLabel, runs: runsText(count) }) : runsText(count));
       table = model.rows.length ? boardTableHtml(model, { routeKeys }) : `<p class="panel-line">${esc(t('boards_empty'))}</p>`;
       if (!live) line = `<p class="panel-line">${esc(t('boards_signed_out'))}</p>`;
     }
@@ -129,10 +132,20 @@ export function mountBoard(el, { ref, seed = null, title, yours, dayLabel = '', 
   }
   function load() {
     if (!live) return;
-    store.globalBoard(ref, { seed }).then(v => v, () => null).then(v => { if (gone) return; state = v; draw(); });
+    Promise.resolve(fetch ? fetch(ref, seed) : store.globalBoard(ref, { seed })).then(v => v, () => null).then(v => { if (gone) return; state = v; draw(); });
   }
   draw(); load();
   return { destroy() { gone = true; } };
+}
+
+/** The Desks tab without a desk board: signed out, sign in; signed in off a desk, the way to Teams and the code box. Pure. */
+export function deskPromptHtml(signedIn, failed = false) {
+  const line = !signedIn ? t('boards_desks_signed_out') : failed ? t('desk_failed') : t('boards_desk_prompt');
+  const button = !signedIn
+    ? buttonHtml({ label: t('rail_sign_in'), key: 'Enter', primary: true, id: 'boardsDesk', attrs: { 'data-signin': true } })
+    : buttonHtml({ label: t('boards_desk_link'), key: 'Enter', href: '#/teams', primary: true, id: 'boardsDesk' });
+  const code = signedIn ? `<a class="panel-link" href="#/desk">${esc(t('boards_desk_code'))}</a>` : '';
+  return `<div class="pg-two"><div class="pg-main">${panelHtml({ heading: esc(t('boards_tab_desks')), body: `<p class="panel-line">${esc(line)}</p><div class="btn-row">${button}${code}</div>`, cls: 'board', attrs: { 'data-cursor': true, 'data-cursor-enter': '#boardsDesk', tabindex: '-1' } })}</div></div>`;
 }
 
 /** The board a tab opens on: the drill with your latest clean run, else the first benchmark, else the first. */
@@ -151,6 +164,7 @@ export function mountLeaderboardPage(root, ctx = {}) {
   let tab = (BOARD_TABS.find(b => b.key === q.board) || BOARD_TABS[0]).key;
   let ref = q.ref || null;
   let board = null;
+  let deskRef = q.board === 'desks' ? q.ref || null : null;
   const signedIn = () => store.liveBoards();
 
   function entriesFor(k) {
@@ -158,13 +172,32 @@ export function mountLeaderboardPage(root, ctx = {}) {
     if (k === 'challenges') return DRILLS.filter(d => d.kind === 'challenge').map(d => ({ id: d.id, title: d.title.replace(/^Challenge:\s*/i, '').replace(/^./, c => c.toUpperCase()), chapter: d.chapter, benchmark: d.benchmark }));
     return [];
   }
+  let deskGen = 0;
+  /** The Desks tab, signed in: the desk's board with a drill picker, or the way onto a desk. */
+  function mountDeskTab(hostEl) {
+    const my = ++deskGen;
+    hostEl.innerHTML = `<p class="panel-line">${esc(t('boards_loading'))}</p>`;
+    deskApi.mine().then(r => {
+      if (my !== deskGen || !hostEl.isConnected) return;
+      if (r.error || !r.data) { hostEl.innerHTML = deskPromptHtml(true, !!r.error); if (ctx.cursor) ctx.cursor.refresh(); return; }
+      const entries = entriesFor('drills');
+      if (!deskRef || !entries.some(e => e.id === deskRef)) deskRef = (entries[0] || {}).id || null;
+      hostEl.innerHTML = `<div class="tabs-row desk-tab-row"><span class="panel-h">${esc(r.data.name)}</span><label class="picker"><span>${esc(t('boards_pick'))}</span><select id="deskBoardPick">${entries.map(e => `<option value="${esc(e.id)}"${e.id === deskRef ? ' selected' : ''}>${esc(e.title)}</option>`).join('')}</select></label></div><div class="board-host-desk"></div>`;
+      const e = entries.find(x => x.id === deskRef);
+      const side = panelHtml({ body: `<a class="panel-link" href="#/desk">${esc(t('boards_desk_open'))}</a>`, cls: 'desk-open' });
+      if (deskRef) board = mountBoard(hostEl.querySelector('.board-host-desk'), { ref: deskRef, title: e ? e.title : deskRef, yours: t('boards_yours'), side, fetch: (ref_, seed) => deskApi.board(ref_, seed), live: true });
+      const pick = hostEl.querySelector('#deskBoardPick'); if (pick) pick.onchange = () => { deskRef = pick.value; if (board) { board.destroy(); board = null; } mountDeskTab(hostEl); };
+      if (ctx.cursor) ctx.cursor.refresh();
+    });
+  }
   function render(focusTab) {
     if (board) { board.destroy(); board = null; }
     document.body.dataset.mode = (BOARD_TABS.find(b => b.key === tab) || {}).mode || 'daily';
     const tabsHtmlStr = tabsHtml(BOARD_TABS.map(b => ({ key: b.key, label: t(b.copy), mode: b.mode, on: b.key === tab })), t('boards_title'));
     let picker = '', host = '<div class="board-host"></div>';
     if (tab === 'desks') {
-      host = `<div class="pg-two"><div class="pg-main">${panelHtml({ heading: esc(t('boards_tab_desks')), body: `<p class="panel-line">${esc(signedIn() ? siteCopy('boards_desk_prompt', 'Start a desk to compete with your own group.') : t('boards_desks_signed_out'))}</p><div class="btn-row">${buttonHtml({ label: signedIn() ? t('boards_desk_link') : t('rail_sign_in'), key: 'Enter', href: signedIn() ? '#/teams' : '#/account', primary: true, id: 'boardsDesk' })}</div>`, cls: 'board', attrs: { 'data-cursor': true, 'data-cursor-enter': '#boardsDesk', tabindex: '-1' } })}</div></div>`;
+      // signed in, the desk's own board (Phase F desks v1) once rpc_desk_mine answers; off a desk, or signed out, the way in
+      host = signedIn() ? '<div class="desk-tab-host"></div>' : deskPromptHtml(false);
     } else if (tab !== 'daily') {
       const entries = entriesFor(tab);
       if (!ref || !entries.some(e => e.id === ref)) ref = defaultRef(entries, store.attempts());
@@ -173,6 +206,8 @@ export function mountLeaderboardPage(root, ctx = {}) {
     el.innerHTML = `<div class="tabs-row">${tabsHtmlStr}${picker}</div>${host}`;
     wireTabs(el, (key, viaKeys) => { tab = key; ref = null; render(viaKeys); });
     const pick = el.querySelector('#boardPick'); if (pick) pick.onchange = () => { ref = pick.value; render(); };
+    const deskHost = el.querySelector('.desk-tab-host');
+    if (deskHost) mountDeskTab(deskHost);
     const hostEl = el.querySelector('.board-host');
     if (hostEl) {
       if (tab === 'daily') {

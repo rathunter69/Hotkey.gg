@@ -11,8 +11,9 @@
 // With the `payments` flag off (hotkey.gg until Wolf says go) both say checkout opens at launch.
 import { auth } from './auth.js';
 import { entitlement } from './entitlement.js';
-import { paymentsOn, STRIPE_PUBLISHABLE_KEY, SUPPORT_EMAIL } from './config.js';
-import { startCheckout, openPortal, loadStripe, planDetails, planDate } from './billing.js';
+import { paymentsOn, SUPPORT_EMAIL } from './config.js';
+import { startCheckout, openPortal, planDetails, planDate } from './billing.js';
+import { beginCheckout, mountPaymentForm } from './checkout.js';
 import { track } from './telemetry.js';
 import { siteCopy } from '../content/copy/apply.js';
 import { buttonHtml, panelHtml } from '../ui/components/table.js';
@@ -168,7 +169,7 @@ export function mountCheckoutPage(root, ctx = {}) {
 
   async function showForm() {
     paint(formHtml());
-    const r = await startCheckout();
+    const r = await beginCheckout(startCheckout);
     if (!alive || r.error === 'stale') return;
     if (r.error === 'already_subscribed') { await showHave(); return; }
     if (r.error === 'not_signed_in') { showSignin(); return; }
@@ -178,16 +179,10 @@ export function mountCheckoutPage(root, ctx = {}) {
       const s = el.querySelector('#coSummary'); if (s) s.outerHTML = summaryHtml({ student: true });
     }
     try {
-      const StripeCtor = await loadStripe();
-      if (!alive) return;
-      const stripe = StripeCtor(STRIPE_PUBLISHABLE_KEY);
-      // Stripe.js names the embedded form's constructor initEmbeddedCheckout (the brief); a newer release may call it createEmbeddedCheckoutPage
-      const init = stripe.initEmbeddedCheckout || stripe.createEmbeddedCheckoutPage;
-      embedded = await init.call(stripe, { fetchClientSecret: async () => r.clientSecret });
-      if (!alive) { embedded.destroy(); return; }
+      // the processor's form (checkout.js picks the adapter; Stripe's embedded form today)
       const mount = el.querySelector('#coStripe');
-      mount.innerHTML = ''; mount.removeAttribute('aria-busy');
-      embedded.mount(mount);
+      embedded = await mountPaymentForm(mount, r.session, { alive: () => alive });
+      if (embedded) mount.removeAttribute('aria-busy');
     } catch (e) { if (alive) showError('failed'); }
   }
 

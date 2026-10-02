@@ -18,6 +18,8 @@ import { siteCopy } from '../content/copy/apply.js';
 import { paymentsOn } from './config.js';
 import { buttonHtml } from '../ui/components/table.js';
 import { planDetails, openPortal, planDate } from './billing.js';
+import { parseDeskCode, joinHref } from './desks.js';
+import { entitlement } from './entitlement.js';
 
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const SECTIONS = ['stats', 'profile', 'data', 'billing'];
@@ -289,6 +291,9 @@ export function mountAccountPage(root, ctx = {}) {
       const code = el.querySelector('#redeemInput').value.trim().toUpperCase();
       const msg = el.querySelector('#redeemMsg');
       if (!code) { msg.textContent = 'Enter the code you were given.'; return; }
+      // a Teams desk's code (TEAM-XXXX-XXXX) is a seat, not a one-time code: its join page takes it (Phase F)
+      const desk = parseDeskCode(code);
+      if (desk) { location.hash = joinHref(desk); return; }
       const sb = auth.client(); if (!sb) return;
       const t = auth.token();
       try {
@@ -306,6 +311,7 @@ export function mountAccountPage(root, ctx = {}) {
         const until = data && data.ends_at ? new Date(data.ends_at).toLocaleDateString() : null;
         msg.textContent = until ? `Paid access is on until ${until}.` : 'Paid access is on.';
         showToast('Code redeemed');
+        entitlement.refresh(true).catch(() => {});   // the chapters it opened show at once (M58)
         el.querySelector('#redeemInput').value = '';
       } catch (err) { if (auth.current(t)) msg.textContent = 'Network error. Try again.'; }
     };

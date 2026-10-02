@@ -21,7 +21,7 @@ export function questCtx() {
   let pro = false; try { pro = entitlement.entitled(); } catch (e) { /* a guest */ }
   const all = store.all();
   const completed = new Set(Object.keys(all).filter(id => all[id] && all[id].completed));
-  const open = l => pro || l.access !== 'paid';
+  const open = l => !entitlement.locked(l);   // M58: a chapter at a time
   const lessonsLeft = LESSONS.some(l => open(l) && l.kind !== 'testout' && !completed.has(l.id));
   const challenges = [];
   for (const ch of CHAPTERS) for (const m of modulesOf(ch)) if (m.challenge && open(m.challenge)) challenges.push({ ref: m.challenge.id, module: m.title });
