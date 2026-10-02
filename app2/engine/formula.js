@@ -83,7 +83,10 @@ export function tokenize(src) {
     if (ch === "'" || ch === '$' || /[A-Za-z_]/.test(ch)) {
       // sheet-prefixed reference: Name!A1 or 'My Sheet'!A1 — the prefix and the ref are ONE token
       // (the whole span, so text rewriters replace it as a unit); the corner after ':' stays plain
-      const sm = /^(?:'((?:[^']|'')+)'|([A-Za-z_][A-Za-z0-9_.]*))!/.exec(rest);
+      // a 3D reference names a run of sheets, First:Last!B5 or 'Jan 1:Mar 1'!B5 (never A1:Sheet2!B5, a cell before the colon)
+      let sm = /^([A-Za-z_][A-Za-z0-9_.]*:[A-Za-z_][A-Za-z0-9_.]*)!/.exec(rest);
+      if (sm && /^\$?[A-Za-z]{1,3}\$?\d+:/.test(sm[1])) sm = null;
+      if (sm) sm = [sm[0], undefined, sm[1]]; else sm = /^(?:'((?:[^']|'')+)'|([A-Za-z_][A-Za-z0-9_.]*))!/.exec(rest);
       if (sm) {
         const sheetName = sm[1] ? sm[1].replace(/''/g, "'") : sm[2];
         const tail = rest.slice(sm[0].length);
@@ -167,6 +170,9 @@ const MAX_ARGS = { ABS: 1, SIGN: 1, INT: 1, TRUNC: 2, COUNTBLANK: 1, ROUND: 2, R
 const LIFT = new Set(['ABS', 'SIGN', 'INT', 'TRUNC', 'ROUND', 'ROUNDUP', 'ROUNDDOWN', 'MOD', 'SQRT', 'POWER', 'EXP', 'LN', 'LOG', 'LOG10', 'NOT', 'LEN', 'LEFT', 'RIGHT', 'MID',
   'FIND', 'SEARCH', 'TRIM', 'UPPER', 'LOWER', 'PROPER', 'SUBSTITUTE', 'REPLACE', 'REPT', 'EXACT', 'VALUE', 'TEXT', 'T', 'N', 'DATE', 'YEAR', 'MONTH', 'DAY', 'WEEKDAY', 'DAYS',
   'EDATE', 'EOMONTH', 'YEARFRAC']);
+/** The functions that take a 3D reference (Excel's list, as far as the engine computes them). */
+const THREE_D = new Set(['SUM', 'AVERAGE', 'AVERAGEA', 'COUNT', 'COUNTA', 'MAX', 'MIN', 'PRODUCT']);
+const is3D = n => !!n && (n.k === 'ref' || n.k === 'range') && typeof n.sheet === 'string' && n.sheet.includes(':');
 const BP = { '=': 1, '<>': 1, '<': 1, '<=': 1, '>': 1, '>=': 1, '&': 2, '+': 3, '-': 3, '*': 4, '/': 4, '^': 5 };
 const BP_UNARY = 6, BP_PCT = 7;
 
@@ -725,6 +731,13 @@ export function evalFormula(expr, ctx = {}) {
   }
   /* ---- the function table --------------------------------------------------------- */
   function callFn(name, node) {
+    // a 3D reference (Jan:Mar!B5) is one argument per sheet of the run, in the functions Excel lets take one; anywhere else it is #VALUE!
+    if (node.args.some(is3D)) {
+      if (!THREE_D.has(name)) throw err('#VALUE!');
+      const ex = [];
+      for (const a of node.args) { if (!is3D(a)) { ex.push(a); continue; } const [x, y] = a.sheet.split(':'); const names = ctx.sheetSpan ? ctx.sheetSpan(x, y) : null; if (!names) throw err('#REF!'); for (const nm of names) ex.push({ ...a, sheet: String(nm).toUpperCase() }); }
+      return callFn(name, { ...node, args: ex });
+    }
     const slots = node.args;   // null = omitted slot; arity was checked by the parser
     // lazy forms first: they choose which arguments to evaluate, or classify an error instead of propagating it
     switch (name) {
@@ -1107,14 +1120,14 @@ export function evalFormula(expr, ctx = {}) {
         return new Range(t.r1, t.c1, t.r2, t.c2, t.sheet || undefined);
       }
       case 'paren': return ev(node.x);
-      case 'ref': { const p = refParts(node.ref);
+      case 'ref': { if (is3D(node)) throw err('#VALUE!'); const p = refParts(node.ref);
         if (node.spill) {   // A1#: the range A1 spills into (the sheet answers through ctx.spillRange); a formula that does not spill is its one cell; anything else is #REF!
           const sp = ctx.spillRange ? ctx.spillRange(refKey(p.r, p.c)) : null;
           if (sp) return new Range(sp.r1, sp.c1, sp.r2, sp.c2);
           if (!(ctx.isFormula && ctx.isFormula(refKey(p.r, p.c)))) throw err('#REF!');
         }
         return new Range(p.r, p.c, p.r, p.c, node.sheet); }
-      case 'range': return rangeOf(node.a, node.b, node.sheet);
+      case 'range': if (is3D(node)) throw err('#VALUE!'); return rangeOf(node.a, node.b, node.sheet);
       case 'colrange': { const a = offCol(node.a, node.absA), b = offCol(node.b, node.absB); return new Range(1, Math.min(a, b), ROWS, Math.max(a, b)); }
       case 'rowrange': { const a = offRow(node.a, node.absA), b = offRow(node.b, node.absB); return new Range(Math.min(a, b), 1, Math.max(a, b), COLS); }
       case 'un': { const v = ev(node.x); if (node.op === '+') return v; if (isMulti(v)) return broadcast([v], x => -toNum(x)); return -toNum(v); }   // unary plus is a no-op in Excel: text stays text
@@ -1196,7 +1209,7 @@ export function valueText(v) {
 }
 /** The text of an AST, as the formula bar would show it (references upper-case, sheet names quoted when needed). `mark` wraps one node in \u0001…\u0002 so the caller can find its span. */
 export function unparseAst(node, mark) {
-  const sheetTxt = n => n ? (/^[A-Z_][A-Z0-9_.]*$/i.test(n) ? n : "'" + n.replace(/'/g, "''") + "'") + '!' : '';
+  const sheetTxt = n => n ? (/^[A-Z_][A-Z0-9_.]*(:[A-Z_][A-Z0-9_.]*)?$/i.test(n) ? n : "'" + n.replace(/'/g, "''") + "'") + '!' : '';
   const u = n => {
     const t = (() => {
       switch (n.k) {

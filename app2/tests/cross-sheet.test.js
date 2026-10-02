@@ -140,3 +140,19 @@ test('addSheet with recalc: false defers the workbook recalculation to one recal
   s.recalcAll();
   assert.equal(s.sheet.value('A1'), 5);
 });
+
+test('3D references: SUM(Jan:Mar!B5) adds the cell on every sheet of the run, in tab order; a sheet moved inside joins; outside the aggregates it is #VALUE!', () => {
+  const s = new Session(new Sheet({ cells: { A1: { value: 'Summary' } } })); s.renameSheet(0, 'Summary');
+  for (const [nm, v] of [['Jan', 10], ['Feb', 20], ['Mar', 30], ['Apr', 40]]) s.addSheet(nm, new Sheet({ cells: { B5: { value: v }, C5: { value: 1 } } }));
+  const S = s.sheets[0].sheet;
+  S.commitInput('=SUM(Jan:Mar!B5)', 1, 2); assert.equal(S.value('B1'), 60);
+  S.commitInput('=SUM(Jan:Mar!B5:C5)', 2, 2); assert.equal(S.value('B2'), 63);
+  S.commitInput('=AVERAGE(Feb:Apr!B5)', 3, 2); assert.equal(S.value('B3'), 30);
+  S.commitInput("=MAX('Jan:Feb'!B5,5)", 4, 2); assert.equal(S.value('B4'), 20);
+  S.commitInput('=COUNT(Mar:Jan!B5)', 5, 2); assert.equal(S.value('B5'), 3, 'the ends in either order');
+  S.commitInput('=Jan:Mar!B5', 6, 2); assert.equal(S.value('B6'), '#VALUE!');
+  S.commitInput('=SUM(Jan:Dec!B5)', 7, 2); assert.equal(S.value('B7'), '#REF!');
+  const feb = s.sheets.find(e => e.name === 'Feb').sheet; feb.commitInput('25', 5, 2); assert.equal(S.value('B1'), 65, 'an edit on a sheet in the run recalculates the total');
+  assert.equal(S.formula('B1'), '=SUM(Jan:Mar!B5)');
+  S.commitInput('=SUM(A1:Apr!B5)', 8, 2); assert.notEqual(S.value('B8'), 100, 'A1:Apr!B5 is not a 3D reference');
+});
