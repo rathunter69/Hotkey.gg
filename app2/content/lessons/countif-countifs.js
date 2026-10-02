@@ -15,7 +15,9 @@ const siteCounts = (ses, sh) => block(sh, 'C', ...SITES, { fns: ['COUNTIF'], wan
 const memberCounts = (ses, sh) => block(sh, 'D', ...SITES, { fns: ['COUNTIFS'], want: bySite(ses, sh, isMember) });
 const retailCounts = (ses, sh) => block(sh, 'E', ...SITES, { fns: ['COUNTIFS'], want: bySite(ses, sh, amountOver(0)) });
 const byPkg = (ses, sh, ...preds) => r => countRows(exportRows(ses), ofPackage(code(sh, 'B' + r)), ...preds);
-const pkgCounts = (ses, sh) => block(sh, 'C', ...PKG, { fns: ['COUNTIF'], want: byPkg(ses, sh) }) && block(sh, 'D', ...PKG, { fns: ['COUNTIFS'], want: byPkg(ses, sh, isRetailRow) });
+const pkgWashes = (ses, sh) => block(sh, 'C', ...PKG, { fns: ['COUNTIF'], want: byPkg(ses, sh) });
+const pkgRetail = (ses, sh) => block(sh, 'D', ...PKG, { fns: ['COUNTIFS'], want: byPkg(ses, sh, isRetailRow) });
+const pkgCounts = (ses, sh) => pkgWashes(ses, sh) && pkgRetail(ses, sh);
 const amounts = ses => exportRows(ses).map(x => x.amount).filter(isNum);
 const BANDS = [a => a < 15, a => a >= 15 && a < 20, a => a >= 20];
 const bands = (ses, sh) => !!sh && BANDS.every((f, i) => calls(sh, 'C' + (34 + i), ['COUNTIFS']) && near(sh.value('C' + (34 + i)), amounts(ses).filter(f).length)) && live(sh, 'C34')
@@ -64,15 +66,15 @@ export default {
     { id: 'site-count', teach: 'COUNTIF(range, criteria) counts the cells in the range that match the criteria, so =COUNTIF(Transactions!$B$5:$B$94,B15) counts the export rows whose site is the code in B15. Anchor the range with $ and leave B15 relative, and one formula serves all six sites.', text: 'Count the washes by site: select C15:C20, type =COUNTIF(Transactions!$B$5:$B$94,B15) and press Ctrl+Enter.', keys: `→ Ctrl+↓ ×4 → Shift+↓ ×5 "${F.site}" Ctrl+↵`, requires: ['countif-countifs', 'ctrl-arrow', 'shift-arrow', 'ctrl-enter-fill', 'relative-absolute', 'cross-sheet-ref'],
       hintStuck: 'pulse range C15:C20 · The site codes in B15:B20 are the criteria.',
       check: (s, ses) => { const sh = summary(ses); return settled(ses) && siteCounts(ses, sh); } },
-    { id: 'member-count', teach: 'COUNTIFS takes the pairs one after another and counts a row only when every pair matches. A criteria in quotes can compare: "<>" means not blank, so the member column with "<>" counts member washes.', text: 'In D15:D20 count each site’s member washes: COUNTIFS on the site, then the member column Transactions!$D$5:$D$94 with "<>".', keys: `→ Shift+↓ ×5 ${q(F.member)} Ctrl+↵`, requires: ['criteria-operators', 'countif-countifs', 'shift-arrow', 'ctrl-enter-fill'],
+    { id: 'package-count', text: 'The same COUNTIF by package: C25:C27 =COUNTIF(Transactions!$C$5:$C$94,B25) with Ctrl+Enter, the package letters as the criteria.', keys: `Ctrl+↓ ×2 ↓ Shift+↓ ×2 "${F.pkg}" Ctrl+↵`, requires: ['countif-countifs', 'ctrl-arrow', 'shift-arrow', 'ctrl-enter-fill'],
+      hintStuck: 'pulse range C25:C27 · The package letters in B25:B27 are the criteria.',
+      check: (s, ses) => { const sh = summary(ses); return settled(ses) && pkgWashes(ses, sh); } },
+    { id: 'member-count', teach: 'COUNTIFS takes the pairs one after another and counts a row only when every pair matches. A criteria in quotes can compare: "<>" means not blank, so the member column with "<>" counts member washes.', text: 'In D15:D20 count each site’s member washes: COUNTIFS on the site, then the member column Transactions!$D$5:$D$94 with "<>".', keys: `Ctrl+↑ ×3 ↓ → Shift+↓ ×5 ${q(F.member)} Ctrl+↵`, requires: ['criteria-operators', 'countif-countifs', 'ctrl-arrow', 'shift-arrow', 'ctrl-enter-fill'],
       hintStuck: 'pulse range D15:D20 · A member wash has an id in column D of the export.',
       check: (s, ses) => { const sh = summary(ses); return settled(ses) && memberCounts(ses, sh); } },
-    { id: 'retail-count', text: 'In E15:E20 count each site’s retail washes: COUNTIFS on the site, then the amounts Transactions!$E$5:$E$94 with ">0".', keys: `→ Shift+↓ ×5 ${q(F.retail)} Ctrl+↵`, requires: ['criteria-operators', 'countif-countifs', 'shift-arrow', 'ctrl-enter-fill'],
-      hintStuck: 'pulse range E15:E20 · A member wash carries 0, a retail wash its price.',
-      check: (s, ses) => { const sh = summary(ses); return settled(ses) && retailCounts(ses, sh); } },
-    { id: 'package-count', text: 'By package: C25:C27 =COUNTIF(Transactions!$C$5:$C$94,B25), and retail washes in D25:D27 with the member column "" for blank.', keys: `← ×2 Ctrl+↓ ×2 ↓ Shift+↓ ×2 "${F.pkg}" Ctrl+↵ → Shift+↓ ×2 ${q(F.pkgRetail)} Ctrl+↵`, requires: ['countif-countifs', 'criteria-operators', 'ctrl-arrow', 'shift-arrow', 'ctrl-enter-fill'],
-      hintStuck: 'pulse range C25:D27 · The package letters in B25:B27 are the criteria.',
-      check: (s, ses) => { const sh = summary(ses); return settled(ses) && pkgCounts(ses, sh); } },
+    { id: 'retail-count', text: 'Retail washes with COUNTIFS: E15:E20 on the site with the amounts ">0", then D25:D27 on the package with the member column "".', keys: `→ Shift+↓ ×5 ${q(F.retail)} Ctrl+↵ Ctrl+↓ ×2 ↓ ← Shift+↓ ×2 ${q(F.pkgRetail)} Ctrl+↵`, requires: ['criteria-operators', 'countif-countifs', 'ctrl-arrow', 'shift-arrow', 'ctrl-enter-fill'],
+      hintStuck: 'pulse range E15:E20 · A member wash carries 0 and a member id; a retail wash carries its price and no id.',
+      check: (s, ses) => { const sh = summary(ses); return settled(ses) && retailCounts(ses, sh) && pkgRetail(ses, sh); } },
     { id: 'bands', teach: 'Two pairs on the same range make a band: ">=15" with "<20" counts the $15 tickets and leaves the $20 ones to the next band. The edges are where a band count goes wrong, because a > where >= belongs drops every ticket sitting exactly on the edge.', text: 'Count the tickets in C34:C36: "<15", then ">=15" with "<20", then ">=20", and color the three green, since they read only Transactions.', keys: `← ×2 Ctrl+↓ ×2 ↓ → ${q(F.band1)} ↵ ${q(F.band2)} ↵ ${q(F.band3)} ↵ ↑ Shift+↑ ×2 Alt H F C → ×8 ↵`, requires: ['criteria-operators', 'countif-countifs', 'font-color', 'link-colour-convention', 'ctrl-arrow', 'shift-arrow', 'type-to-enter'], convention: 'B2',
       hintStuck: 'pulse range C34:C36 · The band labels in B34:B36 give the edges.',
       check: (s, ses) => { const sh = summary(ses); return settled(ses) && bands(ses, sh); } },
@@ -102,8 +104,8 @@ export default {
     'Ninety rows counted six ways, and the blocks agree with each other except where the export lies.',
     'The package block counts all 90 washes and the site block finds 88, because two site codes in the export end in a space and match nothing in B15:B20. The checks in C80:C81 caught it before a buyer did; module 3.4 finds the two rows and fixes them. Best practice: write the criteria range once, anchor it, and fill; a range that slips by a row is the commonest wrong number in a databook.',
   ],
-  solution: `Right Ctrl+Down Ctrl+Down Ctrl+Down Ctrl+Down Right ${SEL5} "${F.site}" Ctrl+Enter Right ${SEL5} ${q(F.member)} Ctrl+Enter Right ${SEL5} ${q(F.retail)} Ctrl+Enter `
-    + `Left Left Ctrl+Down Ctrl+Down Down Shift+Down Shift+Down "${F.pkg}" Ctrl+Enter Right Shift+Down Shift+Down ${q(F.pkgRetail)} Ctrl+Enter `
+  solution: `Right Ctrl+Down Ctrl+Down Ctrl+Down Ctrl+Down Right ${SEL5} "${F.site}" Ctrl+Enter Ctrl+Down Ctrl+Down Down Shift+Down Shift+Down "${F.pkg}" Ctrl+Enter `
+    + `Ctrl+Up Ctrl+Up Ctrl+Up Down Right ${SEL5} ${q(F.member)} Ctrl+Enter Right ${SEL5} ${q(F.retail)} Ctrl+Enter Ctrl+Down Ctrl+Down Down Left Shift+Down Shift+Down ${q(F.pkgRetail)} Ctrl+Enter `
     + `Left Left Ctrl+Down Ctrl+Down Down Right ${q(F.band1)} Enter ${q(F.band2)} Enter ${q(F.band3)} Enter Up Shift+Up Shift+Up Alt H F C Right Right Right Right Right Right Right Right Enter `
     + `Down "${F.bandCheck}" Enter Ctrl+Down Down ${SEL5} Shift+Right Shift+Right "${F.cross}" Ctrl+Enter `
     + 'Ctrl+Up Down Shift+Down Shift+Down Shift+Down Shift+Down Shift+Down Shift+Down Shift+Right Shift+Right Alt+= Ctrl+Up Ctrl+Up Ctrl+Up Ctrl+Up Ctrl+Up Down Shift+Down Shift+Down Shift+Down Shift+Right Alt+= Ctrl+Up Ctrl+Up Ctrl+Up Down Shift+Down Shift+Down Shift+Down Shift+Down Shift+Down Shift+Down Shift+Right Shift+Right Alt+= '

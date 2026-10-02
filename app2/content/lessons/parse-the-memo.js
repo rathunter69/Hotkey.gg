@@ -1,10 +1,10 @@
 // Chapter 3 · 3.4.2 FIND, SEARCH and SUBSTITUTE: parse the memo (clearcoat-databook, S4a → S4b)
 // The memo packs three facts into one string, "Wash D @ AUS-DOM (kiosk)". On Transactions the
 // learner finds the @ with FIND (U), cuts the site out after it with MID (V), cuts the channel out
-// between the brackets with two FINDs (W), reads the package case-blind with SEARCH and UPPER (X),
-// reads the lower-case row where it pays off, and drops the kiosk tag with SUBSTITUTE (Y). The raw
+// between the brackets with two FINDs (W), reads the package case-blind with SEARCH and UPPER on the
+// lower-case row 37 and then all of X, and drops the kiosk tag on row 34 and then all of Y. The raw
 // memo stays where it is. The closer changes one memo's channel and the parsed column follows.
-import { transactions, settled, selected, onSheet, block } from './lib/databook-checks.js';
+import { transactions, settled, block } from './lib/databook-checks.js';
 
 const R1 = 5, R2 = 94;
 const memo = (sh, r) => { const v = sh.value('F' + r); return typeof v === 'string' ? v : ''; };
@@ -12,14 +12,18 @@ const at = (sh, r) => memo(sh, r).indexOf('@');
 const pos = sh => block(sh, 'U', R1, R2, { fns: ['FIND'], want: r => at(sh, r) + 1 });
 const siteOf = sh => block(sh, 'V', R1, R2, { fns: ['MID', 'FIND'], want: r => memo(sh, r).substr(at(sh, r) + 2, 7) });
 const channel = sh => block(sh, 'W', R1, R2, { fns: ['MID', 'FIND'], want: r => { const m = memo(sh, r), a = m.indexOf('('), b = m.indexOf(')'); return m.slice(a + 1, b); } });
-const pkg = sh => block(sh, 'X', R1, R2, { fns: ['UPPER', 'MID', 'SEARCH'], want: r => { const m = memo(sh, r), i = m.toLowerCase().indexOf('wash '); return m.substr(i + 5, 1).toUpperCase(); } });
-const noKiosk = sh => block(sh, 'Y', R1, R2, { fns: ['SUBSTITUTE'], want: r => memo(sh, r).split(' (kiosk)').join('') });
+const pkgAt = (sh, a, b) => block(sh, 'X', a, b, { fns: ['UPPER', 'MID', 'SEARCH'], want: r => { const m = memo(sh, r), i = m.toLowerCase().indexOf('wash '); return m.substr(i + 5, 1).toUpperCase(); } });
+const pkg = sh => pkgAt(sh, R1, R2);
+const subAt = (sh, a, b) => block(sh, 'Y', a, b, { fns: ['SUBSTITUTE'], want: r => memo(sh, r).split(' (kiosk)').join('') });
+const noKiosk = sh => subAt(sh, R1, R2);
 const F = {
   at: '=FIND("@",F5)',
   site: '=MID(F5,FIND("@",F5)+2,7)',
   channel: '=MID(F5,FIND("(",F5)+1,FIND(")",F5)-FIND("(",F5)-1)',
   pkg: '=UPPER(MID(F5,SEARCH("wash ",F5)+5,1))',
   sub: '=SUBSTITUTE(F5," (kiosk)","")',
+  pkg37: '=UPPER(MID(F37,SEARCH("wash ",F37)+5,1))',
+  sub34: '=SUBSTITUTE(F34," (kiosk)","")',
 };
 
 export default {
@@ -50,14 +54,17 @@ export default {
     { id: 'channel', teach: 'The channel has no fixed length, so cut from one FIND to another: start one past the "(", and take as many characters as lie between the brackets. FIND and SEARCH also take a third argument, where to start looking, which finds the second space as easily as the first.', text: `The channel in W5:W94: ${F.channel} with Ctrl+Enter.`, keys: `Ctrl+G "W5:W94" ↵ '${F.channel}' Ctrl+↵`, requires: ['find-search', 'left-right-mid-len', 'go-to', 'ctrl-enter-fill'],
       hintStuck: 'pulse range W5:W94 · The length is the close bracket’s position less the open bracket’s, less one.',
       check: (s, ses) => { const sh = transactions(ses); return settled(ses) && channel(sh); } },
-    { id: 'package', teach: 'SEARCH works like FIND but ignores case, so SEARCH("wash ",F5) finds “Wash ” and “wash ” alike. UPPER capitalizes every letter, so the package reads one way whatever the terminal typed.', text: `The package in X5:X94, case-blind: ${F.pkg} with Ctrl+Enter.`, keys: `Ctrl+G "X5:X94" ↵ '${F.pkg}' Ctrl+↵`, requires: ['find-search', 'substitute-upper', 'left-right-mid-len', 'go-to', 'ctrl-enter-fill'],
-      hintStuck: 'pulse range X5:X94 · The letter sits five characters after the start of “wash ”.',
+    { id: 'package', teach: 'SEARCH works like FIND but ignores case, so SEARCH("wash ",F37) finds “Wash ” and “wash ” alike. UPPER capitalizes every letter, so the package reads one way whatever the terminal typed.', text: `Row 37’s memo came through as “Wash d”: read its package in X37, case-blind, with ${F.pkg37}.`, keys: `Ctrl+G "X37" ↵ '${F.pkg37}' ↵`, requires: ['find-search', 'substitute-upper', 'left-right-mid-len', 'go-to', 'type-to-enter'],
+      hintStuck: 'pulse cell X37 · The letter sits five characters after the start of “wash ”.',
+      check: (s, ses) => { const sh = transactions(ses); return settled(ses) && pkgAt(sh, 37, 37); } },
+    { id: 'package-all', text: `Now the package for every row in X5:X94: ${F.pkg} with Ctrl+Enter.`, keys: `Ctrl+G "X5:X94" ↵ '${F.pkg}' Ctrl+↵`, requires: ['find-search', 'substitute-upper', 'go-to', 'ctrl-enter-fill'],
+      hintStuck: 'pulse range X5:X94 · The same formula, written from row 5.',
       check: (s, ses) => { const sh = transactions(ses); return settled(ses) && pkg(sh); } },
-    { id: 'lower', text: 'Select the lower-case memo and its parsed columns in F37:X37: “Wash d” still reads D in X37.', keys: 'Ctrl+G "F37:X37" ↵', requires: ['go-to'],
-      hintStuck: 'pulse range F37:X37 · One memo in the export came through with a lower-case package.',
-      check: (s, ses) => { const sh = transactions(ses); return settled(ses) && onSheet(ses, 'Transactions') && selected(sh, 'F37:X37'); } },
-    { id: 'substitute', teach: 'SUBSTITUTE(text, old_text, new_text) swaps every match for the new text, and a fourth argument changes only the nth. REPLACE swaps by position instead of by content. Parse into helper columns and keep the raw memo: it is the audit trail.', text: `The memo without the kiosk tag in Y5:Y94: ${F.sub} with Ctrl+Enter.`, keys: `Ctrl+G "Y5:Y94" ↵ '${F.sub}' Ctrl+↵`, requires: ['substitute-upper', 'go-to', 'ctrl-enter-fill'], convention: 'C1',
-      hintStuck: 'pulse range Y5:Y94 · Swap the space and the tag for nothing at all.',
+    { id: 'substitute', teach: 'SUBSTITUTE(text, old_text, new_text) swaps every match for the new text, and a fourth argument changes only the nth. REPLACE swaps by position instead of by content. Parse into helper columns and keep the raw memo: it is the audit trail.', text: `Row 34 is a kiosk wash: drop the tag in Y34 with ${F.sub34}.`, keys: `Ctrl+G "Y34" ↵ '${F.sub34}' ↵`, requires: ['substitute-upper', 'go-to', 'type-to-enter'], convention: 'C1',
+      hintStuck: 'pulse cell Y34 · Swap the space and the tag for nothing at all.',
+      check: (s, ses) => { const sh = transactions(ses); return settled(ses) && subAt(sh, 34, 34); } },
+    { id: 'substitute-all', text: `Every memo without the kiosk tag in Y5:Y94: ${F.sub} with Ctrl+Enter; a memo with no tag passes through unchanged.`, keys: `Ctrl+G "Y5:Y94" ↵ '${F.sub}' Ctrl+↵`, requires: ['substitute-upper', 'go-to', 'ctrl-enter-fill'], convention: 'C1',
+      hintStuck: 'pulse range Y5:Y94 · The same formula, written from row 5.',
       check: (s, ses) => { const sh = transactions(ses); return settled(ses) && noKiosk(sh); } },
     { id: 'tie', closer: true, demo: { script: 'Ctrl+G "Transactions!F5" Enter "Wash B @ AUS-AIR (app)" Enter Ctrl+G "Transactions!U5:Y5" Enter Escape Escape Escape', cadence: 320 }, text: 'Does it tie? Watch the memo in F5 change its channel to (app), and the channel in W5 follow it.', requires: [],
       hintStuck: 'pulse cell W5 · Every parsed column reads the raw memo in F.',
@@ -73,5 +80,5 @@ export default {
     'FIND and SEARCH say where to cut, MID cuts, UPPER and SUBSTITUTE make the pieces read one way. Best practice: parse into helper columns and never overwrite the raw text, so anyone can check a parsed value against the string it came from.',
   ],
   solution: `Ctrl+G "Transactions!U5:U94" Enter '${F.at}' Ctrl+Enter Ctrl+G "V5:V94" Enter '${F.site}' Ctrl+Enter Ctrl+G "W5:W94" Enter '${F.channel}' Ctrl+Enter `
-    + `Ctrl+G "X5:X94" Enter '${F.pkg}' Ctrl+Enter Ctrl+G "F37:X37" Enter Ctrl+G "Y5:Y94" Enter '${F.sub}' Ctrl+Enter`,
+    + `Ctrl+G "X37" Enter '${F.pkg37}' Enter Ctrl+G "X5:X94" Enter '${F.pkg}' Ctrl+Enter Ctrl+G "Y34" Enter '${F.sub34}' Enter Ctrl+G "Y5:Y94" Enter '${F.sub}' Ctrl+Enter`,
 };
