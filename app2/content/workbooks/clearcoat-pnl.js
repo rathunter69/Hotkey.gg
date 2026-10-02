@@ -20,6 +20,7 @@ import { dateToSerial, serialToDate } from '../../engine/format.js';
 import { parseRef, colLetter } from '../../engine/refs.js';
 import { translateFormula } from '../../engine/formula.js';
 import { buildPage, TITLE_FSZ, FIGURE_W } from './page.js';
+import { STYLE_PARTS } from '../../engine/tools.js';
 import { diffStates, sessionToState, PAGE_SETUP_DEFAULT } from './clearcoat-weekly.js';
 
 export { diffStates, sessionToState, PAGE_SETUP_DEFAULT };
@@ -461,6 +462,19 @@ export const CF_SLOW_MONTH = threshold => ({ kind: 'cellValue', op: '<', v1: thr
 export const CH2_PAGE_SETUP = { orientation: 'landscape', scaling: 'fit', adjustTo: 100, fitWide: 1, fitTall: 2, titlesRows: '$1:$5', footer: { left: '&[File]', centre: 'Page &[Page] of &[Pages]', right: '&[Date]' }, printGridlines: false, centerH: true };
 /** The navigation column (2.4.4): a header and the three named blocks, in column Q. */
 export const NAV = { col: 'Q', head: 4, items: [['Revenue', 'Rev'], ['Site costs', 'SiteCosts'], ['EBITDA', 'EBITDA']] };
+/** 2.5.1's duplicate-labels rule over the P&L's labels (Highlight Cells › Duplicate Values, the default Light Red Fill); 2.5.4 deletes it once the labels are fixed. */
+export const CF_DUP_LABELS = { kind: 'duplicate', unique: false, range: 'B7:B35', style: 'lightred' };
+/** 2.3.6's cell style: the P&L's total line saved By Example from B10 with Number unticked, so each figure keeps its own code; applied to Monthly's subtotal rows. (Total itself is Excel's built-in, so the custom one takes its own name.) */
+export const TOTAL_STYLE = { name: 'Total line', from: 'B10', rows: [10, 20, 22] };
+/** The style record New Cell Style writes (engine/tools.js): every part's fields read off the example cell, the Style Includes ticks beside them. */
+export function totalStyleOf(pnlCells) {
+  const p = parseRef(TOTAL_STYLE.from); const cell = new Sheet({ cells: clone(pnlCells) }).get(p.r, p.c); const fmt = {};
+  for (const part in STYLE_PARTS) for (const f of STYLE_PARTS[part]) fmt[f] = clone(cell[f] === undefined ? null : cell[f]);
+  return { name: TOTAL_STYLE.name, includes: { number: false, alignment: true, font: true, border: true, fill: true, protection: true }, fmt };
+}
+/** The second outline level 2.4.2 adds over the site-cost detail: revenue to head office folds, leaving EBITDA. */
+export const OUTER_GROUP = { r1: 7, r2: 23 };
+const withOuterGroup = rows => [{ ...OUTER_GROUP, collapsed: false }, ...rows.map(g => (g.r1 >= OUTER_GROUP.r1 && g.r2 <= OUTER_GROUP.r2 ? { ...g, level: 2 } : g))].sort((a, b) => (a.r1 - b.r1) || ((a.level || 1) - (b.level || 1)));
 
 /** PROPER(TRIM(SUBSTITUTE(SUBSTITUTE(x,"_"," "),"(1)",""))) as 2.6.4 writes it, with EBITDA retyped by hand. */
 export function cleanLabel(dirty) {
@@ -605,6 +619,10 @@ function navColumn(c) {
   c[NAV.col + NAV.head] = { value: 'Go to', bold: true };
   NAV.items.forEach(([label], i) => { c[NAV.col + (NAV.head + 1 + i)] = { value: label }; });
 }
+/** 2.4.4's links: each entry a hyperlink (Ctrl+K, Place in This Document) to its defined name, in Excel's Hyperlink look. */
+function navLinks(c) {
+  NAV.items.forEach(([, name], i) => { Object.assign(c[NAV.col + (NAV.head + 1 + i)], { fontColor: 'blue', uline: true, link: { name } }); });
+}
 /** The defined names behind the navigation column, on the sheet that holds the blocks. */
 export function namesOn(sheetName, rows) {
   const q = /[^A-Za-z0-9_]/.test(sheetName) ? `'${sheetName}'` : sheetName;
@@ -704,7 +722,7 @@ export function solvedDetail(ex, { clean = true, nav = true } = {}) {
     if (cell.fmtStyle === 'comma' || cell.fmtStyle === 'currency' || (cell.fmtStyle === 'custom' && /#,##0/.test(cell.numFmt || ''))) put(c, k, { fmtStyle: 'custom', numFmt: cell.fmtStyle === 'currency' || /\$/.test(cell.numFmt || '') ? CODES.dollar : CODES.plain, decimals: null });
   }
   for (const r of [DETAIL.checkRevenue, DETAIL.checkEbitda]) put(c, 'C' + r, { fmtStyle: 'custom', numFmt: CODES.check, decimals: null });
-  if (nav) navColumn(c);
+  if (nav) { navColumn(c); navLinks(c); }
   sh.rowH = {};
   sh.condFmt = [{ kind: 'dataBar', range: `C${DETAIL.rev}:N${DETAIL.rev}`, color: 'blue' }];
   if (clean) for (const k in c) { const p = parseRef(k); if (p.c === 2 && p.r >= 5 && typeof c[k].value === 'string' && p.r <= DETAIL.ebitda) c[k].value = cleanLabel(c[k].value); }
@@ -736,7 +754,12 @@ export function finish(base, { detail = false } = {}) {
   const inputs = sheetOf(s, 'Inputs');
   finishInputs(inputs.cells, fy[2]);
   s.sheets = [solvedPnl(ex, sheetOf(base, 'P&L')), inputs, solvedMonthly(ex, { nav: !detail }), solvedPrint(ex)];
-  if (detail) s.sheets.push(solvedDetail(ex));
+  if (detail) {   // the chain's end: the tools the lessons add beyond the project's section (the Total line style, the second outline level, the linked navigation column)
+    s.sheets.push(solvedDetail(ex));
+    const p = sheetOf(s, 'P&L'); p.groups = { rows: withOuterGroup(p.groups.rows) };
+    s.cellStyles = [totalStyleOf(p.cells)];
+    const m = sheetOf(s, 'Monthly').cells; for (const r of TOTAL_STYLE.rows) for (const col of ['B', ...FIG_COLS]) if (m[col + r]) m[col + r].style = TOTAL_STYLE.name;
+  }
   s.settings = { ...s.settings, pageSetup: clone(CH2_PAGE_SETUP) };
   s.names = detail ? DETAIL_NAMES : namesOn('Monthly', [10, 20, 24]);
   return s;
@@ -867,6 +890,8 @@ function dressMonthly(s, plant) {
     S.select('C1:O1'); S.setColWidth(PERIOD_CHARS);
   });
   const sh = sheetOf(s, 'Monthly'); sh.freeze = { r: 4, c: 2 }; sh.gridlines = false;   // the sheet settings the P&L has: frozen at C5, gridlines off
+  s.cellStyles = [totalStyleOf(sheetOf(s, 'P&L').cells)];   // the total line saved as a style, then applied to Monthly's subtotals by name
+  for (const r of TOTAL_STYLE.rows) for (const col of ['B', ...FIG_COLS]) if (sh.cells[col + r]) sh.cells[col + r].style = TOTAL_STYLE.name;
 }
 
 /* ---------------- module 2.4 · Alignment and structure ---------------- */
@@ -879,9 +904,9 @@ function alignMonthly(s) {
   put(m, FULL_YEAR_COL + '4', { value: 'Full year', wrap: true });
   put(m, 'A2', { it: true });
 }
-/** 2.4.2 Grouping and outline levels: the site-cost detail and the memo block fold behind a button (one level: the engine's outline has no second). */
+/** 2.4.2 Grouping and outline levels: the site-cost detail and the memo block fold behind a button, and a second level over revenue to head office folds the page to EBITDA. */
 function groupDetail(s) {
-  sheetOf(s, 'P&L').groups = { rows: [{ r1: 13, r2: 19, collapsed: false }, { r1: 33, r2: 35, collapsed: false }] };
+  sheetOf(s, 'P&L').groups = { rows: withOuterGroup([{ r1: 13, r2: 19, collapsed: false }, { r1: 33, r2: 35, collapsed: false }]) };
 }
 /** The stray block 2.4.3 finds under the P&L: Monthly detail's first eighteen rows (the title, the units line, the headers and the Austin cluster), pasted at row 41 with their formats and dirty labels. */
 function strayBlock(ex) {
@@ -900,7 +925,7 @@ function separateSheet(s, ex) {
   const sh = sheetOf(s, 'P&L');
   delete sh.hiddenRows;
   sh.groups.rows.push({ r1: 26, r2: 30, collapsed: false });
-  sh.groups.rows.sort((a, b) => a.r1 - b.r1);
+  sh.groups.rows.sort((a, b) => (a.r1 - b.r1) || ((a.level || 1) - (b.level || 1)));
   for (const k of Object.keys(sh.cells)) if (parseRef(k).r >= DETAIL.strayTop) delete sh.cells[k];
   const src = solvedDetail(ex, { clean: false, nav: false }).cells;
   const cells = {};
@@ -919,15 +944,15 @@ function clusterLinesPlant(ex) {
 /** 2.4.4 A navigation column: the three blocks named, listed at the top of the sheet. */
 function navigation(s, plant) {
   applyPatch(s, plant);
-  navColumn(detail(s));
+  navColumn(detail(s)); navLinks(detail(s));
   s.names = clone(DETAIL_NAMES);
 }
 
 /* ---------------- module 2.5 · Conditional formatting ---------------- */
 
-/** 2.5.1 Highlight rules: a negative margin in red text on the P&L, a slow month shaded on Monthly. */
+/** 2.5.1 Highlight rules: a negative margin in red text on the P&L, the duplicate labels lit over B7:B35 (newest on top), a slow month shaded on Monthly. */
 function highlightRules(s, ex) {
-  sheetOf(s, 'P&L').condFmt = [CF_NEG_MARGIN('C27:E29')];
+  sheetOf(s, 'P&L').condFmt = [CF_DUP_LABELS, CF_NEG_MARGIN('C27:E29')];
   sheetOf(s, 'Monthly').condFmt = [CF_SLOW_MONTH(slowMonthThreshold(ex))];
 }
 /** 2.5.2 Formula-driven rules: the checks turn red when they leave zero; a row lights when its flag in A says x. New rules go to the top of the list, as Excel's do. */

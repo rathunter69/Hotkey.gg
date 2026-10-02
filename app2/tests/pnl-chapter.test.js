@@ -25,6 +25,7 @@ function live(st) {
   ses.sheets[0].name = st.sheets[0].name;
   for (const sh of st.sheets.slice(1)) ses.addSheet(sh.name, build(sh));
   if (st.names) ses.names = st.names;
+  if (ses.loadWorkbookExtras) ses.loadWorkbookExtras(st);   // the custom cell styles (2.3.6) and whatever else the workbook keeps beside its sheets
   if (st.settings) { ses.settings.calcMode = st.settings.calcMode; ses.settings.iterative = st.settings.iterative; ses.settings.qat = st.settings.qat.slice(); if (st.settings.pageSetup) ses.settings.pageSetup = structuredClone(st.settings.pageSetup); }
   for (let i = 0; i < 2; i++) for (const e of ses.sheets) e.sheet.recalc();
   return ses;
@@ -91,13 +92,14 @@ test('each lesson end state carries what its lesson leaves', () => {
   assert.equal(mc.C7.numFmt, CODES.dollar); assert.equal(mc.C7.fontColor, 'blue'); assert.equal(mc.O7.fontColor, undefined, 'the full-year formulas are back to black'); assert.equal(mc.O24.bdbl, true); assert.equal(mc.B20.bt, true); assert.equal(mc.B13.indent, 1);
   assert.equal(mc.A1.ca, 15); assert.equal(mc.A1.fsz, 16); assert.equal(mc.D27.numFmt, CODES.pct); assert.equal(mc.D27.it, true); assert.ok(mc.C13.value < 0, 'Monthly\'s costs arrive flipped'); assert.equal(mc.C22.formula, '=C10+C20');
   assert.equal(m3f.colW[15], FIGURE_W); assert.equal(m3f.gridlines, false); assert.deepEqual(m3f.freeze, { r: 4, c: 2 });
+  assert.deepEqual(stateOf('S3f').cellStyles.map(st => [st.name, st.includes.number, st.fmt.bold, st.fmt.bt]), [['Total line', false, true, true]]); assert.equal(mc.C20.style, 'Total line');
   const m4a = cells('S4a', 'Monthly'); assert.equal(m4a.O4.wrap, true); assert.equal(m4a.O4.value, 'Full year'); assert.equal(m4a.C4.bold, true); assert.equal(m4a.B4.value, 'Month ending'); assert.equal(m4a.A2.it, true);
-  assert.deepEqual(sheet('S4b', 'P&L').groups.rows.map(g => [g.r1, g.r2]), [[13, 19], [33, 35]]);
-  assert.deepEqual(sheet('S4c', 'P&L').groups.rows.map(g => [g.r1, g.r2]), [[13, 19], [26, 30], [33, 35]]); assert.equal(sheet('S4c', 'P&L').hiddenRows, undefined);
+  assert.deepEqual(sheet('S4b', 'P&L').groups.rows.map(g => [g.r1, g.r2, g.level || 1]), [[7, 23, 1], [13, 19, 2], [33, 35, 1]]);
+  assert.deepEqual(sheet('S4c', 'P&L').groups.rows.map(g => [g.r1, g.r2]), [[7, 23], [13, 19], [26, 30], [33, 35]]); assert.equal(sheet('S4c', 'P&L').hiddenRows, undefined);
   const d4c = stateOf('S4c').sheets[4]; assert.equal(d4c.name, 'Monthly detail'); assert.equal(d4c.cells.A1.bold, true); assert.equal(d4c.cells.B5.value, 'AUSTIN'); assert.equal(d4c.cells.B6.value, 'RETAIL_WASH  REVENUE'); assert.equal(d4c.cells.C9.formula, '=SUM(C6:C8)'); assert.equal(d4c.cells.B20, undefined, 'one cluster so far');
-  assert.deepEqual(stateOf('S4d').names, DETAIL_NAMES); const d4d = cells('S4d', 'Monthly detail'); assert.equal(d4d[NAV.col + NAV.head].value, 'Go to'); assert.equal(d4d.Q7.value, 'EBITDA'); assert.equal(d4d['B' + DETAIL.company].value, 'COMPANY'); assert.equal(d4d['C' + DETAIL.rev].formula, '=C9+C24+C39+C54'); assert.deepEqual(stateOf('S4d').sheets[4].freeze, { r: 4, c: 2 });
-  assert.deepEqual(sheet('S5a', 'P&L').condFmt.map(r => [r.kind, r.range]), [['cellValue', 'C27:E29']]); assert.deepEqual(sheet('S5a', 'Monthly').condFmt.map(r => [r.op, r.v1, r.range]), [['<', 3800, 'C10:N10']]);
-  assert.deepEqual(sheet('S5b', 'P&L').condFmt.map(r => r.range), ['B7:E9', 'C39:C40', 'C27:E29']); assert.equal(sheet('S5b', 'P&L').condFmt[1].stopIfTrue, false);
+  assert.deepEqual(stateOf('S4d').names, DETAIL_NAMES); const d4d = cells('S4d', 'Monthly detail'); assert.equal(d4d[NAV.col + NAV.head].value, 'Go to'); assert.equal(d4d.Q7.value, 'EBITDA'); assert.deepEqual(d4d.Q7.link, { name: 'EBITDA' }); assert.equal(d4d.Q5.uline, true); assert.equal(d4d['B' + DETAIL.company].value, 'COMPANY'); assert.equal(d4d['C' + DETAIL.rev].formula, '=C9+C24+C39+C54'); assert.deepEqual(stateOf('S4d').sheets[4].freeze, { r: 4, c: 2 });
+  assert.deepEqual(sheet('S5a', 'P&L').condFmt.map(r => [r.kind, r.range]), [['duplicate', 'B7:B35'], ['cellValue', 'C27:E29']]); assert.deepEqual(sheet('S5a', 'Monthly').condFmt.map(r => [r.op, r.v1, r.range]), [['<', 3800, 'C10:N10']]);
+  assert.deepEqual(sheet('S5b', 'P&L').condFmt.map(r => r.range), ['B7:E9', 'C39:C40', 'B7:B35', 'C27:E29']); assert.equal(sheet('S5b', 'P&L').condFmt[1].stopIfTrue, false);
   assert.deepEqual(sheet('S5c', 'Monthly detail').condFmt.map(r => [r.kind, r.range]), [['dataBar', `C${DETAIL.rev}:N${DETAIL.rev}`]]); assert.deepEqual(sheet('S5c', 'Monthly').condFmt.length, 1, 'the bars came off the page');
   assert.deepEqual(sheet('S5d', 'P&L').condFmt, [CF_CHECKS, { kind: 'cellValue', op: '<', v1: 0, range: 'C27:E30', style: 'redtext' }]);
   const m6a = cells('S6a', 'Monthly'); assert.equal(m6a.C5.formula, '=TEXT(C4,"mmmm yyyy")'); assert.equal(m6a.N5.align, 'r'); assert.equal(cells('S6a', 'Print').E4.formula, `="FY"&TEXT('P&L'!E4,"yy")&'P&L'!E5`); assert.equal(cells('S6a', 'Print').E4.fontColor, 'green'); assert.match(cells('S6a', 'Inputs').B19.formula, /^="Revenue of "&TEXT\('P&L'!E10/);

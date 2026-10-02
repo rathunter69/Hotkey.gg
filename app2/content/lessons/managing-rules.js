@@ -1,7 +1,7 @@
 // Chapter 2 · 2.5.4 Managing rules (clearcoat-pnl, S5c → S5d)
-// Manage Rules lists a sheet's rules, their ranges and their order. The P&L's three rules go to
-// the two the page needs: the row rule from 2.5.2 is deleted (the duplicate-values rule the script
-// names never existed in the engine), the margin rule moves to C27:E30 (a new rule over the four
+// Manage Rules lists a sheet's rules, their ranges and their order. The P&L's four rules go to
+// the two the page needs: the row rule from 2.5.2 and the duplicate-values rule from 2.5.1 are
+// deleted, the margin rule moves to C27:E30 (a new rule over the four
 // lines, the old one deleted, since the engine's manager has no range box), and the checks rule
 // goes to the top with Stop If True. The closer types over total revenue: only the checks rule fires.
 const sheetOf = (ses, name) => { const e = ses.sheets.find(x => x.name === name); return e ? e.sheet : null; };
@@ -14,6 +14,7 @@ const squash = f => String(f || '').replace(/\s+/g, '').toUpperCase();
 const RED = new Set(['redtext', 'lightred', 'redfill']);
 const negRule = x => x.kind === 'cellValue' && x.op === '<' && x.v1 === 0 && RED.has(x.style);
 const checksRule = x => x.kind === 'formula' && squash(x.formula) === '=C39<>0';
+const dupRule = x => x.kind === 'duplicate';
 const flagRule = x => x.kind === 'formula' && /\$A\d+=/.test(squash(x.formula));
 const ordered = sh => !!sh && sh.condFmt.length === 2 && checksRule(sh.condFmt[0]) && sh.condFmt[0].stopIfTrue === true && ruled(sh, 'C27:E30', negRule) && sh.condFmt.filter(negRule).length === 1;
 
@@ -36,12 +37,15 @@ export default {
   prerequisites: ['data-bars-and-scales'],
   brief: 'Rules pile up, overlap and outlive the ranges they were written for, and a page with six rules nobody remembers is a page nobody trusts. Manage Rules lists them, shows their ranges, and lets you delete, reorder and set Stop If True. Tidy the rules on the P&L to the two the page needs. The key is `Alt H L R`.',
   goals: [
-    { id: 'open', text: 'On the P&L, open Manage Rules with Alt, H, L, R and read the three rules and the ranges they apply to.', keys: 'Alt H L R', requires: ['manage-rules'], convention: 'F5',
+    { id: 'open', text: 'On the P&L, open Manage Rules with Alt, H, L, R and read the four rules and the ranges they apply to.', keys: 'Alt H L R', requires: ['manage-rules'], convention: 'F5',
       hintStuck: 'pulse range B7:E9 · The row rule from the last lesson sits on top.',
       check: (s, ses) => onSheet(ses, 'P&L') && ses.dialog === 'condrules' },
-    { id: 'delete-row-rule', text: 'Delete the row rule on B7:E9, now that no row carries a flag, and close the list with Enter.', keys: 'Delete ↵', requires: ['manage-rules'],
+    { id: 'delete-row-rule', text: 'Delete the row rule on B7:E9, now that no row carries a flag.', keys: 'Delete', requires: ['manage-rules'],
       hintStuck: 'pulse range B7:E9 · The first rule in the list is selected when it opens.',
-      check: (s, ses) => { const sh = pnl(ses); return !!sh && !sh.condFmt.some(flagRule) && settled(ses); } },
+      check: (s, ses) => { const sh = pnl(ses); return !!sh && !sh.condFmt.some(flagRule); } },
+    { id: 'delete-dup', text: 'Select the duplicate-values rule on B7:B35 with ↓ and delete it, now that the labels are fixed; close the list with Enter.', keys: '↓ Delete ↵', requires: ['manage-rules', 'duplicate-values'],
+      hintStuck: 'pulse range B7:B35 · Second in the list, under the checks rule.',
+      check: (s, ses) => { const sh = pnl(ses); return !!sh && !sh.condFmt.some(flagRule) && !sh.condFmt.some(dupRule) && settled(ses); } },
     { id: 'margin-range', teach: 'A rule written for C27:E29 misses the growth line under it. Add the same rule over C27:E30, and the old one becomes a duplicate to delete.', text: 'Select the margins and growth C27:E30 and add the rule again: Less Than 0, Red Text.', keys: 'Ctrl+G "C27" ↵ Shift+→ ×2 Shift+↓ ×3 Alt H L H L "0" → ×4 ↵', requires: ['highlight-rule', 'go-to', 'shift-arrow'],
       hintStuck: 'pulse range C27:E30 · Four lines now: three margins and revenue growth.',
       check: (s, ses) => ruled(pnl(ses), 'C27:E30', negRule) && settled(ses) },
@@ -62,5 +66,5 @@ export default {
     'Two rules remain, both named and both where you’d look for them.',
     'The checks rule runs first and stops there, and the margin rule now covers growth as well. When the page goes to the data room, anyone who opens Manage Rules finds two rules that each do one job.',
   ],
-  solution: 'Alt H L R Delete Enter Ctrl+G "C27" Enter Shift+Right Shift+Right Shift+Down Shift+Down Shift+Down Alt H L H L "0" Right Right Right Right Enter Alt H L R Down Down Delete U S Enter',
+  solution: 'Alt H L R Delete Down Delete Enter Ctrl+G "C27" Enter Shift+Right Shift+Right Shift+Down Shift+Down Shift+Down Alt H L H L "0" Right Right Right Right Enter Alt H L R Down Down Delete U S Enter',
 };

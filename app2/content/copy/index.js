@@ -668,8 +668,8 @@ export const COPY = {
    "module": "the-page-a-buyer-reads",
    "order": "2.3.6",
    "title": "One page’s formats carried to the next",
-   "brief": "Monthly is the P&L twelve columns wide, and formatting it cell by cell would take the morning. Paste Special Formats carries a format from one place to many: copy one formatted column, paste its formats over a wider block, and the column repeats across every month. Dress Monthly from the P&L, then give it the P&L’s title, widths and settings. The key is `Ctrl+Alt+V`.",
-   "closing": "One page formatted became the template for the next. || One column of the P&L dressed thirteen on Monthly in a single paste, and the label column, the title and the widths followed. Monthly now reads as the P&L’s sibling, not its cousin.",
+   "brief": "Monthly is the P&L twelve columns wide, and formatting it cell by cell would take the morning. Paste Special Formats carries a format from one place to many: copy one formatted column, paste its formats over a wider block, and the column repeats across every month. A cell style names a look so any page can use it by name. Dress Monthly from the P&L, then give it the P&L’s title, total line, widths and settings. The key is `Ctrl+Alt+V`.",
+   "closing": "One page formatted became the template for the next. || One column of the P&L dressed thirteen on Monthly in a single paste, the total line became a style with a name, and the label column, the title and the widths followed. Monthly now reads as the P&L’s sibling, not its cousin.",
    "wow": "",
    "convention_line": "Format one page, then carry its formats to the next.",
    "mac_note": "",
@@ -704,8 +704,8 @@ export const COPY = {
    "module": "alignment-and-structure",
    "order": "2.4.2",
    "title": "Grouping and outline levels",
-   "brief": "The site-cost detail is seven rows a buyer wants on demand, not on the page. Group them and an outline button appears in the margin: press it and the seven rows fold to the total; press it again and they’re back. The memo block folds the same way, so the page reads short and stays complete. The key is `Alt+Shift+→`.",
-   "closing": "The page reads short and stays complete, and a button decides which. || Folded, the P&L is its totals and its answer; opened, every line is there. A folded row still counts in every total, which is why grouping is safe where hiding is not.",
+   "brief": "The site-cost detail is seven rows a buyer wants on demand, not on the page. Group them and an outline button appears in the margin: press it and the seven rows fold to the total; press it again and they’re back. The memo block folds the same way, and groups nest: a second level over revenue to head office folds the page to its answer. The key is `Alt+Shift+→`.",
+   "closing": "The page reads short and stays complete, and a button decides which. || Folded one level, the P&L is its totals and its answer; folded two, it is the answer alone; opened, every line is there. A folded row still counts in every total, which is why grouping is safe where hiding is not.",
    "wow": "",
    "convention_line": "Group the detail a reader wants on demand; never hide it.",
    "mac_note": "",
@@ -728,8 +728,8 @@ export const COPY = {
    "module": "alignment-and-structure",
    "order": "2.4.4",
    "title": "A navigation column for a long sheet",
-   "brief": "Monthly detail runs to seventy-five rows once the four clusters and the company block are in, and a reader shouldn’t scroll to find the EBITDA line. A navigation column is a short list at the top of the sheet naming each block, and each block carries a defined name, so Ctrl+G with the name lands on it from anywhere. Name the blocks, list them, jump. The key is `Alt M M D`.",
-   "closing": "Three names at the top make a seventy-five-row sheet read like a short one. || A reader finds revenue, site costs and EBITDA from the list and lands on each with Ctrl+G and its name. Names are for the few places people jump to; everything else stays an address.",
+   "brief": "Monthly detail runs to seventy-five rows once the four clusters and the company block are in, and a reader shouldn’t scroll to find the EBITDA line. A navigation column is a short list at the top of the sheet: each entry a hyperlink to a named block, so following it lands you there, and Ctrl+G with the name does the same. Name the blocks, list them, link them. The key is `Ctrl+K`.",
+   "closing": "Three links at the top make a seventy-five-row sheet read like a short one. || A reader finds revenue, site costs and EBITDA from the list and lands on each by following its link, or with Ctrl+G and its name. Names are for the few places people jump to; everything else stays an address.",
    "wow": "",
    "convention_line": "Name the few places people jump to, and list them at the top of the sheet.",
    "mac_note": "",
@@ -740,7 +740,7 @@ export const COPY = {
    "module": "alignment-and-structure",
    "order": "2.4.C",
    "title": "Challenge: a flat P&L into a grouped, navigable one",
-   "brief": "A flat P&L with a stray block under it and rows someone hid. Finish the headers, group the detail, unhide what was hidden and group it, move the stray block to its own sheet, and add a navigation column.",
+   "brief": "A flat P&L with a stray block under it and rows someone hid. Finish the headers, group the detail on two levels, unhide what was hidden and group it, move the stray block to its own sheet, and add a navigation column.",
    "closing": "",
    "wow": "",
    "convention_line": "Group, don’t hide; a different page on its own sheet; names for the places people jump to.",
@@ -752,8 +752,8 @@ export const COPY = {
    "module": "conditional-formatting",
    "order": "2.5.1",
    "title": "Highlight rules: negatives, exceptions",
-   "brief": "Conditional formatting is a rule a range applies to itself, and the built-in rules cover most of what a page needs: less than, greater than, between, equal to. Highlight a negative margin and a month under a threshold, find a duplicate label, and choose the format a reader will understand, not the loudest one. The key is `Alt H L`.",
-   "closing": "With two rules in and the duplicate gone, the page points at its own soft spots. || A margin under zero now reads red without anyone looking for it, and the slow winter months show on Monthly at a glance. Rules like these are a second pair of eyes: one quiet format each, on the cells that matter.",
+   "brief": "Conditional formatting is a rule a range applies to itself, and the built-in rules cover most of what a page needs: less than, greater than, between, equal to, duplicate values. Highlight a negative margin, a month under a threshold and a duplicate label, and choose the format a reader will understand, not the loudest one. The key is `Alt H L`.",
+   "closing": "With three rules in and the duplicate gone, the page points at its own soft spots. || A margin under zero now reads red without anyone looking for it, and the slow winter months show on Monthly at a glance. Rules like these are a second pair of eyes: one quiet format each, on the cells that matter.",
    "wow": "",
    "convention_line": "Read the page before anyone else does; No color for decoration",
    "mac_note": "",
@@ -4563,6 +4563,22 @@ export const COPY = {
    {
     "lesson_id": "cell-styles-format-painter",
     "goal_index": "4",
+    "text": "On P&L!B10, open New Cell Style with Alt, H, J, N, name it Total line, untick Number with Alt+N and press Enter.",
+    "teach": "Cell Styles (Alt, H, J) name a look so a page can use it by name. New Cell Style (N) saves the active cell’s look, and its ticks choose the parts it carries: untick Number (Alt+N) and each figure keeps its own code. Total is Excel’s own style, so this one takes its own name.",
+    "why": "",
+    "hint_stuck": "pulse cell B10 · Total revenue: bold with a top border."
+   },
+   {
+    "lesson_id": "cell-styles-format-painter",
+    "goal_index": "5",
+    "text": "Apply Total line to Monthly’s subtotals B10:O10, B20:O20 and B22:O22: Alt, H, J, ← once to it under Custom, Enter.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range B10:O10 · Your own styles sit last in the gallery, one step left of the first."
+   },
+   {
+    "lesson_id": "cell-styles-format-painter",
+    "goal_index": "6",
     "text": "Give Monthly the P&L’s widths: column A 2, and the months and full year C:O 12.",
     "teach": "",
     "why": "",
@@ -4570,7 +4586,7 @@ export const COPY = {
    },
    {
     "lesson_id": "cell-styles-format-painter",
-    "goal_index": "5",
+    "goal_index": "7",
     "text": "Fit Monthly’s label column to its labels: select B4:B30 and AutoFit with Alt, H, O, I.",
     "teach": "",
     "why": "",
@@ -4578,7 +4594,7 @@ export const COPY = {
    },
    {
     "lesson_id": "cell-styles-format-painter",
-    "goal_index": "6",
+    "goal_index": "8",
     "text": "Freeze Monthly’s panes at C5 with Alt, W, F, F and turn its gridlines off with Alt, W, V, G.",
     "teach": "",
     "why": "",
@@ -4586,7 +4602,7 @@ export const COPY = {
    },
    {
     "lesson_id": "cell-styles-format-painter",
-    "goal_index": "7",
+    "goal_index": "9",
     "text": "Does it tie? Watch Monthly!C7 change to 2000, and Monthly!C24 answer in the borrowed format.",
     "teach": "",
     "why": "",
@@ -4745,6 +4761,30 @@ export const COPY = {
    {
     "lesson_id": "grouping-and-outline-levels",
     "goal_index": "5",
+    "text": "Add a second level: select rows 7:23, retail wash revenue to head office, and group them over the detail with Alt+Shift+→.",
+    "teach": "Group rows that already hold a group and the inner one goes a level deeper: the detail is level 2, the whole block level 1, and each folds on its own.",
+    "why": "",
+    "hint_stuck": "pulse rows 7:23 · Everything above EBITDA, below the Revenue header."
+   },
+   {
+    "lesson_id": "grouping-and-outline-levels",
+    "goal_index": "6",
+    "text": "Fold the outer level from row 7 with Hide Detail, Alt, A, H, so the P&L reads as its timeline and EBITDA.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse rows 7:23 · Row 7 sits in the outer group and in no inner one."
+   },
+   {
+    "lesson_id": "grouping-and-outline-levels",
+    "goal_index": "7",
+    "text": "Open it again with Show Detail, Alt, A, J, and every line is back.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse rows 7:23 · Show Detail opens the group the cell sits in."
+   },
+   {
+    "lesson_id": "grouping-and-outline-levels",
+    "goal_index": "8",
     "text": "Does it tie? Watch the detail fold, C13 change to -4500 through the fold, and C24 answer.",
     "teach": "",
     "why": "",
@@ -4837,6 +4877,22 @@ export const COPY = {
    {
     "lesson_id": "navigation-column",
     "goal_index": "4",
+    "text": "Link Revenue in Q5 to its block: Ctrl+K, Place in This Document with Alt+A, Alt+C to the list, ↓ twice to Rev, Enter.",
+    "teach": "Ctrl+K opens Insert Hyperlink. Place in This Document (Alt+A) lists the sheets and then the defined names; Alt+C reaches the list, ↓ walks it, and Enter links the cell. The cell keeps its words and takes the hyperlink look.",
+    "why": "",
+    "hint_stuck": "pulse cell Q5 · The names come after the sheets, in order: EBITDA, Rev, SiteCosts."
+   },
+   {
+    "lesson_id": "navigation-column",
+    "goal_index": "5",
+    "text": "Link Site costs in Q6 to SiteCosts and EBITDA in Q7 to EBITDA the same way.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range Q6:Q7 · The list opens on this sheet; the names sit under it."
+   },
+   {
+    "lesson_id": "navigation-column",
+    "goal_index": "6",
     "text": "Jump to the EBITDA line by name: Ctrl+G, EBITDA, Enter.",
     "teach": "",
     "why": "",
@@ -4844,7 +4900,7 @@ export const COPY = {
    },
    {
     "lesson_id": "navigation-column",
-    "goal_index": "5",
+    "goal_index": "7",
     "text": "Come back to the top with Ctrl+Home, which lands on C5 under the frozen panes.",
     "teach": "",
     "why": "",
@@ -4852,8 +4908,8 @@ export const COPY = {
    },
    {
     "lesson_id": "navigation-column",
-    "goal_index": "6",
-    "text": "Does it tie? Watch the EBITDA jump, head office in C69 change to -600, and the company’s EBITDA in C70 answer.",
+    "goal_index": "8",
+    "text": "Does it tie? Watch the EBITDA link followed from Q7, head office in C69 change to -600, and the company’s EBITDA in C70 answer.",
     "teach": "",
     "why": "",
     "hint_stuck": "pulse cell C70 · The name lands on the row; the row is live."
@@ -4871,7 +4927,7 @@ export const COPY = {
    {
     "lesson_id": "challenge-grouped-navigable",
     "goal_index": "1",
-    "text": "On the P&L, group the site-cost detail rows 13:19 and the memo rows 33:35.",
+    "text": "On the P&L, group the site-cost detail rows 13:19 and the memo rows 33:35, then rows 7:23 over the detail for a second level.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -4937,30 +4993,38 @@ export const COPY = {
    {
     "lesson_id": "highlight-rules",
     "goal_index": "3",
-    "text": "Back on the P&L, B18 repeats the label Marketing: type Card fees over it.",
-    "teach": "A label that repeats is the easiest error to miss and the first one a buyer finds. Read the labels down column B the way a reader would.",
+    "text": "Back on the P&L, select the labels B7:B35 and add Duplicate Values with Alt, H, L, H, D, Enter.",
+    "teach": "A label that repeats is the easiest error to miss and the first one a buyer finds. Highlight Cells Rules › Duplicate Values (Alt, H, L, H, D) lights every label that appears more than once.",
+    "why": "",
+    "hint_stuck": "pulse range B7:B35 · Every label from retail wash revenue to the memo."
+   },
+   {
+    "lesson_id": "highlight-rules",
+    "goal_index": "4",
+    "text": "B18 and B19 light up because B18 repeats Marketing: type Card fees over it.",
+    "teach": "",
     "why": "",
     "hint_stuck": "pulse cell B18 · The line between maintenance and marketing."
    },
    {
     "lesson_id": "highlight-rules",
-    "goal_index": "4",
-    "text": "Open Manage Rules with Alt, H, L, R and read the margin rule and its range C27:E29.",
+    "goal_index": "5",
+    "text": "Open Manage Rules with Alt, H, L, R and read the two rules on the P&L, the newest on top, and the ranges they apply to.",
     "teach": "Alt, H, L, R opens Manage Rules: every rule on the sheet, its format and the range it applies to, in the order they run.",
     "why": "",
-    "hint_stuck": "pulse range C27:E29 · One rule so far on this sheet."
+    "hint_stuck": "pulse range C27:E29 · Duplicate Values on the labels, then the margin rule."
    },
    {
     "lesson_id": "highlight-rules",
-    "goal_index": "5",
-    "text": "Close Manage Rules with Enter, leaving the rule as it is.",
+    "goal_index": "6",
+    "text": "Close Manage Rules with Enter, leaving the rules as they are.",
     "teach": "",
     "why": "",
     "hint_stuck": "pulse range C27:E29 · Enter is OK."
    },
    {
     "lesson_id": "highlight-rules",
-    "goal_index": "6",
+    "goal_index": "7",
     "text": "Does it tie? Watch January’s retail revenue in Monthly!C7 rise to 2,300, the month reach 4,000, and its yellow clear.",
     "teach": "",
     "why": "",
@@ -5003,10 +5067,10 @@ export const COPY = {
    {
     "lesson_id": "formula-driven-rules",
     "goal_index": "4",
-    "text": "Open Manage Rules with Alt, H, L, R and read the three rules, the newest on top.",
+    "text": "Open Manage Rules with Alt, H, L, R and read the four rules, the newest on top.",
     "teach": "",
     "why": "",
-    "hint_stuck": "pulse range B7:E9 · The row rule, the checks rule, then the margin rule."
+    "hint_stuck": "pulse range B7:E9 · The row rule, the checks rule, Duplicate Values, then the margin rule."
    },
    {
     "lesson_id": "formula-driven-rules",
@@ -5079,7 +5143,7 @@ export const COPY = {
    {
     "lesson_id": "managing-rules",
     "goal_index": "0",
-    "text": "On the P&L, open Manage Rules with Alt, H, L, R and read the three rules and the ranges they apply to.",
+    "text": "On the P&L, open Manage Rules with Alt, H, L, R and read the four rules and the ranges they apply to.",
     "teach": "",
     "why": "",
     "hint_stuck": "pulse range B7:E9 · The row rule from the last lesson sits on top."
@@ -5087,7 +5151,7 @@ export const COPY = {
    {
     "lesson_id": "managing-rules",
     "goal_index": "1",
-    "text": "Delete the row rule on B7:E9, now that no row carries a flag, and close the list with Enter.",
+    "text": "Delete the row rule on B7:E9, now that no row carries a flag.",
     "teach": "",
     "why": "",
     "hint_stuck": "pulse range B7:E9 · The first rule in the list is selected when it opens."
@@ -5095,6 +5159,14 @@ export const COPY = {
    {
     "lesson_id": "managing-rules",
     "goal_index": "2",
+    "text": "Select the duplicate-values rule on B7:B35 with ↓ and delete it, now that the labels are fixed; close the list with Enter.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range B7:B35 · Second in the list, under the checks rule."
+   },
+   {
+    "lesson_id": "managing-rules",
+    "goal_index": "3",
     "text": "Select the margins and growth C27:E30 and add the rule again: Less Than 0, Red Text.",
     "teach": "A rule written for C27:E29 misses the growth line under it. Add the same rule over C27:E30, and the old one becomes a duplicate to delete.",
     "why": "",
@@ -5102,7 +5174,7 @@ export const COPY = {
    },
    {
     "lesson_id": "managing-rules",
-    "goal_index": "3",
+    "goal_index": "4",
     "text": "In Manage Rules, select the old margin rule on C27:E29, third in the list, and delete it.",
     "teach": "",
     "why": "",
@@ -5110,7 +5182,7 @@ export const COPY = {
    },
    {
     "lesson_id": "managing-rules",
-    "goal_index": "4",
+    "goal_index": "5",
     "text": "Move the checks rule to the top with U, tick Stop If True with S, and press Enter.",
     "teach": "Rules run from the top. Move Up (U) puts the checks rule first, and Stop If True (S) means that where a check fires, nothing below it paints the cell.",
     "why": "",
@@ -5118,7 +5190,7 @@ export const COPY = {
    },
    {
     "lesson_id": "managing-rules",
-    "goal_index": "5",
+    "goal_index": "6",
     "text": "Does it tie? Watch total revenue in C10 typed over as 32000: the checks rule fires on C39, and nothing else does.",
     "teach": "",
     "why": "",
