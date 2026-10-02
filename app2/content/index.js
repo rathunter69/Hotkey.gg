@@ -222,6 +222,7 @@ import sort_and_decide from './lessons/sort-and-decide.js';
 import applying_precedents from './lessons/applying-precedents.js';
 import challenge_precedents from './lessons/challenge-precedents.js';
 import sources_and_uses from './lessons/sources-and-uses.js';
+import tranches_and_sweep from './lessons/tranches-and-sweep.js';
 
 export const CHAPTERS = [
   {
@@ -379,7 +380,7 @@ export const CHAPTERS = [
     ],
     lessons: [
       deal_multiples_premiums, sort_and_decide, applying_precedents, challenge_precedents,
-      sources_and_uses,
+      sources_and_uses, tranches_and_sweep,
     ],
   },
 ];

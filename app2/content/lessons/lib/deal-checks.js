@@ -84,6 +84,8 @@ export function typedAs(ses, name, refs, id) {
   const ref0 = cellsAt(id, name);
   return refs.every(ref => { const c = sh.cells[ref]; return !!c && !c.formula && c.value !== undefined && c.value !== null && c.value !== '' && close(c.value, ref0[ref].value); });
 }
+/** The typed cell a link reads: '=Inputs!$C$80' in state `id` at `ref` → 'Inputs!C80' (a liveness input is a typed cell, never a link). */
+export const sourceOf = (id, name, ref) => cellsAt(id, name)[ref].formula.slice(1).replace(/\$/g, '');
 /** The shared liveness rule: the cell moves when one of `inputs` ('Inputs!C43') moves. */
 export const liveVia = (ses, name, ref, inputs) => { const sh = sheetIn(ses, name); return !!sh && isLiveFormula(sh, ref, { inputs: [].concat(inputs) }); };
 
