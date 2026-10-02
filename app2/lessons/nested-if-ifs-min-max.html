@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 53: Nested IF, IFS, and MIN and MAX instead — Formulas and functions · hotkey.gg</title>
+<meta name="description" content="undefined">
+<meta name="generator" content="app2/tests/public-pages.js — generated from lesson data; do not edit by hand">
+<script>try{var v=JSON.parse(localStorage.getItem('hotkey_theme_vars'));if(v&&v.vars){var r=document.documentElement;for(var k in v.vars)r.style.setProperty('--'+k,v.vars[k]);r.setAttribute('data-dark',v.dark?'1':'0');}}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../ui/public.css">
+</head>
+<body>
+<nav class="top"><a class="brand" href="../index.html#/">hotkey<b>.gg</b></a><a href="../index.html#/learn">Learn</a><a href="../index.html#/practice">Practice</a><a href="../index.html#/leaderboard">Leaderboard</a><a href="../index.html#/reference">Reference</a></nav>
+<main>
+<div class="crumb"><a href="../index.html#/learn">Learn</a> › <a href="index.html">Formulas and functions</a> › Logic</div>
+<h1>Lesson 53: Nested IF, IFS, and MIN and MAX instead</h1>
+<div class="meta">Formulas and functions · Logic · medium · <span class="">Paid</span></div>
+<div class="card">
+<p style="margin:0">undefined</p>
+</div>
+<h2>What you will do</h2>
+<ol class="goals"><li><span class="muted">A manager earns a bonus for every day the site clears a tier: the more washes, the bigger the step, which is why the tests have to run from the top tier down.</span> Select the tier table J5:K8 on Summary: 250 washes earn $50 a day, 300 earn $100 and 350 earn $150.</li><li><span class="muted">A nested IF puts the next IF where the false answer goes, so the tests run from the top tier down and the last 0 is what is left.</span> Build the tower in I5, =IF(C5&gt;=350,150,IF(C5&gt;=300,100,IF(C5&gt;=250,50,0))), and fill it down to I10.</li><li>Open I5 with F2 and count the parentheses that close the tower, then Esc: that count is what a reviewer has to check.</li><li><span class="muted">IFS takes the tests in pairs, a test and its answer, and returns the answer beside the first test that holds; TRUE at the end catches everything left. Same answers as the tower, read top to bottom.</span> Replace the tower: with I5:I10 selected, type =IFS(C5&gt;=350,150,C5&gt;=300,100,C5&gt;=250,50,TRUE,0) and press Ctrl+Enter.</li><li><span class="muted">MAX(x,0) floors a figure at zero and MIN(x,150) caps it at 150, each in one call. When a test only floors or caps, MAX or MIN says it without an IF.</span> Floor the gap with MAX: select G5:G10 and rewrite it as =MAX(C5-D5,0) with Ctrl+Enter; the figures do not move.</li><li><span class="muted">When the test picks from a list of bands, IFS says it; when it only caps or floors, MIN or MAX does. In Chapter 4 a lookup on the tier table replaces both.</span> Head the column you kept: type Bonus ($/day) in I4.</li><li>Does it tie? Watch Domain’s washes in C5 rise to 360 and its bonus in I5 step up to $150.</li></ol>
+<div class="cta"><a class="btn" href="../index.html#/lesson/nested-if-ifs-min-max">Start this lesson</a><span class="path">Read → Guided → Try solo → Timed</span></div>
+
+<div class="prevnext"><span>← <a href="if-on-a-threshold.html">Lesson 52: IF on a threshold</a></span><span><a href="and-or-not.html">Lesson 54: AND, OR and NOT</a> →</span></div>
+</main>
+<footer><a href="../index.html#/pricing">Pricing</a><a href="../index.html#/teams">Teams</a><a href="../index.html#/about">About</a><a href="../index.html#/terms">Terms</a><a href="../index.html#/privacy">Privacy</a><a href="../index.html#/contact">Contact</a><span>© hotkey.gg</span></footer>
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 52: IF on a threshold — Formulas and functions · hotkey.gg</title>
+<meta name="description" content="undefined">
+<meta name="generator" content="app2/tests/public-pages.js — generated from lesson data; do not edit by hand">
+<script>try{var v=JSON.parse(localStorage.getItem('hotkey_theme_vars'));if(v&&v.vars){var r=document.documentElement;for(var k in v.vars)r.style.setProperty('--'+k,v.vars[k]);r.setAttribute('data-dark',v.dark?'1':'0');}}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../ui/public.css">
+</head>
+<body>
+<nav class="top"><a class="brand" href="../index.html#/">hotkey<b>.gg</b></a><a href="../index.html#/learn">Learn</a><a href="../index.html#/practice">Practice</a><a href="../index.html#/leaderboard">Leaderboard</a><a href="../index.html#/reference">Reference</a></nav>
+<main>
+<div class="crumb"><a href="../index.html#/learn">Learn</a> › <a href="index.html">Formulas and functions</a> › Logic</div>
+<h1>Lesson 52: IF on a threshold</h1>
+<div class="meta">Formulas and functions · Logic · medium · <span class="">Paid</span></div>
+<div class="card">
+<p style="margin:0">undefined</p>
+</div>
+<h2>What you will do</h2>
+<ol class="goals"><li><span class="muted">Column C links each site’s Sep 15 washes from the point-of-sale day totals, and column D its daily target from Sites, so the question sits on one row.</span> Select the Sep 15 washes and the targets, C5:D10, and read them side by side: Domain washed 262 cars against a target of 250.</li><li><span class="muted">IF(test, if true, if false) asks the question in its first part and returns the second part when it holds, the third when it does not. Words go in double quotes; numbers and references do not.</span> In E5, type =IF(C5&gt;=D5,&quot;On target&quot;,&quot;Below&quot;) and read Domain’s flag against its figures.</li><li>Fill E5 down to E10 with Ctrl+D: five sites read On target, and Cedar Park, which washed nothing on its first Monday, reads Below.</li><li><span class="muted">A flag in words reads well; a flag as 1 or 0 can be added up.</span> Make the flag a number the page can add: =IF(C5&gt;=D5,1,0) in F5, filled down to F10.</li><li><span class="muted">A flag column you can add up is a report: one SUM says how many sites cleared the bar.</span> Count the sites on target in F12, Sites on target, with =SUM(F5:F10).</li><li><span class="muted">The answers can be calculations too: when the site is on target, IF returns the washes above it, and 0 when it is not.</span> The flag can carry the gap instead: in G5, =IF(C5&gt;=D5,C5-D5,0) gives the washes above target; fill it down to G10.</li><li>Does it tie? Watch Mueller’s washes in C6 drop to 210, under its target of 220, and E6, F6, G6 and the count in F12 answer.</li></ol>
+<div class="cta"><a class="btn" href="../index.html#/lesson/if-on-a-threshold">Start this lesson</a><span class="path">Read → Guided → Try solo → Timed</span></div>
+
+<div class="prevnext"><span>← <a href="remix-format-on-the-pnl.html">Lesson 51: Remix: the team’s format on a site P&amp;L</a></span><span><a href="nested-if-ifs-min-max.html">Lesson 53: Nested IF, IFS, and MIN and MAX instead</a> →</span></div>
+</main>
+<footer><a href="../index.html#/pricing">Pricing</a><a href="../index.html#/teams">Teams</a><a href="../index.html#/about">About</a><a href="../index.html#/terms">Terms</a><a href="../index.html#/privacy">Privacy</a><a href="../index.html#/contact">Contact</a><span>© hotkey.gg</span></footer>
+</body>
+</html>

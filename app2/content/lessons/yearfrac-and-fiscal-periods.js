@@ -59,8 +59,8 @@ export default {
       text: 'On Sites, select the ages K5:K10, type =YEARFRAC(E5,$I$5) and press Ctrl+Enter to replace the /365.25.', keys: 'Ctrl+G "Sites!K5" ↵ Shift+↓ ×5 "=YEARFRAC(E5,$I$5)" Ctrl+↵', requires: ['yearfrac', 'relative-absolute', 'ctrl-enter-fill', 'go-to', 'shift-arrow'],
       hintStuck: 'pulse range Sites!K5:K10 · Age (years) is right of Age (days).',
       check: (s, ses) => { const sh = sites(ses); return settled(ses) && !!sh && ages(sh); } },
-    { id: 'stub', teach: 'A stub is a part year. The desk’s main use of YEARFRAC is the annual figure times YEARFRAC(start, period end): what a site opened in September can hold in its first year.',
-      text: 'Cedar Park opened on 9/8/2026, so its first year is a stub: in C15, =YEARFRAC(E10,DATE(2026,12,31)) reads 0.31 of a year.', keys: 'Ctrl+← Ctrl+↓ ×3 ↑ → "=YEARFRAC(E10,DATE(2026,12,31))" ↵', requires: ['yearfrac', 'date-function', 'ctrl-arrow', 'arrow-keys'],
+    { id: 'stub', teach: 'A stub is a part year. The desk’s main use of YEARFRAC is the annual figure times YEARFRAC(start, period end): what a site opened in September can hold in its opening year.',
+      text: 'Cedar Park opened on 9/8/2026, so 2026 is a stub year: in C15, =YEARFRAC(E10,DATE(2026,12,31)) reads 0.31 of a year.', keys: 'Ctrl+← Ctrl+↓ ×3 ↑ → "=YEARFRAC(E10,DATE(2026,12,31))" ↵', requires: ['yearfrac', 'date-function', 'ctrl-arrow', 'arrow-keys'],
       hintStuck: 'pulse cell C15 · The stub line sits under the holidays in the Calendar block.',
       check: (s, ses) => { const sh = sites(ses); return settled(ses) && !!sh && stub(sh); } },
     { id: 'fiscal-year', teach: 'A fiscal year is named for the calendar year it ends in. The buyer’s ends June 30, so a date from July on belongs to the next year: September 2026 is FY2027.',
@@ -79,7 +79,7 @@ export default {
       check: (s, ses) => ses.demoDone.has('tie') },
   ],
   endState: [
-    { text: 'Sites K5:K10 read each age with YEARFRAC, and C15 holds Cedar Park’s first-year stub', check: (s, ses) => { const sh = sites(ses); return !!sh && ages(sh) && stub(sh); } },
+    { text: 'Sites K5:K10 read each age with YEARFRAC, and C15 holds Cedar Park’s 2026 stub', check: (s, ses) => { const sh = sites(ses); return !!sh && ages(sh) && stub(sh); } },
     { text: 'Transactions L5:N94 give every row the buyer’s fiscal year, half and label', check: (s, ses) => { const sh = tx(ses); return !!sh && block(sh); } },
   ],
   closing: [
