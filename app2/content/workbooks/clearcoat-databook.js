@@ -18,6 +18,8 @@
 import { mulberry32 } from '../../engine/rng.js';
 import { dateToSerial } from '../../engine/format.js';
 import { buildPage, FMT } from './page.js';
+/** The chain test and the lesson checker read a session back through the shared diff (every Clearcoat workbook uses it). */
+export { diffStates, sessionToState } from './clearcoat-weekly.js';
 
 export const CHAPTER = 3;
 const D = (y, m, d) => dateToSerial(y, m, d);

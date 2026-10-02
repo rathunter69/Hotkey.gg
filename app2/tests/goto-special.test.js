@@ -70,6 +70,34 @@ test('the dialog: Alt H F D S picks a kind with K/O/F, Enter applies; HFDU/HFDN 
   s.run('Escape Escape Escape Escape Escape');
 });
 
+test('Constants and Formulas narrow by the four boxes: Numbers (U), Text (X), Logicals (G), Errors (E), as Excel has them', () => {
+  const s = new Session(new Sheet({ rows: 20, cols: 8, cells: {
+    A1: { value: 1240 }, A2: { value: '12' }, A3: { value: true }, A4: { formula: '=A1*2' }, A5: { formula: '="OK"' }, A6: { formula: '=1/0' }, A7: { value: 'Note' },
+  } }));
+  const S = s.sheet;
+  const only = k => ({ num: k === 'num', text: k === 'text', logical: k === 'logical', error: k === 'error' });
+  S.select('A1:A7'); assert.equal(S.selectSpecial('constants', only('num')), true);
+  assert.equal(S.selectionText(), 'A1', 'Numbers only: the typed number lights alone');
+  S.select('A1:A7'); assert.equal(S.selectSpecial('constants', only('text')), true);
+  assert.deepEqual(S.multi, ['A2', 'A7'], 'Text only: a number typed as text is text');
+  S.select('A1:A7'); assert.equal(S.selectSpecial('constants', only('logical')), true);
+  assert.equal(S.selectionText(), 'A3');
+  S.select('A1:A7'); assert.equal(S.selectSpecial('formulas', only('text')), true);
+  assert.equal(S.selectionText(), 'A5', 'Formulas, Text only: the formula that returns text');
+  S.select('A1:A7'); assert.equal(S.selectSpecial('formulas', only('error')), true);
+  assert.equal(S.selectionText(), 'A6');
+  S.select('A1:A7'); assert.equal(S.selectSpecial('formulas', only('logical')), false, 'no formula returns a logical: nothing found');
+  // the dialog: O for Constants, then X, G and E untick all but Numbers; Enter selects. The boxes start ticked.
+  S.select('A1:A7');
+  s.run('Alt H F D S O');
+  assert.deepEqual(s.dlg.types, { num: true, text: true, logical: true, error: true });
+  s.run('X G E Enter');
+  assert.equal(S.selectionText(), 'A1');
+  S.select('A1:A7');
+  s.run('Alt H F D S F U G E Enter');
+  assert.equal(S.selectionText(), 'A5', 'Formulas with Text only');
+});
+
 test('Go To opens Special with Alt+S', () => {
   const s = fresh(); const S = s.sheet;
   S.select('B2:B7');

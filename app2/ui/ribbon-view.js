@@ -413,6 +413,9 @@ export class RibbonView {
       R(d.pick === 'constants', 'letter:O', 'C<u>o</u>nstants', 'O') +
       R(d.pick === 'formulas', 'letter:F', '<u>F</u>ormulas', 'F') +
       R(d.pick === 'notes', 'letter:N', '<u>N</u>otes', 'N') +
+      // Constants and Formulas narrow to the kinds ticked here (Excel's four boxes under Formulas)
+      ((d.pick === 'constants' || d.pick === 'formulas') ? (() => { const t = d.types || { num: true, text: true, logical: true, error: true }, C = RibbonView.check;
+        return C(t.num !== false, 'letter:U', 'N<u>u</u>mbers', 'U') + C(t.text !== false, 'letter:X', 'Te<u>x</u>t', 'X') + C(t.logical !== false, 'letter:G', 'Lo<u>g</u>icals', 'G') + C(t.error !== false, 'letter:E', '<u>E</u>rrors', 'E'); })() : '') +
       (ss.note ? `<div class="wb-err">${esc(ss.note)}</div>` : '<div class="od-caplbl">within the selection (the region around the active cell when nothing is selected) · ↵ OK · esc cancel</div>');
   }
   gotoHtml() {

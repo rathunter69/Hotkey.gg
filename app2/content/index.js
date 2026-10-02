@@ -53,6 +53,8 @@ import units_in_the_format from './lessons/units-in-the-format.js';
 import dynamic_headers_with_text from './lessons/dynamic-headers-with-text.js';
 import conditional_codes_and_hidden_zeros from './lessons/conditional-codes-and-hidden-zeros.js';
 import challenge_house_format_set from './lessons/challenge-house-format-set.js';
+import pv_fv_pmt from './lessons/pv-fv-pmt.js';
+import npv_xnpv from './lessons/npv-xnpv.js';
 import remix_format_on_the_pnl from './remixes/formatting-on-the-pnl.js';   // Chapter 1's format challenge, re-clothed (content/remix.js)
 
 export const CHAPTERS = [
@@ -97,6 +99,24 @@ export const CHAPTERS = [
       built_in_formats_on_a_pnl, sign_convention_costs_negative, currency_and_percent_lines, dates_on_the_timeline, challenge_format_the_numbers,
       the_four_section_format, units_in_the_format, dynamic_headers_with_text, conditional_codes_and_hidden_zeros, challenge_house_format_set,
       remix_format_on_the_pnl,
+    ],
+  },
+  {
+    id: 'formulas',
+    title: 'Formulas',
+    access: 'paid',
+    blurb: 'The formulas a deal model is built from: logic, dates, aggregation, text, the time value of money and auditing, worked on the Clearcoat databook a buyer will read.',
+    sections: [
+      { name: 'Logic', blurb: 'IF, AND, OR and the error traps that keep a model honest.' },
+      { name: 'Dates', blurb: 'Real dates, month ends and the calendar a model runs on.' },
+      { name: 'Math and aggregation', blurb: 'Conditional sums and counts, rounding and SUMPRODUCT.' },
+      { name: 'Text', blurb: 'Cleaning and joining the text an export arrives with.' },
+      { name: 'Time value of money', blurb: 'PMT, PV and FV on the site loan, NPV and IRR on a new-site case, and the payment schedule.' },
+      { name: 'Auditing', blurb: 'Trace arrows, Evaluate Formula and F9, the hardcode and external link hunt, and a checks block that rolls up to one flag.' },
+      { name: 'Project and assessment', blurb: 'Build the San Antonio databook end to end, then prove it against the clock.' },
+    ],
+    lessons: [
+      pv_fv_pmt, npv_xnpv,
     ],
   },
 ];

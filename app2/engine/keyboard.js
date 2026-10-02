@@ -1055,10 +1055,13 @@ export class Session {
   openGoToSpecial() {
     this.startClock();
     this.openDialog('gotospecial', this.mode === 'ribbon' ? this.path : []);
-    this.dlg = { kind: 'gotospecial', pick: 'blanks' };
+    this.dlg = { kind: 'gotospecial', pick: 'blanks', types: { num: true, text: true, logical: true, error: true } };
   }
   gotoSpecialKey(key) {
     const d = this.dlg; if (!d) return;
+    // Constants and Formulas carry four boxes, all ticked, as Excel's dialog has them: Numbers (U), Text (X), Logicals (G), Errors (E)
+    const TYPE_KEY = { U: 'num', X: 'text', G: 'logical', E: 'error' };
+    if (TYPE_KEY[key]) { if (!d.types) d.types = { num: true, text: true, logical: true, error: true }; d.types[TYPE_KEY[key]] = !d.types[TYPE_KEY[key]]; return; }
     if (key === 'K') { d.pick = 'blanks'; return; }
     if (key === 'O') { d.pick = 'constants'; return; }
     if (key === 'F') { d.pick = 'formulas'; return; }
@@ -1072,9 +1075,9 @@ export class Session {
       return;
     }
     if (key === 'Enter') {
-      const pick = d.pick;
+      const pick = d.pick, types = d.types;
       this.exitRibbon(false);
-      if (!this.sheet.selectSpecial(pick)) { this.openGoToSpecial(); this.dlg.pick = pick; this.note = SPECIAL_NONE_NOTE; }
+      if (!this.sheet.selectSpecial(pick, types)) { this.openGoToSpecial(); this.dlg.pick = pick; if (types) this.dlg.types = types; this.note = SPECIAL_NONE_NOTE; }
     }
   }
 
