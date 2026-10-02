@@ -6908,7 +6908,10 @@ export const COPY = {
   "ref_board": "The keyboard",
   "ref_leg_open": "Not yet",
   "ref_leg_got": "Yours",
-  "save_line_ch1": "Chapter 1 is nearly done. A free account keeps your progress on any device and puts your name on the certificate."
+  "save_line_ch1": "Chapter 1 is nearly done. A free account keeps your progress on any device and puts your name on the certificate.",
+  "certificate_name": "hotkey.gg Certified",
+  "certificate_course": "Excel for Finance",
+  "certificate_progress": "{n} of 6 chapters Verified"
  },
  "micro": {
   "enter-tab-direction": {

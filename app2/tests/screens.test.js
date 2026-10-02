@@ -62,3 +62,14 @@ test('every site.csv row the screens read exists and is free of the tells', () =
   assert.deepEqual(missing, [], 'missing rows: ' + missing.join(', '));
   for (const k in COPY.site) for (const part of String(COPY.site[k]).split(/\s*\|\|\s*/)) assert.deepEqual(tells(part, { label: /_(next|skip|start|go|not_now|drill_it|see_pricing)$/.test(k) }), [], `${k}: "${part}"`);
 });
+
+test('every site.csv key a site page asks for by name is in the sheet (a page never shows a raw key)', async () => {
+  const { readFileSync } = await import('node:fs');
+  const files = ['ui/components/certificate.js', 'app/profile-page.js', 'app/practice-page.js', 'app/home-page.js', 'app/learn-page.js', 'app/settings-page.js', 'app/pricing-page.js', 'app/reference-page.js', 'ui/components/nudge.js', 'ui/components/signin-dialog.js', 'app/first-run.js', 'app/leaderboard-page.js', 'ui/components/path.js'];
+  const missing = [];
+  for (const f of files) {
+    const src = readFileSync(new URL('../' + f, import.meta.url), 'utf8');
+    for (const m of src.matchAll(/\b(?:t|siteCopy)\('([a-z0-9_]+[a-z0-9])'/g)) if (!(m[1] in COPY.site)) missing.push(f + ': ' + m[1]);
+  }
+  assert.deepEqual(missing, []);
+});
