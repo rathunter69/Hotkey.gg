@@ -31,7 +31,7 @@
 //     Quick Access Toolbar, page setup) are RECORDED by real-looking dialogs (Alt F T, Alt P S P):
 //     the dialog edits a draft (`dlg`), ↵ = OK writes it into `settings`, Esc = Cancel discards it
 
-import { Sheet, PAGE_SETUP_DEFAULT, FONT_SWATCHES, FILL_SWATCHES, CELL_STYLES, CF_STYLE_KEYS, CF_BAR_COLORS, CF_SCALES, cfOperand } from './sheet.js';
+import { Sheet, PAGE_SETUP_DEFAULT, TAB_COLORS, FONT_SWATCHES, FILL_SWATCHES, CELL_STYLES, CF_STYLE_KEYS, CF_BAR_COLORS, CF_SCALES, cfOperand } from './sheet.js';
 import { evalFormula, formulaRefs, translateFormula, parses, valueText, AUTOCOMPLETE_FUNCTIONS } from './formula.js';
 import { serialToDate } from './format.js';
 import { builtinCode } from './numfmt.js';
@@ -552,6 +552,13 @@ export class Session {
       if (k.toLowerCase() === 'n' && !e.ctrlKey) { this.logKey('N'); this.openNewCellStyle(); return true; }   // New Cell Style… under the gallery
       return true;
     }
+    if (this.dialog === 'tabcolor') {   // Format › Tab Color: ← → walk the palette, ↵ colours the tab (every grouped sheet's), N is No Color
+      if (k === 'ArrowLeft') { this.logKey('←'); cycle('tabColorIdx', TAB_COLORS.length, -1); return true; }
+      if (k === 'ArrowRight') { this.logKey('→'); cycle('tabColorIdx', TAB_COLORS.length, 1); return true; }
+      if (k === 'Enter') { this.logKey('↵'); this.setTabColor(TAB_COLORS[this.tabColorIdx].k); this.exitRibbon(false); return true; }
+      if (k.toLowerCase() === 'n') { this.logKey('N'); this.setTabColor(null); this.exitRibbon(false); return true; }
+      return true;
+    }
     if (this.dialog === 'fontcolor') {
       if (k === 'ArrowLeft') { this.logKey('←'); cycle('fontColorIdx', FONT_SWATCHES.length, -1); return true; }
       if (k === 'ArrowRight') { this.logKey('→'); cycle('fontColorIdx', FONT_SWATCHES.length, 1); return true; }
@@ -677,6 +684,7 @@ export class Session {
       case 'MP': this.exitRibbon(false); this.jumpPrecedent(); return;
       case 'MD': this.exitRibbon(false); this.jumpDependent(); return;
       case 'HFC': this.dialog = 'fontcolor'; this.fontColorIdx = 0; return;
+      case 'HOT': this.dialog = 'tabcolor'; this.tabColorIdx = this.sheet.tabColor ? Math.max(0, TAB_COLORS.findIndex(t => t.k === this.sheet.tabColor)) : 0; return;   // Format › Tab Color
       case 'HFG': S.fontSize(1); return done();
       case 'HFK': S.fontSize(-1); return done();
       case 'HH': this.dialog = 'fillcolor'; this.fillColorIdx = 0; return;
@@ -843,6 +851,8 @@ export class Session {
     this.recalcAll();
   }
   /** Shift+F11: a new sheet before the active one, made active (Excel). */
+  /** Colour the active sheet's tab, or every grouped sheet's (null: No Color). */
+  setTabColor(k) { this.startClock(); const idx = this.group ? [...this.group] : [this.sheetIndex]; for (const i of idx) if (this.sheets[i]) this.sheets[i].sheet.tabColor = k || null; this.emit('sheets'); }
   insertSheet() { const i = this.addSheet(undefined, undefined, this.sheetIndex); this.switchSheet(i); return i; }
   /** Whether sheet `i` (the active one by default) holds anything: a value, a formula or a format on any cell. Excel asks before deleting such a sheet. */
   sheetHasContent(i) {

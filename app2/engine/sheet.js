@@ -68,6 +68,12 @@ export const FILL_SWATCHES = [
   { k: 'yellow', hex: '#ffe699', name: 'Yellow (flag)' }, { k: 'green', hex: '#c6e0b4', name: 'Green' },
   { k: 'red', hex: '#f2b8b8', name: 'Red' }, { k: null, hex: 'transparent', name: 'No fill' },
 ];
+/** Format › Tab Color (Alt H O T): the palette's standard colours, then No Color. */
+export const TAB_COLORS = [
+  { k: 'darkred', hex: '#c00000', name: 'Dark Red' }, { k: 'red', hex: '#ff0000', name: 'Red' }, { k: 'orange', hex: '#ffc000', name: 'Orange' }, { k: 'yellow', hex: '#ffff00', name: 'Yellow' },
+  { k: 'lightgreen', hex: '#92d050', name: 'Light Green' }, { k: 'green', hex: '#00b050', name: 'Green' }, { k: 'lightblue', hex: '#00b0f0', name: 'Light Blue' }, { k: 'blue', hex: '#0070c0', name: 'Blue' },
+  { k: 'darkblue', hex: '#002060', name: 'Dark Blue' }, { k: 'purple', hex: '#7030a0', name: 'Purple' }, { k: null, hex: 'transparent', name: 'No Color' },
+];
 export const CELL_STYLES = [
   { k: 'normal', name: 'Normal', apply: c => { const v = c.value, f = c.formula, t = c.txt; for (const k in c) delete c[k]; Object.assign(c, blankCell()); c.value = v; c.formula = f; c.txt = t; } },
   { k: 'input', name: 'Input', apply: c => { c.fontColor = 'blue'; } },
@@ -355,6 +361,7 @@ export class Sheet {
     this.dataTables = null;                // What-If data tables (Alt A W T): [{ r1, c1, r2, c2, row, col }]
     this.pageSetup = clone(PAGE_SETUP_DEFAULT);   // Page Setup (Alt P S P), the print area (Alt P R S, pageSetup.printArea), the custom header and footer
     this.breaks = { rows: [], cols: [] };  // manual page breaks (Alt P B I): a break above each listed row / left of each listed column
+    this.tabColor = null;                  // Format › Tab Color (Alt H O T): a TAB_COLORS key, or null
     this.view = 'normal';                  // the sheet's view: 'normal' (Alt W L), 'pagebreak' (Page Break Preview, Alt W I), 'layout' (Page Layout, Alt W P)
     this.validation = null;                // Data Validation rules by cell key: { allow, data, min, max, source, inCell, ignoreBlank, errTitle, errMsg, errStyle, inTitle, inMsg }
     this.freeze = { r: 0, c: 0 };          // rows/cols frozen above/left of the seam (0 = none)
@@ -385,6 +392,7 @@ export class Sheet {
     if (opts.pageSetup && typeof opts.pageSetup === 'object') this.pageSetup = { ...clone(PAGE_SETUP_DEFAULT), ...clone(opts.pageSetup) };
     if (opts.breaks) this.breaks = { rows: [...new Set((opts.breaks.rows || []).map(n => n | 0).filter(n => n > 1))].sort((a, b) => a - b), cols: [...new Set((opts.breaks.cols || []).map(n => n | 0).filter(n => n > 1))].sort((a, b) => a - b) };
     if (opts.view === 'pagebreak' || opts.view === 'layout') this.view = opts.view;
+    if (opts.tabColor && TAB_COLORS.some(t => t.k === opts.tabColor)) this.tabColor = opts.tabColor;
     if (Array.isArray(opts.dataTables)) this.dataTables = clone(opts.dataTables);   // What-If data tables: [{ r1, c1, r2, c2, row, col }] (the input cells' keys)
     if (opts.active) this.active = this.clamp(opts.active.r, opts.active.c);
     this.recalc();
@@ -1787,6 +1795,7 @@ export class Sheet {
     if (JSON.stringify(this.pageSetup) !== JSON.stringify(PAGE_SETUP_DEFAULT)) out.pageSetup = clone(this.pageSetup);
     if (this.breaks.rows.length || this.breaks.cols.length) out.breaks = clone(this.breaks);
     if (this.view !== 'normal') out.view = this.view;
+    if (this.tabColor) out.tabColor = this.tabColor;
     return out;
   }
 }

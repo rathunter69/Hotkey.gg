@@ -21,7 +21,7 @@ export const MENUS = {
   'HE': [['A', 'Clear all'], ['F', 'Clear formats'], ['C', 'Clear contents'], ['M', 'Clear comments and notes']],
   'HI': [['R', 'Insert rows'], ['C', 'Insert columns'], ['S', 'Insert sheet']],
   'HD': [['R', 'Delete rows'], ['C', 'Delete columns'], ['S', 'Delete sheet']],
-  'HO': [['H', 'Row height…'], ['A', 'Autofit height'], ['W', 'Column width…'], ['I', 'Autofit width'], ['U', 'Hide & Unhide'], ['R', 'Rename sheet'], ['M', 'Move or copy sheet…'], ['E', 'Format cells…']],   // Excel's Format menu: sizes, visibility, the sheet items, E last
+  'HO': [['H', 'Row height…'], ['A', 'Autofit height'], ['W', 'Column width…'], ['I', 'Autofit width'], ['U', 'Hide & Unhide'], ['R', 'Rename sheet'], ['M', 'Move or copy sheet…'], ['T', 'Tab Color'], ['E', 'Format cells…']],   // Excel's Format menu: sizes, visibility, the sheet items, E last
   'HOU': [['R', 'Hide Rows'], ['C', 'Hide Columns'], ['O', 'Unhide Rows'], ['L', 'Unhide Columns']],
   'HB': [['O', 'Bottom'], ['P', 'Top'], ['L', 'Left'], ['R', 'Right'], ['N', 'No border'], ['A', 'All'], ['S', 'Outside'], ['T', 'Thick box'], ['B', 'Double bottom'], ['D', 'Top & bottom']],
   'HU': [['S', 'Sum']],
@@ -184,7 +184,7 @@ export const COMMANDS = {
   'HBA': 'All borders', 'HBS': 'Outside borders', 'HBT': 'Thick outside borders', 'HBB': 'Double bottom border', 'HBD': 'Top and bottom border',
   'HFC': 'Font color', 'HFG': 'Increase font size', 'HFK': 'Decrease font size', 'HFIS': 'Series…', 'HFID': 'Fill down', 'HFIR': 'Fill right',
   'HH': 'Fill color', 'HJ': 'Cell styles', 'HIR': 'Insert sheet rows', 'HIC': 'Insert sheet columns', 'HDR': 'Delete sheet rows', 'HDC': 'Delete sheet columns',
-  'HIS': 'Insert sheet', 'HDS': 'Delete sheet', 'HOR': 'Rename sheet', 'HOM': 'Move or copy sheet…',
+  'HIS': 'Insert sheet', 'HDS': 'Delete sheet', 'HOR': 'Rename sheet', 'HOT': 'Tab Color', 'HOM': 'Move or copy sheet…',
   'HOI': 'AutoFit column width', 'HOA': 'AutoFit row height', 'HOW': 'Column width…', 'HOE': 'Format cells…', 'OE': 'Format cells…',
   'HEA': 'Clear all', 'HEF': 'Clear formats', 'HEC': 'Clear contents', 'HUS': 'AutoSum', 'MUS': 'AutoSum', 'MP': 'Trace precedents', 'MD': 'Trace dependents',
   'HVV': 'Paste values', 'HVS': 'Paste special…', 'ES': 'Paste special…', 'ASA': 'Sort A to Z', 'ASD': 'Sort Z to A', 'WVG': 'Gridlines', 'WG': 'Gridlines',

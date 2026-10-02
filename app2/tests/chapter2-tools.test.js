@@ -78,3 +78,14 @@ test('Page Setup belongs to each sheet: a print area (Alt P R S), a custom heade
   const back = new Sheet(JSON.parse(JSON.stringify(S.toJSON()))); assert.equal(back.pageSetup.printArea, '$A$1:$F$80'); assert.equal(back.view, 'pagebreak'); assert.deepEqual(back.breaks.rows, [41]);
   s.run('Alt P R C'); assert.equal(S.pageSetup.printArea, undefined); s.run('Alt W L'); assert.equal(S.view, 'normal');
 });
+
+test('Format › Tab Color (Alt H O T): the palette walks with the arrows, Enter colours the tab, N is No Color; grouped sheets all take it; it survives toJSON', async () => {
+  const { TAB_COLORS } = await import('../engine/sheet.js');
+  const s = fresh({}); s.addSheet('Inputs'); s.addSheet('IS');
+  s.run('Alt H O T'); assert.equal(s.dialog, 'tabcolor'); s.run('Right Right Enter');
+  assert.equal(s.sheet.tabColor, TAB_COLORS[2].k); assert.equal(s.mode, 'normal');
+  s.run('Ctrl+Shift+PageDown Ctrl+Shift+PageDown Alt H O T Right Right Right Right Right Enter');
+  assert.deepEqual(s.sheets.map(e => e.sheet.tabColor), ['green', 'green', 'green'], 'every grouped sheet');
+  s.run('Alt H O T N'); assert.equal(s.sheet.tabColor, null);
+  s.sheets[1].sheet.tabColor = 'blue'; const back = new Sheet(JSON.parse(JSON.stringify(s.sheets[1].sheet.toJSON()))); assert.equal(back.tabColor, 'blue');
+});

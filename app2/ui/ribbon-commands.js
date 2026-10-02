@@ -225,6 +225,7 @@ export const RIBBON_COMMANDS = {
   'H3': C('Underline', 'Font', 'H', ICON.underline, direct(S => S.toggleAllOrNone('uline')), 'Ctrl+U'),
   'HFG': C('Increase font size', 'Font', 'H', ICON.fontGrow, direct(S => S.fontSize(1))),
   'HFK': C('Decrease font size', 'Font', 'H', ICON.fontShrink, direct(S => S.fontSize(-1))),
+  'HOT': C('Tab Color', 'Cells', 'H', ICON.renameSheet, dialog('tabcolor', s => { s.tabColorIdx = 0; })),
   'HFC': C('Font color', 'Font', 'H', ICON.fontColor, dialog('fontcolor', s => { s.fontColorIdx = 0; })),
   'HH': C('Fill color', 'Font', 'H', ICON.fill, dialog('fillcolor', s => { s.fillColorIdx = 0; })),
   'HBO': C('Bottom border', 'Font', 'H', ICON.borderBottom, direct(S => S.border('bottom'))),
