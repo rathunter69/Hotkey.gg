@@ -988,6 +988,8 @@ const SITE_BLOCKS = { is: ['rev', 'ni'], accrual: ['cashIn1', 'cfoHand'], cf: ['
 const stripSite = (state, name, blocks) => { for (const b of blocks) strip(state, name, span(name, ...SITE_BLOCKS[b])); };
 const onlyPages = (state, names) => { state.sheets = state.sheets.filter(s => names.includes(s.name)); delete state.names; };
 
+// B518: after 5.1.7, the two pages by hand complete (5.2.1 opens the model itself)
+const B518 = derive(DONE, s => { onlyPages(s, ['One site', 'One week']); });
 // B517: before 5.1.7, One site has everything but the ratios; One week is done
 const B517 = derive(DONE, s => { onlyPages(s, ['One site', 'One week']); stripSite(s, 'One site', ['ratios']); });
 // B516: before 5.1.6, One week holds the events and the opening balance sheet only
@@ -1243,7 +1245,7 @@ const B5A = derive(DONE, s => {
 });
 
 const BUILDERS = {
-  B511, B512, B513, B514, B515, B516, B517, B51C,
+  B511, B512, B513, B514, B515, B516, B517, B518, B51C,
   B521, B522, B523, B524, B525, B526, B52C,
   B531, B532, B533, B534, B535, B536, B53C,
   B541, B542, B543, B544, B545: B545broken, B54C,
@@ -1257,7 +1259,7 @@ for (const id in BUILDERS) Object.defineProperty(STATES, id, { get: BUILDERS[id]
 export const STATE_ORDER = Object.keys(BUILDERS);
 /** Which lesson each state starts (the state after a lesson is the next lesson's start; DONE closes every module). */
 export const STATE_LESSONS = {
-  B511: '5.1.1', B512: '5.1.2', B513: '5.1.3', B514: '5.1.4', B515: '5.1.5', B516: '5.1.6', B517: '5.1.7', B51C: '5.1.C',
+  B511: '5.1.1', B512: '5.1.2', B513: '5.1.3', B514: '5.1.4', B515: '5.1.5', B516: '5.1.6', B517: '5.1.7', B518: 'after 5.1.7', B51C: '5.1.C',
   B521: '5.2.1', B522: '5.2.2', B523: '5.2.3', B524: '5.2.4', B525: '5.2.5', B526: '5.2.6', B52C: '5.2.C',
   B531: '5.3.1', B532: '5.3.2', B533: '5.3.3', B534: '5.3.4', B535: '5.3.5', B536: '5.3.6', B53C: '5.3.C',
   B541: '5.4.1', B542: '5.4.2', B543: '5.4.3', B544: '5.4.4', B545: '5.4.5', B54C: '5.4.C',

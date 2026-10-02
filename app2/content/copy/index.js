@@ -1899,6 +1899,18 @@ export const COPY = {
    "mac_note": "",
    "story_beat": ""
   },
+  "one-week-three-statements": {
+   "id": "one-week-three-statements",
+   "module": "the-three-statements",
+   "order": "5.1.6",
+   "title": "One week of one site through all three statements",
+   "brief": "Now the whole thing by hand, small enough to hold in your head: Domain for one week, 1,750 washes, one chemical delivery on credit, one payroll, one loan payment, one week of wear, with the balance sheet it opened on. Every event lands in at least two statements, and the balance check at the end says whether you placed each one right. It is the exercise every modeling course runs, and the one a buyer’s analyst will ask you to talk through. The key is `=`.",
+   "closing": "One week’s six events went through three statements, and the check reads zero. || The week earned $9,585 and added $15,940 to the bank, and you can say where every dollar of the gap went: depreciation, the unpaid delivery, the unpaid tax, the receivable and the principal. That walk is the one a buyer’s analyst asks for, and now you can talk it through.",
+   "wow": "Six events through three statements, two answers for cash, and both checks read zero.",
+   "convention_line": "The check is a live difference → 0; Cash balances the sheet; nothing is forced",
+   "mac_note": "",
+   "story_beat": ""
+  },
   "remix-format-on-the-pnl": {
    "id": "remix-format-on-the-pnl",
    "module": "remixes",
@@ -12005,6 +12017,72 @@ export const COPY = {
     "teach": "",
     "why": "",
     "hint_stuck": "pulse cell C91 · Net income falls, so equity and cash fall by the same story."
+   }
+  ],
+  "one-week-three-statements": [
+   {
+    "lesson_id": "one-week-three-statements",
+    "goal_index": "0",
+    "text": "On One week, the income statement from C30: revenue =C6*C7, the delivery =-C8, payroll =-C10, and EBITDA =SUM(C30:C32).",
+    "teach": "Every event lands in at least two statements. The washes are revenue on the income statement and cash or a receivable on the balance sheet; the delivery is a cost now and a payable until it is paid; the payroll is a cost and cash out.",
+    "why": "",
+    "hint_stuck": "pulse range C30:C33 · The week’s events are the inputs in C6:C16."
+   },
+   {
+    "lesson_id": "one-week-three-statements",
+    "goal_index": "1",
+    "text": "Down to net income: depreciation =-C14, interest =-C12, EBT =C33+C34+C35, tax =-MAX(C36,0)*C16, net income =C36+C37.",
+    "teach": "The loan payment is two events in one: the interest is a cost on the income statement, the principal only moves cash and debt. Tax is accrued this week and paid later, so it is a cost now and a payable on the balance sheet.",
+    "why": "",
+    "hint_stuck": "pulse range C34:C38 · Only the interest part of the payment, C12, is a cost."
+   },
+   {
+    "lesson_id": "one-week-three-statements",
+    "goal_index": "2",
+    "text": "Cash from operations from C41: =C38, =C14, =-(C30/7*C15-C20), =C8-C23, =-C37-C24, and the SUM in C46.",
+    "teach": "Operations walks from net income to cash: depreciation back, the receivable that grew, the delivery still unpaid, and the tax not yet paid.",
+    "why": "",
+    "hint_stuck": "pulse range C41:C46 · The receivable is three days of the week’s revenue, less the one it opened with in C20."
+   },
+   {
+    "lesson_id": "one-week-three-statements",
+    "goal_index": "3",
+    "text": "The principal repaid =-C13, financing =C47, net change =C46+C48, opening cash =C19, closing cash =C50+C49 in C51.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C47:C51 · The principal, C13, is the only financing event."
+   },
+   {
+    "lesson_id": "one-week-three-statements",
+    "goal_index": "4",
+    "text": "The closing balance sheet from C54: cash =C51, receivables =C30/7*C15, PP&E =C21-C14, total assets =SUM(C54:C56).",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C54:C57 · PP&E opened at C21 and wore by a week of depreciation."
+   },
+   {
+    "lesson_id": "one-week-three-statements",
+    "goal_index": "5",
+    "text": "Payables =C23+C8, tax payable =C24-C37, the loan =C25-C13, equity =C26+C38, their SUM in C62, and the check =ROUND(C57-C62,2).",
+    "teach": "Best practice: an event that touches cash touches the cash flow, one that changes what is owned or owed touches the balance sheet, and one that is earned or incurred touches the income statement; most touch two. When the check leaves zero, find the event you put in one statement and not the other.",
+    "why": "",
+    "hint_stuck": "pulse range C58:C63 · Each closing balance is its opening line plus the week’s event."
+   },
+   {
+    "lesson_id": "one-week-three-statements",
+    "goal_index": "6",
+    "text": "Count the week’s cash from C66: =C30+C43, =-C10, =-C11, the SUM in C69, and =ROUND(C69-C49,2) against the statement.",
+    "teach": "A second answer for cash: count what actually moved, the washes collected, the payroll and the loan payment. The delivery isn’t in the count because it is on credit, and neither is the tax because it is unpaid; if the count agrees with the statement, both are right.",
+    "why": "",
+    "hint_stuck": "pulse range C66:C70 · Washes collected are revenue less the rise in receivables from C43."
+   },
+   {
+    "lesson_id": "one-week-three-statements",
+    "goal_index": "7",
+    "text": "Does it tie? Watch one more wash go into C6: it flows through revenue, net income, cash and equity, and both checks stay at zero.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C63 · One wash is $13.90 of revenue, part of it still in receivables."
    }
   ]
  },
