@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Lesson 110: The hardcode and external-link hunt — Formulas and functions · hotkey.gg</title>
-<meta name="description" content="undefined">
+<meta name="description" content="Two things travel badly: a number typed inside a formula, and a link to another workbook, which breaks the day the file is moved and shows a path nobody can follow. Data › Edit Links (Alt, A, K) lists every outside workbook a file reads, and Find for a bracket shows which cell reads it. The old Summary has one of each. Find them and bring both inside. The key is Alt A K.">
 <meta name="generator" content="app2/tests/public-pages.js — generated from lesson data; do not edit by hand">
 <script>try{var v=JSON.parse(localStorage.getItem('hotkey_theme_vars'));if(v&&v.vars){var r=document.documentElement;for(var k in v.vars)r.style.setProperty('--'+k,v.vars[k]);r.setAttribute('data-dark',v.dark?'1':'0');}}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,7 +19,7 @@
 <h1>Lesson 110: The hardcode and external-link hunt</h1>
 <div class="meta">Formulas and functions · Auditing · medium · <span class="">Paid</span></div>
 <div class="card">
-<p style="margin:0">undefined</p>
+<p style="margin:0">Two things travel badly: a number typed inside a formula, and a link to another workbook, which breaks the day the file is moved and shows a path nobody can follow. Data › Edit Links (Alt, A, K) lists every outside workbook a file reads, and Find for a bracket shows which cell reads it. The old Summary has one of each. Find them and bring both inside. The key is <kbd>Alt A K</kbd>.</p>
 </div>
 <h2>What you will do</h2>
 <ol class="goals"><li><span class="muted">A stray link like this is born when someone types =, switches to another open file (Ctrl+Tab cycles the open workbooks, even with a formula open) and points. Edit Links shows the file it reads, and #REF! is what a reader sees once that file has moved.</span> Open Data › Edit Links with Alt A K and read the one external link: last year’s databook, Databook FY25.xlsx.</li><li><span class="muted">An external reference always starts with the file name in square brackets, so Find for [ lands on it. The same search finds what reads a sheet: before deleting a tab, Find its name with Within set to Workbook and Look in to Formulas, Find All, and repoint every cell in the list.</span> Close it, then find the cell that carries the link with Ctrl+F for [ and close Find.</li><li><span class="muted">A figure from outside the file becomes an input: typed, blue, and documented, with the source in the next cell so a reader can check it.</span> Type the 710 the link fetched into C73, its source Databook FY25, Summary F21 in D73, and make both blue.</li><li>Press Alt A K again: with no cell reading it, the link has gone and Excel says the workbook has no links.</li><li>Move the 1.05 out of the formulas: label B75 Price uplift (x), type 1.05 blue in C75, two decimals with the separator and (1,234).</li><li><span class="muted">Replace inside the selection rewrites every formula at once: 1.05 becomes $C$75, anchored, so each row reads the same input.</span> Select E66:E71 and replace 1.05 with $C$75, so all six new-price formulas read the input.</li><li>Does it tie? Watch the uplift in C75 change to 1.08 and the whole new-price column answer.</li></ol>

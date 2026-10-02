@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Lesson 89: NETWORKDAYS and WEEKDAY: the trading calendar — Formulas and functions · hotkey.gg</title>
-<meta name="description" content="undefined">
+<meta name="description" content="A car wash trades seven days a week but its office doesn’t, and a buyer’s washes per trading day means calendar days less the days a site was shut. WEEKDAY says which day of the week a date is; NETWORKDAYS counts the working days between two dates and takes a list of holidays; NETWORKDAYS.INTL lets you say which days are the weekend. Build the trading calendar for the fortnight. The key is NETWORKDAYS.">
 <meta name="generator" content="app2/tests/public-pages.js — generated from lesson data; do not edit by hand">
 <script>try{var v=JSON.parse(localStorage.getItem('hotkey_theme_vars'));if(v&&v.vars){var r=document.documentElement;for(var k in v.vars)r.style.setProperty('--'+k,v.vars[k]);r.setAttribute('data-dark',v.dark?'1':'0');}}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,7 +19,7 @@
 <h1>Lesson 89: NETWORKDAYS and WEEKDAY: the trading calendar</h1>
 <div class="meta">Formulas and functions · Dates · medium · <span class="">Paid</span></div>
 <div class="card">
-<p style="margin:0">undefined</p>
+<p style="margin:0">A car wash trades seven days a week but its office doesn’t, and a buyer’s washes per trading day means calendar days less the days a site was shut. WEEKDAY says which day of the week a date is; NETWORKDAYS counts the working days between two dates and takes a list of holidays; NETWORKDAYS.INTL lets you say which days are the weekend. Build the trading calendar for the fortnight. The key is <kbd>NETWORKDAYS</kbd>.</p>
 </div>
 <h2>What you will do</h2>
 <ol class="goals"><li><span class="muted">TEXT with &quot;ddd&quot; writes the day’s short name, Tue; &quot;dddd&quot; writes it in full. WEEKDAY gives the number, which is what a test can compare.</span> On Transactions, O5 is =WEEKDAY(A5,2), Monday as 1, and P5 is =TEXT(A5,&quot;ddd&quot;), the day’s name; type both with Tab.</li><li>The weekend flag in Q5 is =IF(O5&gt;=6,1,0): Saturday and Sunday are 6 and 7.</li><li>Fill the three to the last row: Go To O94, widen to Q, Ctrl+Shift+↑ up to row 5 and Ctrl+D.</li><li><span class="muted">NETWORKDAYS(start, end, holidays) counts Monday to Friday between two dates, both ends included, less any date in the holiday list.</span> On Sites, select Q5:Q10 and enter =NETWORKDAYS(E5,$I$5,$C$13:$C$14) with Ctrl+Enter: working days since each site opened.</li><li><span class="muted">NETWORKDAYS.INTL takes a weekend as seven digits, Monday first, 1 for a day off. &quot;0000000&quot; has no weekend at all: a car wash trades every day but the holidays.</span> Trading days in R5:R10: select them and enter =NETWORKDAYS.INTL(E5,$I$5,&quot;0000000&quot;,$C$13:$C$14) with Ctrl+Enter.</li><li>On Summary, C62 counts the fortnight’s trading days: =NETWORKDAYS.INTL(C60,C61,&quot;0000000&quot;,Sites!$C$13:$C$14) reads 15.</li><li><span class="muted">The fortnight’s washes in O15:O20 are built in 3.3.3, so the per-day figure reads 0 until then, live and waiting.</span> Washes per trading day in P15:P20: select them, type =O15/$C$62 and press Ctrl+Enter.</li><li>Does it tie? Watch a holiday land on 9/21/2026 in Sites!C14: the fortnight’s trading days in C62 drop to 14.</li></ol>

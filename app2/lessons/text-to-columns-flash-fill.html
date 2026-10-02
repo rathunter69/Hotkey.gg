@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Lesson 101: Text to Columns and Flash Fill — Formulas and functions · hotkey.gg</title>
-<meta name="description" content="undefined">
+<meta name="description" content="When a whole column needs splitting once, a formula is more than the job needs. Text to Columns (Alt, A, E) splits by a delimiter, like the hyphen in AUS-DOM, or by a fixed width, in one pass; Flash Fill (Ctrl+E) watches you type the first result and fills the pattern down. Both write values, not formulas, so they are for a one-time clean, not a live model. Split a copy of the codes both ways. The key is Alt A E.">
 <meta name="generator" content="app2/tests/public-pages.js — generated from lesson data; do not edit by hand">
 <script>try{var v=JSON.parse(localStorage.getItem('hotkey_theme_vars'));if(v&&v.vars){var r=document.documentElement;for(var k in v.vars)r.style.setProperty('--'+k,v.vars[k]);r.setAttribute('data-dark',v.dark?'1':'0');}}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,7 +19,7 @@
 <h1>Lesson 101: Text to Columns and Flash Fill</h1>
 <div class="meta">Formulas and functions · Text · medium · <span class="">Paid</span></div>
 <div class="card">
-<p style="margin:0">undefined</p>
+<p style="margin:0">When a whole column needs splitting once, a formula is more than the job needs. Text to Columns (Alt, A, E) splits by a delimiter, like the hyphen in AUS-DOM, or by a fixed width, in one pass; Flash Fill (Ctrl+E) watches you type the first result and fills the pattern down. Both write values, not formulas, so they are for a one-time clean, not a live model. Split a copy of the codes both ways. The key is <kbd>Alt A E</kbd>.</p>
 </div>
 <h2>What you will do</h2>
 <ol class="goals"><li>Copy the codes in Transactions!B5:B94: the split happens on a copy, never on the export itself.</li><li><span class="muted">A scratch sheet holds a one-time job away from the model. Shift+F11 inserts it in front of the active sheet, so move it to the end, where a reader of the workbook never trips over it.</span> Insert a sheet with Shift+F11, name it Scratch, and move it to the end of the workbook.</li><li>Paste the codes into Scratch at A1.</li><li><span class="muted">Text to Columns is a three-step wizard: Delimited (Alt+D), then the delimiter (Other, Alt+O, and the hyphen), then where the pieces land (Destination, Alt+E) and Finish (Alt+F). The last step also sets each column’s type: set a code column to Text, or its leading zeros are lost. Read the preview first, because a delimiter inside a field over-splits it.</span> With A1:A90 selected, split the codes at the hyphen with Text to Columns, into B and C (Destination $B$1), so A keeps the code.</li><li>Go to C90 and read it: the last code split too, all ninety in one pass, and the formula bar shows a value.</li><li><span class="muted">Flash Fill reads the example you typed, finds where it came from in the row, and writes the same for every row below. It only rearranges characters already in the row, so a site’s name, which is not in the code, stays a lookup.</span> Flash Fill: type AIR in D1 beside AUS-AIR, then press Ctrl+E in D2, and the rest of the sites fill down.</li><li>Select D45 and read the formula bar: Flash Fill wrote a value, not a formula.</li><li>Does it tie? Watch the code in A1 change to SAT-ALA, and the split in B1:D1 stay exactly where it was.</li></ol>

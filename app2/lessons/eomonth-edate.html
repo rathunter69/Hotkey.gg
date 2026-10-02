@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Lesson 69: EOMONTH and EDATE for period ends — Formatting and presentation · hotkey.gg</title>
-<meta name="description" content="undefined">
+<meta name="description" content="A timeline is a chain: each period end is the last day of the month a step after the one before. EOMONTH(date, n) gives the last day of the month n months on; EDATE gives the same day n months on. Build Monthly’s twelve month ends from one typed date, and the P&amp;L’s year ends from the first, so rolling the page forward is one edit. The key is =.">
 <meta name="generator" content="app2/tests/public-pages.js — generated from lesson data; do not edit by hand">
 <script>try{var v=JSON.parse(localStorage.getItem('hotkey_theme_vars'));if(v&&v.vars){var r=document.documentElement;for(var k in v.vars)r.style.setProperty('--'+k,v.vars[k]);r.setAttribute('data-dark',v.dark?'1':'0');}}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,7 +19,7 @@
 <h1>Lesson 69: EOMONTH and EDATE for period ends</h1>
 <div class="meta">Formatting and presentation · Dates and text for presentation · medium · <span class="">Paid</span></div>
 <div class="card">
-<p style="margin:0">undefined</p>
+<p style="margin:0">A timeline is a chain: each period end is the last day of the month a step after the one before. EOMONTH(date, n) gives the last day of the month n months on; EDATE gives the same day n months on. Build Monthly’s twelve month ends from one typed date, and the P&amp;L’s year ends from the first, so rolling the page forward is one edit. The key is <kbd>=</kbd>.</p>
 </div>
 <h2>What you will do</h2>
 <ol class="goals"><li>Leave Monthly!C4 typed as 1/31/2026 and color it blue: it is the one date the chain starts from.</li><li><span class="muted">EOMONTH(date, n) is the last day of the month n months after the date, so =EOMONTH(C4,1) is the end of February whatever day January ended on.</span> In D4 enter =EOMONTH(C4,1) and read Feb-26, the month end after C4.</li><li>Fill D4 right to N4 with Ctrl+R: twelve month ends from one typed date.</li><li>On the P&amp;L, link C4 to the first fiscal year end with =Inputs!B6 and color it green.</li><li><span class="muted">Twelve months on is a year end. Type E4 rather than fill it: Ctrl+R would carry D4’s divider and its A code onto the estimate.</span> Enter =EOMONTH(C4,12) in D4, then Tab, and =EOMONTH(D4,12) in E4.</li><li><span class="muted">EDATE(date, n) is the same day n months on. A formula that returns a date can arrive as a bare serial, so give it a date code.</span> In Inputs!B18 enter =EDATE(B10,3), the as-of date plus three months, and give it the code m/d/yyyy.</li><li>Does it tie? Watch Inputs!B6 change to 12/31/2025, and the P&amp;L’s timeline in C4:E4 roll forward a year.</li></ol>

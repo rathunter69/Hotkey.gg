@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Lesson 80: IF on a threshold — Formulas and functions · hotkey.gg</title>
-<meta name="description" content="undefined">
+<meta name="description" content="The point-of-sale export logs one row per wash, and it is the only number a buyer trusts, because a machine wrote it. A site’s target is the washes it needs in a day to cover its site costs; below it, the site loses money that day. IF asks a question and gives one answer if it is true and another if it is false: =IF(C5&gt;=D5,&quot;On target&quot;,&quot;Below&quot;). Build the daily flag for every site on the Summary block. The key is IF.">
 <meta name="generator" content="app2/tests/public-pages.js — generated from lesson data; do not edit by hand">
 <script>try{var v=JSON.parse(localStorage.getItem('hotkey_theme_vars'));if(v&&v.vars){var r=document.documentElement;for(var k in v.vars)r.style.setProperty('--'+k,v.vars[k]);r.setAttribute('data-dark',v.dark?'1':'0');}}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,7 +19,7 @@
 <h1>Lesson 80: IF on a threshold</h1>
 <div class="meta">Formulas and functions · Logic · medium · <span class="">Paid</span></div>
 <div class="card">
-<p style="margin:0">undefined</p>
+<p style="margin:0">The point-of-sale export logs one row per wash, and it is the only number a buyer trusts, because a machine wrote it. A site’s target is the washes it needs in a day to cover its site costs; below it, the site loses money that day. IF asks a question and gives one answer if it is true and another if it is false: =IF(C5&gt;=D5,&quot;On target&quot;,&quot;Below&quot;). Build the daily flag for every site on the Summary block. The key is <kbd>IF</kbd>.</p>
 </div>
 <h2>What you will do</h2>
 <ol class="goals"><li><span class="muted">Column C links each site’s Sep 15 washes from the point-of-sale day totals, and column D its daily target from Sites, so the question sits on one row.</span> Select the Sep 15 washes and the targets, C5:D10, and read them side by side: Domain washed 262 cars against a target of 250.</li><li><span class="muted">IF(test, if true, if false) asks the question in its first part and returns the second part when it holds, the third when it does not. Words go in double quotes; numbers and references do not.</span> In E5, type =IF(C5&gt;=D5,&quot;On target&quot;,&quot;Below&quot;) and read Domain’s flag against its figures.</li><li>Fill E5 down to E10 with Ctrl+D: five sites read On target, and Cedar Park, which washed nothing on its first Monday, reads Below.</li><li><span class="muted">A flag in words reads well; a flag as 1 or 0 can be added up.</span> Make the flag a number the page can add: =IF(C5&gt;=D5,1,0) in F5, filled down to F10.</li><li><span class="muted">A flag column you can add up is a report: one SUM says how many sites cleared the bar.</span> Count the sites on target in F12, Sites on target, with =SUM(F5:F10).</li><li><span class="muted">The answers can be calculations too: when the site is on target, IF returns the washes above it, and 0 when it is not.</span> The flag can carry the gap instead: in G5, =IF(C5&gt;=D5,C5-D5,0) gives the washes above target; fill it down to G10.</li><li>Does it tie? Watch Mueller’s washes in C6 drop to 210, under its target of 220, and E6, F6, G6 and the count in F12 answer.</li></ol>

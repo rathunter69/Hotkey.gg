@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Lesson 94: MAXIFS, MINIFS, LARGE, SMALL and RANK — Formulas and functions · hotkey.gg</title>
-<meta name="description" content="undefined">
+<meta name="description" content="&quot;Which site was busiest, and on which day?&quot; MAXIFS finds the biggest value that meets a condition and MINIFS the smallest; LARGE and SMALL find the nth biggest or smallest in a range; RANK places every site in order. Together they turn the site block into a league table without sorting anything, which matters because the block has to stay where every link expects it. The key is LARGE.">
 <meta name="generator" content="app2/tests/public-pages.js — generated from lesson data; do not edit by hand">
 <script>try{var v=JSON.parse(localStorage.getItem('hotkey_theme_vars'));if(v&&v.vars){var r=document.documentElement;for(var k in v.vars)r.style.setProperty('--'+k,v.vars[k]);r.setAttribute('data-dark',v.dark?'1':'0');}}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,7 +19,7 @@
 <h1>Lesson 94: MAXIFS, MINIFS, LARGE, SMALL and RANK</h1>
 <div class="meta">Formulas and functions · Math and aggregation · medium · <span class="">Paid</span></div>
 <div class="card">
-<p style="margin:0">undefined</p>
+<p style="margin:0">&quot;Which site was busiest, and on which day?&quot; MAXIFS finds the biggest value that meets a condition and MINIFS the smallest; LARGE and SMALL find the nth biggest or smallest in a range; RANK places every site in order. Together they turn the site block into a league table without sorting anything, which matters because the block has to stay where every link expects it. The key is <kbd>LARGE</kbd>.</p>
 </div>
 <h2>What you will do</h2>
 <ol class="goals"><li><span class="muted">LARGE(array, k) returns the kth biggest value in the range, so k of 1, 2 and 3 is a top three that rereads itself whenever a count moves. SMALL counts up from the smallest the same way. Anchor the range, since every line reads the same six sites.</span> The top three site totals in J15:J17: =LARGE($C$15:$C$20,1), then 2, then 3.</li><li>And the bottom one under them in J18: =SMALL($C$15:$C$20,1).</li><li><span class="muted">RANK(number, ref) gives a value’s place in the list, 1 for the biggest, and ties share a place. Read the order off K without sorting the block.</span> Rank Domain in K15: =RANK(C15,$C$15:$C$20).</li><li>Rank every site in K15:K20: the same RANK with Ctrl+Enter, and read the league table down K.</li><li><span class="muted">MAXIFS(max_range, criteria_range, criteria) returns the largest value on the rows that meet the criteria, the same pairs COUNTIFS takes, and MINIFS the smallest. Daily holds one row per site per day, so the site’s code finds its busiest day.</span> Each site’s busiest day in H15:H20: =MAXIFS(Daily!$D$5:$D$94,Daily!$B$5:$B$94,B15) with Ctrl+Enter.</li><li>Each site’s quietest day in I15:I20, the same pairs with MINIFS.</li><li>Does it tie? Watch Airport’s washes in C19 change to 25, and its rank in K19 and the top three in J15:J17 reorder.</li></ol>

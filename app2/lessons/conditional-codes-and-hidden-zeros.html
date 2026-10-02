@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Lesson 49: Conditional codes and hidden zeros — Formatting and presentation · hotkey.gg</title>
-<meta name="description" content="undefined">
+<meta name="description" content="A format section can carry a color and a condition: [Red] paints a negative, [&lt;1000] applies a code only to small values, and an empty section hides a value altogether. Three semicolons and a cell shows nothing while still holding its number. Use them sparingly; the page’s conventions do most of the talking. Here the checks paint a negative red, the washes pick their code by size, and the flags hide and come back. The key is Ctrl+1.">
 <meta name="generator" content="app2/tests/public-pages.js — generated from lesson data; do not edit by hand">
 <script>try{var v=JSON.parse(localStorage.getItem('hotkey_theme_vars'));if(v&&v.vars){var r=document.documentElement;for(var k in v.vars)r.style.setProperty('--'+k,v.vars[k]);r.setAttribute('data-dark',v.dark?'1':'0');}}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,7 +19,7 @@
 <h1>Lesson 49: Conditional codes and hidden zeros</h1>
 <div class="meta">Formatting and presentation · Custom number formats · medium · <span class="">Paid</span></div>
 <div class="card">
-<p style="margin:0">undefined</p>
+<p style="margin:0">A format section can carry a color and a condition: [Red] paints a negative, [&lt;1000] applies a code only to small values, and an empty section hides a value altogether. Three semicolons and a cell shows nothing while still holding its number. Use them sparingly; the page’s conventions do most of the talking. Here the checks paint a negative red, the washes pick their code by size, and the flags hide and come back. The key is <kbd>Ctrl+1</kbd>.</p>
 </div>
 <h2>What you will do</h2>
 <ol class="goals"><li><span class="muted">A section can open with a color or a condition: [Red] paints that section’s values red, and [&lt;1000] uses a section only for values under 1,000.</span> The checks C39:C40 read zero when the page ties: give them 0_);[Red](0);-_) so a negative check paints itself red.</li><li>Washes in C34:E34 are thousands: give them [&lt;1000]0;#,##0 so a small count and a large one each read right.</li><li><span class="muted">An empty section shows nothing, so ;;; hides every kind of value while the cell still holds it for any formula that reads it.</span> Hide the flags C5:E5 with the code ;;; so the cells keep their A and E but the page stops showing them.</li><li>On Inputs, the switch in B12 holds a 1: give it On;;Off, with the negative section left empty, so it reads On and still multiplies.</li><li><span class="muted">General is the format with no format: General at the top of Ctrl+1’s list returns a cell to showing its value as typed.</span> Back on the P&amp;L, set the flags C5:E5 to General, the top of Ctrl+1’s list, and they show again.</li><li>Does it catch it? Watch total revenue in C10 typed over as 32000, and the check in C39 leave zero and turn red.</li></ol>

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Lesson 111: The checks block with a roll-up flag — Formulas and functions · hotkey.gg</title>
-<meta name="description" content="undefined">
+<meta name="description" content="A databook has a dozen things that must agree, and a reviewer wants one cell that says whether they all do. Each check is a live difference that reads zero; the roll-up is a count of the checks that do not, and a flag that reads OK or CHECK. Finish the Summary’s Checks block, put the flag at the top of the page and turn it red when it fails. The key is COUNTIF.">
 <meta name="generator" content="app2/tests/public-pages.js — generated from lesson data; do not edit by hand">
 <script>try{var v=JSON.parse(localStorage.getItem('hotkey_theme_vars'));if(v&&v.vars){var r=document.documentElement;for(var k in v.vars)r.style.setProperty('--'+k,v.vars[k]);r.setAttribute('data-dark',v.dark?'1':'0');}}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,7 +19,7 @@
 <h1>Lesson 111: The checks block with a roll-up flag</h1>
 <div class="meta">Formulas and functions · Auditing · medium · <span class="">Paid</span></div>
 <div class="card">
-<p style="margin:0">undefined</p>
+<p style="margin:0">A databook has a dozen things that must agree, and a reviewer wants one cell that says whether they all do. Each check is a live difference that reads zero; the roll-up is a count of the checks that do not, and a flag that reads OK or CHECK. Finish the Summary’s Checks block, put the flag at the top of the page and turn it red when it fails. The key is <kbd>COUNTIF</kbd>.</p>
 </div>
 <h2>What you will do</h2>
 <ol class="goals"><li><span class="muted">A check that reads another sheet is a link, so it is green like any link. The loan’s check already sits on Loans at C167; the Summary only points at it.</span> Fill the last two checks: =Loans!C167 in C84, then in C85 members active plus cancelled less the list, and make both green.</li><li><span class="muted">COUNTIF with &quot;&lt;&gt;0&quot; counts the cells that are not zero, so the roll-up reads how many checks fail. A count can be fooled by nothing, but a plain SUM of the checks can: one check off by +1 and another by -1 add to zero. =SUMPRODUCT(ABS(C80:C85)) adds the sizes of the misses instead, and is the safer total when a reader wants the amount.</span> In C86 count the checks not at zero with =COUNTIF(C80:C85,&quot;&lt;&gt;0&quot;).</li><li>In C87 turn the count into one word with =IF(C86=0,&quot;OK&quot;,&quot;CHECK&quot;).</li><li>Link the flag to the top of the Summary, =C87 in C2, so it is the first thing a reader sees.</li><li>Select column C and pick both flags at once with Go To Special, Formulas, Text only: C2 and C87 light.</li><li><span class="muted">Home › Conditional Formatting › Highlight Cells Rules › Equal To (Alt, H, L, H, E) formats every selected cell whose value equals what you type; light red fill with dark red text is its first style.</span> Give both a conditional format with Alt H L H E so CHECK turns red.</li><li>Does it tie? Watch a member’s status typed over on Members turn the flag in C2 to a red CHECK, then go back.</li></ol>
