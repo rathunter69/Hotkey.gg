@@ -1467,6 +1467,174 @@ export const COPY = {
    "mac_note": "",
    "story_beat": ""
   },
+  "sort-multi-level": {
+   "id": "sort-multi-level",
+   "module": "lists-and-tables",
+   "order": "4.2.1",
+   "title": "Sort and multi-level sort",
+   "brief": "Sorting rearranges rows, and it is the one list tool that changes the data’s order for good, so it runs on a copy of the export, never on the sheet the Summary reads. Alt, A, S, S opens the Sort dialog: a level for each column, smallest to largest or the other way, with My data has headers ticked. Sort the copy by site and then by date, then by retail revenue largest first to read the best days at the top. The key is `Alt A S S`.",
+   "closing": "You sorted a copy two ways, and the original stayed where the links expect it. || On a sorted copy, Subtotal (Alt, A, B) writes a SUBTOTAL(9) row at each change of site, a grand total and an outline, and Remove All takes them out again. It is a cut for a question nobody will ask twice; the page’s own totals stay SUMIFS and pivot tables, later in this chapter.",
+   "wow": "",
+   "convention_line": "Name the tabs; outputs left, data right; Values to snapshot, never over live formulas",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "autofilter-subtotal": {
+   "id": "autofilter-subtotal",
+   "module": "lists-and-tables",
+   "order": "4.2.2",
+   "title": "AutoFilter and filtered totals with SUBTOTAL",
+   "brief": "A filter hides the rows that don’t match, so the export can show only Saturdays, or only Domain, without moving anything. Ctrl+Shift+L turns it on, and Alt+Down on a header opens its menu. The trap: SUM adds hidden rows too. SUBTOTAL(109, range) adds only what shows and SUBTOTAL(103, range) counts it, so a filtered total tells the truth; answer Sponsor B’s Saturday question with them. The key is `Ctrl+Shift+L`.",
+   "closing": "The rows you hid stayed out of the total, because SUBTOTAL knows what is showing. || Best practice: any total that sits under a list someone might filter is a SUBTOTAL, never a SUM. Leave the filter arrows on if you like, but clear the filters before you send, or the next reader sees a third of the rows and thinks it is all of them.",
+   "wow": "",
+   "convention_line": "The count, the proposal, the error code; The check is a live difference → 0",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "remove-duplicates": {
+   "id": "remove-duplicates",
+   "module": "lists-and-tables",
+   "order": "4.2.3",
+   "title": "Remove Duplicates and the unique site list",
+   "brief": "A clean list of sites is the spine of every summary, and the export has each site fifteen times. Remove Duplicates (Alt, A, M) keeps the first of each and deletes the rest, so it runs on a copy of the column, never on the export. Then COUNTIF against the original proves the list is complete, and the misspelled code the export carries shows up as a seventh site. The key is `Alt A M`.",
+   "closing": "Six sites made one list, and the seventh was a typo. || Best practice: a unique list is data, so it lives on Lists, proved by a check, and the cube and the drop-downs read it from there. Remove Duplicates only ever runs on a copy: it deletes, and the export is the one thing in the pack nobody types over.",
+   "wow": "",
+   "convention_line": "The check is a live difference → 0; The count, the proposal, the error code",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "data-validation-dropdowns": {
+   "id": "data-validation-dropdowns",
+   "module": "lists-and-tables",
+   "order": "4.2.4",
+   "title": "Data Validation and drop-downs",
+   "brief": "The case sheet has an input for the case name, and someone will type \"Mangement\". Data Validation (Alt, A, V, V) limits a cell to a list or a range of numbers, and shows a drop-down so the choice is picked, not typed. The list comes from Lists, so adding a case adds a choice. Wire the case picker and the site picker, and set a limit on the washes a day inputs. The key is `Alt A V V`.",
+   "closing": "Nobody can type a case that does not exist. || Best practice: every picker reads its list from Lists, so a new case or a new site is one more cell there and the drop-down grows with it. A validation rule is not a check, though: a paste over the cell skips it, so the checks row still has the last word.",
+   "wow": "",
+   "convention_line": "Inputs blue, formulas black; A case toggle, never copies of the file",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "filter-tricks": {
+   "id": "filter-tricks",
+   "module": "lists-and-tables",
+   "order": "4.2.5",
+   "title": "Filter tricks: visible cells only, wildcards, skip blanks",
+   "brief": "A list does three things to the unwary: copy a block with rows hidden by hand and they come too, unless you select visible cells only first with Alt+;. Search for a site by part of its code and COUNTIF wants a wildcard, * for any run of characters and ? for exactly one. Paste a partial column over a full one and its blanks wipe what was there, unless Paste Special skips blanks. The key is `Alt+;`.",
+   "closing": "Visible cells only, a wildcard, and a paste that skips blanks: three keys that each save an afternoon. || Best practice: press Alt+; before any copy from a block with hidden or grouped rows. A filter copies only what shows, but a block pasted onto a filtered list also lands in the rows the filter hides, so clear the filter before you paste.",
+   "wow": "",
+   "convention_line": "Hidden columns get forgotten; Values to snapshot, never over live formulas",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "dynamic-arrays": {
+   "id": "dynamic-arrays",
+   "module": "lists-and-tables",
+   "order": "4.2.6",
+   "title": "UNIQUE, FILTER and SORT: the modern list tools",
+   "brief": "Modern Excel does three of this module’s jobs with a formula that spills its answer into the cells below: UNIQUE(range) gives the unique list, FILTER(range, condition) the matching rows, SORT puts them in order, and SEQUENCE writes 1 to n. They are live where Remove Duplicates and the filter are one-off, but they need a version of Excel that has them, and not every desk does. Build them on Scratch, a sheet that stays yours. The key is `UNIQUE`.",
+   "closing": "The list tools became live formulas, on a sheet that can use them. || Best practice: dynamic arrays in a file that stays yours; the classic tools plus SUMIFS in anything a bank will open, because an older Excel shows a spilled formula as one cell and an error. Check the version before you send.",
+   "wow": "",
+   "convention_line": "Read the page before anyone else does",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "challenge-filtered-list": {
+   "id": "challenge-filtered-list",
+   "module": "lists-and-tables",
+   "order": "4.2.C",
+   "title": "Challenge: a dump into a filtered, deduplicated list",
+   "brief": "A raw dump on Export sort. Sort it two levels, filter Airport and count what shows with SUBTOTAL, rebuild the unique site list and prove it, and put back the case drop-down and the washes limit.",
+   "closing": "",
+   "wow": "",
+   "convention_line": "The check is a live difference → 0; Inputs blue, formulas black",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "sumifs-cube": {
+   "id": "sumifs-cube",
+   "module": "summaries-from-raw-rows",
+   "order": "4.3.1",
+   "title": "The SUMIFS cube: site × week, filled both ways",
+   "brief": "SUMIFS you know from Chapter 3; the cube is what it becomes at scale. Sites down the side, weeks across the top, and one formula in the corner cell that reads the site from its row and the week from its column ($B15 and C$14), filled across and down, so eighteen cells are one formula. The week key on the export is what the column criterion matches. Replace the pasted cube with the live one, then build the revenue cube. The key is `SUMIFS`.",
+   "closing": "One formula filled eighteen cells, and the grand total ties to the export. || Best practice: bounded, anchored ranges. Whole-column references such as E:E work, but every SUMIFS then reads a million rows, and a pack with a few hundred of them crawls.",
+   "wow": "",
+   "convention_line": "Write once, fill right; Links green; external links avoided; The check is a live difference → 0",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "kpi-block": {
+   "id": "kpi-block",
+   "module": "summaries-from-raw-rows",
+   "order": "4.3.2",
+   "title": "The KPI block: washes per hour, member share, utilization",
+   "brief": "Utilization is washes done against washes the tunnel could do, capacity in cars an hour times hours open, and an express wash runs well under half on an average day and fills on a Saturday, so the peak matters as much as the mean. Member share is member washes over all washes; the higher it is, the steadier the revenue. Both are ratios built from the export and the site list, with a lookup bringing hours in. Build the KPI block by site. The key is `INDEX`.",
+   "closing": "Utilization and member share are built by site, and two of the buyers’ questions point at them. || Best practice: a ratio on a total row is worked from the totals, never an average of the rows above, because six sites of different sizes do not weigh the same. Read the peak beside the mean: a site at a third of capacity on average can still turn cars away on a Saturday.",
+   "wow": "",
+   "convention_line": "Write once, fill right; Links green; external links avoided",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "date-range-criteria": {
+   "id": "date-range-criteria",
+   "module": "summaries-from-raw-rows",
+   "order": "4.3.3",
+   "title": "Date-range criteria: SUMIFS between two dates",
+   "brief": "\"Revenue in the last seven days\" is a SUMIFS with two conditions on the same column: on or after a start date, and on or before an end date, written \">=\"&C48 with the comparison in quotes and the cell joined by &. SUMPRODUCT does the same the old way, and you will meet it in inherited models. Build a window block with a start and an end date a buyer can type. The key is `&`.",
+   "closing": "Any window a buyer types gets summed from the export. || Best practice: the comparison in quotes, the cell outside, joined with &. The commonest SUMIFS slip is a date typed inside the quotes, which reads as text and matches nothing, or matches the right week until the window moves.",
+   "wow": "",
+   "convention_line": "Inputs blue, formulas black; One input, one cell; formulas reference it",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "kpi-page-linked-labeled-checked": {
+   "id": "kpi-page-linked-labeled-checked",
+   "module": "summaries-from-raw-rows",
+   "order": "4.3.4",
+   "title": "The KPI page: linked, labeled, checked",
+   "brief": "The blocks are built; now they become a page a buyer reads: a title from Inputs, a source line, and a checks block that ties the cubes to the export and the KPI ratios to their parts, with one flag over the lot. Everything on the page is a link or a formula; nothing is typed but the inputs. Then the print set-up, so the page leaves the building on one sheet of paper. The key is `Ctrl+1`.",
+   "closing": "The KPI page reads the export end to end, and its own checks say so. || Best practice: the flag sits where a reviewer looks first, and a page goes out only when it reads zero. Set the print set-up while the page is fresh in your head: nobody remembers the head rows the night the pack ships.",
+   "wow": "",
+   "convention_line": "Fit to page, titles, footer; Title, units, timeline, then the answer; The check is a live difference → 0",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "question-end-to-end": {
+   "id": "question-end-to-end",
+   "module": "summaries-from-raw-rows",
+   "order": "4.3.5",
+   "title": "A buyer’s question answered end to end",
+   "brief": "Sponsor C’s question 7 asks for revenue per site per open hour in the last week, and which site led. Decide the cut, then build it from the pieces you have: the date window, the hours from the KPI block, SUMIFS and RANK. Then write the answer into the log as a formula on the cells, with the status set to Answered. That is the loop for every question in the room. The key is `=`.",
+   "closing": "One question took four pieces you already had, and the log points at the answer. || Best practice: the answer on the log is a formula on the page, with the units in it, so it moves when the data moves and reads as a sentence when a buyer opens the log.",
+   "wow": "",
+   "convention_line": "Links green; external links avoided; Write once, fill right",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "3d-references": {
+   "id": "3d-references",
+   "module": "summaries-from-raw-rows",
+   "order": "4.3.6",
+   "title": "3D references and grouped sheets: site tabs in one formula",
+   "brief": "Head office keeps one tab per site, every one laid out the same, and the buyers want the company total by line. A 3D reference sums the same cell across a run of sheets, =SUM(Domain:CedarPark!C5), so the total is one formula, and a site tab inserted inside the run joins it. Grouping the sheets (Ctrl+Shift+PgDn adds the next) lets you type one row on all of them at once. Build the roll-up from the six Austin tabs. The key is `Ctrl+Shift+PgDn`.",
+   "closing": "Six tabs summed in one formula, and a new tab inside the run joins the sum on its own. || Best practice: 3D references only across tabs that are truly identical, with the first and last tab of the run kept as bookends so a new site can never fall outside it. Ungroup before any other edit: a grouped workbook types on every tab.",
+   "wow": "",
+   "convention_line": "Write once, fill right; The check is a live difference → 0",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "challenge-kpi-block": {
+   "id": "challenge-kpi-block",
+   "module": "summaries-from-raw-rows",
+   "order": "4.3.C",
+   "title": "Challenge: a KPI block that ties to the POS data",
+   "brief": "A fresh export, and the KPI page has lost its ratios, its washes cube, the window and two checks. Rebuild them until every check reads zero, and answer question 9 on the log.",
+   "closing": "",
+   "wow": "",
+   "convention_line": "The check is a live difference → 0; Write once, fill right",
+   "mac_note": "",
+   "story_beat": ""
+  },
   "remix-format-on-the-pnl": {
    "id": "remix-format-on-the-pnl",
    "module": "remixes",
@@ -9422,6 +9590,786 @@ export const COPY = {
     "why": "",
     "hint_stuck": ""
    }
+  ],
+  "sort-multi-level": [
+   {
+    "lesson_id": "sort-multi-level",
+    "goal_index": "0",
+    "text": "Copy the export’s block, Export!A4:G94, headers and all seven columns: Ctrl+G to A4, select to G94 and press Ctrl+C.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range Export!A4:G94 · Ctrl+Shift+Down runs to the last row of the export."
+   },
+   {
+    "lesson_id": "sort-multi-level",
+    "goal_index": "1",
+    "text": "Insert a sheet right after Export (Ctrl+PgDn to Domain, Shift+F11) and rename it Export sort with Alt, H, O, R.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse tab Domain · Shift+F11 puts the new sheet before the tab you are on."
+   },
+   {
+    "lesson_id": "sort-multi-level",
+    "goal_index": "2",
+    "text": "Paste the block at A4 of Export sort, then Paste Special, Column widths (Ctrl+Alt+V, W) so every column reads as it did.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell A4 · The block is still on the clipboard, so the second paste brings only the widths."
+   },
+   {
+    "lesson_id": "sort-multi-level",
+    "goal_index": "3",
+    "text": "Sort the copy by Site A to Z, then add a level (Alt+A) for Date oldest to newest, and press OK.",
+    "teach": "Alt, A, S, S opens the Sort dialog on the block around the active cell. Each level is a column and an order; Excel sorts by the first level and uses the next one only to break ties, so site then date gives six runs of fifteen days.",
+    "why": "",
+    "hint_stuck": "pulse range A4:G94 · Typing a letter in the Sort by box jumps to the column that starts with it."
+   },
+   {
+    "lesson_id": "sort-multi-level",
+    "goal_index": "4",
+    "text": "Sort the copy again by its F4 header, Retail revenue, Largest to Smallest, so the best days sit at the top.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range F4:F94 · Tab moves to the Order box; Down flips it to Largest to Smallest."
+   },
+   {
+    "lesson_id": "sort-multi-level",
+    "goal_index": "5",
+    "text": "Does it tie? Watch the copy’s best day in F5 change to $4,000 while the export’s own rows stay as they came.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell F5 · The copy and the export are separate now: a change on one never reaches the other."
+   }
+  ],
+  "autofilter-subtotal": [
+   {
+    "lesson_id": "autofilter-subtotal",
+    "goal_index": "0",
+    "text": "On Export, land on the header A4 and press Ctrl+Shift+L: filter arrows on every header.",
+    "teach": "Ctrl+Shift+L puts a filter arrow on every header of the block around the active cell. Nothing is hidden yet: the arrows are the switches.",
+    "why": "",
+    "hint_stuck": "pulse cell Export!A4 · The filter covers the block around the active cell."
+   },
+   {
+    "lesson_id": "autofilter-subtotal",
+    "goal_index": "1",
+    "text": "Alt+Down on the Site header B4, press E to search, type DOM and Enter: Domain’s fifteen days only.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell B4 · The search box keeps only the values that contain what you type."
+   },
+   {
+    "lesson_id": "autofilter-subtotal",
+    "goal_index": "2",
+    "text": "Under the block, put =SUM(E5:E94) in E96 and =SUBTOTAL(109,E5:E94) in E97, and read the two against each other.",
+    "teach": "SUBTOTAL(109, range) adds the cells of rows that show; a row a filter hides drops out. SUM never looks, so under a filter the two disagree, and the SUBTOTAL is the one that answers the question on screen.",
+    "why": "",
+    "hint_stuck": "pulse range E96:E97 · SUM still counts all ninety rows; SUBTOTAL counts Domain’s fifteen."
+   },
+   {
+    "lesson_id": "autofilter-subtotal",
+    "goal_index": "3",
+    "text": "Add a second filter on the Day column, I4: search Sat, so only Domain’s Saturdays show.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell I4 · Filters stack: the Site filter stays on while you add the Day one."
+   },
+   {
+    "lesson_id": "autofilter-subtotal",
+    "goal_index": "4",
+    "text": "Count the rows showing with =SUBTOTAL(103,A5:A94) in E98: Sponsor B’s Saturdays at Domain.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell E98 · 103 counts the cells that are not empty, in the rows that show."
+   },
+   {
+    "lesson_id": "autofilter-subtotal",
+    "goal_index": "5",
+    "text": "Clear every filter with Alt, A, C, and check that SUM and SUBTOTAL agree again.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range E96:E97 · With every row showing, the two totals read the same."
+   },
+   {
+    "lesson_id": "autofilter-subtotal",
+    "goal_index": "6",
+    "text": "Does it tie? Watch the export filter to Airport: the SUM in E96 stays put, and only the SUBTOTALs move.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range E96:E98 · Only SUBTOTAL knows which rows the filter hides."
+   }
+  ],
+  "remove-duplicates": [
+   {
+    "lesson_id": "remove-duplicates",
+    "goal_index": "0",
+    "text": "Copy the export’s Site column, Export!B4:B94, and paste it on Lists at N4.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell Lists!N4 · Copy the header with the codes, so the list keeps its name."
+   },
+   {
+    "lesson_id": "remove-duplicates",
+    "goal_index": "1",
+    "text": "With the pasted column selected, Alt, A, M and Enter: read the seven codes left, one of them AUS-DMO.",
+    "teach": "Remove Duplicates (Alt, A, M) keeps the first row of each value and deletes the rest, then tells you how many went. The ticked columns define a duplicate: tick two and a row goes only when the pair repeats.",
+    "why": "",
+    "hint_stuck": "pulse range N4:N94 · The dialog works on the selection; Enter is OK."
+   },
+   {
+    "lesson_id": "remove-duplicates",
+    "goal_index": "2",
+    "text": "On Export, Ctrl+F finds AUS-DMO; press Esc and type AUS-DOM over it.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell Export!B59 · Find searches the sheet you are on, so go to Export first."
+   },
+   {
+    "lesson_id": "remove-duplicates",
+    "goal_index": "3",
+    "text": "Back on Lists, the typo no longer exists in the export: clear AUS-DMO from the list, leaving six codes.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell N11 · Ctrl+Down runs to the last code in the list."
+   },
+   {
+    "lesson_id": "remove-duplicates",
+    "goal_index": "4",
+    "text": "Beside each code, O5:O10, count its rows on the export: =COUNTIF(Export!$B$5:$B$94,N5) with Ctrl+Enter.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range O5:O10 · Anchor the export’s column so every code counts the same ninety rows."
+   },
+   {
+    "lesson_id": "remove-duplicates",
+    "goal_index": "5",
+    "text": "Total the counts in O11 with Alt+=, and in C26 check them against the export: =O11-COUNTA(Export!$B$5:$B$94).",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C26 · Ninety rows on the export, ninety counted: the check reads a dash."
+   },
+   {
+    "lesson_id": "remove-duplicates",
+    "goal_index": "6",
+    "text": "Does it tie? Watch a new code typed into the export leave the COUNTIF proof one short, and the check in C26 say so.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C26 · A code that is not on the list is a row nobody counts."
+   }
+  ],
+  "data-validation-dropdowns": [
+   {
+    "lesson_id": "data-validation-dropdowns",
+    "goal_index": "0",
+    "text": "On Scenarios, C10 is the case picker: Alt, A, V, V, Allow List, Source =Lists!$L$5:$L$7, and OK.",
+    "teach": "Alt, A, V, V opens Data Validation on the selected cells. Allow List with a Source of cells turns each one into a drop-down of those cells, and anything else typed there is refused.",
+    "why": "",
+    "hint_stuck": "pulse cell Scenarios!C10 · L jumps the Allow box to List; Tab moves to Source."
+   },
+   {
+    "lesson_id": "data-validation-dropdowns",
+    "goal_index": "1",
+    "text": "Alt+Down on C10 opens the drop-down: pick Downside and press Enter.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C10 · A letter jumps to the case that starts with it."
+   },
+   {
+    "lesson_id": "data-validation-dropdowns",
+    "goal_index": "2",
+    "text": "Type Mangement into C10 and press Enter: read the refusal, then Esc to cancel it.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C10 · Cancel throws the typing away and leaves Downside in the cell."
+   },
+   {
+    "lesson_id": "data-validation-dropdowns",
+    "goal_index": "3",
+    "text": "Give the refusal a message that helps: on the Error Alert tab (Ctrl+PgDn twice), Alt+E and type what to pick.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C10 · Something like: Pick a case from the list: Management, Base or Downside."
+   },
+   {
+    "lesson_id": "data-validation-dropdowns",
+    "goal_index": "4",
+    "text": "On Summary, C34 picks the site: a list rule with Source =Lists!$N$5:$N$10, the unique sites from the last lesson.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell Summary!C34 · The site codes sit in N5:N10 on Lists."
+   },
+   {
+    "lesson_id": "data-validation-dropdowns",
+    "goal_index": "5",
+    "text": "On Scenarios, select the washes a day inputs C5:E5 and allow only a whole number between 100 and 600.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range Scenarios!C5:E5 · W picks Whole number; Tab twice reaches Minimum."
+   },
+   {
+    "lesson_id": "data-validation-dropdowns",
+    "goal_index": "6",
+    "text": "Does it hold? Watch 700 typed into the Base washes in D5 get refused, and 250 stay.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell D5 · The rule allows 100 to 600, so 700 never lands."
+   }
+  ],
+  "filter-tricks": [
+   {
+    "lesson_id": "filter-tricks",
+    "goal_index": "0",
+    "text": "On Export sort, hide rows 20 to 34 by hand: Go To A20:A34 and press Ctrl+9.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse rows 20:34 · Ctrl+9 hides every row the selection touches."
+   },
+   {
+    "lesson_id": "filter-tricks",
+    "goal_index": "1",
+    "text": "Select the block A4:G94, press Alt+; for visible cells only, then Ctrl+C.",
+    "teach": "A copy of a block takes rows hidden by hand along with it. Alt+; selects the visible cells only, so the next Ctrl+C leaves the hidden rows behind; a filter does this on its own.",
+    "why": "",
+    "hint_stuck": "pulse range A4:G94 · Alt+; works on the selection you have, so select first."
+   },
+   {
+    "lesson_id": "filter-tricks",
+    "goal_index": "2",
+    "text": "Insert a sheet after Export sort, rename it Scratch and paste at A1: seventy-five rows and the header.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse tab Domain · Shift+F11 puts the new sheet before the tab you are on."
+   },
+   {
+    "lesson_id": "filter-tricks",
+    "goal_index": "3",
+    "text": "Back on Export sort, the block is still selected: Ctrl+Shift+9 brings rows 20 to 34 back.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse rows 20:34 · Unhide works on the rows the selection spans."
+   },
+   {
+    "lesson_id": "filter-tricks",
+    "goal_index": "4",
+    "text": "Beside the export, count with wildcards: J96 =COUNTIF(B5:B94,\"AUS-*\") and J97 =COUNTIF(B5:B94,\"AUS-?O?\").",
+    "teach": "In a criteria, * stands for any run of characters and ? for exactly one. \"AUS-*\" is every Austin code; \"AUS-?O?\" is a code whose middle letter of three is O.",
+    "why": "",
+    "hint_stuck": "pulse range J96:J97 · Ninety Austin rows, and fifteen that fit the Domain pattern."
+   },
+   {
+    "lesson_id": "filter-tricks",
+    "goal_index": "5",
+    "text": "In J98, retail revenue for every code ending in R: =SUMIFS(F5:F94,B5:B94,\"*R\").",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell J98 · A star in front matches any start; the R must be last."
+   },
+   {
+    "lesson_id": "filter-tricks",
+    "goal_index": "6",
+    "text": "On Export sort, copy the corrections I5:I94 and Paste Special them over the hours at G5 with Skip blanks ticked.",
+    "teach": "Paste Special with Skip blanks (Ctrl+Alt+V, then B) leaves a blank cell of the copy out of the paste, so what sits under it stays. Without it, a partial column wipes the full one.",
+    "why": "",
+    "hint_stuck": "pulse range G5:G94 · B ticks Skip blanks; only the four corrections land."
+   },
+   {
+    "lesson_id": "filter-tricks",
+    "goal_index": "7",
+    "text": "Does it tie? Watch a typo in a Domain code drop the pattern count in J97 to 14 while J96 holds at 90.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell J97 · AUS-DMO is still Austin, but its middle letter is no longer O."
+   }
+  ],
+  "dynamic-arrays": [
+   {
+    "lesson_id": "dynamic-arrays",
+    "goal_index": "0",
+    "text": "On Scratch, put =UNIQUE(Export!B5:B94) in I2 and watch six codes spill down.",
+    "teach": "A dynamic array formula is typed in one cell and spills its answer down as many cells as it needs, with a thin border round the spill. Only the first cell holds the formula; the rest are its answer.",
+    "why": "",
+    "hint_stuck": "pulse cell Scratch!I2 · One formula, six answers below it."
+   },
+   {
+    "lesson_id": "dynamic-arrays",
+    "goal_index": "1",
+    "text": "In J2, wrap it in SORT: =SORT(UNIQUE(Export!B5:B94)) gives the same codes A to Z.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell J2 · SORT takes the whole spilled list as its range."
+   },
+   {
+    "lesson_id": "dynamic-arrays",
+    "goal_index": "2",
+    "text": "In L2, =FILTER(Export!A5:G94,Export!B5:B94=\"AUS-DOM\") pulls Domain’s fifteen rows across seven columns.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell L2 · The condition is a column of TRUE and FALSE, one per row of the range."
+   },
+   {
+    "lesson_id": "dynamic-arrays",
+    "goal_index": "3",
+    "text": "Under the filtered rows, L18 =SUM(P2:P16) adds Domain’s total washes from the spill.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell L18 · Total washes is the fifth column of the export, so P in the spill."
+   },
+   {
+    "lesson_id": "dynamic-arrays",
+    "goal_index": "4",
+    "text": "In T2, =SEQUENCE(12) writes a month counter, 1 to 12, from one cell.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell T2 · SEQUENCE(n) counts from 1 to n down the column."
+   },
+   {
+    "lesson_id": "dynamic-arrays",
+    "goal_index": "5",
+    "text": "Does it tie? Watch a new code typed into the export join the UNIQUE list as a seventh row, with nobody rerunning anything.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range I2:I8 · A spill recalculates like any formula."
+   }
+  ],
+  "challenge-filtered-list": [
+   {
+    "lesson_id": "challenge-filtered-list",
+    "goal_index": "0",
+    "text": "Sort Export sort by Site, then by Date oldest to newest, in one Sort dialog.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-filtered-list",
+    "goal_index": "1",
+    "text": "Filter the copy to AUS-AIR and count the rows showing in J2 with =SUBTOTAL(103,A5:A94).",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-filtered-list",
+    "goal_index": "2",
+    "text": "Copy Export!B4:B94 to Lists!N4 and run Remove Duplicates: the six site codes.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-filtered-list",
+    "goal_index": "3",
+    "text": "Prove the list in O5:O10 with COUNTIF against the export, and total it in O11: ninety rows.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-filtered-list",
+    "goal_index": "4",
+    "text": "Make Scenarios!C10 a drop-down of the cases in Lists!$L$5:$L$7.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-filtered-list",
+    "goal_index": "5",
+    "text": "Limit the washes a day inputs Scenarios!C5:E5 to a whole number from 100 to 600.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "sumifs-cube": [
+   {
+    "lesson_id": "sumifs-cube",
+    "goal_index": "0",
+    "text": "On Summary, link the site block to the unique list: B5:B10 =Lists!N5 with Ctrl+Enter, in green.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range B5:B10 · Every figure on the page starts from Lists, so the sites do too."
+   },
+   {
+    "lesson_id": "sumifs-cube",
+    "goal_index": "1",
+    "text": "The cube’s sites in B15:B20 read the block above: =$B5 with Ctrl+Enter.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range B15:B20 · One list of sites, read everywhere it is needed."
+   },
+   {
+    "lesson_id": "sumifs-cube",
+    "goal_index": "2",
+    "text": "In C15, the corner: =SUMIFS(Export!$E$5:$E$94,Export!$B$5:$B$94,$B15,Export!$H$5:$H$94,C$14).",
+    "teach": "A cube is one SUMIFS read two ways: the site from its row and the week from its column. Anchor the column of the site ($B15) and the row of the week (C$14), and the corner cell’s formula is right in every cell of the grid.",
+    "why": "",
+    "hint_stuck": "pulse cell C15 · Washes are column E of the export, the site B and the week key H."
+   },
+   {
+    "lesson_id": "sumifs-cube",
+    "goal_index": "3",
+    "text": "Select C15:E20 and fill it, Ctrl+D down and then Ctrl+R across: eighteen cells, one formula.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C15:E20 · Ctrl+D copies the top row down; Ctrl+R then copies column C across."
+   },
+   {
+    "lesson_id": "sumifs-cube",
+    "goal_index": "4",
+    "text": "Type the totals over the pasted ones, F15:F20 =SUM(C15:E15) and C21:F21 =SUM(F15:F20), then set C15:F21 to Automatic font.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C15:F21 · Formulas are black: in Ctrl+1, Font, Automatic is the first color in the list."
+   },
+   {
+    "lesson_id": "sumifs-cube",
+    "goal_index": "5",
+    "text": "The revenue cube the same way: B25:B30 =$B5, then C25:E30 a SUMIFS on column F against C$24, and Alt+= on C25:F31.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C25:E30 · The corner: =SUMIFS(Export!$F$5:$F$94,Export!$B$5:$B$94,$B25,Export!$H$5:$H$94,C$24)"
+   },
+   {
+    "lesson_id": "sumifs-cube",
+    "goal_index": "6",
+    "text": "Tie both cubes to the export in the Checks block: C72 =F21-SUM(Export!$E$5:$E$94) and C73 the same for revenue.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C72:C73 · Revenue is column F: =F31-SUM(Export!$F$5:$F$94)"
+   },
+   {
+    "lesson_id": "sumifs-cube",
+    "goal_index": "7",
+    "text": "Does it tie? Watch one export row’s retail washes change, and its cube cell, the totals and the check move with it.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C15 · The check still reads a dash: the cube reads the same rows the SUM does."
+   }
+  ],
+  "kpi-block": [
+   {
+    "lesson_id": "kpi-block",
+    "goal_index": "0",
+    "text": "Hours open by site in E5:E10 from Lists: =INDEX(Lists!$G$5:$G$10,MATCH($B5,Lists!$B$5:$B$10,0)) with Ctrl+Enter.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range E5:E10 · Hours open sit in column G on Lists, the codes in column B."
+   },
+   {
+    "lesson_id": "kpi-block",
+    "goal_index": "1",
+    "text": "Daily capacity in F5:F10 =D5*E5, and the days each site reported in G5:G10 with COUNTIFS on the site and hours \">0\".",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range G5:G10 · A day with no hours is a day the site did not report: =COUNTIFS(Export!$B$5:$B$94,$B5,Export!$G$5:$G$94,\">0\")"
+   },
+   {
+    "lesson_id": "kpi-block",
+    "goal_index": "2",
+    "text": "Washes by site in H5:H10 with SUMIFS on the export, then utilization in I5:I10 =H5/(F5*G5).",
+    "teach": "A ratio is a figure over the base it is measured against. Utilization is washes over what the tunnel could have done in the days it reported, capacity a day times days, so H5/(F5*G5); percent to one decimal, in italics, like every ratio on the page.",
+    "why": "",
+    "hint_stuck": "pulse range I5:I10 · The brackets matter: washes over the product of capacity and days."
+   },
+   {
+    "lesson_id": "kpi-block",
+    "goal_index": "3",
+    "text": "The peak day in J5:J10 with MAXIFS on the site, and its utilization in K5:K10 =J5/F5.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range J5:J10 · =MAXIFS(Export!$E$5:$E$94,Export!$B$5:$B$94,$B5)"
+   },
+   {
+    "lesson_id": "kpi-block",
+    "goal_index": "4",
+    "text": "Member washes in L5:L10, a SUMIFS on column D of the export, and member share in M5:M10 =L5/H5.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range L5:L10 · =SUMIFS(Export!$D$5:$D$94,Export!$B$5:$B$94,$B5)"
+   },
+   {
+    "lesson_id": "kpi-block",
+    "goal_index": "5",
+    "text": "The total row: SUM for F11, H11 and L11, MAX for J11, and the ratios from totals, I11 =H11/SUMPRODUCT(F5:F10,G5:G10) and M11 =L11/H11.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range F11:M11 · An average of six ratios is not the cluster’s ratio: divide the totals."
+   },
+   {
+    "lesson_id": "kpi-block",
+    "goal_index": "6",
+    "text": "On Q&A, set questions 2 and 3 to Answered and point their answers at Summary: F6 =Summary!I5 and F7 =Summary!M11.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range E6:F7 · An answer is a link to the cell that holds it, never a typed figure."
+   },
+   {
+    "lesson_id": "kpi-block",
+    "goal_index": "7",
+    "text": "Does it tie? Watch Airport’s capacity on Lists go to 160: its utilization in I9 falls and its washes in H9 stay put.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell I9 · Capacity sits under the ratio, not over it."
+   }
+  ],
+  "date-range-criteria": [
+   {
+    "lesson_id": "date-range-criteria",
+    "goal_index": "0",
+    "text": "On Summary, type the window’s dates in blue: C48 the start, 9/23/2026, and C49 the end, 9/29/2026, the export’s last day.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C48:C49 · Seven days, counting both ends: the 23rd to the 29th."
+   },
+   {
+    "lesson_id": "date-range-criteria",
+    "goal_index": "1",
+    "text": "Washes in the window in C50: =SUMIFS(Export!$E$5:$E$94,Export!$A$5:$A$94,\">=\"&C48,Export!$A$5:$A$94,\"<=\"&C49).",
+    "teach": "A criteria can be an operator joined to a cell: \">=\"&C48 reads on or after whatever date C48 holds. Two pairs on the same date column make a window, and moving either date moves the answer.",
+    "why": "",
+    "hint_stuck": "pulse cell C50 · The operator sits in quotes; the date cell stays outside them, joined by &."
+   },
+   {
+    "lesson_id": "date-range-criteria",
+    "goal_index": "2",
+    "text": "Retail revenue in the window in C51: the same SUMIFS on column F of the export.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C51 · =SUMIFS(Export!$F$5:$F$94,Export!$A$5:$A$94,\">=\"&C48,Export!$A$5:$A$94,\"<=\"&C49)"
+   },
+   {
+    "lesson_id": "date-range-criteria",
+    "goal_index": "3",
+    "text": "In D50, the old way: =SUMPRODUCT((Export!A5:A94>=C48)*(Export!A5:A94<=C49)*Export!E5:E94), and read that it equals C50.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell D50 · Each condition is a column of TRUE and FALSE; multiplied, they keep the rows in the window."
+   },
+   {
+    "lesson_id": "date-range-criteria",
+    "goal_index": "4",
+    "text": "Clear D50, then answer question 8 on Q&A: E12 Answered and F12 =Summary!C51.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range E12:F12 · One figure on the page, one link from the log."
+   },
+   {
+    "lesson_id": "date-range-criteria",
+    "goal_index": "5",
+    "text": "Does it tie? Watch the end date in C49 move back a day: C50 and C51 both fall, and so does the answer on the log.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C50:C51 · The window is two typed dates, so a buyer can ask for any week."
+   }
+  ],
+  "kpi-page-linked-labeled-checked": [
+   {
+    "lesson_id": "kpi-page-linked-labeled-checked",
+    "goal_index": "0",
+    "text": "On Summary, make the title in A1 a formula on the export period, =\"Clearcoat Express: KPI page, \"&Inputs!$C$14, in green.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell A1 · The period lives once, in Inputs!C14; the title reads it."
+   },
+   {
+    "lesson_id": "kpi-page-linked-labeled-checked",
+    "goal_index": "1",
+    "text": "In B69, type a source line that names Export, Lists and the six site tabs, and set it in italics with Ctrl+I.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell B69 · Source: the POS export on Export, the site list on Lists, and the six site tabs"
+   },
+   {
+    "lesson_id": "kpi-page-linked-labeled-checked",
+    "goal_index": "2",
+    "text": "Finish the checks: C74 =ROUND(M11*H11-L11,0), C75 =H11-F21, and the flag in C77 over all five.",
+    "teach": "A KPI page proves itself: every ratio ties back to its parts and every block to the export, each as a difference that reads zero, and one flag over the checks says whether the page ties. A reviewer reads the flag first.",
+    "why": "",
+    "hint_stuck": "pulse range C74:C77 · The flag: =IF(AND(C72=0,C73=0,C74=0,C75=0,C76=0),0,1)"
+   },
+   {
+    "lesson_id": "kpi-page-linked-labeled-checked",
+    "goal_index": "3",
+    "text": "Print set-up: landscape (Alt, P, O, L), then Page Setup, Fit to one page wide by one tall.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell A1 · Alt+F picks Fit to; Tab moves to the pages tall box."
+   },
+   {
+    "lesson_id": "kpi-page-linked-labeled-checked",
+    "goal_index": "4",
+    "text": "Repeat rows 1:4 on every page (Alt, P, I), and put the file name left and the date right in the footer.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse rows 1:4 · The footer’s three boxes are Alt+U, Alt+C and Alt+R."
+   },
+   {
+    "lesson_id": "kpi-page-linked-labeled-checked",
+    "goal_index": "5",
+    "text": "Does it tie? Watch an export row change: the cubes, the KPI block and the window all move, and the flag in C77 stays at zero.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C77 · Every block reads the same rows, so the checks still agree."
+   }
+  ],
+  "question-end-to-end": [
+   {
+    "lesson_id": "question-end-to-end",
+    "goal_index": "0",
+    "text": "On Summary, the block’s sites in B55:B60 read the site block: =$B5 with Ctrl+Enter.",
+    "teach": "Every question in the log goes the same way: read it, decide the cut (here, the window’s seven days by site), build the cut from the blocks already on the page, and answer with a link, never a typed figure.",
+    "why": "",
+    "hint_stuck": "pulse range B55:B60 · The window is already the last seven days, in C48:C49."
+   },
+   {
+    "lesson_id": "question-end-to-end",
+    "goal_index": "1",
+    "text": "Revenue in the window by site in C55:C60: a SUMIFS on the site and both date criteria, the dates anchored.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C55:C60 · =SUMIFS(Export!$F$5:$F$94,Export!$B$5:$B$94,$B55,Export!$A$5:$A$94,\">=\"&$C$48,Export!$A$5:$A$94,\"<=\"&$C$49)"
+   },
+   {
+    "lesson_id": "question-end-to-end",
+    "goal_index": "2",
+    "text": "Open hours in the window in D55:D60: hours a day from the KPI block times the days, =E5*($C$49-$C$48+1).",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range D55:D60 · Both ends count, so the days are end minus start plus one."
+   },
+   {
+    "lesson_id": "question-end-to-end",
+    "goal_index": "3",
+    "text": "Revenue an hour in E55:E60 =C55/D55, and its rank in F55:F60 =RANK(E55,$E$55:$E$60).",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range F55:F60 · Anchor the list RANK reads, so every row ranks against the same six."
+   },
+   {
+    "lesson_id": "question-end-to-end",
+    "goal_index": "4",
+    "text": "The leader in C61, =INDEX($B$55:$B$60,MATCH(1,$F$55:$F$60,0)), and its figure in D61 the same way on column E.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C61:D61 · =INDEX($E$55:$E$60,MATCH(1,$F$55:$F$60,0))"
+   },
+   {
+    "lesson_id": "question-end-to-end",
+    "goal_index": "5",
+    "text": "On Q&A, question 7: E11 Answered, and F11 a formula on the leader and its figure in dollars an hour.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell F11 · =Summary!C61&\" at \"&TEXT(Summary!D61,\"$#,##0.00\")&\" an hour\""
+   },
+   {
+    "lesson_id": "question-end-to-end",
+    "goal_index": "6",
+    "text": "Does it tie? Watch the window in C48:C49 move a week back, and the answer in F11 on the log follow it.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell F11 · The answer is a formula, so it is never out of date."
+   }
+  ],
+  "3d-references": [
+   {
+    "lesson_id": "3d-references",
+    "goal_index": "0",
+    "text": "Open the Domain tab and read it: weeks across, the lines down, the same layout as the other five site tabs.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range Domain!B4:F9 · Retail washes on row 5, member washes on 6, retail revenue on 8."
+   },
+   {
+    "lesson_id": "3d-references",
+    "goal_index": "1",
+    "text": "On Summary, the roll-up’s input lines: C65:E65 =SUM(Domain:CedarPark!C5), then the same on row 66 (C6) and row 68 (C8).",
+    "teach": "A 3D reference names a run of sheets, first and last, and a cell: =SUM(Domain:CedarPark!C5) adds C5 on every tab from Domain to Cedar Park. Only the input lines are 3D sums; the roll-up works its own totals.",
+    "why": "",
+    "hint_stuck": "pulse range C65:E68 · Ctrl+Enter carries the 3D sum across: D65 adds D5, E65 adds E5."
+   },
+   {
+    "lesson_id": "3d-references",
+    "goal_index": "2",
+    "text": "The roll-up’s own arithmetic: C67:E67 =C65+C66, and F65:F68 =SUM(C65:E65) down the side.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C67:F67 · A total row on the page proves its own arithmetic."
+   },
+   {
+    "lesson_id": "3d-references",
+    "goal_index": "3",
+    "text": "From Domain!B12, group the six tabs (Ctrl+Shift+PgDn five times) and type the check block once: Checks in bold, the tie in row 13.",
+    "teach": "Ctrl+Shift+PgDn adds the next tab to a group, and while a group is on, what you type and format lands on every sheet in it. Moving to a sheet outside the group ends it; check before any other edit.",
+    "why": "",
+    "hint_stuck": "pulse range B12:C13 · Row 13: Total washes tie to retail plus member, then =F7-F5-F6 beside it, indented and in the page’s number format."
+   },
+   {
+    "lesson_id": "3d-references",
+    "goal_index": "4",
+    "text": "Leave the group with Ctrl+PgUp to Export, then on Summary tie the roll-up to the cube in C76: =F67-F21.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C76 · The flag in C77 reads it the moment it is there."
+   },
+   {
+    "lesson_id": "3d-references",
+    "goal_index": "5",
+    "text": "Does it tie? Watch a figure on Mueller’s tab change and the roll-up in C65 move with it.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C65 · One formula reads all six tabs."
+   }
+  ],
+  "challenge-kpi-block": [
+   {
+    "lesson_id": "challenge-kpi-block",
+    "goal_index": "0",
+    "text": "Utilization by site in Summary!I5:I10: washes over daily capacity times days reported.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-kpi-block",
+    "goal_index": "1",
+    "text": "Member share by site in M5:M10: member washes over washes.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-kpi-block",
+    "goal_index": "2",
+    "text": "Washes in the window in C50: a SUMIFS between the dates in C48 and C49.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-kpi-block",
+    "goal_index": "3",
+    "text": "The washes cube C15:E20: one SUMIFS on the site $B15 and the week C$14, entered with Ctrl+Enter.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-kpi-block",
+    "goal_index": "4",
+    "text": "Tie both cubes to the export in C72 and C73, so the flag in C77 reads zero.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-kpi-block",
+    "goal_index": "5",
+    "text": "Answer question 9 on Q&A: E9 Answered, and F9 a link to the washes over the export.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
   ]
  },
  "modules": {
@@ -9599,6 +10547,20 @@ export const COPY = {
    "objective": "Why a model reads a dataset; VLOOKUP and HLOOKUP and how they fail; MATCH, then INDEX/MATCH; two-way INDEX/MATCH; XLOOKUP; approximate match for bands and IFERROR around a lookup; multi-criteria lookups; OFFSET and INDIRECT and why the standard avoids them.",
    "story_beat": "The model can’t hold the data. || Sponsor A’s first question is simple, the Deluxe price, and the price list is on another sheet. A lookup reaches into a table, finds a row by its key and brings back the column you asked for, so a page can read a dataset it could never hold. Every model a buyer sends you is built on them, and every one has a way to fail.",
    "page_name": "The question log, answered"
+  },
+  "lists-and-tables": {
+   "id": "lists-and-tables",
+   "name": "Lists and tables",
+   "objective": "Lists: sort and multi-level sort; AutoFilter and filtered totals with SUBTOTAL; Remove Duplicates and the unique site list; Data Validation and drop-downs; filter tricks (visible cells only, wildcards, skip blanks); the modern list tools, UNIQUE, FILTER and SORT.",
+   "story_beat": "Ninety rows, sorted, filtered, deduplicated. || Sponsor B wants the export by site and then by day, the Saturdays only, and a clean list of sites with no repeats. They also want the inputs on the case sheet limited to choices from a list, so nobody types \"Mangement\". Sort, filter, Remove Duplicates and Data Validation are the list tools, and they change the data or what you see of it, so the rule is: on a copy, and with a total that knows what’s filtered.",
+   "page_name": "The export, as a list"
+  },
+  "summaries-from-raw-rows": {
+   "id": "summaries-from-raw-rows",
+   "name": "Summaries from raw rows",
+   "objective": "Summaries from raw rows: the SUMIFS cube filled both ways; the KPI block (washes per hour, member share, utilization); date-range criteria; the KPI page linked, labeled and checked; a buyer’s question answered end to end; 3D references and grouped sheets across site tabs.",
+   "story_beat": "The KPI page. || Every buyer wants the same page: washes and revenue by site and by week, utilization, member share, and a way to ask any question of the export without touching it. The page is a set of SUMIFS reading the export by keys, laid out as a cube, with a KPI block on top and a checks block underneath, and it answers the log’s questions one after another.",
+   "page_name": "The KPI page"
   }
  },
  "site": {

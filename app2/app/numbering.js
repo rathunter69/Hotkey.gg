@@ -18,6 +18,7 @@ export const MODULE_NUMBERS = {
   'time-value-of-money': '3.5', auditing: '3.6', 'ch3-project-and-assessment': '3.7',
   // Chapter 4 · Data and lookups (script-ch4.md)
   lookups: '4.1',
+  'lists-and-tables': '4.2', 'summaries-from-raw-rows': '4.3',
 };
 /** The catalogue section the chapter's project, assessment and test-out sit in (module 1.8). */
 export const FINAL_SECTION = 'Project and assessment';

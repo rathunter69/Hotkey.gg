@@ -17,7 +17,7 @@
 //   rv.setMode('slim');                                  // the learner's toggle persists in prefs (one store: app/prefs.js)
 //   rv.render();                                         // (re-runs on session.onChange)
 
-import { TABS, MENUS, RIBBON_GROUPS, RIBBON_ICONS, RIBBON_MENU_ICONS, FMT_OPTS, PASTE_OPTS, PASTE_OP_OPTS, COMMANDS, tabName,
+import { TABS, MENUS, RIBBON_GROUPS, RIBBON_ICONS, RIBBON_MENU_ICONS, FMT_OPTS, PASTE_OPTS, PASTE_OP_OPTS, PASTE_SKIP_BLANKS, COMMANDS, tabName,
   QAT_COMMANDS, POPULAR_COMMANDS, OPTIONS_PAGES, OPTIONS_LIVE_PAGES } from '../engine/ribbon.js';
 import { FONT_SWATCHES, FILL_SWATCHES, TAB_COLORS, CELL_STYLES, CF_STYLES, CF_STYLE_KEYS, CF_BAR_COLORS, CF_SCALES, CF_OP_LABEL } from '../engine/sheet.js';
 import { DELETE_SHEET_PROMPT } from '../engine/keyboard.js';
@@ -643,6 +643,8 @@ export class RibbonView {
           const on = ss.pasteOp === op;
           rows += `<div class="pd-opt${on ? ' on' : ''}" data-act="letter:${k}"><span class="pd-radio">${on ? '●' : '○'}</span><span class="pd-key">${k}</span><span>${lbl}</span></div>`;
         });
+        { const [k, lbl] = PASTE_SKIP_BLANKS; const on = !!ss.pasteSkip;
+          rows += `<div class="pd-opt${on ? ' on' : ''}" data-act="letter:${k}"><span class="pd-radio">${on ? '☑' : '☐'}</span><span class="pd-key">${k}</span><span>${lbl}</span></div>`; }
         d.querySelector('.pd-opts').innerHTML = rows;
         this.positionDialog(d);
       }

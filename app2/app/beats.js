@@ -75,6 +75,11 @@ const BEATS_DEFAULT = {
   // Chapter 4 · Data and lookups (script-ch4.md story cards)
   lookups: { eyebrow: 'Module 4.1 · lookups', title: 'The model can’t hold the data.',
     body: 'Sponsor A’s first question is simple, the Deluxe price, and the price list is on another sheet. A lookup reaches into a table, finds a row by its key and brings back the column you asked for, so a page can read a dataset it could never hold. Every model a buyer sends you is built on them, and every one has a way to fail.' },
+  // Chapter 4 · Data and Lookups (script-ch4.md story cards)
+  'lists-and-tables': { eyebrow: 'Module 4.2 · lists and tables', title: 'Ninety rows, sorted, filtered, deduplicated.',
+    body: 'Sponsor B wants the export by site and then by day, the Saturdays only, and a clean list of sites with no repeats. They also want the inputs on the case sheet limited to choices from a list, so nobody types "Mangement". Sort, filter, Remove Duplicates and Data Validation are the list tools, and they change the data or what you see of it, so the rule is: on a copy, and with a total that knows what’s filtered.' },
+  'summaries-from-raw-rows': { eyebrow: 'Module 4.3 · summaries from raw rows', title: 'The KPI page.',
+    body: 'Every buyer wants the same page: washes and revenue by site and by week, utilization, member share, and a way to ask any question of the export without touching it. The page is a set of SUMIFS reading the export by keys, laid out as a cube, with a KPI block on top and a checks block underneath, and it answers the log’s questions one after another.' },
   'project-and-assessment': { eyebrow: 'Module 1.8 · project, assessment, test-out', title: 'Management’s next feed is in.',
     body: 'A fresh week, a blank Report, and everything the chapter taught. Build the page start to finish, then prove it against the clock on Monday morning; or test out of the chapter in five minutes.' },
 };

@@ -46,7 +46,7 @@ export const MENUS = {
   'N': [['V', 'PivotTable']],
   'NV': [['T', 'From Table/Range…']],
   'MU': [['S', 'Sum']],
-  'A': [['K', 'Edit Links'], ['S', 'Sort'], ['T', 'Filter'], ['E', 'Text to Columns'], ['F', 'Flash Fill'], ['M', 'Remove Duplicates'], ['V', 'Data Validation'], ['W', 'What-If Analysis'], ['G', 'Group'], ['U', 'Ungroup'], ['H', 'Hide detail'], ['J', 'Show detail']],   // Excel's Data tab: Queries & Connections, Sort & Filter, Data Tools, Forecast, Outline
+  'A': [['K', 'Edit Links'], ['S', 'Sort'], ['T', 'Filter'], ['C', 'Clear'], ['E', 'Text to Columns'], ['F', 'Flash Fill'], ['M', 'Remove Duplicates'], ['V', 'Data Validation'], ['W', 'What-If Analysis'], ['G', 'Group'], ['U', 'Ungroup'], ['H', 'Hide detail'], ['J', 'Show detail']],   // Excel's Data tab: Queries & Connections, Sort & Filter, Data Tools, Forecast, Outline
   'AV': [['V', 'Data Validation…']],
   'AW': [['G', 'Goal Seek…'], ['T', 'Data Table…']],
   'AG': [['G', 'Group…'], ['A', 'Auto Outline']],      // split buttons, as in Excel: Alt A G G groups, Alt A U U ungroups
@@ -60,7 +60,7 @@ export const MENUS = {
 
 /** Excel's real Home-tab groups — the renderer draws each as a labelled cluster. */
 export const RIBBON_GROUPS = {
-  'A': [['Queries & Connections', ['K']], ['Sort & Filter', ['S', 'T']], ['Data Tools', ['E', 'F', 'M', 'V']], ['Forecast', ['W']], ['Outline', ['G', 'U', 'H', 'J']]],
+  'A': [['Queries & Connections', ['K']], ['Sort & Filter', ['S', 'T', 'C']], ['Data Tools', ['E', 'F', 'M', 'V']], ['Forecast', ['W']], ['Outline', ['G', 'U', 'H', 'J']]],
   'N': [['Tables', ['V']]],
   'P': [['Page Setup', ['M', 'O', 'S', 'A', 'B', 'G', 'I']]],
   'H': [
@@ -108,6 +108,8 @@ export const FMT_OPTS = [
   ['E', 'superscript ¹'], ['K', 'strikethrough'], ['A', 'center across'],
   ['U', 'Custom…'],   // the Custom box: type an Excel format code (Chapter 2)
 ];
+/** Paste Special's Skip blanks tick box: a blank in the copied block leaves the cell under it alone. */
+export const PASTE_SKIP_BLANKS = ['B', 'Skip blanks'];
 export const PASTE_OP_OPTS = [['O', 'None', 'none'], ['M', 'Multiply', 'multiply'], ['D', 'Add', 'add'], ['S', 'Subtract', 'subtract'], ['I', 'Divide', 'divide']];
 export const PASTE_OPTS = [
   ['A', 'All', 'all'], ['F', 'Formulas', 'formulas'], ['V', 'Values', 'values'],
@@ -199,7 +201,7 @@ export const COMMANDS = {
   'HLD': 'Data Bars', 'HLS': 'Color Scales', 'HLCS': 'Clear Rules from Selected Cells', 'HLCE': 'Clear Rules from Entire Sheet', 'HLR': 'Manage Rules…',
   'MAA': 'Remove Arrows', 'MAP': 'Remove Precedent Arrows', 'MAD': 'Remove Dependent Arrows', 'MV': 'Evaluate Formula', 'MW': 'Watch Window', 'MK': 'Error Checking',
   'MXA': 'Automatic', 'MXE': 'Automatic Except for Data Tables', 'MXM': 'Manual',
-  'AE': 'Text to Columns…', 'AF': 'Flash Fill', 'AM': 'Remove Duplicates…', 'AVV': 'Data Validation…', 'AK': 'Edit Links…', 'AT': 'Filter', 'ASS': 'Sort…', 'AWG': 'Goal Seek…', 'AWT': 'Data Table…', 'NVT': 'PivotTable…',
+  'AE': 'Text to Columns…', 'AF': 'Flash Fill', 'AM': 'Remove Duplicates…', 'AVV': 'Data Validation…', 'AK': 'Edit Links…', 'AT': 'Filter', 'AC': 'Clear', 'ASS': 'Sort…', 'AWG': 'Goal Seek…', 'AWT': 'Data Table…', 'NVT': 'PivotTable…',
 };
 
 /**

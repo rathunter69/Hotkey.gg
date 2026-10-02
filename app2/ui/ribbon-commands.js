@@ -211,7 +211,7 @@ const autoSum = s => { leaveRibbon(s); s.startClock(); s.doAutoSum(); };
 const tool = id => s => { leaveRibbon(s); s.startClock(); s.toolCommand(id); };
 const gridlines = direct((S, s) => { S.gridlines = !S.gridlines; s.toast(S.gridlines ? 'Gridlines shown.' : 'Gridlines hidden. Alt W V G shows them.'); S.commit('ribbon'); });
 const fmtCells = s => { leaveRibbon(s); s.openFormatCells(); };
-const pasteSpecial = dialog('paste', s => { s.pasteKind = 'all'; s.pasteOp = 'none'; });
+const pasteSpecial = dialog('paste', s => { s.pasteKind = 'all'; s.pasteOp = 'none'; s.pasteSkip = false; });
 
 const C = (label, group, tab, icon, run, keys) => ({ label, group, tab, icon, run, keys: keys || '' });
 
@@ -313,6 +313,7 @@ export const RIBBON_COMMANDS = {
   'ASD': C('Sort Z to A', 'Sort & Filter', 'A', ICON.sortZA, sortRun('desc')),
   'ASS': C('Sort…', 'Sort & Filter', 'A', ICON.sortAZ, tool('ASS')),
   'AT': C('Filter', 'Sort & Filter', 'A', ICON.filter, tool('AT'), 'Ctrl+Shift+L'),
+  'AC': C('Clear', 'Sort & Filter', 'A', ICON.clear, tool('AC')),
   'AK': C('Edit Links', 'Queries & Connections', 'A', ICON.link, tool('AK')),
   'AE': C('Text to Columns', 'Data Tools', 'A', ICON.textToCols, tool('AE')),
   'AF': C('Flash Fill', 'Data Tools', 'A', ICON.flashFill, tool('AF'), 'Ctrl+E'),
@@ -424,7 +425,6 @@ export const UNIMPLEMENTED = [
   U('Financial', 'Financial', 'Function Library', 'M'), U('Logical', 'Logical', 'Function Library', 'M'), U('TextFn', 'Text', 'Function Library', 'M'),
   U('CalculateNow', 'Calculate Now', 'Calculation', 'M', ICON.calc),
   U('FromText', 'From Text/CSV', 'Get & Transform Data', 'A', ICON.fromText), U('FromWeb', 'From Web', 'Get & Transform Data', 'A', ICON.fromWeb),
-  U('ClearFilter', 'Clear', 'Sort & Filter', 'A', ICON.clear),
   U('ForecastSheet', 'Forecast Sheet', 'Forecast', 'A', ICON.chartLine),
   U('Spelling', 'Spelling', 'Proofing', 'R', ICON.spelling), U('Thesaurus', 'Thesaurus', 'Proofing', 'R', ICON.thesaurus),
   U('NewComment', 'New Comment', 'Comments', 'R', ICON.comment), U('DeleteComment', 'Delete', 'Comments', 'R', ICON.del), U('ShowComments', 'Show Comments', 'Comments', 'R', ICON.comment),
@@ -515,7 +515,7 @@ export const RIBBON_LAYOUT = {
   A: [
     { name: 'Get & Transform Data', cols: [big({ dead: 'FromText' }), big({ dead: 'FromWeb' })] },
     { name: 'Queries & Connections', cols: [big({ cmd: 'AK' })] },
-    { name: 'Sort & Filter', cols: [{ rows: [[ico({ cmd: 'ASA' })], [ico({ cmd: 'ASD' })]] }, big({ cmd: 'ASS' }), big({ cmd: 'AT', check: 'autoFilter' }), { rows: [[{ dead: 'ClearFilter' }]] }] },
+    { name: 'Sort & Filter', cols: [{ rows: [[ico({ cmd: 'ASA' })], [ico({ cmd: 'ASD' })]] }, big({ cmd: 'ASS' }), big({ cmd: 'AT', check: 'autoFilter' }), { rows: [[ico({ cmd: 'AC' })]] }] },
     { name: 'Data Tools', cols: [big({ cmd: 'AE' }), big({ cmd: 'AF' }), big({ cmd: 'AM' }), big({ menu: 'AV', cmd: 'AVV', label: 'Data Validation' })] },
     { name: 'Forecast', cols: [big({ menu: 'AW' }), big({ dead: 'ForecastSheet' })] },
     { name: 'Outline', cols: [big({ menu: 'AG', cmd: 'AGG', label: 'Group' }), big({ menu: 'AU', cmd: 'AUU', label: 'Ungroup' }), { rows: [[{ cmd: 'AH' }], [{ cmd: 'AJ' }]] }] },

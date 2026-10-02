@@ -208,6 +208,7 @@ const methods = {
       case 'AVV': this.openValidation(); return true;
       case 'AK': this.openEditLinks(); return true;
       case 'AT': this.exitRibbon(false); this.toggleAutoFilter(); return true;
+      case 'AC': this.exitRibbon(false); this.clearFilters(); return true;
       case 'ASS': this.openSortDialog(); return true;
       case 'AWG': this.openGoalSeek(); return true;
       case 'AWT': this.openDataTable(); return true;
@@ -295,6 +296,11 @@ const methods = {
     const sr = S.selRange(); const a = S.dispActive();
     const rg = sr.r1 === sr.r2 && sr.c1 === sr.c2 ? S.regionAround(a.r, a.c) : { r1: sr.r1, c1: sr.c1, r2: sr.r2, c2: sr.c2 };
     S.filter = { ...rg, crit: {} }; S.filterRows = new Set(); S.commit('layout'); return true;
+  },
+  /** Data › Clear (Alt A C): every column's criterion comes off and every row shows; the arrows stay. */
+  clearFilters() {
+    const S = this.sheet; this.startClock(); if (!S.filter) return false;
+    S.pushUndo(); S.filter.crit = {}; S.filterRows = new Set(); S.commit('layout'); return true;
   },
   /** Recompute the rows the AutoFilter hides from its criteria (every column's must pass). */
   applyFilter() {
