@@ -50,7 +50,6 @@ The site keeps your guest progress, settings, theme and similar preferences in y
 |---|---|---|
 | Supabase, Inc. | Database, sign-in and sign-in emails | Everything in section 2 that is stored with an account; IP address and browser for each request |
 | Cloudflare, Inc. | Hosts the site | Every page request: IP address, browser, the page asked for |
-| Google LLC (Google Fonts) | Serves the site's two typefaces | IP address and browser on each page load (no cookies) **[LAWYER]** see third-parties.md: we recommend self-hosting the fonts, which removes this transfer |
 | Google LLC (sign-in) | Only if you choose Continue with Google | Google's own account data, under Google's policy; Google learns you signed in to hotkey.gg |
 | Stripe, Inc. and Link (Stripe's merchant of record service) | Checkout, subscriptions, receipts, renewal notices, tax, fraud checks | Your email, payment details (we never see your card), IP address and device data for fraud prevention |
 

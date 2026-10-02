@@ -38,6 +38,6 @@ Nothing here is shared with anyone or used to follow you on other sites.
 
 ### Fonts
 
-The site loads its two typefaces from Google Fonts. That sets no cookies, but your browser's request reaches Google. See third-parties.md.
+The site's two typefaces are served from hotkey.gg itself, so no font request reaches a third party. See third-parties.md.
 
 Last updated: **[date of publication]**

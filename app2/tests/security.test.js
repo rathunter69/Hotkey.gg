@@ -73,8 +73,8 @@ test('CSP: scripts from this origin and the hashed inline scripts only; no inlin
 
 test('CSP (hotkey.gg): exactly the origins the site loads, and nothing of Stripe until checkout is switched on', () => {
   assert.deepEqual(SITE_CSP['connect-src'], ["'self'", `https://${SUPA}`, `wss://${SUPA}`], 'the Supabase project: REST, Auth and functions over https, Realtime over wss');
-  assert.deepEqual(SITE_CSP['style-src'], ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com']);
-  assert.deepEqual(SITE_CSP['font-src'], ["'self'", 'https://fonts.gstatic.com']);
+  assert.deepEqual(SITE_CSP['style-src'], ["'self'", "'unsafe-inline'"]);
+  assert.deepEqual(SITE_CSP['font-src'], ["'self'"], 'the two fonts are self-hosted (app2/ui/fonts): no request leaves the site for a font');
   assert.deepEqual(SITE_CSP['img-src'], ["'self'", 'data:', 'blob:']);
   assert.deepEqual(SITE_CSP['frame-src'], ["'none'"]);
   assert.deepEqual(SITE_CSP['worker-src'], ["'none'"]);
