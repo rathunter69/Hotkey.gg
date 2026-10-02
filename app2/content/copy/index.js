@@ -1983,6 +1983,18 @@ export const COPY = {
    "mac_note": "",
    "story_beat": ""
   },
+  "populate-from-data": {
+   "id": "populate-from-data",
+   "module": "model-setup",
+   "order": "5.2.5",
+   "title": "Populate the statements from the data tab: INDEX/MATCH on label and year",
+   "brief": "The three historical years arrive on a Data tab as the accountants sent them: forty lines in their order, years across, labels that don’t match the model’s. The model’s IS should read them by name, not by position: INDEX/MATCH on the label down and the year across (4.1.4), so one formula fills the whole historical block and survives a re-sorted export. Where Data has two lines with one label, SUMIFS on label and year does the same job and adds them (4.1.7). Fill the IS historicals from Data by name. The key is `INDEX`.",
+   "closing": "The historicals read the data tab by name, so the next dump can be any shape. || Three years of actuals fill the IS with four formulas, and none of them knows which row Data put a line on. When the accountants send next year’s export with a line added, the model reads it the same way.",
+   "wow": "Three years of history on the IS, read from the export by name and year.",
+   "convention_line": "One input, one cell; formulas reference it",
+   "mac_note": "",
+   "story_beat": ""
+  },
   "remix-format-on-the-pnl": {
    "id": "remix-format-on-the-pnl",
    "module": "remixes",
@@ -12487,6 +12499,56 @@ export const COPY = {
     "teach": "",
     "why": "",
     "hint_stuck": "pulse cell C7 · One check off zero is enough to turn the flag."
+   }
+  ],
+  "populate-from-data": [
+   {
+    "lesson_id": "populate-from-data",
+    "goal_index": "0",
+    "text": "In IS!A5, =INDEX(Inputs!$N$5:$N$40,MATCH($B5,Inputs!$M$5:$M$40,0)), filled down to A7 with Ctrl+D.",
+    "teach": "Data uses the accountants’ labels, and the mapping on Inputs, the model’s line in M and their name in N, translates one into the other. A helper in column A does the translation once per line.",
+    "why": "",
+    "hint_stuck": "pulse range A5:A7 · MATCH finds the model’s label in M; INDEX returns the name beside it in N."
+   },
+   {
+    "lesson_id": "populate-from-data",
+    "goal_index": "1",
+    "text": "Revenue in C5:E7 in one entry: =INDEX(Data!$C$5:$F$44,MATCH($A5,…),MATCH(YEAR(C$4),Data!$C$4:$F$4,0)), with Ctrl+Enter.",
+    "teach": "One formula for the block: the helper finds the row on Data, YEAR of the header finds the column, because Data holds 2024 where the model holds a date. $A keeps the label column still; the row 4 anchor keeps the header row still.",
+    "why": "",
+    "hint_stuck": "pulse range C5:E7 · The label range is Data!$B$5:$B$44."
+   },
+   {
+    "lesson_id": "populate-from-data",
+    "goal_index": "2",
+    "text": "Cost of sales in C9:E9: the same lookup with a minus in front, =-INDEX(…).",
+    "teach": "Data records costs as positive figures; the IS shows them negative, so the formula carries a minus in front.",
+    "why": "",
+    "hint_stuck": "pulse range C9:E9 · A cost is a negative on this IS."
+   },
+   {
+    "lesson_id": "populate-from-data",
+    "goal_index": "3",
+    "text": "The six site costs in C13:E18, in one entry with the minus lookup.",
+    "teach": "Best practice: never link a model to a data dump by cell position. The next dump will be a row longer or sorted differently, and a lookup by name is what survives it.",
+    "why": "",
+    "hint_stuck": "pulse range C13:E18 · The helpers in A13:A18 are already there."
+   },
+   {
+    "lesson_id": "populate-from-data",
+    "goal_index": "4",
+    "text": "Switch rent in C14:E14 to =-SUMIFS(INDEX(Data!$C$5:$F$44,0,MATCH(YEAR(C$4),…)),Data!$B$5:$B$44,$A14).",
+    "teach": "Data splits rent over two accounts with one label, and MATCH stops at the first. SUMIFS adds every row with the label, and INDEX(block,0,n) hands it the year’s column (4.1.7).",
+    "why": "",
+    "hint_stuck": "pulse range C14:E14 · Both Rent lines on Data belong in the total."
+   },
+   {
+    "lesson_id": "populate-from-data",
+    "goal_index": "5",
+    "text": "Does it tie? Watch FY26 retail sales on Data rise by 1,000, and the IS’s FY26 revenue answer.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell E5 · The IS reads Data by name and year."
    }
   ]
  },
