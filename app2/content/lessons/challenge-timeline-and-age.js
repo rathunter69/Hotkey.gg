@@ -1,7 +1,7 @@
 // Chapter 3 · 3.2.C Challenge: a fiscal-quarter timeline and an age table (seeded over S1d)
 // The module's starting sheet with a fresh site register and a fresh export: the seed moves the
 // opening dates on Sites (the newest site opened within the month), the as-of date and the
-// export's ninety dates by the same number of days, anywhere in a year either side, so fiscal
+// export’s ninety dates by the same number of days, anywhere in a year either side, so fiscal
 // years, halves and weekends land differently every time. Six goals graded on values and
 // liveness: YEARFRAC ages, vintages, month and quarter keys, the buyer's June fiscal year and
 // half, a weekend flag and trading days. Graders hold every column live and the month key as text.
