@@ -12,7 +12,7 @@ import { attemptId, dayOf, traceOf } from './records.js';
 import { tierFor } from './pars.js';
 import { gameCtx, celebrate } from './stats.js';
 import { track } from './telemetry.js';
-import { nextLesson, chapterOf, moduleOf } from '../content/index.js';
+import { nextLesson, chapterOf, moduleOf, CHAPTERS } from '../content/index.js';
 import { CONVENTIONS } from '../content/conventions.js';
 import { SheetView } from '../ui/sheet-view.js';
 import { RibbonView } from '../ui/ribbon-view.js';
@@ -547,6 +547,8 @@ export function mountLessonView(root, lesson, { mode = 'guided', seed: seedOpt, 
       store.chapterPass(lesson.chapter, lesson.kind);
       if (lesson.kind === 'testout' && chapter) { const all = store.all(); const ids = chapter.lessons.filter(l => l.id !== lesson.id && !(all[l.id] && all[l.id].completed)).map(l => l.id); if (ids.length) store.skip(ids); }
     }
+    // Chapter 6, the last, finished by a subscriber: the course-complete email is due (E-checkout section 6; logged until an email path exists)
+    { const ch = chapterOf(lesson); if (ch && CHAPTERS.indexOf(ch) === 5) import('./billing.js').then(b => b.noteCourseComplete(ch.lessons.map(l => l.id), store.all())).catch(() => {}); }
     saveState = saved ? '' : 'Couldn’t save on this device (storage blocked); the lesson still counts for this visit';
     const ctxAfter = gameCtx();
     xpGained = Math.max(0, ctxAfter.xp - ctxBefore.xp);

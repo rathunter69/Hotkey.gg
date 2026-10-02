@@ -1,10 +1,9 @@
-// The site screens of run R1b built here (M92, M95, M101, M105, M106): the pricing page keeps the
-// live figures and lays them out to 3.0, the paywall is one panel, the Settings page renders from
+// The site screens of run R1b built here (M92, M95, M101, M105, M106): the paywall is one panel
+// (pricing and checkout are tested in payments-ui.test.js), the Settings page renders from
 // SETTINGS_GROUPS, the footer carries 3.0's lines, and every line the screens show is a site.csv
 // row free of the tells.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { PRICES, proTerms, pricingHtml, FREE_ROWS, PRO_ROWS } from '../app/pricing-page.js';
 import { paywallHtml, PAID_LINE } from '../ui/components/paywall.js';
 import { lockHeading } from '../app/lock-page.js';
 import { columnsFor, visibleSettings, controlHtml, groupHtml, themeTiles } from '../app/settings-page.js';
@@ -16,28 +15,14 @@ import { tells } from '../content/copy/tells.js';
 
 const text = html => String(html).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 
-test('pricing (M105): the live figures stay, Free and Pro side by side, the toggle, the rows, the money-back line and Teams', () => {
-  assert.deepEqual(PRICES, { month: 9, year: 90, studentMonth: 7, studentYear: 70 }, 'nothing changes until Wolf says go');
-  const terms = proTerms();
-  assert.deepEqual(terms.map(x => [x.key, x.price]), [['month', '$9'], ['year', '$90']]);
-  const html = pricingHtml({ term: 'month' });
-  const t = text(html);
-  for (const s of ['Pricing', 'Free', 'Pro', '$0', '$9', 'Monthly', 'Yearly', '$7', '$70', 'Go Pro', 'Checkout opens at launch.', '14 days', 'Teams and classes']) assert.ok(t.includes(s), s);
-  assert.ok(pricingHtml({ term: 'year' }).includes('id="proFigure">$90<'), 'the toggle swaps the figure');
-  assert.equal(FREE_ROWS().length, 4); assert.equal(PRO_ROWS().length, 4);
-  assert.equal((html.match(/class="plan-tick"/g) || []).length, 8, 'one ticked row each');
-  assert.ok(html.includes('class="panel plan"') && html.includes('plan-pro'), 'two panels');
-  assert.doesNotMatch(t, /→|·/, 'no arrow on a button, no dot-joined facts');
-  assert.ok(html.includes('disabled'), 'Go Pro waits for checkout');
-});
-
-test('the paywall (M105) is one panel: the heading with Pro at its right, the line, Go Pro on Enter and Not now on Esc', () => {
-  const html = paywallHtml({ heading: 'Chapter 2: Formatting', signedIn: false });
+test('the paywall (M105) is one panel: the heading with Full Access at its right, the line, the price, Get full access on Enter and Not now on Esc', () => {
+  const html = paywallHtml({ heading: 'Chapter 2: Formatting', signedIn: false, payments: false });
   assert.ok(html.startsWith('<section class="panel panel-mode paywall"'));
   const t = text(html);
-  assert.ok(t.includes('Chapter 2: Formatting') && t.includes('Pro') && t.includes(PAID_LINE()) && t.includes('Go Pro Enter') && t.includes('Not now Esc'));
+  assert.ok(t.includes('Chapter 2: Formatting') && t.includes('Full Access') && t.includes(PAID_LINE()) && t.includes('Get full access Enter') && t.includes('Not now Esc'));
+  assert.ok(t.includes('$15 a month') && t.includes('$9'), 'the price line matches Pricing');
   assert.ok(!t.includes('redeem'), 'a guest sees no redeem line');
-  assert.ok(text(paywallHtml({ heading: 'x', signedIn: true })).includes('redeem a code'));
+  assert.ok(text(paywallHtml({ heading: 'x', signedIn: true, payments: false })).includes('redeem a code'));
   assert.equal(lockHeading(null, { title: 'Formatting' }, 2, ''), 'Chapter 2: Formatting');
   assert.equal(lockHeading({ title: 'Bold the header' }, null, 0, '2.1.3'), '2.1.3 Bold the header');
   assert.equal(lockHeading(null, null, 0, ''), 'This lesson');

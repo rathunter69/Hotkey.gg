@@ -17,3 +17,5 @@
 /cert.html /#/account 301
 /security.html /#/privacy 301
 /admin.html / 302
+/checkout /#/checkout 302
+/checkout/ /#/checkout 302
