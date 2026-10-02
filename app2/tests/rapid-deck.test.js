@@ -66,6 +66,22 @@ test('a second route passes where the course teaches one', () => {
   }
 });
 
+test('a held Alt chord works as a browser sends it: the Alt press opens the KeyTips, the chord closes them and acts', () => {
+  // a browser fires Alt's own keydown before Alt+↓; the engine must not swallow the chord in the KeyTips
+  const f = buildFrag('filter-menu', 4);
+  const s = fragSession(f);
+  s.key({ key: 'Alt', altKey: true });
+  assert.equal(s.mode, 'ribbon');
+  s.key({ key: 'ArrowDown', altKey: true });
+  assert.ok(RAPID_BY_ID['filter-menu'].check(s, f), 'held Alt+↓ opens the filter menu');
+  // a KeyTip letter after Alt still walks the Ribbon
+  const g = fragSession(buildFrag('bold', 4));
+  g.key({ key: 'Alt', altKey: true });
+  g.key({ key: 'h', code: 'KeyH' });
+  assert.equal(g.mode, 'ribbon');
+  assert.ok(g.path.length > 0, 'the Home tab is open');
+});
+
 test('a wrong chord leaves the fragment changed and failing, so the stage can call it', () => {
   const f = buildFrag('bold', 3);
   const s = fragSession(f);

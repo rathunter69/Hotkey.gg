@@ -11,6 +11,7 @@ export const FREE_THEMES = ['workbook', 'contrast', 'default'];
 export const SPECIAL_THEMES = {
   bloomberg: { ach: 'ch1-complete', label: 'Complete Chapter 1' },
   crimson: { rank: 6, label: 'Reach MD' },   // rank.js TIERS index
+  synthwave: { ach: 'combo-10', label: 'A ten-hit rapid-fire combo' },   // the meter's first Combo 10 (M100)
 };
 
 /** Level-locked themes in unlock order: every locked, non-special theme, one each 3 levels. */

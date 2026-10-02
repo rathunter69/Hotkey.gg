@@ -449,7 +449,7 @@ body[data-route="rapid"] > .app{padding:0; margin:0; max-width:none}
 .rf{max-width:var(--rf-max); margin:0 auto; padding:0 var(--content-side) var(--s8); font-family:var(--font); color:var(--ink); display:flex; flex-direction:column; min-height:100vh}
 .rf-top{display:flex; align-items:center; gap:var(--s6); height:var(--rf-top-h); border-bottom:1px solid var(--line)}
 .rf-back{padding:var(--s2) var(--s3); font-size:var(--fs-label)}
-.rf-len{font-size:var(--fs-label); font-weight:var(--fw-semi); color:var(--ink-2)}
+.rf-dur{font-size:var(--fs-label); font-weight:var(--fw-semi); color:var(--ink-2)}
 .rf-hits{font-size:var(--fs-body); font-weight:var(--fw-bold); color:var(--ink)}
 .rf-clock{margin-left:auto; font-family:var(--mono); font-size:var(--fs-clock); font-weight:var(--fw-bold); font-variant-numeric:tabular-nums; color:var(--ink)}
 .rf-clock.low{color:var(--red)}
@@ -485,13 +485,13 @@ body[data-route="rapid"] > .app{padding:0; margin:0; max-width:none}
 /* Ready: what Enter starts */
 .rf-ready{display:flex; flex-direction:column; align-items:center; gap:var(--s5); padding-top:var(--s12); max-width:calc(var(--side-col) * 2); text-align:center}
 .rf-title{margin:0; font-size:var(--fs-prompt); font-weight:var(--fw-heavy); line-height:var(--lh-tight); color:var(--ink)}
-.rf-how{margin:0; padding:0; list-style:none; counter-reset:rf; display:flex; flex-direction:column; gap:var(--s2); text-align:left; font-size:var(--fs-body); line-height:var(--lh-body); color:var(--ink)}
-.rf-how li{counter-increment:rf; display:flex; gap:var(--s3); align-items:baseline}
-.rf-how li::before{content:counter(rf); flex:none; width:var(--s6); height:var(--s6); display:inline-flex; align-items:center; justify-content:center; border-radius:50%; background:var(--rapid-tint); color:var(--rapid-ink); font-size:var(--fs-label); font-weight:var(--fw-bold)}
+.rf-steps{margin:0; padding:0; list-style:none; counter-reset:rfstep; display:flex; flex-direction:column; gap:var(--s2); text-align:left; font-size:var(--fs-body); line-height:var(--lh-body); color:var(--ink)}
+.rf-steps li{counter-increment:rfstep; display:flex; gap:var(--s3); align-items:baseline}
+.rf-steps li::before{content:counter(rfstep); flex:none; width:var(--s6); height:var(--s6); display:inline-flex; align-items:center; justify-content:center; border-radius:50%; background:var(--rapid-tint); color:var(--rapid-ink); font-size:var(--fs-label); font-weight:var(--fw-bold)}
 .rf-go{--mode:var(--rapid); display:inline-flex; align-items:center; gap:var(--s3); padding:var(--s3) var(--s6); font-size:var(--fs-item); font-weight:var(--fw-bold)}
-.rf-lens{display:flex; gap:var(--s2)}
-.rf-lenbtn{display:inline-flex; align-items:center; gap:var(--s2); font:inherit; font-size:var(--fs-body); font-weight:var(--fw-bold); color:var(--ink); background:var(--sheet); border:1px solid var(--edge); border-radius:var(--r-btn); padding:var(--s2) var(--s4); cursor:pointer}
-.rf-lenbtn.on{color:var(--rapid-ink); background:var(--rapid-tint); border-color:var(--rapid)}
+.rf-pick{display:flex; gap:var(--s2)}
+.rf-pickbtn{display:inline-flex; align-items:center; gap:var(--s2); font:inherit; font-size:var(--fs-body); font-weight:var(--fw-bold); color:var(--ink); background:var(--sheet); border:1px solid var(--edge); border-radius:var(--r-btn); padding:var(--s2) var(--s4); cursor:pointer}
+.rf-pickbtn.on{color:var(--rapid-ink); background:var(--rapid-tint); border-color:var(--rapid)}
 .rf-deckline{margin:0; font-size:var(--fs-label); font-weight:var(--fw-bold); color:var(--rapid-ink)}
 .rf-focus{margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:var(--s1); font-size:var(--fs-panel); font-weight:var(--fw-bold)}
 .rf-fine{margin:0; font-size:var(--fs-label); line-height:var(--lh-body); color:var(--ink-2)}
@@ -507,3 +507,7 @@ body[data-route="rapid"] > .app{padding:0; margin:0; max-width:none}
 .rf-ks{display:inline-flex; gap:var(--s1)}
 .rf-slow-t .rf-time{font-family:var(--mono)}
 .rf-acts{display:flex; gap:var(--s3); flex-wrap:wrap; justify-content:center}
+
+/* rapid-fire on the Practice pages: the deck scrolls inside its panel; the Practice side panel's one button sits at its natural width */
+.rf-deck-scroll{max-height:var(--rf-deck-h); overflow:auto}
+.rapid-panel .rapid-go{align-self:flex-start}

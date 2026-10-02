@@ -97,6 +97,11 @@ export function roundOrder(ids, seed, memory = null, n = 400) {
   return out;
 }
 
+/** The deck as the Rapid-fire page lists it: each command reached, its keys as the caps, its chapter. */
+export function deckRows(ch, platform) {
+  return deckFor(ch).map(p => ({ id: p.id, name: cmdName(p.id), keys: splitSequence(p.keys).map(k => keyLabel(k, platform)), ch: p.ch }));
+}
+
 /** The deck line under Ready: how many commands, from which chapters. */
 export function deckLine(n, ch, focus) {
   if (focus) return t('rapid_deck_focus', { n });
@@ -143,7 +148,7 @@ export function mountRapidPage(root, ctx = {}) {
   el.innerHTML = `
     <header class="rf-top">
       <button type="button" class="btn2 btn2-quiet rf-back" id="rfBack"><kbd class="key">Esc</kbd><span>${esc(t('rapid_back'))}</span></button>
-      <span class="rf-len" id="rfLen"></span>
+      <span class="rf-dur" id="rfLen"></span>
       <span class="rf-hits" id="rfHits"></span>
       <span class="rf-clock" id="rfClock"></span>
     </header>
@@ -173,18 +178,18 @@ export function mountRapidPage(root, ctx = {}) {
   /* ---- Ready ---- */
   function renderReady() {
     phase = 'ready'; el.dataset.phase = 'ready';
-    const lens = focus ? '' : `<div class="rf-lens" role="radiogroup">${RAPID_DURATIONS.map((n, i) => `<button type="button" role="radio" aria-checked="${n === dur}" class="rf-lenbtn${n === dur ? ' on' : ''}" data-len="${n}"><kbd class="key">${i + 1}</kbd><span>${esc(t('rapid_len_short_' + n))}</span></button>`).join('')}</div>`;
+    const lens = focus ? '' : `<div class="rf-pick" role="radiogroup">${RAPID_DURATIONS.map((n, i) => `<button type="button" role="radio" aria-checked="${n === dur}" class="rf-pickbtn${n === dur ? ' on' : ''}" data-len="${n}"><kbd class="key">${i + 1}</kbd><span>${esc(t('rapid_len_short_' + n))}</span></button>`).join('')}</div>`;
     parkMeter();
     $('#rfMain').innerHTML = `<section class="rf-ready">
       <p class="rf-deckline">${esc(deckLine(ids.length, chapter, focus))}</p>
       <h1 class="rf-title">${esc(t('rapid_title'))}</h1>
-      ${focus ? `<ol class="rf-focus">${focusIds.map(id => `<li>${esc(cmdName(id))}</li>`).join('')}</ol>` : `<ol class="rf-how">${[1, 2, 3].map(n => `<li>${esc(t('rapid_how_' + n))}</li>`).join('')}</ol>`}
+      ${focus ? `<ol class="rf-focus">${focusIds.map(id => `<li>${esc(cmdName(id))}</li>`).join('')}</ol>` : `<ol class="rf-steps">${[1, 2, 3].map(n => `<li>${esc(t('rapid_how_' + n))}</li>`).join('')}</ol>`}
       ${lens}
       <button type="button" class="btn2 btn2-primary rf-go" id="rfGo"><kbd class="key">${esc(keyLabel('Enter', platform))}</kbd><span>${esc(focus ? t('rapid_ready_focus') : t('rapid_ready'))}</span></button>
       <p class="rf-fine">${esc(siteCopy('rapid_fine', ''))} ${esc(t('rapid_esc_note'))}</p>
     </section>`;
     $('#rfGo').onclick = () => startRound();
-    el.querySelectorAll('.rf-lenbtn').forEach(b => { b.onclick = () => { dur = Number(b.dataset.len); keepLen(dur); renderReady(); }; });
+    el.querySelectorAll('.rf-pickbtn').forEach(b => { b.onclick = () => { dur = Number(b.dataset.len); keepLen(dur); renderReady(); }; });
     paintTop(); paintMeter();
   }
 
@@ -317,7 +322,14 @@ export function mountRapidPage(root, ctx = {}) {
   /** After every key the session took: fill the caps, then judge the fragment. */
   function judge() {
     const log = s.keyLog;
-    if (log.length > logAt) { for (const e of log.slice(logAt)) pressed.push(...keysOfLabel(e.k)); keys += log.length - logAt; logAt = log.length; }
+    if (log.length > logAt) {
+      for (let i = logAt; i < log.length; i++) {
+        // a held Alt chord logs Alt's own press first: one Alt cap, not two
+        if (/^Alt\+/.test(log[i].k) && i > 0 && log[i - 1].k === 'Alt' && pressed[pressed.length - 1] === 'Alt') pressed.pop();
+        pressed.push(...keysOfLabel(log[i].k));
+      }
+      keys += log.length - logAt; logAt = log.length;
+    }
     if (prompt.check(s, frag)) { onHit(); return; }
     if (atRest(s) && stateSig(s) === sig) pressed = [];   // back where the prompt began (Esc out of a cell or a menu): the caps start over
     paintCaps('pressed');
@@ -369,7 +381,7 @@ export function mountRapidPage(root, ctx = {}) {
     paintTop(); paintMeter();
   }
   function drillThese() { if (!slow.length) return again(); location.hash = '#/rapid?focus=' + slow.map(r => r.id).join(','); }
-  function again() { if (focus) location.hash = '#/rapid?len=' + lastLen(); else { combo = 0; startRound(); } }
+  function again() { combo = 0; startRound(); }   // the same round again: a focus round replays its three
 
   function stopTimers() {
     if (tickH) { clearInterval(tickH); tickH = null; }

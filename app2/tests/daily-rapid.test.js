@@ -1,9 +1,8 @@
-// app2/tests/daily-rapid.test.js — the Daily's determinism and the rapid-fire deck (Phase D).
+// app2/tests/daily-rapid.test.js — the Daily's determinism (Phase D).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { dailyFor, dailyDrill, shareText } from '../app/daily.js';
 import { mulberry32, hash32 } from '../engine/rng.js';
-import { RAPID_DECK, RAPID_SHEET, RAPID_DURATIONS, hitPoints, deckOrder } from '../app/rapid-fire.js';
 import { DRILLS_BY_ID, DAILY_POOL } from '../content/drills.js';
 import { Sheet } from '../engine/sheet.js';
 import { Session, parseKeyScript, parseKeySpec } from '../engine/keyboard.js';
@@ -31,29 +30,4 @@ test('the Daily: same day same pick; the pick varies over a month; seeded cells 
   assert.match(shareText('2026-09-22', 'X', 12.34, 'pro'), /12\.34s ◆◆/);
 });
 
-test('every rapid-fire prompt is hittable: its keys produce exactly its expected labels', () => {
-  for (const pr of RAPID_DECK) {
-    const sheet = new Sheet({ cells: { ...RAPID_SHEET }, active: { r: 2, c: 2 } });
-    const session = new Session(sheet, {});
-    const script = pr.keys.replace(/↑/g, 'Up').replace(/↓/g, 'Down').replace(/←/g, 'Left').replace(/→/g, 'Right');
-    for (const step of parseKeyScript(script)) {
-      if (step.type === 'text') for (const ch of step.text) session.key({ key: ch });
-      else session.key(parseKeySpec(step.spec));
-    }
-    const labels = session.keyLog.map(e => e.k);
-    assert.deepEqual(labels.slice(-pr.expect.length), pr.expect, `${pr.id}: tail of ${JSON.stringify(labels)}`);
-  }
-  const ids = RAPID_DECK.map(p => p.id);
-  assert.equal(new Set(ids).size, ids.length, 'prompt ids unique');
-  assert.deepEqual(RAPID_DURATIONS, [30, 60, 120]);
-});
-
-test('rapid scoring: the multiplier steps every five combo; the shuffle is seeded', () => {
-  assert.equal(hitPoints(0), 10);
-  assert.equal(hitPoints(4), 10);
-  assert.equal(hitPoints(5), 20);
-  assert.equal(hitPoints(10), 30);
-  assert.deepEqual(deckOrder(7), deckOrder(7));
-  assert.equal(deckOrder(7).length, RAPID_DECK.length);
-  assert.deepEqual([...deckOrder(7)].sort((a, b) => a - b), RAPID_DECK.map((_, i) => i), 'a permutation');
-});
+// rapid-fire's deck and stage have their own tests: rapid-deck.test.js (every prompt on a seeded fragment) and rapid-stage.test.js
