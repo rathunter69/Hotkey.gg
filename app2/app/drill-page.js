@@ -32,6 +32,7 @@ import { recordRun } from './quest-loop.js';
 import { hasPickers, PICKER_LESSON } from '../content/catalog.js';
 import { equipReward } from './cosmetics.js';
 import { shortcutsUsed } from './runner.js';
+import { keyStates } from './key-states.js';
 import { siteCopy } from '../content/copy/apply.js';
 import { entitlement } from './entitlement.js';
 import { createChrome, confirmDialog, isExitKey, EXIT_KEY, sheetKeys, noteSheetKey, sheetKeysDelivered, canFullscreen, fullscreenKeys } from '../ui/components/chrome.js';
@@ -257,6 +258,7 @@ export function mountDrillPage(root, ctx = {}) {
     effects.finish(chrome.stage);
     if (newPb) effects.newPB(); else if (attempt.tier !== 'none') effects.parTier(attempt.tier);
     // the quest loop (6.10): the run ticks its quests before the XP is read, so their XP lands in this result
+    keyStates.notePressed(shortcutsUsed(run.session.keyLog));   // the keys this run pressed are practiced (M57)
     const qr = recordRun({ kind: daily ? 'daily' : 'drill', ref: drill.id, clean: attempt.clean, tier: attempt.tier, pb: newPb, ghost: newPb && !!pbBefore, noWaste: attempt.clean && drill.optimalKeys > 0 && attempt.keys <= drill.optimalKeys, noMouse: !attempt.mouse, used: shortcutsUsed(run.session.keyLog) });
     busyOn = false; if (effects.setBusy) effects.setBusy(false);
     const earned = celebrate(effects, ctxBefore);

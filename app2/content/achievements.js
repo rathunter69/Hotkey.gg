@@ -11,11 +11,13 @@
 //         pbs        PBs by ref (store.pbRecords())
 //         attempts   attempt list (store.attempts())
 //         quests     { done, weeks } (app/quests.js questTotals)
+//         keyRecords { [keyId]: { p?, u? } } (app/key-states.js: practiced and under par)
 //         xp, level, signedIn, streakDays }
 import { LESSONS, CHAPTERS, modulesOf } from './index.js';
 import { DRILLS } from './drills.js';
 import { REFERENCE } from './reference.js';
 import { siteCopy } from './copy/apply.js';
+import { stateOf } from '../app/key-states.js';
 
 const P = c => (c && typeof c.progress === 'object' && c.progress) || {};
 const A = c => (Array.isArray(c && c.attempts) ? c.attempts : []);
@@ -70,9 +72,15 @@ const cleanModule = c => {
   }
   return n(best.got >= best.of, best.got, best.of);
 };
-/** Every key a chapter's lessons teach, collected (taught) on the Reference page (M57). */
-const KEYS_BY_CHAPTER = CHAPTERS.map(ch => { const ids = new Set(ch.lessons.map(l => l.id)); return [...new Set(REFERENCE.filter(e => e.lessonId && ids.has(e.lessonId)).map(e => e.lessonId))]; });
-const keysCollected = (c, i) => { const ls = KEYS_BY_CHAPTER[i] || []; const d = ls.filter(id => completed(c, id)).length; return n(ls.length > 0 && d >= ls.length, d, ls.length || 1); };
+/** Every key a chapter's lessons teach (the keys sheet's rows whose lesson sits in the chapter), each past Not yet on the Reference page (M57). */
+const KEYS_BY_CHAPTER = CHAPTERS.map(ch => { const ids = new Set(ch.lessons.map(l => l.id)); return REFERENCE.filter(e => !e.addin && e.lessonId && ids.has(e.lessonId)); });
+const keysCollected = (c, i) => {
+  const rows = KEYS_BY_CHAPTER[i] || [];
+  const done = new Set(Object.keys(P(c)).filter(id => completed(c, id)));
+  const ctx = { done, records: (c && typeof c.keyRecords === 'object' && c.keyRecords) || {} };
+  const d = rows.filter(r => stateOf(r, ctx) !== 'not-yet').length;
+  return n(rows.length > 0 && d >= rows.length, d, rows.length || 1);
+};
 const Q = c => (c && c.quests) || {};
 
 export const RARITIES = ['common', 'rare', 'epic', 'legendary'];

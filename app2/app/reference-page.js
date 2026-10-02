@@ -17,7 +17,8 @@
 import { lessonById, lessonNumber } from '../content/index.js';
 import { settings } from './settings.js';
 import { store } from './store.js';
-import { schedule, MICRO } from './schedule.js';
+import { schedule, MICRO, microLesson } from './schedule.js';
+import { keyStates, stateOf, KEY_STATES as STATES } from './key-states.js';
 import { itemNumber } from './numbering.js';
 import { moduleOf } from '../content/index.js';
 import { siteCopy } from '../content/copy/apply.js';
@@ -37,18 +38,19 @@ export function detectPlatform(nav = typeof navigator !== 'undefined' ? navigato
   } catch (e) { return 'win'; }
 }
 
-/** The groups of 3.0, in page order, each the categories of content/reference.js it gathers. */
+/** The groups of 3.0, in page order, each the categories of content/reference.js it gathers. A row's
+ * group is the keys sheet's `group` column (M50); the categories say the same and a test holds them equal. */
 export const REFERENCE_GROUPS = [
   { id: 'move', copy: 'ref_group_move', label: 'Move', categories: ['Navigation'] },
   { id: 'select', copy: 'ref_group_select', label: 'Select', categories: ['Selection'] },
-  { id: 'edit', copy: 'ref_group_edit', label: 'Edit', categories: ['Editing', 'Copy and paste', 'Rows and columns', 'Workbook'] },
-  { id: 'format', copy: 'ref_group_format', label: 'Format', categories: ['Formatting', 'Borders', 'Number formats'] },
-  { id: 'formulas', copy: 'ref_group_formulas', label: 'Formulas', categories: ['Formulas and fill'] },
+  { id: 'edit', copy: 'ref_group_edit', label: 'Edit', categories: ['Editing', 'Copy and paste', 'Rows and columns', 'Page layout and print', 'Workbook'] },
+  { id: 'format', copy: 'ref_group_format', label: 'Format', categories: ['Formatting', 'Borders', 'Number formats', 'Conditional formatting'] },
+  { id: 'formulas', copy: 'ref_group_formulas', label: 'Formulas', categories: ['Formulas and fill', 'Auditing'] },
   { id: 'ribbon', copy: 'ref_group_ribbon', label: 'The Ribbon', categories: ['Ribbon'] },
   { id: 'data', copy: 'ref_group_data', label: 'Data', categories: ['Data and outline'] },
 ];
-/** The four states of a key (3.0), in order of progress. */
-export const KEY_STATES = ['not-yet', 'taught', 'practiced', 'under-par'];
+/** The four states of a key (3.0; M57), in order of progress. */
+export const KEY_STATES = STATES;
 const STATE_COPY = { 'not-yet': ['ref_state_not_yet', 'Not yet'], taught: ['ref_state_taught', 'Taught'], practiced: ['ref_state_practiced', 'Practiced'], 'under-par': ['ref_state_under_par', 'Under par'] };
 
 /**
@@ -58,7 +60,7 @@ const STATE_COPY = { 'not-yet': ['ref_state_not_yet', 'Not yet'], taught: ['ref_
  */
 export function groupRows(reference, groups = REFERENCE_GROUPS) {
   return groups.map(g => {
-    const entries = reference.filter(e => !e.addin && g.categories.includes(e.category));
+    const entries = reference.filter(e => !e.addin && (e.group ? e.group === g.id : g.categories.includes(e.category)));
     const rows = [];
     for (const e of entries) {
       const ribbon = /\(Ribbon\)$/.test(e.name);
@@ -72,17 +74,12 @@ export function groupRows(reference, groups = REFERENCE_GROUPS) {
 }
 
 /**
- * A key's state for this learner. Pure.
- *   done: the completed lesson ids; practiced: concept ids with a rep noted; underPar: concept ids under par
+ * A key's state for this learner (app/key-states.js stateOf). Pure.
+ *   done: the completed lesson ids; records: the key's stored practiced and under-par stamps;
+ *   practiced / underPar: concept ids with a refresher rep noted, and landed fast
  *   under-par > practiced > taught (the lesson that teaches it is complete) > not-yet
  */
-export function keyState(entry, { done = new Set(), practiced = new Set(), underPar = new Set() } = {}) {
-  const c = entry && entry.concept;
-  if (c && underPar.has(c)) return 'under-par';
-  if (c && practiced.has(c)) return 'practiced';
-  if (entry && entry.lessonId && done.has(entry.lessonId)) return 'taught';
-  return 'not-yet';
-}
+export function keyState(entry, ctx = {}) { return stateOf(entry, ctx); }
 /** The keys collected: every row past Not yet. Pure. */
 export function collectedCount(rows, ctx) { return rows.filter(r => keyState(r.entry, ctx) !== 'not-yet').length; }
 
@@ -94,7 +91,8 @@ export function learnerKeyContext() {
     const st = schedule.state();
     for (const id in st) { const it = st[id]; if (it && it.reps > 0) practiced.add(id); if (it && it.reps > 0 && it.q >= 5) underPar.add(id); }
   } catch (e) { /* no schedule */ }
-  return { done, practiced, underPar };
+  let records = {}; try { records = keyStates.records(); } catch (e) { /* no records */ }
+  return { done, practiced, underPar, records };
 }
 
 /** Keycaps for one chord: held keys joined with +, alternatives with /, sequence segments side by side. */
@@ -179,15 +177,20 @@ export function mountReferencePage(root, opts = {}) {
     const state = keyState(e, ctx);
     const g = groups.find(x => x.rows.includes(r) || x.rows.some(y => y.entry === e)) || groups[0];
     const drill = e.concept && MICRO[e.concept] && state !== 'not-yet' ? `<a class="btn2 btn2-quiet" href="#/due/${esc(e.concept)}">${esc(t('ref_drill_it', 'Drill it'))}</a>` : '';
+    const showMe = e.concept && MICRO[e.concept] ? `<button type="button" class="btn2 btn2-quiet" data-show="${esc(e.concept)}">${esc(t('ref_show_me', 'Show me'))}</button>` : '';
+    // the other routes, side by side (M50): the Ribbon chord, the legacy chord, and what else the grader accepts
+    const routes = [['ref_route_ribbon', 'Ribbon', e.ribbon && !r.ribbon ? keysHtml({ win: e.ribbon, mac: e.ribbon }) : ''], ['ref_route_legacy', 'Legacy', e.legacy ? keysHtml({ win: e.legacy, mac: e.legacy }) : '']]
+      .filter(x => x[2]).map(([k, fb, html]) => `<div class="kr-focus-or"><span class="label">${esc(t(k, fb))}</span>${html}</div>`).join('');
+    const alts = e.alternatives ? `<p class="kr-focus-note">${esc(fill(t('ref_also', 'Also: {routes}'), { routes: e.alternatives }))}</p>` : '';
     const open = lesson ? `<a class="btn2" href="#/lesson/${esc(lesson.id)}">${esc(fill(t('ref_open_lesson', 'Lesson {n}'), { n: taughtIn(lessonNumberOf(lesson)) }))}</a>` : '';
     return `<div class="kr-focus-card" data-g="${g.id}">
       <span class="kr-focus-group">${esc(t(g.copy, g.label))}</span>
       <div class="kr-focus-keys">${keysHtml(e)}</div>
-      ${r.ribbon ? `<div class="kr-focus-or"><span class="label">${esc(t('ref_or', 'or'))}</span>${keysHtml(r.ribbon)}</div>` : ''}
+      ${r.ribbon ? `<div class="kr-focus-or"><span class="label">${esc(t('ref_or', 'or'))}</span>${keysHtml(r.ribbon)}</div>` : ''}${routes}
       <h2 class="kr-focus-name">${esc(e.name)}</h2>
       ${e.what && e.what !== e.name ? `<p class="kr-focus-what">${esc(e.what)}</p>` : ''}
-      ${e.note && e.note !== 'Windows only' ? `<p class="kr-focus-note">${esc(e.note)}</p>` : ''}
-      <div class="kr-focus-foot"><span class="kr-state" data-state="${state}"><i class="kr-dot" aria-hidden="true"></i>${stateWord(state)}</span><span class="btn-row">${open}${drill}</span></div>
+      ${e.note && e.note !== 'Windows only' ? `<p class="kr-focus-note">${esc(e.note)}</p>` : ''}${alts}
+      <div class="kr-focus-foot"><span class="kr-state" data-state="${state}"><i class="kr-dot" aria-hidden="true"></i>${stateWord(state)}</span><span class="btn-row">${open}${showMe}${drill}</span></div>
     </div>`;
   }
   function render() {
@@ -215,9 +218,26 @@ export function mountReferencePage(root, opts = {}) {
     foot.textContent = fill(t('ref_collected', '{n} of {m} keys collected.'), { n: collectedCount(all, ctx), m: all.length }) + ' ' + t('ref_drill_note', 'Drill it opens a short rep on that one key.');
     applyPlatform(); apply();
   }
-  let shown = null, only = null;
+  let shown = null, only = null, demo = null;
+  /** Show me (M57): the key's single-key rep plays itself on a small sheet in the card, on the demo engine. */
+  function showMe(concept) {
+    const lesson = microLesson(concept); const box = el.querySelector('#refFocus');
+    if (!lesson || !box) return;
+    stopDemo();
+    box.innerHTML = `<div class="kr-demo" data-g="${shown ? shown.g.id : 'move'}"><div class="kr-demo-head"><span class="kr-focus-group">${esc(t('ref_show_me', 'Show me'))}</span><span class="kr-demo-title">${esc(lesson.title)}</span><button type="button" class="btn2 btn2-quiet" data-close-demo>${esc(t('ref_show_close', 'Close'))} <kbd class="key">Esc</kbd></button></div><div class="kr-demo-host"></div></div>`;
+    const host = box.querySelector('.kr-demo-host');
+    const board = el.querySelector('.kr-board'); if (board) board.classList.add('kr-showing');
+    demo = { pending: true };
+    const mine = demo;
+    import('../ui/demo-player.js').then(m => {
+      if (disposed || demo !== mine) return;
+      demo = m.mountDemo(host, { lesson, autoplay: true, loop: false, cadence: 700, doneLine: t('ref_show_done', 'That’s the key. Drill it to make it yours.') });
+    }).catch(() => { if (demo === mine) { demo = null; show(shown); } });
+  }
+  function stopDemo() { if (demo && demo.destroy) { try { demo.destroy(); } catch (e) { /* gone */ } } demo = null; const board = el.querySelector('.kr-board'); if (board) board.classList.remove('kr-showing'); }
   /** Show a row in the card and press its keys on the board. */
   function show(r, pressed) {
+    stopDemo();
     shown = r;
     const box = el.querySelector('#refFocus'); if (box) box.innerHTML = focusHtml(r, ctxOf());
     el.querySelectorAll('.kb-key.kb-down').forEach(k => { k.classList.remove('kb-down'); if (k.dataset.g0 != null) { if (k.dataset.g0) k.setAttribute('data-g', k.dataset.g0); else k.removeAttribute('data-g'); delete k.dataset.g0; } });
@@ -252,10 +272,12 @@ export function mountReferencePage(root, opts = {}) {
     else { show(null, ids); const box = el.querySelector('#refFocus'); if (box) box.innerHTML = `<div class="kr-focus-empty"><p class="kr-focus-hint">${esc(fill(t('ref_no_key', 'Nothing in the course uses {k} yet.'), { k: chordLabel(ids) }))}</p></div>`; }
   }
   const rowOf = target => { const tr = target && target.closest && target.closest('.kr-row'); return tr ? rows.find(r => r.el === tr) : null; };
-  const onOver = e => { const r = rowOf(e.target); if (r && r !== shown) show(r); };
+  const onOver = e => { if (demo) return; const r = rowOf(e.target); if (r && r !== shown) show(r); };
   const onFocusIn = e => { const r = rowOf(e.target); if (r) show(r); };
   const onClick = e => {
     const b = e.target.closest('[data-plat]'); if (b) { setPlatform(b.dataset.plat); return; }
+    const sm = e.target.closest('[data-show]'); if (sm) { showMe(sm.dataset.show); return; }
+    if (e.target.closest('[data-close-demo]')) { show(shown); return; }
     const j = e.target.closest('[data-jump]'); if (j) { e.preventDefault(); const sec = el.querySelector('#ref-' + j.dataset.jump); if (sec) sec.scrollIntoView({ block: 'start' }); const first = rows.find(r => r.g.id === j.dataset.jump && !r.el.hidden); if (first) show(first); }
   };
   const onInput = e => { if (e.target === search) { only = null; apply(); } };
@@ -271,6 +293,7 @@ export function mountReferencePage(root, opts = {}) {
   const onWindowKey = e => {
     if (e.defaultPrevented || isEditable(e.target) || !search || !document.body.contains(el) || !data) return;
     if (e.key === '/' && !e.ctrlKey && !e.metaKey && !e.altKey) { e.preventDefault(); search.focus(); search.select(); return; }
+    if (e.key === 'Escape' && demo) { e.preventDefault(); show(shown); return; }
     if (e.key === 'Escape' && only) { e.preventDefault(); only = null; search.value = ''; apply(); show(null); return; }
     if (['Control', 'Shift', 'Meta', 'Alt'].includes(e.key)) return;
     const ids = chordOfEvent(e, platform);
@@ -281,5 +304,5 @@ export function mountReferencePage(root, opts = {}) {
   window.addEventListener('keydown', onWindowKey);
   const ready = boot();
   return { ready, get platform() { return platform; },
-    destroy() { disposed = true; window.removeEventListener('keydown', onWindowKey); el.removeEventListener('click', onClick); el.removeEventListener('input', onInput); el.removeEventListener('keydown', onKey); el.removeEventListener('mouseover', onOver); el.removeEventListener('focusin', onFocusIn); el.remove(); } };
+    destroy() { disposed = true; stopDemo(); window.removeEventListener('keydown', onWindowKey); el.removeEventListener('click', onClick); el.removeEventListener('input', onInput); el.removeEventListener('keydown', onKey); el.removeEventListener('mouseover', onOver); el.removeEventListener('focusin', onFocusIn); el.remove(); } };
 }

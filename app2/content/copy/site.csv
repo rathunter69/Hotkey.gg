@@ -473,7 +473,7 @@ ref_drill_it,Drill it
 ref_or,or
 ref_no_match,No key matches that.
 ref_collected,{n} of {m} keys collected.
-ref_drill_note,Drill it opens a short rep on that one key.
+ref_drill_note,Drill it opens a short rep on that one key. Show me plays it on a small sheet.
 settings_title,Settings
 settings_saved_line,Saved as you change them
 settings_not_saved,Couldn’t save on this device
@@ -1231,3 +1231,9 @@ rapid_cmd_name-manager,Name Manager
 rapid_cmd_define-name,Define Name
 rapid_cmd_pivot-table,PivotTable
 rapid_cmd_calc-except-tables,Automatic Except for Data Tables
+ref_show_me,Show me
+ref_show_close,Close
+ref_show_done,That’s the key. Drill it to make it yours.
+ref_route_ribbon,Ribbon
+ref_route_legacy,Legacy
+ref_also,Also: {routes}

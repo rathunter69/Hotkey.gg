@@ -30,12 +30,19 @@ test('ids are unique', () => {
   assert.equal(referenceById('nope'), null);
 });
 
-test('every lessonId exists in the catalogue and matches the entry concept', () => {
+test('every lessonId exists in the catalogue: the lesson the keys sheet names, else the one that teaches the concept (M50)', () => {
   for (const e of REFERENCE) {
     if (e.lessonId === null) { assert.equal(lessonForConcept(e.concept), null, `${e.id}: concept ${e.concept} is taught, lessonId should be set`); continue; }
     const lesson = LESSONS_BY_ID[e.lessonId];
     assert.ok(lesson, `${e.id}: lesson ${e.lessonId} is in the catalogue`);
-    assert.ok(e.concept && (lesson.teaches || lesson.concepts || []).includes(e.concept), `${e.id}: lesson ${e.lessonId} teaches "${e.concept}"`);
+    assert.ok(!lesson.kind || lesson.kind === 'lesson', `${e.id}: ${e.lessonId} is a lesson, not a challenge or a gate`);
+    const teaches = e.concept && (lesson.teaches || lesson.concepts || []).includes(e.concept);
+    const toks = s => String(s).replace(/↵/g, 'Enter').split(/\s+/).filter(Boolean);
+    const want = toks(e.win);
+    const SHIFTED = { '$': '4', '%': '5', '!': '1', '#': '3', '+': '=', '~': '`' };
+    const alt = e.win.replace(/^Ctrl\+Shift\+(.)$/, (m, c) => 'Ctrl+Shift+' + (SHIFTED[c] || c));
+    const presses = [want, toks(alt)].some(w => (lesson.goals || []).some(g => { const have = toks(g.keys || ''); for (let i = 0; i + w.length <= have.length; i++) if (w.every((x, j) => have[i + j] === x)) return true; return false; }));
+    assert.ok(teaches || presses, `${e.id}: lesson ${e.lessonId} teaches "${e.concept}" or a goal of it presses ${e.win}`);
   }
 });
 
@@ -70,9 +77,10 @@ test('the Foundations shortcuts resolve to the module lesson that teaches them',
     assert.ok(e.lessonId, `${id} (${e.win}) links to a lesson`);
     assert.equal(e.lessonId, lessonId, `${id} (${e.win}) links to ${lessonId}`);
   }
-  // the modules teach bold as bold-italic-underline, so the bold-command rows link nowhere until a lesson teaches that concept
+  // the modules teach bold as bold-italic-underline: no lesson carries the bold-command concept, so the
+  // keys sheet names the lesson whose goals first press Ctrl+B (M50); the Ribbon route links nowhere
   assert.equal(teacherOf('bold-command'), null);
-  assert.equal(referenceById('ctrl-b').lessonId, null); assert.equal(referenceById('alt-h-1').lessonId, null);
+  assert.equal(referenceById('ctrl-b').lessonId, 'fonts-fills-borders'); assert.equal(referenceById('alt-h-1').lessonId, null);
   // by chord too
   assert.equal(referenceByChord('Alt H B O')[0].lessonId, 'fonts-fills-borders');
   assert.equal(referenceByChord('ctrl + 1')[0].lessonId, 'ribbon-by-keyboard');

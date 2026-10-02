@@ -24,7 +24,8 @@ import { prefs, keyLabel } from './prefs.js';
 import { inferTarget, altPath, glowRibbon, targetBoxes, targetParts, unionBox, rangesOf, rangeCorners } from '../ui/cues.js';
 import { moduleNumber, itemNumber, isFinalItem, FINAL_MODULE } from './numbering.js';
 import { beatFor, pageDelivered } from './beats.js';
-import { schedule, grade as scheduleGrade, dueToday } from './schedule.js';
+import { schedule, grade as scheduleGrade, dueToday, FAST_SECS } from './schedule.js';
+import { keyStates, keyIdsForConcept } from './key-states.js';
 import { shouldOfferInstall, installAvailable, promptInstall, INSTALL_PROMPT } from './install.js';
 import { siteCopy } from '../content/copy/apply.js';
 import { settings } from './settings.js';
@@ -581,8 +582,11 @@ export function mountLessonView(root, lesson, { mode = 'guided', seed: seedOpt, 
     card.el.hidden = true;
     track('lesson_complete', { lesson_id: lesson.id, mode: run.mode });
     const used = shortcutsUsed(run.session.keyLog).map(u => ({ keys: u.keys, count: u.count }));
+    keyStates.notePressed(used);   // every key pressed in a lesson is practiced (M57)
     if (isMicro) {
       lastClean = !assisted() && !run.mouseCount;
+      // Drill it: a clean single-key rep inside its par puts the key under par (M57)
+      if (lastClean && Number.isFinite(run.elapsed) && run.elapsed <= FAST_SECS) keyStates.noteUnderPar(keyIdsForConcept(lesson.concept));
       schedule.note([lesson.concept], scheduleGrade({ ok: true, secs: run.elapsed, hint: assisted() }));
       effects.finish(chrome.stage);
       const q = dueToday(schedule.state(), {}).items.filter(i => i.id !== lesson.concept); const nextDue = q[0] || null;
