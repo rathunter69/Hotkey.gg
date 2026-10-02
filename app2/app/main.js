@@ -10,6 +10,7 @@
 //   #/leaderboard  #/reference  #/pricing  #/teams  #/account
 //   #/about  #/terms  #/privacy  #/eula  #/contact
 //   #/due/<shortcut>   a refresher rep from today's queue (app/due-page.js)
+//   #/checkout         Phase E checkout; #/checkout/done the return from Stripe (app/checkout-page.js)
 //   anything else      404
 //
 // Page modules load lazily with import(); a failed load renders an error card with Retry, never
@@ -70,6 +71,8 @@ export function parseRoute(hash) {
   else if (path === '/daily') { name = 'drill'; params.daily = true; }
   else if (path === '/rapid') name = 'rapid';
   else if ((m = /^\/due\/([a-z0-9-]+)$/.exec(path))) { name = 'due'; params.id = m[1]; }
+  else if (path === '/checkout') name = 'checkout';
+  else if (path === '/checkout/done') { name = 'checkout'; params.done = true; }
   else if (['/leaderboard', '/reference', '/pricing', '/teams', '/account', '/about', '/terms', '/privacy', '/eula', '/contact'].includes(path)) name = path.slice(1);
   else name = 'notfound';
   return { name, params, query, path };
@@ -106,7 +109,7 @@ export function titleFor(name, extra) {
     lesson: (extra ? extra + ' · ' : '') + 'hotkey.gg', locked: (extra ? extra + ' · ' : '') + 'Paid tier · hotkey.gg', practice: 'Practice · hotkey.gg', drill: (extra ? extra + ' · ' : '') + 'Practice · hotkey.gg', leaderboard: 'Leaderboards · hotkey.gg',
     reference: 'Reference · hotkey.gg', pricing: 'Pricing · hotkey.gg', teams: 'Teams · hotkey.gg', account: 'Account · hotkey.gg', about: 'About · hotkey.gg',
     terms: 'Terms · hotkey.gg', privacy: 'Privacy · hotkey.gg', eula: 'EULA · hotkey.gg', contact: 'Contact · hotkey.gg', notfound: 'Page not found · hotkey.gg',
-    due: 'Due today · hotkey.gg' };
+    due: 'Due today · hotkey.gg', checkout: 'Get full access · hotkey.gg' };
   return T[name] || 'hotkey.gg';
 }
 
@@ -120,6 +123,23 @@ export function legacyQuery(search) {
   if (!s) return null;
   const q = new URLSearchParams(s.startsWith('?') ? s.slice(1) : s);
   return q.has('drill') ? '/#/practice' : null;
+}
+
+/**
+ * Stripe sends a buyer back to the page with a query string, never a hash (the edge functions'
+ * return URLs): ?checkout_session=<id> after checkout, ?billing=done from the Customer Portal. The
+ * shell turns them into hash routes at boot. Pure: takes `location.search` and `location.pathname`,
+ * returns the URL to replaceState to, or null.
+ */
+export function stripeReturn(search, pathname = '/') {
+  const s = String(search == null ? '' : search);
+  if (!s) return null;
+  const q = new URLSearchParams(s.startsWith('?') ? s.slice(1) : s);
+  const path = String(pathname || '/');
+  const id = q.get('checkout_session');
+  if (id != null) return path + '#/checkout/done' + (/^cs_[A-Za-z0-9_]{1,250}$/.test(id) ? '?session_id=' + id : '');
+  if (q.get('billing') === 'done') return path + '#/account?section=billing';
+  return null;
 }
 
 /** A first-time visitor has neither saved prefs, nor lesson progress, nor a signed-in session. */
@@ -151,6 +171,7 @@ const LOADERS = {
   pricing: { file: './pricing-page.js', pick: m => m.mountPricingPage },
   teams: { file: './teams-page.js', pick: m => m.mountTeamsPage },
   account: { file: './account-page.js', pick: m => m.mountAccountPage },
+  checkout: { file: './checkout-page.js', pick: m => m.mountCheckoutPage },   // Phase E: the embedded form, behind the payments flag
   about: { file: './legal-pages.js', pick: m => m.mountAboutPage },
   terms: { file: './legal-pages.js', pick: m => r => m.mountLegalPage(r, 'terms') },
   privacy: { file: './legal-pages.js', pick: m => r => m.mountLegalPage(r, 'privacy') },
@@ -173,7 +194,7 @@ async function loadPage(entry) {
 export function pageLabel(name, params) {
   const L = { home: 'Home', landing: 'The front page', root: 'Home', start: 'Getting started', learn: 'Learn', lesson: 'This lesson',
     practice: 'Practice', drill: params && params.daily ? 'The Daily' : 'This drill', rapid: 'Rapid-fire', due: 'Due today',
-    leaderboard: 'The leaderboard', reference: 'The shortcut reference', pricing: 'Pricing', teams: 'Teams', account: 'Your account' };
+    leaderboard: 'The leaderboard', reference: 'The shortcut reference', pricing: 'Pricing', teams: 'Teams', account: 'Your account', checkout: 'Checkout' };
   return L[name] || 'This page';
 }
 
@@ -225,6 +246,8 @@ export function startApp({ navEl, rootEl, footEl }) {
   let gen = 0;             // bumps on every route: a slow import for an old route never mounts
   const legacy = legacyQuery(location.search);
   if (legacy) { try { history.replaceState(null, '', legacy); } catch (e) { /* file:// etc.: route as-is */ } }
+  const back = stripeReturn(location.search, location.pathname);
+  if (back) { try { history.replaceState(null, '', back); } catch (e) { /* route as-is */ } }
   prefs.reflect();
   const nav = mountNav(navEl, { active: 'home', onSignOut: () => auth.signOut() });
   // one KeyTips registry for site pages (M88): never inside the workspace, where Alt is the Ribbon's; a setting switches it off
