@@ -51,7 +51,7 @@ test('every drill validates', () => {
 });
 
 /** Chapter 1's drills as screenplay 6.1 lists them (resized 2026-10-01; M108): id and Pass par. */
-const CH1 = [['get-around', 60], ['enter-and-fill', 90], ['find-and-fix', 60], ['paste-surgeon', 90], ['row-wrangler', 60], ['format-the-weekly-page', 120],
+const CH1 = [['get-around', 80], ['enter-and-fill', 90], ['find-and-fix', 60], ['paste-surgeon', 90], ['row-wrangler', 60], ['format-the-weekly-page', 120],
   ['insert-and-amend', 90], ['formula-sprint', 120], ['combine-two-tabs', 120], ['before-you-send', 120], ['weekly-sales-report', 180]];
 
 test("Chapter 1's eleven drills: 6.1's set and order, eight to twenty goals, pars from the reference route", () => {

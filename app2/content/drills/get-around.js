@@ -1,38 +1,54 @@
 // Practice · Foundations — Get around the report (screenplay 6.1; built from Edge jumps, Go anywhere
-// and Block select). Nothing on the sheet changes: the end state graded is where the cursor and the
-// selection stand, on the sheet the goal names, whatever keys put them there.
+// and Block select). Every jump and every selection ends in a fix you can see (payoff pass,
+// 2026-10-02): the report arrives half tidied, with the Total row plain, the headers left over their
+// figures, the typed inputs black, the Revenue column too narrow to read, and a typo on Costs. The
+// end state graded is the sheet's formats and the fixed figure, whatever keys put them there.
 import { parsFromRoute } from '../../app/pars.js';
-import { reportPage, costsPage, cutFrom, at, selIs } from './austin.js';
-import { colLetter } from '../../engine/refs.js';
+import { reportPage, costsPage, cutFrom, refsIn } from './austin.js';
 
 const REPORT = reportPage();
 const COSTS = costsPage();
-const start = cutFrom(REPORT, (cells, sh) => { sh.active = { r: 5, c: 1 }; });
-const onReport = (ses, fn) => ses.sheetIndex === 0 && fn();
+COSTS.sheet.cells.B8 = { ...COSTS.sheet.cells.B8, value: 880 };   // Monday's card fees, a zero too many
+const TOTAL = refsIn('A10:F10'), HEADERS = refsIn('B4:F4'), INPUTS = refsIn('B5:C9'), DAYS = refsIn('B17:G21');
+const start = cutFrom(REPORT, (cells, sh) => {
+  for (const ref of TOTAL) { delete cells[ref].bold; delete cells[ref].bt; }
+  for (const ref of HEADERS) delete cells[ref].align;
+  for (const ref of [...INPUTS, 'B13', ...DAYS]) delete cells[ref].fontColor;
+  sh.colW = { ...sh.colW, 4: 40 };
+  sh.active = { r: 5, c: 1 };
+});
+const report = ses => ses.sheets[0].sheet;
+const blue = (s, refs) => refs.every(ref => s.cellAt(ref).fontColor === 'blue');
 
 export default {
   id: 'get-around',
   chapter: 'foundations',
   title: 'Get around the report',
-  task: 'Get around the report by its edges and by address, select its blocks, a row and a column, and visit Costs.',
+  task: 'Get around the report by its edges and fix each part you land on, then fix a typo on Costs by its address.',
   access: 'free',
   sheet: start,
   sheets: [{ name: 'Report' }, COSTS.sheet],
   goals: [
-    { id: 'total', text: 'Jump down to the Total row in A10.', keys: 'Ctrl+↓', check: (s, ses) => onReport(ses, () => at(s, 'A10')) },
-    { id: 'edge', text: 'Jump to the right edge of the Total row, F10.', keys: 'Ctrl+→', check: (s, ses) => onReport(ses, () => at(s, 'F10')) },
-    { id: 'top', text: 'Jump up to the Gross profit header in F4.', keys: 'Ctrl+↑', check: (s, ses) => onReport(ses, () => at(s, 'F4')) },
-    { id: 'check', text: 'Go straight to the check in B25.', keys: 'Ctrl+G "B25" ↵', check: (s, ses) => !ses.dialog && onReport(ses, () => at(s, 'B25')) },
-    { id: 'home', text: 'Snap home to B5, the first figure under the frozen panes.', keys: 'Ctrl+Home', check: (s, ses) => onReport(ses, () => at(s, 'B5')) },
-    { id: 'block', text: 'Select the site figures B5:F9 in one jump.', keys: 'Ctrl+G "B5:F9" ↵', check: (s, ses) => !ses.dialog && onReport(ses, () => selIs(s, 'B5:F9')) },
-    { id: 'days', text: 'Select the washes by day, B17:G21, from B17 by its edges.', keys: 'Ctrl+G "B17" ↵ Ctrl+Shift+↓ Ctrl+Shift+→', check: (s, ses) => !ses.dialog && onReport(ses, () => selIs(s, 'B17:G21')) },
-    { id: 'row', text: 'Select all of row 10, the Total row.', keys: 'Ctrl+G "A10" ↵ Shift+Space', check: (s, ses) => onReport(ses, () => selIs(s, `A10:${colLetter(s.cols)}10`)) },
-    { id: 'column', text: 'Select all of column D, Revenue.', keys: 'Ctrl+G "D4" ↵ Ctrl+Space', check: (s, ses) => onReport(ses, () => selIs(s, `D1:D${s.rows}`)) },
-    { id: 'costs', text: 'Go to Monday’s card fees on Costs, B8.', keys: 'Ctrl+G "Costs!B8" ↵', check: (s, ses) => !ses.dialog && ses.sheetIndex === 1 && at(s, 'B8') },
-    { id: 'back', text: 'Go back to Report and snap home to B5.', keys: 'Ctrl+PgUp Ctrl+Home', check: (s, ses) => onReport(ses, () => at(s, 'B5')) },
+    { id: 'total', text: 'Jump down to the Total row, select A10:F10 to its edge and bold it.', keys: 'Ctrl+↓ Ctrl+Shift+→ Ctrl+B',
+      check: (s, ses) => TOTAL.every(ref => report(ses).cellAt(ref).bold) },
+    { id: 'rule', text: 'Give the same Total row a top border.', keys: 'Alt H B P',
+      check: (s, ses) => TOTAL.every(ref => report(ses).cellAt(ref).bt) },
+    { id: 'headers', text: 'Jump up to the headers and right-align B4:F4 over their figures.', keys: 'Ctrl+↑ → Ctrl+Shift+→ then Alt H A R',
+      check: (s, ses) => HEADERS.every(ref => report(ses).cellAt(ref).align === 'r') },
+    { id: 'inputs', text: 'Select the typed washes and tickets B5:C9 and color them blue.', keys: '↓ Shift+→ Shift+↓ ×4 then Alt H F C → ×4 ↵',
+      check: (s, ses) => blue(report(ses), INPUTS) },
+    { id: 'cost', text: 'Jump down to the cost per wash in B13 and make it blue with F4.', keys: 'Ctrl+↓ Ctrl+↓ F4',
+      check: (s, ses) => blue(report(ses), ['B13']) },
+    { id: 'days', text: 'Select the washes by day B17:G21 by their edges and make them blue with F4.', keys: 'Ctrl+↓ ↓ Ctrl+Shift+↓ Ctrl+Shift+→ F4',
+      check: (s, ses) => blue(report(ses), DAYS) },
+    { id: 'revenue', text: 'Revenue in column D is too narrow to read: select the column and AutoFit it.', keys: 'Ctrl+Home → → Ctrl+Space then Alt H O I',
+      check: (s, ses) => { const sh = report(ses); return sh.colW[4] >= sh.neededWidth(4); } },
+    { id: 'costs', text: 'Go to Monday’s card fees on Costs, B8, and fix the typo: 880 should be 88.', keys: 'Ctrl+G "Costs!B8" ↵ "88" ↵',
+      check: (s, ses) => ses.sheets[1].sheet.value('B8') === 88 },
   ],
-  solution: 'Ctrl+Down Ctrl+Right Ctrl+Up Ctrl+G "B25" Enter Ctrl+Home Ctrl+G "B5:F9" Enter Ctrl+G "B17" Enter Ctrl+Shift+Down Ctrl+Shift+Right Ctrl+G "A10" Enter Shift+Space Ctrl+G "D4" Enter Ctrl+Space Ctrl+G "Costs!B8" Enter Ctrl+PgUp Ctrl+Home',
-  optimalKeys: 46,
-  route: 30,
-  pars: parsFromRoute(30),
+  solution: 'Ctrl+Down Ctrl+Shift+Right Ctrl+B Alt H B P Ctrl+Up Right Ctrl+Shift+Right Alt H A R Down Shift+Right Shift+Down Shift+Down Shift+Down Shift+Down Alt H F C Right Right Right Right Enter '
+    + 'Ctrl+Down Ctrl+Down F4 Ctrl+Down Down Ctrl+Shift+Down Ctrl+Shift+Right F4 Ctrl+Home Right Right Ctrl+Space Alt H O I Ctrl+G "Costs!B8" Enter "88" Enter',
+  optimalKeys: 60,
+  route: 40,
+  pars: parsFromRoute(40),
 };
