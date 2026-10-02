@@ -81,8 +81,10 @@ if (syn.status !== 0) fail(`syntax error in ${relative(root, (syn.stderr.split('
 console.log(`syntax ok: ${files.length} modules`);
 
 // 2. isolation — static import specifiers must stay inside app2/
-// [^\w$-]: a hyphen before the keyword means a kebab-case id ('welcome-export'), not a statement
-const IMPORT_RX = /(?:^|[^\w$-])(?:import|export)\s*(?:[\w${},*\s]+from\s*)?['"]([^'"]+)['"]|import\s*\(\s*['"]([^'"]+)['"]\s*\)/g;
+// [^\w$-]: a hyphen before the keyword means a kebab-case id ('welcome-export'), not a statement.
+// An export names a module only through a from clause; the keyword followed straight by a quote is not a
+// statement, so text such as 'ties to the export' is not read as one.
+const IMPORT_RX = /(?:^|[^\w$-])(?:import\s*(?:[\w${},*\s]+from\s*)?|export\s*[\w${},*\s]+from\s*)['"]([^'"]+)['"]|import\s*\(\s*['"]([^'"]+)['"]\s*\)/g;
 for (const f of files) {
   const src = readFileSync(f, 'utf8');
   let m;

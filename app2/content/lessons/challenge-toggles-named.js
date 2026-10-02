@@ -47,7 +47,7 @@ export default {
       keys: 'Ctrl+F3 ↓ ×3 Alt+E Alt+R "=Inputs!$C$15" ↵ ↓ Alt+D ↵ Esc',
       check: (s, ses) => namesDefined(ses) && ticketFixed(ses) && settled(ses) },
     { id: 'switch-by-name', text: 'Make the live column G5:G8 and the check in C58 on Scenarios read the switch as Case.', convention: 'C9',
-      keys: 'Ctrl+G "Scenarios!G5" ↵ "=CHOOSE(Case,C5,D5,E5)" ↵ Shift+↓ ×2 "=INDEX(C6:E6,Case)" Ctrl+↵ Ctrl+G "C58" ↵ "=INDEX($C$54:$E$54,Case)-C24" ↵',
+      keys: 'Ctrl+G "Scenarios!G5" ↵ "=CHOOSE(Case,C5,D5,E5)" ↵ Shift+↓ ×2 "=INDEX(C6:E6,Case)" Ctrl+↵ Ctrl+G "C58" ↵ "=ROUND(INDEX($D$54:$F$54,Case)-C24,0)" ↵',
       check: (s, ses) => liveByName(ses) && checkByName(ses) && settled(ses) },
     { id: 'picker', text: 'Point the case picker in Scenarios C10 at the name: Data Validation, List, Source =Cases.', convention: 'E9',
       keys: 'Ctrl+G "C10" ↵ Alt A V V Alt+C L Alt+S "=Cases" ↵',
@@ -66,5 +66,5 @@ export default {
       if (!listMatches(ses)) return { ok: false, why: 'the list on Inputs from B19 does not show every name and what it refers to' };
       return { ok: true }; },
   ],
-  solution: 'Ctrl+G "Scenarios!C11" Enter Alt M M D "Case" Enter Ctrl+G "Inputs!C5" Enter Alt M M D "Cost_Per_Wash" Enter Ctrl+G "Lists!L5:L7" Enter Alt M M D "Cases" Enter Ctrl+F3 Down Down Down Alt+E Alt+R "=Inputs!$C$15" Enter Down Alt+D Enter Escape Ctrl+G "Scenarios!G5" Enter "=CHOOSE(Case,C5,D5,E5)" Enter Shift+Down Shift+Down "=INDEX(C6:E6,Case)" Ctrl+Enter Ctrl+G "C58" Enter "=INDEX($C$54:$E$54,Case)-C24" Enter Ctrl+G "C10" Enter Alt A V V Alt+C L Alt+S "=Cases" Enter Ctrl+G "Inputs!B19" Enter F3 Alt+L',
+  solution: 'Ctrl+G "Scenarios!C11" Enter Alt M M D "Case" Enter Ctrl+G "Inputs!C5" Enter Alt M M D "Cost_Per_Wash" Enter Ctrl+G "Lists!L5:L7" Enter Alt M M D "Cases" Enter Ctrl+F3 Down Down Down Alt+E Alt+R "=Inputs!$C$15" Enter Down Alt+D Enter Escape Ctrl+G "Scenarios!G5" Enter "=CHOOSE(Case,C5,D5,E5)" Enter Shift+Down Shift+Down "=INDEX(C6:E6,Case)" Ctrl+Enter Ctrl+G "C58" Enter "=ROUND(INDEX($D$54:$F$54,Case)-C24,0)" Enter Ctrl+G "C10" Enter Alt A V V Alt+C L Alt+S "=Cases" Enter Ctrl+G "Inputs!B19" Enter F3 Alt+L',
 };

@@ -750,3 +750,58 @@ VLOOKUP with TRUE (approximate on sorted lists), HLOOKUP, XLOOKUP with not-found
   - 4.6 is three short lessons; it could be two (fold 4.6.3 into 4.6.1) if the chapter runs long.
   - The Dashboard sheet is tables with conditional formatting, no charts (screenplay section 5 coverage note); confirm charts stay out at launch.
   - Source pass (2026-09-30): the fold-back plan in claude/source-checklist.md (section H) is applied to this chapter as DRAFT (28 edits, including 4.2.5 rebuilt on hidden rows and 4.5.5 renamed the pass-through driver). Wolf's calls of that day are in the decision log (screenplay 11); what was held back stays listed in the checklist's section B.
+
+## Built differently
+
+### 4.1 (r4-lessons-a)
+- The package list is at Lists!B14:E16, not B5:E7. Capacity is column 5 of B:H, and the cube runs by week, not by month.
+- 4.1.2: the failures come in this order: no FALSE, keyed by name, then a column insert.
+- 4.1.4: the inputs are C34 and C35 and the answer is C38, not H14, H15 and H17.
+- 4.1.6: the bonus key is the cube total divided by 15, not C5.
+- 4.1.7: the inputs are planted, not typed. In each lesson the labels and formats are planted, so the learner writes only formulas.
+- 4.1.8: OFFSET and INDIRECT go in Summary N and O, not L and M, and the row is inserted at Lists row 5.
+- The nested XLOOKUP sits in Summary J19 and the array MATCH in J20.
+- The best-practice goals are folded into teach lines.
+- 4.1.C runs for 180 seconds, not four minutes, and is graded by 5 goals and 4 graders. Its seed shuffles another cluster's site list.
+
+### 4.6 and 4.7 (r4-lessons-d)
+- Names are made with Define Name (Alt M M D), not the Name Box. The names list is pasted on Inputs, not Cover.
+- 4.6.2 has one stray name, OldTicket, which points at a wrong cell rather than reading #REF!. There is no second stray, and a Go To by name goal is added.
+- 4.6.3: moving the list five rows and adding a fourth case appear in a teach line and the closing only. The closing shows the drop-down.
+- 4.6.C works on Case, Cases, Cost_Per_Wash and Ticket: Ticket is re-pointed and a stray Ticket_old is deleted.
+- 4.P has no pivot goal. The sensitivity tables, dashboard, roll-up and per-hour block come pre-built, and the window dates come pre-typed.
+- 4.A runs on Dallas. The switch is in C11 and the picker in C10, not B5 and B4.
+
+### 4.4 and 4.5 (r4-lessons-c)
+- 4.4.2 groups dates by the export's Week key, not with Alt J T G.
+- Pivots hold one value field at a time. There is no Site filter, and Value Field Settings has no number format.
+- GETPIVOTDATA is typed, not generated automatically.
+- Pivots sit on a sheet named Cuts.
+- 4.4.2 reads Riverside's count as 15 rows against 14 days reported.
+- The 4.4.3 correction is to member washes on Export!D5 and Domain!C6, and it carries into 4.5.
+- The data tables sit in D:H with their corner in column C.
+- The case picker and switch are at C10:C11, not B4:B5.
+- The base case is marked bold, not bordered.
+- The Goal Seek answer is noted as 121.
+- The pass-through driver is at C13:C14. The demo of the error when the input moves is skipped.
+- The case table is D49:F54. The sticky IF is built, watched and then removed. The goal to color the live column green is dropped.
+- 4.5.C holds Base's member share at 50% and has no separate pass-through goal.
+- Both challenges grade figures against the learner's own model.
+
+### 4.2 and 4.3 (r4-lessons-b)
+- The cube runs by week, not by month, because the export covers a fortnight.
+- The pickers are at Scenarios C10 and Summary C34.
+- Dynamic arrays are done on a Scratch sheet.
+- 4.2.5 shows the hidden-rows step only through Alt+;.
+- SUMPRODUCT is typed and then cleared.
+- 4.2.3 deletes the typo row rather than running Remove Duplicates again.
+- In 4.3.1 the learner types the totals.
+- 4.3.4 skips the sections and formats, which are already in place.
+- 4.3.6 skips the insert-tab step and uses one tab check, =F7-F5-F6.
+- 4.2.C always filters the same site, AUS-AIR.
+- 4.3.C keeps the script's title, "A KPI block that ties to the export" (the check that flagged it was fixed).
+
+### Joined up (r4-int)
+- 4.2.1 starts on 4.1.8's end and plants the module's start (4.1's scaffolds cleared, the site block on INDEX/MATCH), so 4.1 to 4.7 is one chain.
+- The project and assessment read the case sheet as 4.5 built it: the sensitivities and the cases side by side are real Data Tables (D:H and D49:F54), and the C58 check reads =ROUND(INDEX($D$54:$F$54,Case)-C24,0).
+- The 4.4 and 4.5 ids are short (pivot-build-rearrange, case-outputs-side-by-side, challenge-three-case-model and so on).

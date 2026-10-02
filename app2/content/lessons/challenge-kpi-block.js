@@ -1,4 +1,4 @@
-// Chapter 4 · 4.3.C Challenge: a KPI block that ties to the POS data (seeded over S43C)
+// Chapter 4 · 4.3.C Challenge: a KPI block that ties to the export (seeded over S43C)
 // A fresh fortnight's export lands on Export, and head office's site tabs carry its weekly figures.
 // The KPI page has lost its utilization and member share columns, the washes cube, the window's
 // washes and the two cube checks; question 9 on the log is open again. Rebuild them so every check
@@ -64,7 +64,7 @@ export default {
   workbook: 'clearcoat-pack',
   state: { before: 'S43C' },
   kind: 'challenge',
-  title: 'Challenge: a KPI block that ties to the POS data',
+  title: 'Challenge: a KPI block that ties to the export',
   difficulty: 'hard',
   tags: ['challenge', 'formulas', 'kpi', 'summary'],
   access: 'paid',

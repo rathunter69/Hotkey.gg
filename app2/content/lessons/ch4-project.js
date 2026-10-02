@@ -95,27 +95,27 @@ export const keysFor = (sites = SITES) => {
     'break-even': ['Ctrl+G "Scenarios!C41" ↵ "=INDEX(Lists!$H$5:$H$10,MATCH(C40,Lists!$B$5:$B$10,0))" ↵ "=C14-Inputs!$C$5-(1-G7)*Inputs!$C$7" ↵ ↓ "=C43*C42-C41" ↵ "=C41/C42" ↵',
       `↑ ×2 Alt A W G Alt+V "0" Alt+C "C43" ↵ Esc ↓ ×2 "${breakEvenOf(sites[0]).goalSeek}" ↵`].join(' '),
     checks: [one('Summary!C72', '=F21-SUM(Export!$E$5:$E$94)'), '"=F31-SUM(Export!$F$5:$F$94)" ↵ "=ROUND(M11*H11-L11,0)" ↵ "=H11-F21" ↵ "=F67-F21" ↵ "=IF(AND(C72=0,C73=0,C74=0,C75=0,C76=0),0,1)" ↵',
-      one('Scenarios!C58', '=INDEX($C$54:$E$54,Case)-C24'), '"=ROUND(C45,0)-C46" ↵ "=IF(AND(C25>=0,C25<=1),0,1)" ↵'].join(' '),
+      one('Scenarios!C58', '=ROUND(INDEX($D$54:$F$54,Case)-C24,0)'), '"=ROUND(C45,0)-C46" ↵ "=IF(AND(C25>=0,C25<=1),0,1)" ↵'].join(' '),
     log: ['Ctrl+G "\'Q&A\'!E6" ↵', ...['=Summary!I5', '=Summary!M11', '=Summary!C44', '=Summary!F21', '=Summary!J11'].map(f => `"Answered" Tab "${f}" ↵`),
-      '↓', ...['=Summary!C51', '=Scenarios!E54', '=Scenarios!C46'].map(f => `"Answered" Tab "${f}" ↵`)].join(' '),
+      '↓', ...['=Summary!C51', '=Scenarios!F54', '=Scenarios!C46'].map(f => `"Answered" Tab "${f}" ↵`)].join(' '),
   };
 };
 
 const REQUIRES = {
   'clean-export': ['find-replace', 'replace-all', 'go-to'],
   'unique-list': ['countif-countifs', 'check-cell', 'ctrl-enter-fill', 'cross-sheet-ref', 'relative-absolute', 'go-to', 'type-to-enter'],
-  'site-block': ['ctrl-enter-fill', 'cross-sheet-ref', 'relative-absolute', 'go-to'],
-  'kpi-block': ['countif-countifs', 'sumif-sumifs', 'maxifs-minifs', 'sumproduct', 'sum-family', 'ctrl-enter-fill', 'relative-absolute', 'go-to', 'tab-commits', 'arrow-keys'],
-  cubes: ['sumif-sumifs', 'sum-family', 'ctrl-enter-fill', 'relative-absolute', 'cross-sheet-ref', 'go-to'],
-  window: ['sumif-sumifs', 'criteria-operators', 'go-to'],
+  'site-block': ['ctrl-enter-fill', 'cross-sheet-ref', 'relative-absolute', 'go-to', 'index-match', 'match-function', 'index-function'],
+  'kpi-block': ['countif-countifs', 'sumif-sumifs', 'maxifs-minifs', 'sumproduct', 'sum-family', 'ctrl-enter-fill', 'relative-absolute', 'go-to', 'tab-commits', 'arrow-keys', 'kpi-ratios'],
+  cubes: ['sumif-sumifs', 'sum-family', 'ctrl-enter-fill', 'relative-absolute', 'cross-sheet-ref', 'go-to', 'sumifs-cube'],
+  window: ['sumif-sumifs', 'criteria-operators', 'go-to', 'date-window'],
   names: ['names-sparingly', 'defined-name', 'paste-list', 'go-to', 'keytips'],
-  pickers: ['name-driven-list', 'go-to', 'keytips'],
-  switch: ['names-sparingly', 'formula-basics', 'go-to', 'shift-arrow', 'ctrl-enter-fill'],
-  driver: ['formula-basics', 'cross-sheet-ref', 'go-to'],
+  pickers: ['name-driven-list', 'go-to', 'keytips', 'data-validation'],
+  switch: ['names-sparingly', 'formula-basics', 'go-to', 'shift-arrow', 'ctrl-enter-fill', 'case-switch'],
+  driver: ['formula-basics', 'cross-sheet-ref', 'go-to', 'pass-through-driver'],
   outputs: ['formula-basics', 'sum-family', 'cross-sheet-ref', 'relative-absolute', 'go-to', 'type-to-enter'],
-  'break-even': ['formula-basics', 'cross-sheet-ref', 'go-to', 'keytips', 'arrow-keys', 'type-to-enter'],
-  checks: ['check-cell', 'sum-family', 'round-function', 'formula-basics', 'go-to'],
-  log: ['cross-sheet-ref', 'go-to', 'tab-commits', 'type-to-enter'],
+  'break-even': ['formula-basics', 'cross-sheet-ref', 'go-to', 'keytips', 'arrow-keys', 'type-to-enter', 'goal-seek'],
+  checks: ['check-cell', 'sum-family', 'round-function', 'formula-basics', 'go-to', 'kpi-page', 'index-function'],
+  log: ['cross-sheet-ref', 'go-to', 'tab-commits', 'type-to-enter', 'question-loop'],
 };
 const CONVENTION = { 'clean-export': 'E3', 'unique-list': 'F1', 'site-block': 'C3', 'kpi-block': 'C3', cubes: 'C3', window: 'B4', names: 'C9', pickers: 'C9', switch: 'E9', driver: 'B4', outputs: 'C1', 'break-even': 'B6', checks: 'F1', log: 'B2' };
 

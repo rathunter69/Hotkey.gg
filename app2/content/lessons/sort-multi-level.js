@@ -1,9 +1,10 @@
-// Chapter 4 · 4.2.1 Sort and multi-level sort (clearcoat-pack, S42 → S421)
+// Chapter 4 · 4.2.1 Sort and multi-level sort (clearcoat-pack, S418 → S421; the module's start, S42, arrives as a planting)
 // Sorting changes the data's order for good, so it runs on a copy: the export’s block copied onto a
 // new sheet, Export sort, beside the export, pasted with the export’s column widths, then sorted by
 // site and date in one Sort dialog with two levels, then by retail revenue largest first. The closer
 // changes a revenue figure on the copy and the export’s own row stays put.
 import { exportSheet, copySheet, rowsOf, sameText, sheetNames, isNum } from './lib/pack-list-checks.js';
+import { bridge } from '../workbooks/clearcoat-pack.js';
 
 const COLS = 'ABCDEFG';
 /** The copy's block sits on a sheet named Export sort, right after Export. */
@@ -37,7 +38,8 @@ export default {
   section: 'Lists and tables',
   module: 'lists-and-tables',
   workbook: 'clearcoat-pack',
-  state: { before: 'S42', after: 'S421' },
+  state: { before: 'S418', after: 'S421' },
+  plant: bridge('S418', 'S42'),   // 4.1's scaffolds cleared, the site block on INDEX/MATCH
   title: 'Sort and multi-level sort',
   difficulty: 'medium',
   tags: ['data', 'lists', 'sort'],

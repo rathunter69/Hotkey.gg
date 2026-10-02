@@ -774,6 +774,20 @@ const S41Cdone = challenge41(S418, 'fixed');
 
 // S42: the module's start: module 4.1's scaffolds cleared, the site block on the standard route (name and capacity by INDEX/MATCH)
 const S42 = derive(S418, s => { drop(s, 'Summary', SCAFFOLD_41_REFS); take(s, SOLVED, 'Summary', blockRefs(SITE_R, COLS('CD'))); });
+/**
+ * The planting that carries one state to another when the two differ only in their cells: every cell
+ * that changes, keyed 'Sheet!Ref' (null for a cell that goes). A module's first lesson starts on the
+ * last lesson's end and lands its module's start this way, so the chain stays one chain.
+ */
+export function bridge(fromId, toId) {
+  const a = STATES[fromId], b = STATES[toId]; const out = {};
+  if (a.sheets.map(x => x.name).join('|') !== b.sheets.map(x => x.name).join('|')) throw new Error(`bridge ${fromId} to ${toId}: the sheets differ`);
+  for (const sb of b.sheets) {
+    const ca = sheetOf(a, sb.name).cells, cb = sb.cells;
+    for (const ref of new Set([...Object.keys(ca), ...Object.keys(cb)])) if (JSON.stringify(ca[ref]) !== JSON.stringify(cb[ref])) out[sb.name + '!' + ref] = cb[ref] ? clone(cb[ref]) : null;
+  }
+  return out;
+}
 
 /**
  * The sorted copy of the export (4.2.1): A4:G94 copied onto a new sheet with Ctrl+V (the Total

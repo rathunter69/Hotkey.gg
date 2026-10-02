@@ -1627,7 +1627,7 @@ export const COPY = {
    "id": "challenge-kpi-block",
    "module": "summaries-from-raw-rows",
    "order": "4.3.C",
-   "title": "Challenge: a KPI block that ties to the POS data",
+   "title": "Challenge: a KPI block that ties to the export",
    "brief": "A fresh export, and the KPI page has lost its ratios, its washes cube, the window and two checks. Rebuild them until every check reads zero, and answer question 9 on the log.",
    "closing": "",
    "wow": "",
@@ -11257,7 +11257,7 @@ export const COPY = {
    {
     "lesson_id": "naming-sparingly",
     "goal_index": "3",
-    "text": "Rewrite the check in C58 to read the switch by name: =INDEX($C$54:$E$54,Case)-C24.",
+    "text": "Rewrite the check in C58 to read the switch by name: =ROUND(INDEX($D$54:$F$54,Case)-C24,0).",
     "teach": "",
     "why": "",
     "hint_stuck": "pulse cell C58 · The live case’s EBITDA in the side-by-side table, less the EBITDA above."
