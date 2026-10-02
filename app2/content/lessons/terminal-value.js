@@ -37,16 +37,16 @@ const impliedOk = ses => fx(ses, C('impMult'), [C('tvPerp'), J('ebitda')], val(s
 const tripOk = ses => { const m = val(ses, C('impMult')) * val(ses, J('ebitda')); return fx(ses, C('roundTrip'), [C('impMult'), K('fcf')], (m * wacc(ses) - v(ses, 'fcf')) / (m + v(ses, 'fcf')))
   && checkRow(sheetIn(ses, 'Checks'), [RT], () => ['DCF!' + C('roundTrip'), INP('growth')]); };
 const switchOk = ses => fx(ses, C('method'), [INP('tvMethod')], inp(ses, 'tvMethod')) && fx(ses, C('tv'), [C('method'), C('tvPerp'), C('tvExit')], val(ses, inp(ses, 'tvMethod') === 1 ? C('tvPerp') : C('tvExit')));
-const typed = (refs, first) => refs.map((ref, i) => `${i === 0 ? `Ctrl+G "${first || ref}" ↵` : (+ref.slice(1) === +refs[i - 1].slice(1) + 1 && ref[0] === refs[i - 1][0] ? '↓' : `Ctrl+G "${ref}" ↵`)} "${F[ref]}" ↵`).join(' ');
+const typed = (refs, first) => refs.map((ref, i) => `${i === 0 ? `Ctrl+G "DCF!${first || ref}" ↵` : (+ref.slice(1) === +refs[i - 1].slice(1) + 1 && ref[0] === refs[i - 1][0] ? '↓' : `Ctrl+G "DCF!${ref}" ↵`)} "${F[ref]}" ↵`).join(' ');
 const KEYS = {
-  carry: typed([K('ebitda'), K('depLess')], 'DCF!' + K('ebitda')),
-  fill: `Ctrl+G "J${row('ebit')}:K${row('depBack')}" ↵ Ctrl+R Ctrl+G "J${row('fcf')}:K${row('fcfShare')}" ↵ Ctrl+R`,
+  carry: typed([K('ebitda'), K('depLess')]),
+  fill: `Ctrl+G "DCF!J${row('ebit')}:K${row('depBack')}" ↵ Ctrl+R Ctrl+G "DCF!J${row('fcf')}:K${row('fcfShare')}" ↵ Ctrl+R`,
   steady: typed([K('capex'), K('nwc')]),
   perp: typed([C('tvPerp')]),
   exit: typed([C('tvExit')]),
   implied: typed([C('impMult'), C('impGrowth')]),
   trip: `${typed([C('roundTrip')])} Ctrl+G "Checks!${RT}" ↵ "${F.rt}" ↵`,
-  switch: typed([C('method'), C('tv')], 'DCF!' + C('method')),
+  switch: typed([C('method'), C('tv')]),
 };
 const KCELLS = [...['ebitda', 'depLess', ...KCALC, 'capex', 'nwc'].map(K)];
 
@@ -110,7 +110,7 @@ export default {
       hintStuck: `pulse range ${C('method')}:${C('tv')} · 1 picks the perpetuity, 2 the exit multiple.`,
       check: (s, ses) => settled(ses) && switchOk(ses) },
     { id: 'tie', closer: true, demo: { script: `Ctrl+G "Inputs!C${R('Inputs', 'exit')}" Enter "13" Enter Ctrl+G "DCF!${C('impGrowth')}" Enter`, cadence: 360 },
-      text: 'Does it tie? Watch the exit multiple go from 11.0x to 13.0x: the growth it implies climbs.', requires: [],
+      text: 'Does it tie? Watch the exit multiple on Inputs go from 11.0x to 13.0x: the implied growth in C30 climbs.', requires: [],
       hintStuck: `pulse cell ${C('impGrowth')} · A higher multiple says the market expects faster growth.`,
       check: (s, ses) => ses.demoDone.has('tie') },
   ],

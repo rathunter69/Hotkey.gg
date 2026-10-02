@@ -89,6 +89,11 @@ const BEATS_DEFAULT = {
     body: 'The pack is thirteen sheets now, and the case switch is read from all over it. A name turns Scenarios!$C$11 into Case, so a formula reads like English and a reviewer finds the switch by name. But a model with a hundred names is worse than one with none. Name the toggles and the key inputs, manage them, and let the picker read its list by name.' },
   'ch4-project-and-assessment': { eyebrow: 'Module 4.7 · project and assessment', title: 'The diligence pack.',
     body: 'A fresh export, a question log with eight questions open, a case sheet with three columns and no switch wired. Answer the log, build the KPI page, wire the case and name what deserves it. Build it, then build it again on another cluster’s export against the clock. The assessment is the test-out.' },
+  // Chapter 5 · Finance and accounting (script-ch5.md story cards)
+  'auditing-a-model': { eyebrow: 'Module 5.5 · auditing a model', title: 'Audit it before they do.',
+    body: 'Three buyers’ analysts are about to open this model looking for the mistake that lets them pay less, so find it first. A model gets audited the way a databook does, and then for the things only a model can get wrong: a row that doesn’t cross-foot, a formula that breaks pattern halfway across, an input that survives a stress test by luck.' },
+  dcf: { eyebrow: 'Module 5.6 · DCF', title: 'What the cash flows are worth.',
+    body: 'The model says what the business will earn; the DCF says what that’s worth today. Take the cash the business throws off after tax, capex and working capital, before anyone is paid interest, discount it at the return its investors require, add what it’s worth beyond the forecast, and you have an enterprise value. Take off the debt and what’s left is what the owners are selling.' },
   'project-and-assessment': { eyebrow: 'Module 1.8 · project, assessment, test-out', title: 'Management’s next feed is in.',
     body: 'A fresh week, a blank Report, and everything the chapter taught. Build the page start to finish, then prove it against the clock on Monday morning; or test out of the chapter in five minutes.' },
 };

@@ -40,22 +40,22 @@ export default {
       check: (s, ses) => settled(ses) && onSheet(ses, D) && pressedSince(ses, 'Ctrl+PgDn') },
     { id: 'date', teach: 'Every discount period counts from a stated date: the FY26 year end, the same date the net debt is taken at. It is typed once with the DCF inputs and linked here.',
       text: `Link the valuation date in ${VAL} to Inputs: ${F.val}.`,
-      keys: `Ctrl+G "${VAL}" ↵ "${F.val}" ↵`, requires: ['dcf', 'cross-sheet-ref', 'f4-anchor', 'go-to'], convention: 'B2',
+      keys: `Ctrl+G "DCF!${VAL}" ↵ "${F.val}" ↵`, requires: ['dcf', 'cross-sheet-ref', 'f4-anchor', 'go-to'], convention: 'B2',
       hintStuck: `pulse cell ${VAL} · Row ${R('Inputs', 'valDate')} on Inputs holds 12/31/2026.`,
       check: (s, ses) => settled(ses) && dateOk(ses) },
     { id: 'ebitda', teach: 'The cash flows start from EBITDA, the operating profit before depreciation, interest and tax. The IS already has it, so the DCF reads it and never retypes it.',
       text: `Link EBITDA across C${R(D, 'ebitda')}:J${R(D, 'ebitda')}: ${F.ebitda}, entered with Ctrl+Enter.`,
-      keys: `Ctrl+G "C${R(D, 'ebitda')}:J${R(D, 'ebitda')}" ↵ "${F.ebitda}" Ctrl+↵`, requires: ['dcf', 'cross-sheet-ref', 'ctrl-enter-fill', 'go-to'], convention: 'C3',
+      keys: `Ctrl+G "DCF!C${R(D, 'ebitda')}:J${R(D, 'ebitda')}" ↵ "${F.ebitda}" Ctrl+↵`, requires: ['dcf', 'cross-sheet-ref', 'ctrl-enter-fill', 'go-to'], convention: 'C3',
       hintStuck: `pulse range C${R(D, 'ebitda')}:J${R(D, 'ebitda')} · EBITDA is row ${R('IS', 'ebitda')} on the IS.`,
       check: (s, ses) => settled(ses) && linked(ses, 'ebitda') },
     { id: 'capex', teach: 'Capex is cash out the door, so it comes in with a minus sign: the schedule shows it as a positive spend.',
       text: `Link capex across C${R(D, 'capex')}:J${R(D, 'capex')}: ${F.capex}.`,
-      keys: `Ctrl+G "C${R(D, 'capex')}:J${R(D, 'capex')}" ↵ "${F.capex}" Ctrl+↵`, requires: ['cross-sheet-ref', 'ctrl-enter-fill', 'go-to'], convention: 'C3',
+      keys: `Ctrl+G "DCF!C${R(D, 'capex')}:J${R(D, 'capex')}" ↵ "${F.capex}" Ctrl+↵`, requires: ['cross-sheet-ref', 'ctrl-enter-fill', 'go-to'], convention: 'C3',
       hintStuck: `pulse range C${R(D, 'capex')}:J${R(D, 'capex')} · Total capex is row ${R('Schedules', 'capexTotal')} on Schedules.`,
       check: (s, ses) => settled(ses) && linked(ses, 'capex') },
     { id: 'nwc', teach: 'The working-capital schedule already shows its cash effect with the sign the cash flow needs, so this link takes it as it stands.',
       text: `Link the change in working capital across C${R(D, 'nwc')}:J${R(D, 'nwc')}: ${F.nwc}.`,
-      keys: `Ctrl+G "C${R(D, 'nwc')}:J${R(D, 'nwc')}" ↵ "${F.nwc}" Ctrl+↵`, requires: ['cross-sheet-ref', 'ctrl-enter-fill', 'go-to'], convention: 'C3',
+      keys: `Ctrl+G "DCF!C${R(D, 'nwc')}:J${R(D, 'nwc')}" ↵ "${F.nwc}" Ctrl+↵`, requires: ['cross-sheet-ref', 'ctrl-enter-fill', 'go-to'], convention: 'C3',
       hintStuck: `pulse range C${R(D, 'nwc')}:J${R(D, 'nwc')} · The cash effect of working capital is row ${R('Schedules', 'wcCash')} on Schedules.`,
       check: (s, ses) => settled(ses) && linked(ses, 'nwc') },
     { id: 'tie', closer: true, demo: { script: `Ctrl+G "Inputs!G${R('Inputs', 'bNew')}" Enter "3" Enter Ctrl+G "DCF!G${R(D, 'capex')}" Enter`, cadence: 360 },
@@ -71,7 +71,7 @@ export default {
     'The page is laid out, and every input it needs already lives in the model.',
     'Best practice: the DCF reads the model. A DCF with its own typed cash flows is a calculator, not a valuation, and it stops moving the first time the rollout does. Picture a house: what the house is worth is enterprise value, the mortgage is net debt, and the owner’s stake is equity. This page prices it off the rent it would earn.',
   ],
-  solution: `Ctrl+G "Checks!A1" Enter Ctrl+PgDn Ctrl+G "${VAL}" Enter "${F.val}" Enter `
-    + `Ctrl+G "C${R(D, 'ebitda')}:J${R(D, 'ebitda')}" Enter "${F.ebitda}" Ctrl+Enter Ctrl+G "C${R(D, 'capex')}:J${R(D, 'capex')}" Enter "${F.capex}" Ctrl+Enter `
-    + `Ctrl+G "C${R(D, 'nwc')}:J${R(D, 'nwc')}" Enter "${F.nwc}" Ctrl+Enter`,
+  solution: `Ctrl+G "Checks!A1" Enter Ctrl+PgDn Ctrl+G "DCF!${VAL}" Enter "${F.val}" Enter `
+    + `Ctrl+G "DCF!C${R(D, 'ebitda')}:J${R(D, 'ebitda')}" Enter "${F.ebitda}" Ctrl+Enter Ctrl+G "DCF!C${R(D, 'capex')}:J${R(D, 'capex')}" Enter "${F.capex}" Ctrl+Enter `
+    + `Ctrl+G "DCF!C${R(D, 'nwc')}:J${R(D, 'nwc')}" Enter "${F.nwc}" Ctrl+Enter`,
 };

@@ -50,7 +50,7 @@ export default {
       check: (s, ses) => settled(ses) && onIS(ses) && s.selectionText() === `${UTIL},${MKT}` },
     { id: 'fill-typed', teach: 'Each row is one formula written in FY27 and filled right, so the cure for a typed cell is the fill: Ctrl+R copies the cell to its left across the selection, references shifted.',
       text: 'Put each back on its row’s formula: select F15:G15 and press Ctrl+R, then H18:I18 and Ctrl+R.',
-      keys: 'Ctrl+G "F15:G15" ↵ Ctrl+R Ctrl+G "H18:I18" ↵ Ctrl+R', requires: ['fill-down-right', 'go-to'], convention: 'C3',
+      keys: '← Shift+→ Ctrl+R ↓ ↓ ↓ Tab Tab Shift+→ Ctrl+R', requires: ['fill-down-right', 'shift-arrow', 'arrow-keys', 'tab-commits'], convention: 'C3',
       hintStuck: 'pulse range F15:G15 · The cell to the left holds the row’s formula.',
       check: (s, ses) => settled(ses) && typedFixed(ses) },
     { id: 'row-diff', teach: 'Row differences compares every cell of the selected row with the active cell’s formula, shifted to its column, and selects the ones that do not match. A formula that lost a $ halfway across looks right and gives the wrong figure.',
@@ -60,7 +60,7 @@ export default {
       check: (s, ses) => settled(ses) && onSch(ses) && s.selectionText() === 'H' + LAB },
     { id: 'refill', teach: 'H32 reads the FY29 cell of the cost input, which is blank, where every other year reads $C$50. Refill the whole row from FY27 so it is one formula again.',
       text: 'Refill the row from FY27: select F32:J32 and press Ctrl+R.',
-      keys: 'Ctrl+G "F32:J32" ↵ Ctrl+R', requires: ['fill-down-right', 'go-to'], convention: 'C3',
+      keys: '← ← Shift+→ ×4 Ctrl+R', requires: ['fill-down-right', 'shift-arrow', 'arrow-keys'], convention: 'C3',
       hintStuck: 'pulse range F32:J32 · FY27 holds the row’s formula as written.',
       check: (s, ses) => settled(ses) && laborOk(ses) },
     { id: 'count', teach: 'ISNUMBER less ISFORMULA is 1 only on a typed number, so the SUMPRODUCT counts typed numbers directly. Counting numbers and formulas separately and subtracting would let a formula showing a dash hide a typed figure.',
@@ -69,7 +69,7 @@ export default {
       hintStuck: 'pulse range C38:C41 · Only the projected columns, F to J: history is typed on purpose.',
       check: (s, ses) => settled(ses) && countsOk(ses) },
     { id: 'fold', text: `Fold them into the roll-up: C44 ${ROLLUP}.`,
-      keys: `Ctrl+G "C44" ↵ "${ROLLUP}" ↵`, requires: ['hardcode-count', 'rollup-flag', 'go-to'],
+      keys: `Ctrl+G "Checks!C44" ↵ "${ROLLUP}" ↵`, requires: ['hardcode-count', 'rollup-flag', 'go-to'],
       hintStuck: 'pulse cell C44 · Add SUM(C38:C41) to what the cell already holds.',
       check: (s, ses) => settled(ses) && countsOk(ses) && foldedOk(ses) },
     { id: 'tie', closer: true, demo: { script: 'Ctrl+G "IS!H13" Enter "-5000" Enter Ctrl+G "Checks!C38" Enter', cadence: 320 },
@@ -85,7 +85,7 @@ export default {
     'Every projected cell is a formula, and every row is one formula across.',
     'Constants found the two typed figures and Row differences the formula that lost its anchor; the counts on Checks now catch the next of either. Tip from the desk: where one cell in a row has to differ on purpose, border it and say why in the next cell, so Row differences lighting it is a known exception nobody flattens with a fill.',
   ],
-  solution: 'Ctrl+G "IS!F5:J32" Enter Alt H F D S O Enter Ctrl+G "F15:G15" Enter Ctrl+R Ctrl+G "H18:I18" Enter Ctrl+R '
-    + 'Ctrl+G "Schedules!F32:J32" Enter Alt H F D S W Enter Ctrl+G "F32:J32" Enter Ctrl+R '
-    + `Ctrl+G "Checks!C38" Enter "${F.hcIS}" Enter Down "${F.hcCF}" Enter Down "${F.hcBS}" Enter Down "${F.hcSch}" Enter Ctrl+G "C44" Enter "${ROLLUP}" Enter`,
+  solution: 'Ctrl+G "IS!F5:J32" Enter Alt H F D S O Enter Left Shift+Right Ctrl+R Down Down Down Tab Tab Shift+Right Ctrl+R '
+    + 'Ctrl+G "Schedules!F32:J32" Enter Alt H F D S W Enter Left Left Shift+Right Shift+Right Shift+Right Shift+Right Ctrl+R '
+    + `Ctrl+G "Checks!C38" Enter "${F.hcIS}" Enter Down "${F.hcCF}" Enter Down "${F.hcBS}" Enter Down "${F.hcSch}" Enter Ctrl+G "Checks!C44" Enter "${ROLLUP}" Enter`,
 };

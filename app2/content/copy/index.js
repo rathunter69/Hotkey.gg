@@ -1839,6 +1839,150 @@ export const COPY = {
    "mac_note": "",
    "story_beat": ""
   },
+  "tie-outs-cross-foots": {
+   "id": "tie-outs-cross-foots",
+   "module": "auditing-a-model",
+   "order": "5.5.1",
+   "title": "Tie-outs and cross-foots",
+   "brief": "A tie-out proves a figure in two places is the same figure; a cross-foot proves a block adds both ways, down the lines and across the years. Checks already ties the balance sheet, cash, debt, PP&E and revenue. Fill the three rows still marked pending, add two limit checks that count balances gone below zero, and read the flag on the Cover. The key is `=`.",
+   "closing": "Eight checks are live, and each one names the line it guards. || A tie-out proves two places agree, a cross-foot proves a block adds both ways, and a limit check catches what a tie cannot: a balance gone through zero. Best practice: build a check the day you build the line it guards, never the night before it goes out.",
+   "wow": "",
+   "convention_line": "The check is a live difference → 0; Write once, fill right",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "error-flags-checks-summary": {
+   "id": "error-flags-checks-summary",
+   "module": "auditing-a-model",
+   "order": "5.5.2",
+   "title": "Error flags and the checks summary",
+   "brief": "A check that reads zero can’t see a #REF! in a cell no check reads, and when an error reaches a check, the check turns into an error that says nothing about where it started. SUMPRODUCT(--ISERROR(block)) counts the errors on a sheet, and Error Checking (Alt, M, K) walks you to each one. Count the errors sheet by sheet on Checks, fold the counts into the flag, then find and fix the one planted in the model. The key is `ISERROR`.",
+   "closing": "The flag now sees errors as well as differences, and one cell says the model is clean. || A #REF! in a memo cell would have reached no tie and sat in the file until a buyer’s analyst found it. The error count found it in one row, Error Checking walked to it, and the Watch Window keeps the flag in view while you work anywhere else in the model.",
+   "wow": "",
+   "convention_line": "The check is a live difference → 0; Go To Special, show formulas, trace",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "model-wide-sweep": {
+   "id": "model-wide-sweep",
+   "module": "auditing-a-model",
+   "order": "5.5.3",
+   "title": "The model-wide sweep: hardcodes and pattern breaks",
+   "brief": "Two faults hide in a projected block: a typed number where a formula belongs, and a formula that breaks pattern halfway across a row. Go To Special finds both: Constants lights every typed number in a selection, and Row differences every cell whose formula is not the row’s. Sweep the model with both, then count typed numbers sheet by sheet on Checks so the flag catches the next one. The key is `Alt H F D S`.",
+   "closing": "Every projected cell is a formula, and every row is one formula across. || Constants found the two typed figures and Row differences the formula that lost its anchor; the counts on Checks now catch the next of either. Tip from the desk: where one cell in a row has to differ on purpose, border it and say why in the next cell, so Row differences lighting it is a known exception nobody flattens with a fill.",
+   "wow": "",
+   "convention_line": "Write once, fill right; One input, one cell; formulas reference it; Go To Special, show formulas, trace",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "stress-tests": {
+   "id": "stress-tests",
+   "module": "auditing-a-model",
+   "order": "5.5.4",
+   "title": "Stress tests: zero, huge, a loss",
+   "brief": "A model that balances on the base case can still break: take washes to zero and a margin divides by nothing; build a hundred sites and the revolver has to carry it; make the washes cost more than they earn and tax has to stop at zero. A stress test types an input to an extreme, reads what breaks, fixes the formula that should have held, and puts the input back. Run four on Inputs before a buyer’s analyst does. The key is `Ctrl+Z`.",
+   "closing": "The model held at four extremes, and you fixed the one formula that didn’t. || Best practice: run the stress tests before sending, every time. A buyer’s analyst runs them in the first ten minutes, and a model that breaks at zero tells them nobody looked.",
+   "wow": "",
+   "convention_line": "Read the page before anyone else does; MIN/MAX or a lookup instead",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "challenge-eight-faults": {
+   "id": "challenge-eight-faults",
+   "module": "auditing-a-model",
+   "order": "5.5.C",
+   "title": "Challenge: eight planted faults",
+   "brief": "The linked model with eight faults: two typed numbers, a pattern break, a sign, a missing add-back, a #REF!, a check that isn’t a formula and a plug on the balance sheet. Find and fix them all, and the flag reads OK.",
+   "closing": "",
+   "wow": "",
+   "convention_line": "The check is a live difference → 0; Cash balances the sheet; nothing is forced; Write once, fill right",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "what-a-dcf-is": {
+   "id": "what-a-dcf-is",
+   "module": "dcf",
+   "order": "5.6.1",
+   "title": "What a DCF is, and what the statements feed it",
+   "brief": "A discounted cash flow values a business as the cash it will generate, discounted to today: the NPV from Chapter 3 applied to the whole company instead of one site. It needs cash flows, a discount rate and a terminal value, and the model already holds what the cash flows are built from. The DCF page sits next to Checks, laid out and empty. Link it to the model so the next five lessons can fill it. The key is `Ctrl+PgDn`.",
+   "closing": "The page is laid out, and every input it needs already lives in the model. || Best practice: the DCF reads the model. A DCF with its own typed cash flows is a calculator, not a valuation, and it stops moving the first time the rollout does. Picture a house: what the house is worth is enterprise value, the mortgage is net debt, and the owner’s stake is equity. This page prices it off the rent it would earn.",
+   "wow": "",
+   "convention_line": "Links green; external links avoided; Write once, fill right",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "unlevered-free-cash-flow": {
+   "id": "unlevered-free-cash-flow",
+   "module": "dcf",
+   "order": "5.6.2",
+   "title": "Unlevered free cash flow",
+   "brief": "Unlevered free cash flow is the cash the washes generate before anybody gets paid, not the lenders and not the owners. Start from EBIT, take off the tax owed on it as if there were no debt, add depreciation back, then take off capex and the cash tied up in working capital. It ignores how the business is financed, so the operations are valued first and the debt comes off at equity value. Build it from the linked lines. The key is `=`.",
+   "closing": "This is the cash the business throws off for whoever owns it, before the debt is paid. || Best practice: tax here is on EBIT, and interest is nowhere on this page. If either slips in, the value counts the debt twice. Unlevered cash flow goes with WACC and gives enterprise value; cash flow after interest goes with the cost of equity and gives equity value. Mixing the two is the classic error.",
+   "wow": "",
+   "convention_line": "Write once, fill right; Links green; external links avoided",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "wacc-block": {
+   "id": "wacc-block",
+   "module": "dcf",
+   "order": "5.6.3",
+   "title": "The WACC block",
+   "brief": "The discount rate is the weighted average cost of capital: the return equity investors require, blended with the after-tax cost of debt, weighted by how much of the company each funds. Cost of equity is a risk-free rate plus beta times the market premium; cost of debt is what the company could borrow at today, less the tax shield; the weights come from a target capital structure. Build the block from the inputs and read what a car wash’s WACC is. The key is `=`.",
+   "closing": "Seven sourced inputs built the return the company’s investors require. || Best practice: every WACC input carries its source in the next cell on Inputs. It is the number a buyer argues with first, and a source is what ends the argument.",
+   "wow": "",
+   "convention_line": "Links green; external links avoided; Name toggles and key inputs only",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "terminal-value": {
+   "id": "terminal-value",
+   "module": "dcf",
+   "order": "5.6.4",
+   "title": "Terminal value: perpetuity and exit multiple",
+   "brief": "The forecast stops at FY31 and the business doesn’t, so the terminal value stands for everything after. The perpetuity method grows a normalized last year’s cash flow at a steady rate forever; the exit multiple method sells the business in FY31 at a multiple of EBITDA, the way a sponsor will. Build both, then read the implied multiple of one and the implied growth of the other, so each checks the other. The key is `=`.",
+   "closing": "You have two terminal values, and each says whether the other is reasonable. || Best practice: when the two methods disagree by more than a third, one of the inputs is wrong, not the method. Read the implied multiple against the comps and the implied growth against the economy before you trust either value.",
+   "wow": "",
+   "convention_line": "Write once, fill right; Links green; external links avoided; The check is a live difference → 0; A case toggle, never copies of the file",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "discounting-mid-year": {
+   "id": "discounting-mid-year",
+   "module": "dcf",
+   "order": "5.6.5",
+   "title": "Discounting and the mid-year convention",
+   "brief": "A discount factor is 1 over (1 + WACC) to the t, and the question is what t is. Cash arrives through the year, not on December 31, so the mid-year convention discounts year 1 at 0.5, year 2 at 1.5, and so on. The present values, summed, plus the discounted terminal value, are enterprise value; less net debt is equity value. Build it, and read what the convention is worth. The key is `^`.",
+   "closing": "Enterprise value comes from five discounted years and a terminal, and the convention moves the forecast years about 5%. || Best practice: say which convention the page uses wherever the value is quoted. Two analysts a few percent apart are usually one mid-year switch apart.",
+   "wow": "",
+   "convention_line": "Links green; external links avoided; Write once, fill right; The check is a live difference → 0; Read the page before anyone else does",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "dcf-sensitivity": {
+   "id": "dcf-sensitivity",
+   "module": "dcf",
+   "order": "5.6.6",
+   "title": "Sensitivity tables: WACC by growth, WACC by exit multiple",
+   "brief": "No one believes a single DCF number, so the page ends on two tables: enterprise value at five WACCs against five growth rates, and against five exit multiples. Each table reads the value built on its own terminal method, so neither goes flat when the switch moves. The edges are laid out; write each grid as one formula, format both the way the book prints them, and read the range a buyer will negotiate inside. The key is `F4`.",
+   "closing": "Two tables show the range inside which the whole negotiation will happen. || Best practice: keep the steps tight, about half a point of WACC and growth and one turn of multiple, so the corners are a range a buyer will actually discuss. Read across a row before you quote the base case: if one step moves the value by a fifth, say so.",
+   "wow": "",
+   "convention_line": "Links green; external links avoided; Write once, fill right; One decimals setting per line; Read the page before anyone else does",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "challenge-dcf": {
+   "id": "challenge-dcf",
+   "module": "dcf",
+   "order": "5.6.C",
+   "title": "Challenge: a DCF from a given free-cash-flow line",
+   "brief": "Five years of free cash flow are given on DCF, with EBITDA, the periods, the WACC inputs and the tables’ edges. Build the WACC, both terminal values, the mid-year factors, enterprise and equity value, and one sensitivity grid.",
+   "closing": "",
+   "wow": "",
+   "convention_line": "Write once, fill right; Name toggles and key inputs only; Read the page before anyone else does",
+   "mac_note": "",
+   "story_beat": ""
+  },
   "remix-format-on-the-pnl": {
    "id": "remix-format-on-the-pnl",
    "module": "remixes",
@@ -11664,6 +11808,718 @@ export const COPY = {
     "why": "",
     "hint_stuck": ""
    }
+  ],
+  "tie-outs-cross-foots": [
+   {
+    "lesson_id": "tie-outs-cross-foots",
+    "goal_index": "0",
+    "text": "Tie the equity roll across C12:J12: =ROUND(BS!C21+BS!C22+BS!C23-BS!C24,2), entered with Ctrl+Enter.",
+    "teach": "Equity rolls like every schedule: opening, plus net income, less distributions, is closing. Written as a live difference wrapped in ROUND, it reads zero in every year the roll holds.",
+    "why": "",
+    "hint_stuck": "pulse range C12:J12 · One formula, written for FY24, lands in every year with Ctrl+Enter."
+   },
+   {
+    "lesson_id": "tie-outs-cross-foots",
+    "goal_index": "1",
+    "text": "Tie EBITDA to the Chapter 2 P&L across C13:J13: =IF(Inputs!C$6=0,ROUND(IS!C24-C48,2),0).",
+    "teach": "The historical EBITDA has to agree with the P&L the buyers saw in Chapter 2, typed blue in row 48 with its source. In the projected years there is nothing to tie, so the IF reads 0 there.",
+    "why": "",
+    "hint_stuck": "pulse range C13:J13 · The flag row says whether a year is projected: 0 is an actual."
+   },
+   {
+    "lesson_id": "tie-outs-cross-foots",
+    "goal_index": "2",
+    "text": "Cross-foot the cost build in C11: =ROUND(SUM(Schedules!C32:J37)-SUM(Schedules!C38:J38),2).",
+    "teach": "A cross-foot adds a block twice: every cost line across every year, and the site-cost total row across the years. If one line is left out of a total, the two sums part.",
+    "why": "",
+    "hint_stuck": "pulse cell C11 · Rows 32 to 37 are the cost lines; row 38 is their total."
+   },
+   {
+    "lesson_id": "tie-outs-cross-foots",
+    "goal_index": "3",
+    "text": "Count debt balances below zero across C17:J17, with COUNTIF and \"<0\" on Schedules rows 82, 92 and 103.",
+    "teach": "A tie-out cannot see a balance that has gone through zero: a debt tranche repaid past nothing still ties to itself. A limit check counts what should never happen, with COUNTIF and \"<0\", and reads zero while none does.",
+    "why": "",
+    "hint_stuck": "pulse range C17:J17 · Rows 82, 92 and 103 are the term loan, the delayed draw and the revolver closing."
+   },
+   {
+    "lesson_id": "tie-outs-cross-foots",
+    "goal_index": "4",
+    "text": "Do the same for closing PP&E across C18:J18, with COUNTIF on Schedules row 65.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C18:J18 · Row 65 is closing PP&E, net."
+   },
+   {
+    "lesson_id": "tie-outs-cross-foots",
+    "goal_index": "5",
+    "text": "Clear the pending notes in K11:K13 with Clear All, then Go To Cover!C7: the flag reads OK.",
+    "teach": "The roll-up already adds every row from the balance check down, so the new rows fold into the flag as they land. A pending note says a check is not built yet; once it is, the note goes.",
+    "why": "",
+    "hint_stuck": "pulse range K11:K13 · Clear All takes the note and its italic with it."
+   },
+   {
+    "lesson_id": "tie-outs-cross-foots",
+    "goal_index": "6",
+    "text": "Does it tie? Watch FY29 PP&E on the BS typed over: the PP&E tie in H9 names the line, and the flag turns to CHECK.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell H9 · Each check guards one line."
+   }
+  ],
+  "error-flags-checks-summary": [
+   {
+    "lesson_id": "error-flags-checks-summary",
+    "goal_index": "0",
+    "text": "Count each sheet's errors in C30:C35, starting with C30 =SUMPRODUCT(--ISERROR(IS!C5:J60)) and one sheet a row.",
+    "teach": "ISERROR turns every cell of a block into TRUE or FALSE, the two minus signs turn those into 1 and 0, and SUMPRODUCT adds them. One row a sheet, each over the whole block the sheet uses.",
+    "why": "",
+    "hint_stuck": "pulse range C30:C35 · The labels in column B name each row’s sheet."
+   },
+   {
+    "lesson_id": "error-flags-checks-summary",
+    "goal_index": "1",
+    "text": "Fold the counts into the roll-up: C44 =SUMPRODUCT(ABS(C6:J27))+SUM(C30:C35), and the flag turns to CHECK.",
+    "teach": "An error doesn’t net to zero, so the roll-up adds the counts to the sum of the differences: OK only when both are zero. Schedules reads 1, and the flag says so.",
+    "why": "",
+    "hint_stuck": "pulse cell C44 · Add SUM(C30:C35) to what the cell already holds."
+   },
+   {
+    "lesson_id": "error-flags-checks-summary",
+    "goal_index": "2",
+    "text": "Go to Schedules, the sheet the count names, and press Alt, M, K: Error Checking lands on the #REF! in H66.",
+    "teach": "Error Checking works on one sheet at a time, so go to the sheet the count names first. It selects each error cell in turn and shows its formula.",
+    "why": "",
+    "hint_stuck": "pulse cell H66 · Row 66 is a memo: capex over depreciation."
+   },
+   {
+    "lesson_id": "error-flags-checks-summary",
+    "goal_index": "3",
+    "text": "Close it with Esc and rewrite H66 by pointing: =IFERROR(H63/H64,0), so the count reads 0 and the flag OK.",
+    "teach": "The memo divides capex by depreciation in the same year; the reference to depreciation was deleted. Point at both again rather than typing them, and the count falls to zero.",
+    "why": "",
+    "hint_stuck": "pulse cell H66 · Total capex is row 63 and depreciation row 64."
+   },
+   {
+    "lesson_id": "error-flags-checks-summary",
+    "goal_index": "4",
+    "text": "Open the Watch Window with Alt, M, W, add Cover!C7:C8 with Alt+A, and close it with Esc.",
+    "teach": "The Watch Window keeps a cell in view with its value whatever sheet you are on. Best practice: the flag on the Cover is the first cell a reviewer reads and the last one you read before sending.",
+    "why": "",
+    "hint_stuck": "pulse cell C7 · C7 is the flag and C8 the sum of differences behind it."
+   },
+   {
+    "lesson_id": "error-flags-checks-summary",
+    "goal_index": "5",
+    "text": "Does it tie? Watch a #DIV/0! typed into the IS: the count in C30 catches it and the flag turns to CHECK.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C30 · Every error on the IS adds one."
+   }
+  ],
+  "model-wide-sweep": [
+   {
+    "lesson_id": "model-wide-sweep",
+    "goal_index": "0",
+    "text": "On IS, select the projected block F5:J32 and run Go To Special, Constants: two typed figures light up, G15 and I18.",
+    "teach": "A projected block should hold nothing but formulas, so Go To Special, Constants, Numbers on it selects exactly the cells somebody typed over. Each one is a figure that will not move when the inputs do.",
+    "why": "",
+    "hint_stuck": "pulse range F5:J32 · O picks Constants; Enter selects them."
+   },
+   {
+    "lesson_id": "model-wide-sweep",
+    "goal_index": "1",
+    "text": "Put each back on its row’s formula: select F15:G15 and press Ctrl+R, then H18:I18 and Ctrl+R.",
+    "teach": "Each row is one formula written in FY27 and filled right, so the cure for a typed cell is the fill: Ctrl+R copies the cell to its left across the selection, references shifted.",
+    "why": "",
+    "hint_stuck": "pulse range F15:G15 · The cell to the left holds the row’s formula."
+   },
+   {
+    "lesson_id": "model-wide-sweep",
+    "goal_index": "2",
+    "text": "On Schedules, select the labor row F32:J32 and run Go To Special, Row differences: FY29, H32, lights up.",
+    "teach": "Row differences compares every cell of the selected row with the active cell’s formula, shifted to its column, and selects the ones that do not match. A formula that lost a $ halfway across looks right and gives the wrong figure.",
+    "why": "",
+    "hint_stuck": "pulse range F32:J32 · W picks Row differences."
+   },
+   {
+    "lesson_id": "model-wide-sweep",
+    "goal_index": "3",
+    "text": "Refill the row from FY27: select F32:J32 and press Ctrl+R.",
+    "teach": "H32 reads the FY29 cell of the cost input, which is blank, where every other year reads $C$50. Refill the whole row from FY27 so it is one formula again.",
+    "why": "",
+    "hint_stuck": "pulse range F32:J32 · FY27 holds the row’s formula as written."
+   },
+   {
+    "lesson_id": "model-wide-sweep",
+    "goal_index": "4",
+    "text": "Count typed numbers in C38:C41 on Checks, starting with C38 =SUMPRODUCT(ISNUMBER(IS!F5:J60)*(1-ISFORMULA(IS!F5:J60))) and one sheet a row.",
+    "teach": "ISNUMBER less ISFORMULA is 1 only on a typed number, so the SUMPRODUCT counts typed numbers directly. Counting numbers and formulas separately and subtracting would let a formula showing a dash hide a typed figure.",
+    "why": "",
+    "hint_stuck": "pulse range C38:C41 · Only the projected columns, F to J: history is typed on purpose."
+   },
+   {
+    "lesson_id": "model-wide-sweep",
+    "goal_index": "5",
+    "text": "Fold them into the roll-up: C44 =SUMPRODUCT(ABS(C6:J27))+SUM(C30:C35)+SUM(C38:C41).",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C44 · Add SUM(C38:C41) to what the cell already holds."
+   },
+   {
+    "lesson_id": "model-wide-sweep",
+    "goal_index": "6",
+    "text": "Does it tie? Watch a figure typed into FY29 labor on the IS: the count in C38 catches it and the flag turns to CHECK.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C38 · A typed number in the projection counts one."
+   }
+  ],
+  "stress-tests": [
+   {
+    "lesson_id": "stress-tests",
+    "goal_index": "0",
+    "text": "Take washes to zero: 0 into Inputs!F22:J22 with Ctrl+Enter and 0 into C42; the IS margins read #DIV/0!.",
+    "teach": "Zero is the first stress: every ratio divides by something, and a divisor of zero is #DIV/0!. With no washes, revenue is nothing, so every margin on the IS breaks.",
+    "why": "",
+    "hint_stuck": "pulse range F22:J22 · Row 22 is the Base case washes a day; C42 the washes at a new site."
+   },
+   {
+    "lesson_id": "stress-tests",
+    "goal_index": "1",
+    "text": "Wrap the four margins: C11:J11 =IFERROR(C10/C8,\"-\"), and rows 21, 25 and 32 the same way.",
+    "teach": "A ratio with nothing to divide by has no answer, so IFERROR shows a dash where the error would be. Use it only where the error is expected, never around a whole calculation to hide one.",
+    "why": "",
+    "hint_stuck": "pulse range C11:J11 · Each margin is its line over revenue in row 8."
+   },
+   {
+    "lesson_id": "stress-tests",
+    "goal_index": "2",
+    "text": "Put the base case back: 250 into Inputs!F22:J22 and 200 into C42.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range F22:J22 · The Base case runs 250 washes a day; a new site 200."
+   },
+   {
+    "lesson_id": "stress-tests",
+    "goal_index": "3",
+    "text": "Type 100 into FY27 new sites, Inputs!F21: cash holds at the 5,000 minimum and the flag stays OK; then Ctrl+Z.",
+    "teach": "Ctrl+Z takes back the last change, so a stress is one entry and one undo. A hundred sites is $250m of capex: the revolver draws whatever cash before it falls short of the minimum, and the model still balances.",
+    "why": "",
+    "hint_stuck": "pulse cell F21 · The revolver is the plug that is not a plug: it draws to the minimum cash."
+   },
+   {
+    "lesson_id": "stress-tests",
+    "goal_index": "4",
+    "text": "Type 150% into the FY27 cost of a wash, Inputs!F25: a loss, and Schedules F120 shows no tax; then Ctrl+Z.",
+    "teach": "When the washes cost more than they bring in, earnings before tax go negative, and tax has to stop at zero rather than turn into a refund. The MAX in the tax schedule does that, and the loss is carried to a later year.",
+    "why": "",
+    "hint_stuck": "pulse cell F25 · Row 120 on Schedules is the tax charge."
+   },
+   {
+    "lesson_id": "stress-tests",
+    "goal_index": "5",
+    "text": "Type 100% and then 0% into FY27 member share, Inputs!F24: no errors either way; then Ctrl+Z twice.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell F24 · At 100% every wash is a member’s; at 0% none is."
+   },
+   {
+    "lesson_id": "stress-tests",
+    "goal_index": "6",
+    "text": "Does it tie? Watch C44 on Checks and C7 on the Cover: the base case is back, every check reads zero, and the flag reads OK.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C7 · The last cell you read before sending."
+   }
+  ],
+  "challenge-eight-faults": [
+   {
+    "lesson_id": "challenge-eight-faults",
+    "goal_index": "0",
+    "text": "Put the two typed figures on the IS projection back on their rows’ formulas.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-eight-faults",
+    "goal_index": "1",
+    "text": "Find the labor formula on Schedules that breaks pattern and refill its row from FY27.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-eight-faults",
+    "goal_index": "2",
+    "text": "On CF, add FY28 depreciation back and put the sign of the FY29 receivables change right.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-eight-faults",
+    "goal_index": "3",
+    "text": "Fix the #REF! the error count finds on Schedules.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-eight-faults",
+    "goal_index": "4",
+    "text": "Make the equity roll on Checks a live difference again: =ROUND(BS!C21+BS!C22+BS!C23-BS!C24,2) across C12:J12.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-eight-faults",
+    "goal_index": "5",
+    "text": "Take the plug out of FY31 cash on the BS so it reads the cash flow’s closing cash, and the flag reads OK.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "what-a-dcf-is": [
+   {
+    "lesson_id": "what-a-dcf-is",
+    "goal_index": "0",
+    "text": "Go to Checks with Ctrl+G, then press Ctrl+PgDn to reach the DCF page next door.",
+    "teach": "Ctrl+PgDn moves one sheet to the right, and the DCF page is the tab after Checks. Its blocks are labeled already: free cash flow, discounting, terminal value, enterprise value to equity value, WACC and the sensitivity tables.",
+    "why": "",
+    "hint_stuck": "pulse cell A1 · DCF is the tab to the right of Checks."
+   },
+   {
+    "lesson_id": "what-a-dcf-is",
+    "goal_index": "1",
+    "text": "Link the valuation date in C5 to Inputs: =Inputs!$C$87.",
+    "teach": "Every discount period counts from a stated date: the FY26 year end, the same date the net debt is taken at. It is typed once with the DCF inputs and linked here.",
+    "why": "",
+    "hint_stuck": "pulse cell C5 · Row 87 on Inputs holds 12/31/2026."
+   },
+   {
+    "lesson_id": "what-a-dcf-is",
+    "goal_index": "2",
+    "text": "Link EBITDA across C8:J8: =IS!C24, entered with Ctrl+Enter.",
+    "teach": "The cash flows start from EBITDA, the operating profit before depreciation, interest and tax. The IS already has it, so the DCF reads it and never retypes it.",
+    "why": "",
+    "hint_stuck": "pulse range C8:J8 · EBITDA is row 24 on the IS."
+   },
+   {
+    "lesson_id": "what-a-dcf-is",
+    "goal_index": "3",
+    "text": "Link capex across C14:J14: =-Schedules!C63.",
+    "teach": "Capex is cash out the door, so it comes in with a minus sign: the schedule shows it as a positive spend.",
+    "why": "",
+    "hint_stuck": "pulse range C14:J14 · Total capex is row 63 on Schedules."
+   },
+   {
+    "lesson_id": "what-a-dcf-is",
+    "goal_index": "4",
+    "text": "Link the change in working capital across C15:J15: =Schedules!C56.",
+    "teach": "The working-capital schedule already shows its cash effect with the sign the cash flow needs, so this link takes it as it stands.",
+    "why": "",
+    "hint_stuck": "pulse range C15:J15 · The cash effect of working capital is row 56 on Schedules."
+   },
+   {
+    "lesson_id": "what-a-dcf-is",
+    "goal_index": "5",
+    "text": "Does it tie? Watch three new sites in FY28 instead of six: capex on the DCF falls with them.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell G14 · The DCF reads the schedule, so it moves with the rollout."
+   }
+  ],
+  "unlevered-free-cash-flow": [
+   {
+    "lesson_id": "unlevered-free-cash-flow",
+    "goal_index": "0",
+    "text": "Link depreciation across C9:J9, as a deduction: =-Schedules!C64.",
+    "teach": "Free cash flow is built down the page from EBITDA, one line at a time. Depreciation comes off first to reach EBIT, because tax is charged on profit after depreciation.",
+    "why": "",
+    "hint_stuck": "pulse range C9:J9 · Depreciation is row 64 on Schedules, shown positive there."
+   },
+   {
+    "lesson_id": "unlevered-free-cash-flow",
+    "goal_index": "1",
+    "text": "EBIT across C10:J10: =C8+C9.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C10:J10 · EBITDA plus the line below it, which is negative."
+   },
+   {
+    "lesson_id": "unlevered-free-cash-flow",
+    "goal_index": "2",
+    "text": "Tax on EBIT across C11:J11: =-MAX(C10,0)*Inputs!$C$84.",
+    "teach": "Tax here is on EBIT at the rate, not the tax on the IS, which is lower because interest came off first. MAX keeps a loss year from turning into a refund.",
+    "why": "",
+    "hint_stuck": "pulse range C11:J11 · The tax rate is row 84 on Inputs; anchor it with F4."
+   },
+   {
+    "lesson_id": "unlevered-free-cash-flow",
+    "goal_index": "3",
+    "text": "NOPAT, EBIT after that tax, across C12:J12: =C10+C11.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C12:J12 · EBIT plus the tax line, which is negative."
+   },
+   {
+    "lesson_id": "unlevered-free-cash-flow",
+    "goal_index": "4",
+    "text": "Add depreciation back across C13:J13: =-C9.",
+    "teach": "Depreciation is a charge that never left the bank account, so it comes back now that tax is done.",
+    "why": "",
+    "hint_stuck": "pulse range C13:J13 · The deduction in row 9, turned around."
+   },
+   {
+    "lesson_id": "unlevered-free-cash-flow",
+    "goal_index": "5",
+    "text": "Unlevered free cash flow across C16:J16: =SUM(C12:C15).",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C16:J16 · NOPAT, depreciation back, capex and working capital, rows 12 to 15."
+   },
+   {
+    "lesson_id": "unlevered-free-cash-flow",
+    "goal_index": "6",
+    "text": "The memo, FCF as a share of EBITDA, across C17:J17: =IFERROR(C16/C8,\"-\").",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C17:J17 · Free cash flow over EBITDA; IFERROR shows a dash where EBITDA is nothing."
+   },
+   {
+    "lesson_id": "unlevered-free-cash-flow",
+    "goal_index": "7",
+    "text": "Does it tie? Watch three new sites in FY27 instead of six: capex falls, and free cash flow rises that year.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell F16 · Fewer sites, less capex, more cash."
+   }
+  ],
+  "wacc-block": [
+   {
+    "lesson_id": "wacc-block",
+    "goal_index": "0",
+    "text": "Link the four cost of equity inputs into C50:C53, starting with C50 =Inputs!$C$88.",
+    "teach": "The seven WACC inputs are typed once on Inputs, each with its source in the next cell, and the DCF links them. Clearcoat is private, so its beta of 1.2 stands for the listed operators’ betas, relevered at the 40% target.",
+    "why": "",
+    "hint_stuck": "pulse range C50:C53 · Rows 88 to 91 on Inputs, in the same order."
+   },
+   {
+    "lesson_id": "wacc-block",
+    "goal_index": "1",
+    "text": "Cost of equity in C54: =C50+C52*C51+C53, about 13.2%.",
+    "teach": "The size premium is the extra return investors ask of a company as small as Clearcoat. It is added after beta times the premium, never inside it.",
+    "why": "",
+    "hint_stuck": "pulse cell C54 · Risk-free, plus beta times the premium, plus the size premium."
+   },
+   {
+    "lesson_id": "wacc-block",
+    "goal_index": "2",
+    "text": "Link the cost of debt and the tax rate into C55:C56: =Inputs!$C$92, then =Inputs!$C$84.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C55:C56 · The loan’s 7% is what Clearcoat could borrow at today."
+   },
+   {
+    "lesson_id": "wacc-block",
+    "goal_index": "3",
+    "text": "After-tax cost of debt in C57: =C55*(1-C56).",
+    "teach": "Interest is deducted before tax, so every dollar of it saves a quarter in tax. Debt costs its rate times one less the tax rate.",
+    "why": "",
+    "hint_stuck": "pulse cell C57 · 7% times 75%."
+   },
+   {
+    "lesson_id": "wacc-block",
+    "goal_index": "4",
+    "text": "The weights: C58 =Inputs!$C$93, and C59 =1-C58.",
+    "teach": "The weights come from a target capital structure, the mix a buyer would fund the business with, not whatever today’s balance sheet happens to show.",
+    "why": "",
+    "hint_stuck": "pulse range C58:C59 · Equity funds whatever debt does not."
+   },
+   {
+    "lesson_id": "wacc-block",
+    "goal_index": "5",
+    "text": "WACC in C60: =C59*C54+C58*C57, about 10%.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C60 · Each cost times its weight, added."
+   },
+   {
+    "lesson_id": "wacc-block",
+    "goal_index": "6",
+    "text": "With C60 selected, define the name WACC with Alt, M, M, D.",
+    "teach": "Every discount factor on the page reads this one cell, so it gets a name: WACC reads better in a formula than a cell address, and it cannot drift when rows move.",
+    "why": "",
+    "hint_stuck": "pulse cell C60 · Type the name and press Enter; the cell is already selected."
+   },
+   {
+    "lesson_id": "wacc-block",
+    "goal_index": "7",
+    "text": "Does it tie? Watch beta on Inputs go from 1.2 to 1.5: the cost of equity rises, and WACC in C60 with it.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C60 · Beta drives the cost of equity, and equity is 60% of the blend."
+   }
+  ],
+  "terminal-value": [
+   {
+    "lesson_id": "terminal-value",
+    "goal_index": "0",
+    "text": "Carry FY31 into the normalized column: K8 =J8, and K9 =J9.",
+    "teach": "FY31 is still a rollout year, so its raw cash flow would charge six new sites’ capex forever. Column K is a normalized FY31 beside the forecast; it starts from FY31’s EBITDA and depreciation.",
+    "why": "",
+    "hint_stuck": "pulse range K8:K9 · Each reads the cell to its left."
+   },
+   {
+    "lesson_id": "terminal-value",
+    "goal_index": "1",
+    "text": "Fill J10:K13 and J16:K17 across with Ctrl+R.",
+    "teach": "The rest of the column runs the same formulas as the forecast, so Ctrl+R fills them across from FY31.",
+    "why": "",
+    "hint_stuck": "pulse range J10:K13 · Capex and working capital get their own formulas next, so skip rows 14 and 15."
+   },
+   {
+    "lesson_id": "terminal-value",
+    "goal_index": "2",
+    "text": "Set K14 to =-K13 and K15 to =Inputs!$C$98.",
+    "teach": "In a steady year capex only replaces what wears out, so it is set to depreciation; working capital moves by its steady amount from Inputs.",
+    "why": "",
+    "hint_stuck": "pulse range K14:K15 · Capex is the depreciation added back, turned around."
+   },
+   {
+    "lesson_id": "terminal-value",
+    "goal_index": "3",
+    "text": "The perpetuity value in C27: =K16*(1+Inputs!$C$95)/(WACC-Inputs!$C$95).",
+    "teach": "The perpetuity grows the normalized cash flow a year and divides by WACC less growth. Growth is 3%, no faster than the economy, and it has to sit below WACC or the formula breaks.",
+    "why": "",
+    "hint_stuck": "pulse cell C27 · K16 is the normalized cash flow; growth is row 95 on Inputs."
+   },
+   {
+    "lesson_id": "terminal-value",
+    "goal_index": "4",
+    "text": "The exit value in C28: =J8*Inputs!$C$94.",
+    "teach": "The exit multiple sells the business at the end of FY31 for 11.0 times that year’s EBITDA, sourced to the listed operators and the precedent deals.",
+    "why": "",
+    "hint_stuck": "pulse cell C28 · FY31 EBITDA is J8."
+   },
+   {
+    "lesson_id": "terminal-value",
+    "goal_index": "5",
+    "text": "Implied multiple in C29: =C27/J8, and implied growth in C30: =(C28*WACC-K16)/(C28+K16).",
+    "teach": "Each method implies the other’s input: the perpetuity value over FY31 EBITDA is a multiple, and the perpetuity formula solved for growth turns the exit value into a growth rate.",
+    "why": "",
+    "hint_stuck": "pulse range C29:C30 · Read them against 11.0x and 3%."
+   },
+   {
+    "lesson_id": "terminal-value",
+    "goal_index": "6",
+    "text": "The round trip in C31: =((C29*J8)*WACC-K16)/((C29*J8)+K16), then on Checks C26: =ROUND(DCF!C31-Inputs!$C$95,6).",
+    "teach": "Feed the implied multiple back into the exit method, solve for growth, and the growth input must come back. If it doesn’t, the two values aren’t built on the same cash flow.",
+    "why": "",
+    "hint_stuck": "pulse cell C31 · The check is a live difference that reads zero."
+   },
+   {
+    "lesson_id": "terminal-value",
+    "goal_index": "7",
+    "text": "The switch: C32 =Inputs!$C$96, and C33 =CHOOSE(C32,C27,C28).",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C32:C33 · 1 picks the perpetuity, 2 the exit multiple."
+   },
+   {
+    "lesson_id": "terminal-value",
+    "goal_index": "8",
+    "text": "Does it tie? Watch the exit multiple on Inputs go from 11.0x to 13.0x: the implied growth in C30 climbs.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C30 · A higher multiple says the market expects faster growth."
+   }
+  ],
+  "discounting-mid-year": [
+   {
+    "lesson_id": "discounting-mid-year",
+    "goal_index": "0",
+    "text": "Period t across C20:J20: =IF(Inputs!C$6=1,Inputs!C$8-IF(Inputs!$C$97=1,0.5,0),0), entered with Ctrl+Enter.",
+    "teach": "The period counter is the year count from Inputs, less a half when the mid-year switch is on, and zero in the historical years, so only the forecast is discounted.",
+    "why": "",
+    "hint_stuck": "pulse range C20:J20 · Row 6 on Inputs is the projection flag, row 8 the counter."
+   },
+   {
+    "lesson_id": "discounting-mid-year",
+    "goal_index": "1",
+    "text": "The discount factor across C21:J21: =IF(Inputs!C$6=1,1/(1+WACC)^C20,0).",
+    "teach": "The caret raises to a power: 1/(1+WACC)^t is what a dollar t years out is worth today.",
+    "why": "",
+    "hint_stuck": "pulse range C21:J21 · WACC is the named cell; t is the row above."
+   },
+   {
+    "lesson_id": "discounting-mid-year",
+    "goal_index": "2",
+    "text": "Present values across C22:J22: =C16*C21, then their sum in C23: =SUM(C22:J22).",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C22:J22 · Free cash flow times its factor."
+   },
+   {
+    "lesson_id": "discounting-mid-year",
+    "goal_index": "3",
+    "text": "Discount factors for the terminal values: C36 =J21, and C37 =1/(1+WACC)^Inputs!$J$8.",
+    "teach": "An exit is a sale at the end of FY31, so it takes the end-year factor whatever the switch says; a perpetuity’s cash keeps arriving through the year, so it takes year 5’s own factor.",
+    "why": "",
+    "hint_stuck": "pulse range C36:C37 · Year 5 on the counter is Inputs J8."
+   },
+   {
+    "lesson_id": "discounting-mid-year",
+    "goal_index": "4",
+    "text": "Discount each terminal value: C38 =C27*C36, and C39 =C28*C37.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C38:C39 · Each value times its own factor."
+   },
+   {
+    "lesson_id": "discounting-mid-year",
+    "goal_index": "5",
+    "text": "Enterprise value: C40 =C23+C38, C41 =C23+C39, and C42 =CHOOSE(C32,C40,C41).",
+    "teach": "Enterprise value is the discounted forecast plus the discounted terminal value, built once per method so each sensitivity table can read its own. The switch picks which one goes on.",
+    "why": "",
+    "hint_stuck": "pulse range C40:C42 · The sum of present values plus each discounted terminal value."
+   },
+   {
+    "lesson_id": "discounting-mid-year",
+    "goal_index": "6",
+    "text": "Net debt in C43: =Schedules!$E$111, and equity value in C44: =C42-C43.",
+    "teach": "Picture a house: enterprise value is what the house is worth, net debt the mortgage, and equity the owner’s stake. Net debt is taken at the valuation date, the FY26 year end.",
+    "why": "",
+    "hint_stuck": "pulse range C43:C44 · Net debt is row 111 on Schedules, FY26 in column E."
+   },
+   {
+    "lesson_id": "discounting-mid-year",
+    "goal_index": "7",
+    "text": "The memos: C45 =CHOOSE(C32,C38,C39)/C42, C46 =C23/C42, and E47:F47 =$C$42/E8.",
+    "teach": "How much of the value rests on the terminal value is the first thing a reviewer reads. The multiples get read against the comps: FY27’s is lower while EBITDA grows.",
+    "why": "",
+    "hint_stuck": "pulse range C45:C46 · The two shares add to 100%."
+   },
+   {
+    "lesson_id": "discounting-mid-year",
+    "goal_index": "8",
+    "text": "The cross-check: C24 =SUMPRODUCT($F$16:$J$16,1/(1+WACC)^Inputs!$F$8:$J$8), then on Checks C27: =ROUND(DCF!C24-NPV(WACC,DCF!F16:J16),2).",
+    "teach": "NPV discounts each flow a whole period out, which is the end-year case, so a SUMPRODUCT at end-year periods must match it exactly.",
+    "why": "",
+    "hint_stuck": "pulse cell C24 · The check reads zero when the two agree."
+   },
+   {
+    "lesson_id": "discounting-mid-year",
+    "goal_index": "9",
+    "text": "Does it tie? Watch the mid-year switch on Inputs go off: the present values in C23 fall about 5%, and the exit value stays put.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C23 · Half a year at 10% is worth about 5%; the exit is a sale at the end of FY31 either way."
+   }
+  ],
+  "dcf-sensitivity": [
+   {
+    "lesson_id": "dcf-sensitivity",
+    "goal_index": "0",
+    "text": "The drivers: C63 =WACC, C64 =Inputs!$C$95, and C65 =Inputs!$C$94.",
+    "teach": "The tables read three cells on their own page, never Inputs directly: WACC, growth and the multiple, each passed through. The edges step out from them by the steps on Inputs.",
+    "why": "",
+    "hint_stuck": "pulse range C63:C65 · Growth is row 95 on Inputs and the multiple row 94."
+   },
+   {
+    "lesson_id": "dcf-sensitivity",
+    "goal_index": "1",
+    "text": "Select D69:H73 and enter =SUMPRODUCT($F$16:$J$16,1/(1+$C69)^$F$20:$J$20)+$K$16*(1+D$68)/($C69-D$68)/(1+$C69)^$J$20 with Ctrl+Enter.",
+    "teach": "One formula fills the grid when its anchors are mixed: $C69 keeps the column on the WACC edge and lets the row move, D$68 keeps the row on the growth edge and lets the column move. Each cell values the business at its own pair.",
+    "why": "",
+    "hint_stuck": "pulse range D69:H73 · The forecast discounted at the row’s WACC, plus the perpetuity at the column’s growth."
+   },
+   {
+    "lesson_id": "dcf-sensitivity",
+    "goal_index": "2",
+    "text": "Select D77:H81 and enter =SUMPRODUCT($F$16:$J$16,1/(1+$C77)^$F$20:$J$20)+$J$8*D$76/(1+$C77)^Inputs!$J$8 with Ctrl+Enter.",
+    "teach": "The exit grid is the same forecast plus FY31 EBITDA times the column’s multiple, a sale at the end of FY31.",
+    "why": "",
+    "hint_stuck": "pulse range D77:H81 · The multiples run across row 76."
+   },
+   {
+    "lesson_id": "dcf-sensitivity",
+    "goal_index": "3",
+    "text": "Format D69:H73 with the code #,##0.0,_);(#,##0.0,), then D77:H81 with F4.",
+    "teach": "A comma after the last digit placeholder divides by a thousand, so thousands print as millions with one decimal, the way the book shows a valuation range.",
+    "why": "",
+    "hint_stuck": "pulse range D69:H73 · Ctrl+1, N, then type the code into the Custom box."
+   },
+   {
+    "lesson_id": "dcf-sensitivity",
+    "goal_index": "4",
+    "text": "Bold the base case of each grid: F71, then F79, with Ctrl+B.",
+    "teach": "The middle cell of each grid is the base case, and it equals the enterprise value above for its method. Bold it so the eye starts there.",
+    "why": "",
+    "hint_stuck": "pulse cell F71 · It should read the same as the enterprise value for its method, in millions."
+   },
+   {
+    "lesson_id": "dcf-sensitivity",
+    "goal_index": "5",
+    "text": "Does it tie? Watch three new sites in FY27 instead of six: both tables shift together.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell F71 · Every cell reads the same forecast, so the whole grid moves."
+   }
+  ],
+  "challenge-dcf": [
+   {
+    "lesson_id": "challenge-dcf",
+    "goal_index": "0",
+    "text": "Build the WACC in C60 from the block above it and name the cell WACC.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-dcf",
+    "goal_index": "1",
+    "text": "The perpetuity value in C27, on the normalized cash flow in K16 at the growth on Inputs.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-dcf",
+    "goal_index": "2",
+    "text": "The exit value in C28, FY31 EBITDA at the multiple on Inputs.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-dcf",
+    "goal_index": "3",
+    "text": "Mid-year discount factors across F21:J21, on the periods in row 20.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-dcf",
+    "goal_index": "4",
+    "text": "Enterprise value in C42 on the method the switch names, and equity value in C44 after FY26 net debt.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-dcf",
+    "goal_index": "5",
+    "text": "Fill one sensitivity grid, perpetuity or exit multiple, against its edges.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
   ]
  },
  "modules": {
@@ -11883,6 +12739,20 @@ export const COPY = {
    "objective": "Build the weekly report end to end, then prove it against the clock; or test out of the chapter.",
    "story_beat": "The diligence pack. || A fresh export, a question log with eight questions open, a case sheet with three columns and no switch wired. Answer the log, build the KPI page, wire the case and name what deserves it. Build it, then build it again on another cluster’s export against the clock. The assessment is the test-out.",
    "page_name": "The diligence pack"
+  },
+  "auditing-a-model": {
+   "id": "auditing-a-model",
+   "name": "Auditing a model",
+   "objective": "Tie-outs and cross-foots; error flags and the checks summary; the model-wide sweep for hardcodes and pattern breaks; stress tests.",
+   "story_beat": "Audit it before they do. || Three buyers’ analysts are about to open this model looking for the mistake that lets them pay less, so find it first. A model gets audited the way a databook does, and then for the things only a model can get wrong: a row that doesn’t cross-foot, a formula that breaks pattern halfway across, an input that survives a stress test by luck.",
+   "page_name": "The model, audited"
+  },
+  "dcf": {
+   "id": "dcf",
+   "name": "DCF",
+   "objective": "What a DCF is; unlevered free cash flow; the WACC block; terminal value both ways; discounting and the mid-year convention; sensitivity tables.",
+   "story_beat": "What the cash flows are worth. || The model says what the business will earn; the DCF says what that’s worth today. Take the cash the business throws off after tax, capex and working capital, before anyone is paid interest, discount it at the return its investors require, add what it’s worth beyond the forecast, and you have an enterprise value. Take off the debt and what’s left is what the owners are selling.",
+   "page_name": "The DCF page"
   }
  },
  "site": {

@@ -43,13 +43,13 @@ export default {
   seed: rng => challengeSeed(ID, rng),
   goals: [
     { id: 'hardcodes', text: 'Put the two typed figures on the IS projection back on their rows’ formulas.',
-      keys: 'Ctrl+G "IS!F15:G15" ↵ Ctrl+R Ctrl+G "H18:I18" ↵ Ctrl+R',
+      keys: 'Ctrl+G "IS!F15:G15" ↵ Ctrl+R Ctrl+G "IS!H18:I18" ↵ Ctrl+R',
       check: (s, ses) => settled(ses) && typedOk(ses) },
     { id: 'row-differences', text: 'Find the labor formula on Schedules that breaks pattern and refill its row from FY27.',
       keys: 'Ctrl+G "Schedules!F32:J32" ↵ Ctrl+R',
       check: (s, ses) => settled(ses) && patternOk(ses) },
     { id: 'cash-flow', text: 'On CF, add FY28 depreciation back and put the sign of the FY29 receivables change right.',
-      keys: 'Ctrl+G "CF!F7:G7" ↵ Ctrl+R Ctrl+G "G8:H8" ↵ Ctrl+R',
+      keys: 'Ctrl+G "CF!F7:G7" ↵ Ctrl+R Ctrl+G "CF!G8:H8" ↵ Ctrl+R',
       check: (s, ses) => settled(ses) && cashFlowOk(ses) },
     { id: 'ref', text: 'Fix the #REF! the error count finds on Schedules.',
       keys: 'Ctrl+G "Schedules!G66:H66" ↵ Ctrl+R',
@@ -68,7 +68,7 @@ export default {
     ses => deadOk(ses) ? { ok: true } : { ok: false, why: 'the equity check is typed. A check is a live difference that reads zero, never a typed 0' },
     ses => plugOk(ses) && flagOk(ses) ? { ok: true } : { ok: false, why: 'cash on the balance sheet is forced. It reads the cash flow statement’s closing cash, and the balance follows from every other link' },
   ],
-  solution: 'Ctrl+G "IS!F15:G15" Enter Ctrl+R Ctrl+G "H18:I18" Enter Ctrl+R Ctrl+G "Schedules!F32:J32" Enter Ctrl+R '
-    + 'Ctrl+G "CF!F7:G7" Enter Ctrl+R Ctrl+G "G8:H8" Enter Ctrl+R Ctrl+G "Schedules!G66:H66" Enter Ctrl+R '
+  solution: 'Ctrl+G "IS!F15:G15" Enter Ctrl+R Ctrl+G "IS!H18:I18" Enter Ctrl+R Ctrl+G "Schedules!F32:J32" Enter Ctrl+R '
+    + 'Ctrl+G "CF!F7:G7" Enter Ctrl+R Ctrl+G "CF!G8:H8" Enter Ctrl+R Ctrl+G "Schedules!G66:H66" Enter Ctrl+R '
     + `Ctrl+G "Checks!C12:J12" Enter "${F.eq}" Ctrl+Enter Ctrl+G "BS!I6:J6" Enter Ctrl+R`,
 };

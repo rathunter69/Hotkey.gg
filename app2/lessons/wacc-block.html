@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 162: The WACC block — Finance and Accounting · hotkey.gg</title>
+<meta name="description" content="The discount rate is the weighted average cost of capital: the return equity investors require, blended with the after-tax cost of debt, weighted by how much of the company each funds. Cost of equity is a risk-free rate plus beta times the market premium; cost of debt is what the company could borrow at today, less the tax shield; the weights come from a target capital structure. Build the block from the inputs and read what a car wash’s WACC is. The key is =.">
+<meta name="generator" content="app2/tests/public-pages.js — generated from lesson data; do not edit by hand">
+<script>try{var v=JSON.parse(localStorage.getItem('hk2_theme_vars'));if(v&&v.vars){var r=document.documentElement;for(var k in v.vars)r.style.setProperty('--'+k,v.vars[k]);r.setAttribute('data-dark',v.dark?'1':'0');}}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../ui/public.css">
+</head>
+<body>
+<nav class="top"><a class="brand" href="../index.html#/">hotkey<b>.gg</b></a><a href="../index.html#/learn">Learn</a><a href="../index.html#/practice">Practice</a><a href="../index.html#/leaderboard">Leaderboard</a><a href="../index.html#/reference">Reference</a></nav>
+<main>
+<div class="crumb"><a href="../index.html#/learn">Learn</a> › <a href="index.html">Finance and Accounting</a> › DCF</div>
+<h1>Lesson 162: The WACC block</h1>
+<div class="meta">Finance and Accounting · DCF · medium · <span class="">Paid</span></div>
+<div class="card">
+<p style="margin:0">The discount rate is the weighted average cost of capital: the return equity investors require, blended with the after-tax cost of debt, weighted by how much of the company each funds. Cost of equity is a risk-free rate plus beta times the market premium; cost of debt is what the company could borrow at today, less the tax shield; the weights come from a target capital structure. Build the block from the inputs and read what a car wash’s WACC is. The key is <kbd>=</kbd>.</p>
+</div>
+<h2>What you will do</h2>
+<ol class="goals"><li><span class="muted">The seven WACC inputs are typed once on Inputs, each with its source in the next cell, and the DCF links them. Clearcoat is private, so its beta of 1.2 stands for the listed operators’ betas, relevered at the 40% target.</span> Link the four cost of equity inputs into C50:C53, starting with C50 =Inputs!$C$88.</li><li><span class="muted">The size premium is the extra return investors ask of a company as small as Clearcoat. It is added after beta times the premium, never inside it.</span> Cost of equity in C54: =C50+C52*C51+C53, about 13.2%.</li><li>Link the cost of debt and the tax rate into C55:C56: =Inputs!$C$92, then =Inputs!$C$84.</li><li><span class="muted">Interest is deducted before tax, so every dollar of it saves a quarter in tax. Debt costs its rate times one less the tax rate.</span> After-tax cost of debt in C57: =C55*(1-C56).</li><li><span class="muted">The weights come from a target capital structure, the mix a buyer would fund the business with, not whatever today’s balance sheet happens to show.</span> The weights: C58 =Inputs!$C$93, and C59 =1-C58.</li><li>WACC in C60: =C59*C54+C58*C57, about 10%.</li><li><span class="muted">Every discount factor on the page reads this one cell, so it gets a name: WACC reads better in a formula than a cell address, and it cannot drift when rows move.</span> With C60 selected, define the name WACC with Alt, M, M, D.</li><li>Does it tie? Watch beta on Inputs go from 1.2 to 1.5: the cost of equity rises, and WACC in C60 with it.</li></ol>
+<div class="cta"><a class="btn" href="../index.html#/lesson/wacc-block">Start this lesson</a><span class="path">Read → Guided → Try solo → Timed</span></div>
+
+<div class="prevnext"><span>← <a href="unlevered-free-cash-flow.html">Lesson 161: Unlevered free cash flow</a></span><span><a href="terminal-value.html">Lesson 163: Terminal value: perpetuity and exit multiple</a> →</span></div>
+</main>
+<footer><a href="../index.html#/pricing">Pricing</a><a href="../index.html#/teams">Teams</a><a href="../index.html#/about">About</a><a href="../index.html#/terms">Terms</a><a href="../index.html#/privacy">Privacy</a><a href="../index.html#/contact">Contact</a><span>© hotkey.gg</span></footer>
+</body>
+</html>

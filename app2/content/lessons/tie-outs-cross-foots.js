@@ -39,7 +39,7 @@ export default {
   headline: '=',
   conventions: ['F1', 'C3'],
   teaches: ['tie-out', 'cross-foot', 'limit-check'],
-  uses: ['check-cell', 'go-to', 'sheet-reference', 'ctrl-enter-fill', 'shift-arrow', 'arrow-keys', 'countif-countifs', 'round-function', 'if-function', 'sum-family', 'rollup-flag'],
+  uses: ['check-cell', 'go-to', 'sheet-reference', 'ctrl-enter-fill', 'shift-arrow', 'arrow-keys', 'ctrl-arrow', 'countif-countifs', 'round-function', 'if-function', 'sum-family', 'rollup-flag'],
   prerequisites: ['challenge-linked-statements', 'ch4-assessment'],
   brief: 'A tie-out proves a figure in two places is the same figure; a cross-foot proves a block adds both ways, down the lines and across the years. Checks already ties the balance sheet, cash, debt, PP&E and revenue. Fill the three rows still marked pending, add two limit checks that count balances gone below zero, and read the flag on the Cover. The key is `=`.',
   goals: [
@@ -60,7 +60,7 @@ export default {
       check: (s, ses) => settled(ses) && xfootOk(ses) },
     { id: 'debt-limit', teach: 'A tie-out cannot see a balance that has gone through zero: a debt tranche repaid past nothing still ties to itself. A limit check counts what should never happen, with COUNTIF and "<0", and reads zero while none does.',
       text: 'Count debt balances below zero across C17:J17, with COUNTIF and "<0" on Schedules rows 82, 92 and 103.',
-      keys: `↓ ×6 Shift+→ ×7 '${F.debtNeg}' Ctrl+↵`, requires: ['limit-check', 'countif-countifs', 'shift-arrow', 'ctrl-enter-fill'], convention: 'F1',
+      keys: `← Ctrl+↓ Ctrl+↓ ↓ → Shift+→ ×7 '${F.debtNeg}' Ctrl+↵`, requires: ['limit-check', 'countif-countifs', 'ctrl-arrow', 'arrow-keys', 'shift-arrow', 'ctrl-enter-fill'], convention: 'F1',
       hintStuck: 'pulse range C17:J17 · Rows 82, 92 and 103 are the term loan, the delayed draw and the revolver closing.',
       check: (s, ses) => settled(ses) && debtOk(ses) },
     { id: 'ppe-limit', text: 'Do the same for closing PP&E across C18:J18, with COUNTIF on Schedules row 65.',
@@ -86,6 +86,6 @@ export default {
     'A tie-out proves two places agree, a cross-foot proves a block adds both ways, and a limit check catches what a tie cannot: a balance gone through zero. Best practice: build a check the day you build the line it guards, never the night before it goes out.',
   ],
   solution: `Ctrl+G "Checks!C12:J12" Enter "${F.eq}" Ctrl+Enter Down Shift+Right Shift+Right Shift+Right Shift+Right Shift+Right Shift+Right Shift+Right "${F.ebitda}" Ctrl+Enter `
-    + `Up Up "${F.xfoot}" Enter Down Down Down Down Down Down Shift+Right Shift+Right Shift+Right Shift+Right Shift+Right Shift+Right Shift+Right '${F.debtNeg}' Ctrl+Enter `
+    + `Up Up "${F.xfoot}" Enter Left Ctrl+Down Ctrl+Down Down Right Shift+Right Shift+Right Shift+Right Shift+Right Shift+Right Shift+Right Shift+Right '${F.debtNeg}' Ctrl+Enter `
     + `Down Shift+Right Shift+Right Shift+Right Shift+Right Shift+Right Shift+Right Shift+Right '${F.ppeNeg}' Ctrl+Enter Ctrl+G "Checks!K11:K13" Enter Alt H E A Ctrl+G "Cover!C7" Enter`,
 };

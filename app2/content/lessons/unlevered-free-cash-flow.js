@@ -28,8 +28,8 @@ const nopatOk = ses => calcRow(ses, 'nopat', ['ebit', 'taxEbit'], v => v('ebit')
 const backOk = ses => calcRow(ses, 'depBack', ['depLess'], v => -v('depLess'));
 const fcfOk = ses => calcRow(ses, 'fcf', ['nopat', 'capex', 'nwc'], v => v('nopat') + v('depBack') + v('capex') + v('nwc'));
 const shareOk = ses => calcRow(ses, 'fcfShare', ['fcf', 'ebitda'], v => (isNum(v('ebitda')) && v('ebitda') !== 0 ? v('fcf') / v('ebitda') : '-'));
-const go = key => (key === KEYS[0] ? D + '!' : '') + range(key);
-const step = (key, text) => ({ keys: `Ctrl+G "${go(key)}" ↵ '${F[key]}' Ctrl+↵`, text: text.replace('%F', F[key]).replace('%R', range(key)) });
+const go = key => range(key);
+const step = (key, text) => ({ keys: `Ctrl+G "DCF!${go(key)}" ↵ '${F[key]}' Ctrl+↵`, text: text.replace('%F', F[key]).replace('%R', range(key)) });
 
 export default {
   id: 'unlevered-free-cash-flow',
@@ -89,5 +89,5 @@ export default {
     'This is the cash the business throws off for whoever owns it, before the debt is paid.',
     'Best practice: tax here is on EBIT, and interest is nowhere on this page. If either slips in, the value counts the debt twice. Unlevered cash flow goes with WACC and gives enterprise value; cash flow after interest goes with the cost of equity and gives equity value. Mixing the two is the classic error.',
   ],
-  solution: KEYS.map(k => `Ctrl+G "${go(k)}" Enter '${F[k]}' Ctrl+Enter`).join(' '),
+  solution: KEYS.map(k => `Ctrl+G "DCF!${go(k)}" Enter '${F[k]}' Ctrl+Enter`).join(' '),
 };

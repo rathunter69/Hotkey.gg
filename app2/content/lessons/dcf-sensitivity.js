@@ -41,10 +41,10 @@ const baseOk = ses => ['sg', 'sm'].every(p => !!(dcf(ses).cellAt(BASE[p]) || {})
 const CODE = MILL;
 const KEYS = {
   drivers: `Ctrl+G "DCF!${C('ptW')}" ↵ "${F.ptW}" ↵ ↓ "${F.ptG}" ↵ ↓ "${F.ptM}" ↵`,
-  sg: `Ctrl+G "${range('sg')}" ↵ "${F.sg}" Ctrl+↵`,
-  sm: `Ctrl+G "${range('sm')}" ↵ "${F.sm}" Ctrl+↵`,
-  millions: `Ctrl+G "${range('sg')}" ↵ Ctrl+1 N Tab End Alt+T "${CODE}" ↵ Ctrl+G "${range('sm')}" ↵ F4`,
-  base: `Ctrl+G "${BASE.sg}" ↵ Ctrl+B Ctrl+G "${BASE.sm}" ↵ Ctrl+B`,
+  sg: `Ctrl+G "DCF!${range('sg')}" ↵ "${F.sg}" Ctrl+↵`,
+  sm: `Ctrl+G "DCF!${range('sm')}" ↵ "${F.sm}" Ctrl+↵`,
+  millions: `Ctrl+G "DCF!${range('sg')}" ↵ Ctrl+1 N Tab End Alt+T "${CODE}" ↵ Ctrl+G "DCF!${range('sm')}" ↵ F4`,
+  base: `Ctrl+G "DCF!${BASE.sg}" ↵ Ctrl+B Ctrl+G "DCF!${BASE.sm}" ↵ Ctrl+B`,
 };
 
 export default {
@@ -91,12 +91,12 @@ export default {
       keys: KEYS.millions, requires: ['custom-number-format', 'format-units', 'f4-repeat', 'go-to'], convention: 'D2',
       hintStuck: `pulse range ${range('sg')} · Ctrl+1, N, then type the code into the Custom box.`,
       check: (s, ses) => settled(ses) && millionsOk(ses) },
-    { id: 'base', teach: 'The middle cell of each grid is the base case, and it equals the enterprise value above for its method. Bold it so the eye starts there; the house style boxes nothing.',
+    { id: 'base', teach: 'The middle cell of each grid is the base case, and it equals the enterprise value above for its method. Bold it so the eye starts there.',
       text: `Bold the base case of each grid: ${BASE.sg}, then ${BASE.sm}, with Ctrl+B.`,
       keys: KEYS.base, requires: ['bold-italic-underline', 'go-to'], convention: 'F4',
       hintStuck: `pulse cell ${BASE.sg} · It should read the same as the enterprise value for its method, in millions.`,
       check: (s, ses) => settled(ses) && baseOk(ses) },
-    { id: 'tie', closer: true, demo: { script: `Ctrl+G "Inputs!F${R('Inputs', 'bNew')}" Enter "3" Enter Ctrl+G "DCF!${BASE.sg}" Enter Ctrl+G "${BASE.sm}" Enter`, cadence: 360 },
+    { id: 'tie', closer: true, demo: { script: `Ctrl+G "Inputs!F${R('Inputs', 'bNew')}" Enter "3" Enter Ctrl+G "DCF!${BASE.sg}" Enter Ctrl+G "DCF!${BASE.sm}" Enter`, cadence: 360 },
       text: 'Does it tie? Watch three new sites in FY27 instead of six: both tables shift together.', requires: [],
       hintStuck: `pulse cell ${BASE.sg} · Every cell reads the same forecast, so the whole grid moves.`,
       check: (s, ses) => ses.demoDone.has('tie') },

@@ -20,7 +20,7 @@ const atcodOk = ses => calcOk(ses, 'atcod', ['cod', 'taxW'], x => x('cod') * (1 
 const weightsOk = ses => linkOk(ses, 'debtW') && calcOk(ses, 'eqW', ['debtW'], x => 1 - x('debtW'));
 const waccOk = ses => calcOk(ses, 'wacc', ['eqW', 'coe', 'debtW', 'atcod'], x => x('eqW') * x('coe') + x('debtW') * x('atcod'));
 const namedOk = ses => { const n = Object.entries(ses.names || {}).find(([k]) => k.toUpperCase() === 'WACC'); return !!n && String(n[1]).replace(/\$/g, '').toUpperCase() === 'DCF!' + c('wacc'); };
-const type = (keys, first) => keys.map((k, i) => `${i ? '↓ ' : ''}"${F[k]}" ↵`).join(' ').replace(/^/, `Ctrl+G "${first}" ↵ `);
+const type = (keys, first) => keys.map((k, i) => `${i ? '↓ ' : ''}"${F[k]}" ↵`).join(' ').replace(/^/, `Ctrl+G "DCF!${first}" ↵ `);
 
 export default {
   id: 'wacc-block',
@@ -44,12 +44,12 @@ export default {
   goals: [
     { id: 'equity-inputs', teach: 'The seven WACC inputs are typed once on Inputs, each with its source in the next cell, and the DCF links them. Clearcoat is private, so its beta of 1.2 stands for the listed operators’ betas, relevered at the 40% target.',
       text: `Link the four cost of equity inputs into ${c('rf')}:${c('size')}, starting with ${c('rf')} ${F.rf}.`,
-      keys: type(['rf', 'erp', 'beta', 'size'], 'DCF!' + c('rf')), requires: ['wacc', 'cross-sheet-ref', 'f4-anchor', 'go-to', 'arrow-keys'], convention: 'B2',
+      keys: type(['rf', 'erp', 'beta', 'size'], c('rf')), requires: ['wacc', 'cross-sheet-ref', 'f4-anchor', 'go-to', 'arrow-keys'], convention: 'B2',
       hintStuck: `pulse range ${c('rf')}:${c('size')} · Rows ${R('Inputs', 'rf')} to ${R('Inputs', 'size')} on Inputs, in the same order.`,
       check: (s, ses) => settled(ses) && eqInputs(ses) },
     { id: 'coe', teach: 'The size premium is the extra return investors ask of a company as small as Clearcoat. It is added after beta times the premium, never inside it.',
       text: `Cost of equity in ${c('coe')}: ${F.coe}, about 13.2%.`,
-      keys: `Ctrl+G "${c('coe')}" ↵ "${F.coe}" ↵`, requires: ['wacc', 'formula-operators', 'go-to'],
+      keys: `Ctrl+G "DCF!${c('coe')}" ↵ "${F.coe}" ↵`, requires: ['wacc', 'formula-operators', 'go-to'],
       hintStuck: `pulse cell ${c('coe')} · Risk-free, plus beta times the premium, plus the size premium.`,
       check: (s, ses) => settled(ses) && coeOk(ses) },
     { id: 'debt-inputs', text: `Link the cost of debt and the tax rate into ${c('cod')}:${c('taxW')}: ${F.cod}, then ${F.taxW}.`,
@@ -58,7 +58,7 @@ export default {
       check: (s, ses) => settled(ses) && debtInputs(ses) },
     { id: 'atcod', teach: 'Interest is deducted before tax, so every dollar of it saves a quarter in tax. Debt costs its rate times one less the tax rate.',
       text: `After-tax cost of debt in ${c('atcod')}: ${F.atcod}.`,
-      keys: `Ctrl+G "${c('atcod')}" ↵ "${F.atcod}" ↵`, requires: ['wacc', 'formula-operators', 'go-to'],
+      keys: `Ctrl+G "DCF!${c('atcod')}" ↵ "${F.atcod}" ↵`, requires: ['wacc', 'formula-operators', 'go-to'],
       hintStuck: `pulse cell ${c('atcod')} · 7% times 75%.`,
       check: (s, ses) => settled(ses) && atcodOk(ses) },
     { id: 'weights', teach: 'The weights come from a target capital structure, the mix a buyer would fund the business with, not whatever today’s balance sheet happens to show.',
@@ -67,7 +67,7 @@ export default {
       hintStuck: `pulse range ${c('debtW')}:${c('eqW')} · Equity funds whatever debt does not.`,
       check: (s, ses) => settled(ses) && weightsOk(ses) },
     { id: 'wacc', text: `WACC in ${c('wacc')}: ${F.wacc}, about 10%.`,
-      keys: `Ctrl+G "${c('wacc')}" ↵ "${F.wacc}" ↵`, requires: ['wacc', 'formula-operators', 'go-to'],
+      keys: `Ctrl+G "DCF!${c('wacc')}" ↵ "${F.wacc}" ↵`, requires: ['wacc', 'formula-operators', 'go-to'],
       hintStuck: `pulse cell ${c('wacc')} · Each cost times its weight, added.`,
       check: (s, ses) => settled(ses) && waccOk(ses) },
     { id: 'name', teach: 'Every discount factor on the page reads this one cell, so it gets a name: WACC reads better in a formula than a cell address, and it cannot drift when rows move.',
@@ -76,7 +76,7 @@ export default {
       hintStuck: `pulse cell ${c('wacc')} · Type the name and press Enter; the cell is already selected.`,
       check: (s, ses) => settled(ses) && namedOk(ses) },
     { id: 'tie', closer: true, demo: { script: `Ctrl+G "Inputs!C${R('Inputs', 'beta')}" Enter "1.5" Enter Ctrl+G "DCF!${c('wacc')}" Enter`, cadence: 360 },
-      text: 'Does it tie? Watch beta go from 1.2 to 1.5: the cost of equity rises, and WACC with it.', requires: [],
+      text: 'Does it tie? Watch beta on Inputs go from 1.2 to 1.5: the cost of equity rises, and WACC in C60 with it.', requires: [],
       hintStuck: `pulse cell ${c('wacc')} · Beta drives the cost of equity, and equity is 60% of the blend.`,
       check: (s, ses) => ses.demoDone.has('tie') },
   ],
@@ -88,6 +88,6 @@ export default {
     'Seven sourced inputs built the return the company’s investors require.',
     'Best practice: every WACC input carries its source in the next cell on Inputs. It is the number a buyer argues with first, and a source is what ends the argument.',
   ],
-  solution: [type(['rf', 'erp', 'beta', 'size'], 'DCF!' + c('rf')), `Ctrl+G "${c('coe')}" ↵ "${F.coe}" ↵`, type(['cod', 'taxW'], c('cod')), `Ctrl+G "${c('atcod')}" ↵ "${F.atcod}" ↵`,
-    type(['debtW', 'eqW'], c('debtW')), `Ctrl+G "${c('wacc')}" ↵ "${F.wacc}" ↵`, 'Alt M M D "WACC" ↵'].join(' ').replace(/↵/g, 'Enter').replace(/↓/g, 'Down'),
+  solution: [type(['rf', 'erp', 'beta', 'size'], c('rf')), `Ctrl+G "DCF!${c('coe')}" ↵ "${F.coe}" ↵`, type(['cod', 'taxW'], c('cod')), `Ctrl+G "DCF!${c('atcod')}" ↵ "${F.atcod}" ↵`,
+    type(['debtW', 'eqW'], c('debtW')), `Ctrl+G "DCF!${c('wacc')}" ↵ "${F.wacc}" ↵`, 'Alt M M D "WACC" ↵'].join(' ').replace(/↵/g, 'Enter').replace(/↓/g, 'Down'),
 };

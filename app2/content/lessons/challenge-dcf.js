@@ -52,11 +52,11 @@ const EQ_F = `=${C('ev')}-Schedules!$${ND()[0]}$${ND().slice(1)}`;
 const GRID_F = `=SUMPRODUCT($F$${row('fcf')}:$J$${row('fcf')},1/(1+$C${row('sm0')})^$F$${row('t')}:$J$${row('t')})+$J$${row('ebitda')}*D$${row('smH')}/(1+$C${row('sm0')})^${PN}`;
 const KEYS = {
   wacc: `Ctrl+G "DCF!${C('wacc')}" ↵ "${WACC_F}" ↵ Alt M M D "WACC" ↵`,
-  perp: `Ctrl+G "${C('tvPerp')}" ↵ "${PERP_F}" ↵`,
+  perp: `Ctrl+G "DCF!${C('tvPerp')}" ↵ "${PERP_F}" ↵`,
   exit: `↓ "${EXIT_F}" ↵`,
-  factors: `Ctrl+G "F${row('df')}:J${row('df')}" ↵ "${DF_F}" Ctrl+↵`,
-  ev: `Ctrl+G "${C('ev')}" ↵ "${EV_F}" ↵ Ctrl+G "${C('eqv')}" ↵ "${EQ_F}" ↵`,
-  table: `Ctrl+G "D${row('sm0')}:H${row('sm4')}" ↵ "${GRID_F}" Ctrl+↵`,
+  factors: `Ctrl+G "DCF!F${row('df')}:J${row('df')}" ↵ "${DF_F}" Ctrl+↵`,
+  ev: `Ctrl+G "DCF!${C('ev')}" ↵ "${EV_F}" ↵ Ctrl+G "DCF!${C('eqv')}" ↵ "${EQ_F}" ↵`,
+  table: `Ctrl+G "DCF!D${row('sm0')}:H${row('sm4')}" ↵ "${GRID_F}" Ctrl+↵`,
 };
 
 export default {

@@ -38,17 +38,17 @@ const memoOk = ses => { const ev = val(ses, C('ev')); return fx(ses, C('tvShare'
 const npvOk = ses => fx(ses, C('pvEnd'), ['F' + row('fcf'), 'J' + row('fcf')], PROJ_COLS.reduce((t, col, i) => t + val(ses, col + row('fcf')) / Math.pow(1 + W(ses), i + 1), 0))
   && checkRow(sheetIn(ses, 'Checks'), [NPV], () => ['DCF!' + C('pvEnd'), 'DCF!F' + row('fcf'), 'DCF!J' + row('fcf')]);
 /** Type formulas down a column of cells: Go To the first, then ↓ between neighbours. */
-const typed = (keys, first) => keys.map((k, i) => `${i === 0 ? `Ctrl+G "${first || C(k)}" ↵` : (row(k) === row(keys[i - 1]) + 1 ? '↓' : `Ctrl+G "${C(k)}" ↵`)} "${F[C(k)]}" ↵`).join(' ');
-const across = (key, first) => `Ctrl+G "${first || ''}C${row(key)}:J${row(key)}" ↵ "${F[key]}" Ctrl+↵`;
+const typed = (keys, first) => keys.map((k, i) => `${i === 0 ? `Ctrl+G "DCF!${first || C(k)}" ↵` : (row(k) === row(keys[i - 1]) + 1 ? '↓' : `Ctrl+G "DCF!${C(k)}" ↵`)} "${F[C(k)]}" ↵`).join(' ');
+const across = (key, first) => `Ctrl+G "DCF!${first || ''}C${row(key)}:J${row(key)}" ↵ "${F[key]}" Ctrl+↵`;
 const KEYS = {
-  t: across('t', D + '!'),
+  t: across('t'),
   df: across('df'),
-  pv: `${across('pv')} Ctrl+G "${C('pvSum')}" ↵ "${F[C('pvSum')]}" ↵`,
+  pv: `${across('pv')} Ctrl+G "DCF!${C('pvSum')}" ↵ "${F[C('pvSum')]}" ↵`,
   dfTv: typed(['dfPerp', 'dfExit']),
   pvTv: typed(['pvTvPerp', 'pvTvExit']),
   ev: typed(['evPerp', 'evExit', 'ev']),
   eq: typed(['netDebt', 'eqv']),
-  memo: `${typed(['tvShare', 'fcShare'])} Ctrl+G "E${row('evMult')}:F${row('evMult')}" ↵ "${F.mult}" Ctrl+↵`,
+  memo: `${typed(['tvShare', 'fcShare'])} Ctrl+G "DCF!E${row('evMult')}:F${row('evMult')}" ↵ "${F.mult}" Ctrl+↵`,
   npv: `${typed(['pvEnd'])} Ctrl+G "Checks!${NPV}" ↵ "${F.npv}" ↵`,
 };
 const CELLS = [...['t', 'df', 'pv'].flatMap(k => rowRefs(D, k)), ...SINGLES.map(C), 'E' + row('evMult'), 'F' + row('evMult')];
@@ -117,7 +117,7 @@ export default {
       hintStuck: `pulse cell ${C('pvEnd')} · The check reads zero when the two agree.`,
       check: (s, ses) => settled(ses) && npvOk(ses) },
     { id: 'tie', closer: true, demo: { script: `Ctrl+G "Inputs!C${R('Inputs', 'mid')}" Enter "0" Enter Ctrl+G "DCF!${C('pvSum')}" Enter`, cadence: 360 },
-      text: 'Does it tie? Watch the mid-year switch go off: the forecast years’ present values fall about 5%, and the exit value stays put.', requires: [],
+      text: 'Does it tie? Watch the mid-year switch on Inputs go off: the present values in C23 fall about 5%, and the exit value stays put.', requires: [],
       hintStuck: `pulse cell ${C('pvSum')} · Half a year at 10% is worth about 5%; the exit is a sale at the end of FY31 either way.`,
       check: (s, ses) => ses.demoDone.has('tie') },
   ],
