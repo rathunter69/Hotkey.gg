@@ -549,7 +549,9 @@ export class Sheet {
   regionAround(r, c) {
     let r1 = r, r2 = r, c1 = c, c2 = c;
     const any = (rr1, cc1, rr2, cc2) => { for (let rr = Math.max(1, rr1); rr <= Math.min(this.rows, rr2); rr++) for (let cc = Math.max(1, cc1); cc <= Math.min(this.cols, cc2); cc++) if (this.nonEmpty(rr, cc)) return true; return false; };
-    for (let guard = 0; guard < 60; guard++) {
+    // grows one row or column per side per pass until nothing touches it: a region has no size limit (Excel's
+    // current region runs the whole of a 90-row export), so the guard is the grid itself, not a fixed count
+    for (let guard = 0, most = this.rows + this.cols + 2; guard < most; guard++) {
       let grew = false;
       if (r1 > 1 && any(r1 - 1, c1 - 1, r1 - 1, c2 + 1)) { r1--; grew = true; }
       if (r2 < this.rows && any(r2 + 1, c1 - 1, r2 + 1, c2 + 1)) { r2++; grew = true; }

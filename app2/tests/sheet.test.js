@@ -283,6 +283,13 @@ test('Ctrl+Home under frozen panes lands on the first unfrozen cell, as Excel do
   s.freeze = { r: 1, c: 0 }; s.goTo(9, 9); s.moveHome(true, false); assert.equal(s.selectionText(), 'A2');
 });
 
+test('the current region has no size limit: a 150-row column is one region', () => {
+  const cells = {}; for (let r = 1; r <= 150; r++) { cells['A' + r] = { value: 'AUS-DOM' }; cells['B' + r] = { value: r }; }
+  const s = new Sheet({ rows: 200, cols: 5, cells });
+  assert.deepEqual(s.regionAround(2, 1), { r1: 1, c1: 1, r2: 150, c2: 2 });
+  assert.deepEqual(s.regionAround(149, 3), { r1: 1, c1: 1, r2: 150, c2: 3 }, 'from the empty column beside it');
+});
+
 test('a bracket inside a string literal is text: the entry commits, and only real brackets auto-close', () => {
   assert.deepEqual(Sheet.classifyInput('=LEN("(")'), { kind: 'formula', formula: '=LEN("(")' });
   const channel = '=MID(A1,FIND("(",A1)+1,FIND(")",A1)-FIND("(",A1)-1)';
