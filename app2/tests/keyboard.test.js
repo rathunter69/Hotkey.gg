@@ -278,7 +278,7 @@ test('Page Setup (Alt P S P): rows to repeat, the footer sections and print grid
   s.run('Alt+R'); assert.equal(s.dlg.tab, 'sheet'); assert.equal(s.dlg.focus, 'titlesRows');
   s.run('"$1:$3"'); assert.equal(s.dlg.titlesRows, '$1:$3', 'a text field takes what is typed');
   s.run('Alt+H'); assert.equal(s.dlg.tab, 'sheet', 'Alt+H does nothing in Page Setup (M66)');
-  s.run('Shift+Tab H'); assert.equal(s.dlg.tab, 'hf', 'on the row of tabs a letter picks a tab'); assert.equal(s.dlg.focus, 'tabs');
+  s.run('Shift+Tab Shift+Tab H'); assert.equal(s.dlg.tab, 'hf', 'on the row of tabs a letter picks a tab'); assert.equal(s.dlg.focus, 'tabs');
   s.run('Alt+U'); assert.equal(s.dlg.sub, 'footer', 'Alt+U opens Custom Footer'); assert.equal(s.dlg.focus, 'footL', 'the cursor in the left section');
   s.run('"&[file]" Tab "Voltline" Tab "&[Date]"'); assert.equal(s.dlg.footL, '&[file]'); assert.equal(s.dlg.footC, 'Voltline'); assert.equal(s.dlg.footR, '&[Date]');
   s.run('Alt+C'); assert.equal(s.dlg.focus, 'footC'); s.run('" Energy"'); assert.equal(s.dlg.footC, 'Voltline Energy', 'a space types into a section');

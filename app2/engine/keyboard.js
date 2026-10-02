@@ -31,7 +31,7 @@
 //     Quick Access Toolbar, page setup) are RECORDED by real-looking dialogs (Alt F T, Alt P S P):
 //     the dialog edits a draft (`dlg`), ↵ = OK writes it into `settings`, Esc = Cancel discards it
 
-import { Sheet, FONT_SWATCHES, FILL_SWATCHES, CELL_STYLES, CF_STYLE_KEYS, CF_BAR_COLORS, CF_SCALES, cfOperand } from './sheet.js';
+import { Sheet, PAGE_SETUP_DEFAULT, FONT_SWATCHES, FILL_SWATCHES, CELL_STYLES, CF_STYLE_KEYS, CF_BAR_COLORS, CF_SCALES, cfOperand } from './sheet.js';
 import { evalFormula, formulaRefs, translateFormula, parses, valueText, AUTOCOMPLETE_FUNCTIONS } from './formula.js';
 import { serialToDate } from './format.js';
 import { builtinCode } from './numfmt.js';
@@ -149,8 +149,8 @@ function makeSettings(session) {
   Object.defineProperty(st, 'gridlines', { enumerable: true, get: () => !!session.sheet.gridlines, set: v => { session.sheet.gridlines = !!v; } });
   st.qat = QAT_DEFAULT.slice();
   st.showFormulas = false;   // Ctrl+` / Formulas › Show Formulas (C2 gap 5): the view paints formula text instead of values
-  st.pageSetup = { orientation: 'portrait', scaling: 'adjust', adjustTo: 100, fitWide: 1, fitTall: 1,
-    titlesRows: '', footer: { left: '', centre: '', right: '' }, printGridlines: false };   // C2 gap 6: Sheet and Header/Footer pages
+  // Page Setup belongs to each sheet (Excel): settings.pageSetup reads and writes the ACTIVE sheet's (C2 gap 6: Sheet and Header/Footer pages)
+  Object.defineProperty(st, 'pageSetup', { enumerable: true, get: () => session.sheet.pageSetup, set: v => { session.sheet.pageSetup = v && typeof v === 'object' ? v : clonePS(PAGE_SETUP_DEFAULT); } });
   // M66's Margins page (margins in inches, centerH, centerV) is written into pageSetup only once it differs from Excel's Normal, so a state that never touched it reads as before
   st.enterMoves = true;   // Options › Advanced › After pressing Enter, move selection (M40); a lesson state carries settings.enterMoves === false
   st.statusMin = false; st.statusMax = false;   // the status bar's Minimum / Maximum (its right-click menu)
@@ -158,13 +158,14 @@ function makeSettings(session) {
   st.ribbonCollapsed = false;      // Ctrl+F1
   return st;
 }
+const clonePS = o => JSON.parse(JSON.stringify(o));
 /** Excel's Normal margins, inches. */
 export const MARGINS_DEFAULT = { top: 0.75, bottom: 0.75, left: 0.7, right: 0.7, header: 0.3, footer: 0.3 };
 const MARGIN_FIELDS = { mTop: 'top', mBottom: 'bottom', mLeft: 'left', mRight: 'right', mHeader: 'header', mFooter: 'footer' };
 export const PAGESETUP_TABS = [{ k: 'page', key: 'P' }, { k: 'margins', key: 'M' }, { k: 'hf', key: 'H' }, { k: 'sheet', key: 'S' }];
 const clampInt = (v, lo, hi, dflt) => { const n = parseInt(v, 10); return Number.isFinite(n) ? Math.max(lo, Math.min(hi, n)) : dflt; };
 /** Page Setup's typed-text controls (Sheet › Rows to repeat at top; Header/Footer › the three footer sections). */
-const PAGESETUP_TEXT = new Set(['titlesRows', 'footL', 'footC', 'footR']);
+const PAGESETUP_TEXT = new Set(['titlesRows', 'printArea', 'footL', 'footC', 'footR', 'headL', 'headC', 'headR']);
 /** 'Rows to repeat at top' as Excel shows it back: '$1:$3' / '1:3' / '2' → '$1:$3' / '$2:$2'; blank is no titles (''); anything else is not a reference (null — Excel refuses it). */
 export function normTitlesRows(text) {
   const t = String(text == null ? '' : text);
@@ -758,6 +759,14 @@ export class Session {
       case 'WFR': S.freeze = { r: 1, c: 0 }; return done();
       case 'WFC': S.freeze = { r: 0, c: 1 }; return done();
       case 'PSP': this.openPageSetup(); return;
+      case 'PRS': S.setPrintArea(); return done();       // Print Area › Set Print Area
+      case 'PRC': S.clearPrintArea(); return done();     // Print Area › Clear Print Area
+      case 'PBI': S.insertPageBreak(); return done();    // Breaks › Insert Page Break
+      case 'PBR': S.removePageBreak(); return done();    // Breaks › Remove Page Break
+      case 'PBA': S.resetPageBreaks(); return done();    // Breaks › Reset All Page Breaks
+      case 'WI': S.view = 'pagebreak'; this.emit('settings'); return done();   // View › Page Break Preview
+      case 'WL': S.view = 'normal'; this.emit('settings'); return done();      // View › Normal
+      case 'WP': S.view = 'layout'; this.emit('settings'); return done();      // View › Page Layout
       case 'POP': this.setOrientation('portrait'); return done();
       case 'POL': this.setOrientation('landscape'); return done();
       default: this.path = []; this.note = '';
@@ -1121,7 +1130,8 @@ export class Session {
       mTop: String(m.top), mBottom: String(m.bottom), mLeft: String(m.left), mRight: String(m.right), mHeader: String(m.header), mFooter: String(m.footer), centerH: !!p.centerH, centerV: !!p.centerV,
       orientation: p.orientation, scaling: p.scaling, adjustTo: String(p.adjustTo), fitWide: String(p.fitWide), fitTall: String(p.fitTall),
       titlesRows: String(p.titlesRows || ''), printGridlines: !!p.printGridlines,
-      footL: String(f.left || ''), footC: String(f.centre || ''), footR: String(f.right || '') };
+      footL: String(f.left || ''), footC: String(f.centre || ''), footR: String(f.right || ''),
+      headL: String((p.header || {}).left || ''), headC: String((p.header || {}).centre || ''), headR: String((p.header || {}).right || ''), printArea: String(p.printArea || '') };
   }
   openOptions(page) { this.startClock(); this.openDialog('options', this.mode === 'ribbon' ? this.path : []); this.dlg = this.optionsDraft(page); }
   openPageSetup(tab) { this.startClock(); this.openDialog('pagesetup', this.mode === 'ribbon' ? this.path : []); this.dlg = this.pageSetupDraft(tab); }
@@ -1133,7 +1143,7 @@ export class Session {
   /** The Tab order of the open dialog's controls. */
   dialogTabOrder() {
     const d = this.dlg; if (!d) return [];
-    if (d.kind === 'pagesetup') return ['tabs'].concat(d.tab === 'hf' ? ['footL', 'footC', 'footR'] : d.tab === 'sheet' ? ['titlesRows', 'printGrid'] : d.tab === 'margins' ? ['mTop', 'mLeft', 'mRight', 'mBottom', 'mHeader', 'mFooter', 'centerH', 'centerV'] : ['orient', 'adjustTo', 'fitWide', 'fitTall']);
+    if (d.kind === 'pagesetup') return ['tabs'].concat(d.tab === 'hf' ? ['footL', 'footC', 'footR'] : d.tab === 'sheet' ? ['printArea', 'titlesRows', 'printGrid'] : d.tab === 'margins' ? ['mTop', 'mLeft', 'mRight', 'mBottom', 'mHeader', 'mFooter', 'centerH', 'centerV'] : ['orient', 'adjustTo', 'fitWide', 'fitTall']);
     if (d.kind === 'find') return d.replace ? ['find', 'repl'] : ['find'];
     if (d.kind === 'condfmt') return d.op === 'duplicate' ? ['which', 'style'] : d.op === 'formula' ? ['formula', 'style'] : d.op === 'between' ? ['v1', 'v2', 'style'] : ['v1', 'style'];
     if (d.kind !== 'options') return [];   // Rename Sheet, Delete Sheet and Move or Copy have one control each: nothing to Tab between
@@ -1247,11 +1257,12 @@ export class Session {
     const field = { adjustTo: 3, fitWide: 2, fitTall: 2 };   // digits each numeric field takes
     const textFocus = PAGESETUP_TEXT.has(d.focus);
     const setTab = k => { d.tab = k; d.focus = 'tabs'; d.sub = null; this.lastTabs.pagesetup = k; };
-    if (d.sub === 'footer') {   // Custom Footer (Alt+U on Header/Footer): three sections, Alt+L / C / R; Enter = OK back to the page, Esc = Cancel
+    if (d.sub === 'footer' || d.sub === 'header') {   // Custom Footer (Alt+U) / Custom Header (Alt+C) on Header/Footer: three sections, Alt+L / C / R; Enter = OK back to the page, Esc = Cancel
+      const px = d.sub === 'footer' ? 'foot' : 'head';
       if (key === 'Enter') { d.sub = null; d.focus = 'tabs'; return; }
       if (key === 'Escape') { Object.assign(d, d.subSaved); d.sub = null; d.focus = 'tabs'; return; }
-      if (key === 'Tab' || key === 'Shift+Tab') { const o = ['footL', 'footC', 'footR']; const i = Math.max(0, o.indexOf(d.focus)); d.focus = o[(i + (key === 'Tab' ? 1 : 2)) % 3]; return; }
-      if (key === 'Alt+L' || key === 'Alt+C' || key === 'Alt+R') { d.focus = { L: 'footL', C: 'footC', R: 'footR' }[key.slice(4)]; return; }
+      if (key === 'Tab' || key === 'Shift+Tab') { const o = [px + 'L', px + 'C', px + 'R']; const i = Math.max(0, o.indexOf(d.focus)); d.focus = o[(i + (key === 'Tab' ? 1 : 2)) % 3]; return; }
+      if (key === 'Alt+L' || key === 'Alt+C' || key === 'Alt+R') { d.focus = px + key.slice(4); return; }
       if (key.startsWith('Alt+')) return;
       if (key === 'Backspace') { d[d.focus] = d[d.focus].slice(0, -1); return; }
       if (key.length === 1 && d[d.focus].length < 64) d[d.focus] += key;
@@ -1281,12 +1292,13 @@ export class Session {
       }
       if (d.tab === 'hf') {
         if (acc === 'U') { d.sub = 'footer'; d.subSaved = { footL: d.footL, footC: d.footC, footR: d.footR }; d.focus = 'footL'; return; }   // Custom Footer…, the cursor in the left section
-        if (acc === 'L' || acc === 'C' || acc === 'R') { d.focus = acc === 'L' ? 'footL' : acc === 'C' ? 'footC' : 'footR'; return; }
+        if (acc === 'C') { d.sub = 'header'; d.subSaved = { headL: d.headL, headC: d.headC, headR: d.headR }; d.focus = 'headL'; return; }   // Custom Header…
+        if (acc === 'L' || acc === 'R') { d.focus = acc === 'L' ? 'footL' : 'footR'; return; }
         return;
       }
       if (acc === 'R') { d.tab = 'sheet'; this.lastTabs.pagesetup = 'sheet'; d.focus = 'titlesRows'; return; }
       if (acc === 'G') { d.tab = 'sheet'; this.lastTabs.pagesetup = 'sheet'; d.focus = 'printGrid'; d.printGridlines = !d.printGridlines; return; }
-      if (d.tab === 'sheet') return;
+      if (d.tab === 'sheet') { if (acc === 'A') { d.focus = 'printArea'; } return; }   // Print area (Alt+A on the Sheet page)
       if (acc === 'T') { d.orientation = 'portrait'; d.focus = 'orient'; return; }
       if (acc === 'L') { d.orientation = 'landscape'; d.focus = 'orient'; return; }
       if (acc === 'A') { d.scaling = 'adjust'; d.focus = 'adjustTo'; d.fresh = 'adjustTo'; return; }
@@ -1325,7 +1337,11 @@ export class Session {
     const titles = normTitlesRows(d.titlesRows);
     if (titles === null) { d.tab = 'sheet'; d.focus = 'titlesRows'; this.note = REF_NOT_VALID; return; }   // Excel refuses the reference and keeps the dialog open
     p.titlesRows = titles;
+    const pa = String(d.printArea || '').trim().replace(/\$/g, '').toUpperCase(); const parea = pa ? parseRange(pa) : null;
+    if (pa && !parea) { d.tab = 'sheet'; d.focus = 'printArea'; this.note = REF_NOT_VALID; return; }
+    if (parea) p.printArea = '$' + colLetterOf(parea.c1) + '$' + parea.r1 + ':$' + colLetterOf(parea.c2) + '$' + parea.r2; else delete p.printArea;
     p.footer = { left: normFooterText(d.footL), centre: normFooterText(d.footC), right: normFooterText(d.footR) };
+    if (d.headL || d.headC || d.headR) p.header = { left: normFooterText(d.headL), centre: normFooterText(d.headC), right: normFooterText(d.headR) }; else delete p.header;
     p.printGridlines = !!d.printGridlines;
     const m = { ...(p.margins || MARGINS_DEFAULT) };
     for (const f in MARGIN_FIELDS) { const v = parseFloat(d[f]); if (Number.isFinite(v) && v >= 0 && v < 50) m[MARGIN_FIELDS[f]] = Math.round(v * 100) / 100; }

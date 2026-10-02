@@ -23,7 +23,11 @@ import { fmtNum, dispText, dispMarked, fitGeneral, serialToDate, HASHES, PAD_MAR
 import { isValidFormat, normalizeCode, stepDecimals, codeDecimals } from './numfmt.js';
 
 export const COLW_DEFAULT = 64;   // px: Excel's default column width at 100% (8.43 characters); autofit widens beyond this
-export const ROWH_DEFAULT = 20;   // px: Excel's default row height at 100% (15pt)
+export const ROWH_DEFAULT = 20;
+/** A sheet's Page Setup as Excel starts it (Page Setup belongs to the sheet; the Session's settings.pageSetup reads the active one). */
+export const PAGE_SETUP_DEFAULT = { orientation: 'portrait', scaling: 'adjust', adjustTo: 100, fitWide: 1, fitTall: 1, titlesRows: '', footer: { left: '', centre: '', right: '' }, printGridlines: false };
+/** Letter paper, inches, and the screen's 96 px to the inch: what an automatic page break counts against. */
+const PAPER = { w: 8.5, h: 11 }, PX_IN = 96;   // px: Excel's default row height at 100% (15pt)
 export const CHARPX = 8.6;        // mono digit width the #### test assumes
 export const TXTPX = 6.9;         // proportional label glyph
 export const PAD_NUM = 12, PAD_TXT = 20, FIT_SLACK = 4, COLW_MAX = 220;
@@ -349,6 +353,9 @@ export class Sheet {
     this.filter = null;                    // the AutoFilter (Ctrl+Shift+L): { r1, c1, r2, c2, crit: { [col]: criterion } }; the header row is r1
     this.filterRows = new Set();           // the rows the AutoFilter hides (apart from hiddenRows: Unhide does not show them, SUBTOTAL 101+ skips them)
     this.dataTables = null;                // What-If data tables (Alt A W T): [{ r1, c1, r2, c2, row, col }]
+    this.pageSetup = clone(PAGE_SETUP_DEFAULT);   // Page Setup (Alt P S P), the print area (Alt P R S, pageSetup.printArea), the custom header and footer
+    this.breaks = { rows: [], cols: [] };  // manual page breaks (Alt P B I): a break above each listed row / left of each listed column
+    this.view = 'normal';                  // the sheet's view: 'normal' (Alt W L), 'pagebreak' (Page Break Preview, Alt W I), 'layout' (Page Layout, Alt W P)
     this.validation = null;                // Data Validation rules by cell key: { allow, data, min, max, source, inCell, ignoreBlank, errTitle, errMsg, errStyle, inTitle, inMsg }
     this.freeze = { r: 0, c: 0 };          // rows/cols frozen above/left of the seam (0 = none)
     this.groups = { rows: [], cols: [] };  // the outline (C2 gap 4): [{r1,r2,collapsed}] / [{c1,c2,collapsed}], one level
@@ -375,6 +382,9 @@ export class Sheet {
     if (opts.names) for (const k in opts.names) { const n = opts.names[k]; if (n && n.ref) this.names[String(n.name || k).toUpperCase()] = { name: String(n.name || k), ref: String(n.ref) }; }
     if (opts.zoom) this.zoom = clampZoom(opts.zoom);
     if (opts.validation && typeof opts.validation === 'object') this.validation = clone(opts.validation);
+    if (opts.pageSetup && typeof opts.pageSetup === 'object') this.pageSetup = { ...clone(PAGE_SETUP_DEFAULT), ...clone(opts.pageSetup) };
+    if (opts.breaks) this.breaks = { rows: [...new Set((opts.breaks.rows || []).map(n => n | 0).filter(n => n > 1))].sort((a, b) => a - b), cols: [...new Set((opts.breaks.cols || []).map(n => n | 0).filter(n => n > 1))].sort((a, b) => a - b) };
+    if (opts.view === 'pagebreak' || opts.view === 'layout') this.view = opts.view;
     if (Array.isArray(opts.dataTables)) this.dataTables = clone(opts.dataTables);   // What-If data tables: [{ r1, c1, r2, c2, row, col }] (the input cells' keys)
     if (opts.active) this.active = this.clamp(opts.active.r, opts.active.c);
     this.recalc();
@@ -612,13 +622,14 @@ export class Sheet {
   /* ---------------- undo ---------------- */
   snapshot() { return { cells: clone(this.cells), colW: this.colW.slice(), colSet: this.colSet.slice(), rows: this.rows, active: { ...this.active }, sel: this.sel && { ...this.sel },
     rowH: this.rowH.slice(), hiddenRows: [...this.hiddenRows], hiddenCols: [...this.hiddenCols], freeze: { ...this.freeze }, groups: clone(this.groups), condFmt: clone(this.condFmt), names: clone(this.names),
-    filter: clone(this.filter), filterRows: [...this.filterRows], validation: clone(this.validation || null), dataTables: clone(this.dataTables || null) }; }
+    filter: clone(this.filter), filterRows: [...this.filterRows], validation: clone(this.validation || null), dataTables: clone(this.dataTables || null), breaks: clone(this.breaks), printArea: this.pageSetup.printArea || null }; }
   /** Rewind cells AND the whole selection to one moment, so undo/redo re-select the range the operation touched (Excel). */
   restore(s) {
     this.cells = clone(s.cells); this.colW = s.colW.slice(); this.colSet = s.colSet.slice(); this.rows = s.rows;
     if (s.rowH) this.rowH = s.rowH.slice();
     this.hiddenRows = new Set(s.hiddenRows || []); this.hiddenCols = new Set(s.hiddenCols || []);
     this.filter = s.filter ? clone(s.filter) : null; this.filterRows = new Set(s.filterRows || []); this.validation = s.validation ? clone(s.validation) : null; this.dataTables = s.dataTables ? clone(s.dataTables) : null;
+    if (s.breaks) this.breaks = clone(s.breaks); if (s.printArea !== undefined) { if (s.printArea) this.pageSetup.printArea = s.printArea; else delete this.pageSetup.printArea; }
     this.freeze = s.freeze ? { ...s.freeze } : { r: 0, c: 0 };
     this.groups = s.groups ? normGroups(s.groups) : { rows: [], cols: [] };
     this.condFmt = s.condFmt ? normCondFmt(s.condFmt, this.today) : [];
@@ -1691,6 +1702,71 @@ export class Sheet {
     return out;
   }
 
+  /* ---------------- printing: the print area, page breaks, the pages (Page Break Preview) ---------------- */
+  /** Page Layout › Print Area › Set Print Area (Alt P R S): the selection, absolute ('$A$1:$H$40'). */
+  setPrintArea() { const r = this.selRange(); this.pushUndo(); this.pageSetup.printArea = '$' + colLetter(r.c1) + '$' + r.r1 + ':$' + colLetter(r.c2) + '$' + r.r2; this.commit('layout'); return this.pageSetup.printArea; }
+  /** Print Area › Clear Print Area (Alt P R C). */
+  clearPrintArea() { if (!this.pageSetup.printArea) return false; this.pushUndo(); delete this.pageSetup.printArea; this.commit('layout'); return true; }
+  /** What prints: the print area, else A1 to the last used cell. */
+  printRange() {
+    const pa = this.pageSetup.printArea && parseRange(String(this.pageSetup.printArea).replace(/\$/g, ''));
+    if (pa) return pa;
+    const u = this.usedRange(); return { r1: 1, c1: 1, r2: Math.max(1, u.r), c2: Math.max(1, u.c) };
+  }
+  /**
+   * Breaks › Insert Page Break (Alt P B I): a break above the active cell's row and left of its
+   * column (in row 1, only the column break; in column A, only the row break; at A1, none).
+   */
+  insertPageBreak() {
+    const a = this.dispActive(); if (a.r === 1 && a.c === 1) return false;
+    this.pushUndo();
+    if (a.r > 1 && !this.breaks.rows.includes(a.r)) { this.breaks.rows.push(a.r); this.breaks.rows.sort((x, y) => x - y); }
+    if (a.c > 1 && !this.breaks.cols.includes(a.c)) { this.breaks.cols.push(a.c); this.breaks.cols.sort((x, y) => x - y); }
+    this.commit('layout'); return true;
+  }
+  /** Breaks › Remove Page Break (Alt P B R): the manual breaks at the active cell's row and column. */
+  removePageBreak() {
+    const a = this.dispActive(); const had = this.breaks.rows.includes(a.r) || this.breaks.cols.includes(a.c); if (!had) return false;
+    this.pushUndo(); this.breaks.rows = this.breaks.rows.filter(n => n !== a.r); this.breaks.cols = this.breaks.cols.filter(n => n !== a.c); this.commit('layout'); return true;
+  }
+  /** Breaks › Reset All Page Breaks (Alt P B A). */
+  resetPageBreaks() { if (!this.breaks.rows.length && !this.breaks.cols.length) return false; this.pushUndo(); this.breaks = { rows: [], cols: [] }; this.commit('layout'); return true; }
+  /**
+   * The printed pages, down then over, as Page Break Preview numbers them: the print range cut at
+   * the manual breaks and, between them, wherever the next row or column no longer fits on the
+   * paper (letter, the orientation and margins, Adjust to %). Fit to n by m pages cuts the range
+   * into that many even pages and ignores the manual breaks, as Excel does.
+   * Returns [{ r1, c1, r2, c2, page, manual: {top, left} }]; `auto` lists the automatic breaks.
+   */
+  pages() {
+    const p = this.pageSetup; const rg = this.printRange();
+    const m = p.margins || { top: 0.75, bottom: 0.75, left: 0.7, right: 0.7 };
+    const land = p.orientation === 'landscape';
+    const scale = p.scaling === 'fit' ? 1 : Math.max(10, Math.min(400, p.adjustTo || 100)) / 100;
+    const W = ((land ? PAPER.h : PAPER.w) - m.left - m.right) * PX_IN / scale, H = ((land ? PAPER.w : PAPER.h) - m.top - m.bottom) * PX_IN / scale;
+    const size = (axis, n) => axis === 'r' ? (this.hiddenRows.has(n) ? 0 : (this.rowH[n] || ROWH_DEFAULT)) : (this.hiddenCols.has(n) ? 0 : (this.colW[n] || COLW_DEFAULT));
+    const cuts = (axis, a, b, limit, manual, even) => {   // the first row / column of each page
+      const out = [a];
+      if (even) { const n = Math.max(1, Math.min(even, b - a + 1)); for (let i = 1; i < n; i++) out.push(a + Math.round(i * (b - a + 1) / n)); return out; }
+      let used = 0;
+      for (let k = a; k <= b; k++) {
+        const z = size(axis, k);
+        if (k > a && (manual.includes(k) || used + z > limit)) { out.push(k); used = 0; }
+        used += z;
+      }
+      return out;
+    };
+    const fit = p.scaling === 'fit';
+    const rs = cuts('r', rg.r1, rg.r2, H, this.breaks.rows, fit ? (p.fitTall || 1) : 0), cs = cuts('c', rg.c1, rg.c2, W, this.breaks.cols, fit ? (p.fitWide || 1) : 0);
+    const out = []; let page = 0;
+    for (let j = 0; j < cs.length; j++) for (let i = 0; i < rs.length; i++) {
+      out.push({ r1: rs[i], r2: i + 1 < rs.length ? rs[i + 1] - 1 : rg.r2, c1: cs[j], c2: j + 1 < cs.length ? cs[j + 1] - 1 : rg.c2, page: ++page,
+        manual: { top: !fit && this.breaks.rows.includes(rs[i]), left: !fit && this.breaks.cols.includes(cs[j]) } });
+    }
+    out.auto = { rows: fit ? [] : rs.slice(1).filter(n => !this.breaks.rows.includes(n)), cols: fit ? [] : cs.slice(1).filter(n => !this.breaks.cols.includes(n)) };
+    return out;
+  }
+
   /* ---------------- serialisation ---------------- */
   toJSON() {
     const cells = {}; for (const k in this.cells) { const c = this.cells[k]; const b = blankCell(); const o = {}; for (const f in c) if (c[f] !== b[f] && !(f === 'value' && c.formula)) o[f] = c[f]; if (Object.keys(o).length) cells[k] = o; }
@@ -1706,6 +1782,9 @@ export class Sheet {
     if (this.zoom !== ZOOM_DEFAULT) out.zoom = this.zoom;
     if (this.validation && Object.keys(this.validation).length) out.validation = clone(this.validation);
     if (this.dataTables && this.dataTables.length) out.dataTables = clone(this.dataTables);
+    if (JSON.stringify(this.pageSetup) !== JSON.stringify(PAGE_SETUP_DEFAULT)) out.pageSetup = clone(this.pageSetup);
+    if (this.breaks.rows.length || this.breaks.cols.length) out.breaks = clone(this.breaks);
+    if (this.view !== 'normal') out.view = this.view;
     return out;
   }
 }

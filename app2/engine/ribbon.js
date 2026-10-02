@@ -34,7 +34,9 @@ export const MENUS = {
   'HFI': [['S', 'Series…'], ['D', 'Down'], ['R', 'Right']],
   'HFD': [['F', 'Find…'], ['R', 'Replace…'], ['G', 'Go To…'], ['S', 'Go To Special…'], ['U', 'Formulas'], ['N', 'Constants'], ['V', 'Data Validation'], ['O', 'Select Objects']],
   // Page Layout: Excel's real KeyTips — Margins M, Orientation O, Size S Z, Print Area A, Breaks B, Background G, Print Titles I, the Page Setup launcher S P
-  'P': [['M', 'Margins'], ['O', 'Orientation'], ['S', 'Page Setup'], ['A', 'Print Area'], ['B', 'Breaks'], ['G', 'Background'], ['I', 'Print Titles']],
+  'P': [['M', 'Margins'], ['O', 'Orientation'], ['S', 'Page Setup'], ['R', 'Print Area'], ['B', 'Breaks'], ['G', 'Background'], ['I', 'Print Titles']],
+  'PR': [['S', 'Set Print Area'], ['C', 'Clear Print Area']],
+  'PB': [['I', 'Insert Page Break'], ['R', 'Remove Page Break'], ['A', 'Reset All Page Breaks']],
   'PO': [['P', 'Portrait'], ['L', 'Landscape']],
   'PS': [['P', 'Page Setup…'], ['Z', 'Size']],
   'M': [['U', 'Σ AutoSum'], ['M', 'Define Name'], ['P', 'Trace Precedents'], ['D', 'Trace Dependents'], ['A', 'Remove Arrows'], ['H', 'Show Formulas'], ['K', 'Error Checking'], ['V', 'Evaluate Formula'], ['X', 'Calculation Options']],
@@ -51,7 +53,7 @@ export const MENUS = {
   'AU': [['U', 'Ungroup…'], ['C', 'Clear Outline']],
   'AS': [['A', 'Sort A→Z'], ['D', 'Sort Z→A'], ['S', 'Sort…']],
   'E': [['S', 'Paste special…']],
-  'W': [['V', 'Show'], ['Q', 'Zoom'], ['J', '100%'], ['F', 'Freeze Panes']],
+  'W': [['L', 'Normal'], ['I', 'Page Break Preview'], ['P', 'Page Layout'], ['V', 'Show'], ['Q', 'Zoom'], ['J', '100%'], ['F', 'Freeze Panes']],
   'WV': [['G', 'Gridlines']],
   'WF': [['F', 'Freeze Panes'], ['R', 'Freeze Top Row'], ['C', 'Freeze First Column']],
 };
@@ -122,7 +124,7 @@ export const tabName = k => (TABS.find(t => t.k === k) || { name: k }).name;
 export const DEAD = {
   'FI': 'Info', 'FN': 'New', 'FO': 'Open', 'FS': 'Save', 'FA': 'Save As', 'FP': 'Print', 'FH': 'Share', 'FE': 'Export', 'FC': 'Close', 'FD': 'Account',
   'HFDV': 'Data Validation', 'HFDO': 'Select Objects',
-  'PM': 'Margins', 'PA': 'Print Area', 'PB': 'Breaks', 'PG': 'Background', 'PSZ': 'Size', 'AGA': 'Auto Outline',
+  'PM': 'Margins', 'PG': 'Background', 'PSZ': 'Size', 'AGA': 'Auto Outline',
 };
 
 /* ---------------- Excel Options, Page Setup and the Quick Access Toolbar (data the Session reads) ---------------- */
@@ -186,7 +188,8 @@ export const COMMANDS = {
   'HOI': 'AutoFit column width', 'HOA': 'AutoFit row height', 'HOW': 'Column width…', 'HOE': 'Format cells…', 'OE': 'Format cells…',
   'HEA': 'Clear all', 'HEF': 'Clear formats', 'HEC': 'Clear contents', 'HUS': 'AutoSum', 'MUS': 'AutoSum', 'MP': 'Trace precedents', 'MD': 'Trace dependents',
   'HVV': 'Paste values', 'HVS': 'Paste special…', 'ES': 'Paste special…', 'ASA': 'Sort A to Z', 'ASD': 'Sort Z to A', 'WVG': 'Gridlines', 'WG': 'Gridlines',
-  'FT': 'Excel Options…', 'HFDG': 'Go To…', 'PSP': 'Page Setup…', 'POP': 'Portrait', 'POL': 'Landscape', 'PI': 'Print Titles…',
+  'FT': 'Excel Options…', 'HFDG': 'Go To…', 'PSP': 'Page Setup…', 'PRS': 'Set Print Area', 'PRC': 'Clear Print Area', 'PBI': 'Insert Page Break', 'PBR': 'Remove Page Break', 'PBA': 'Reset All Page Breaks',
+  'WL': 'Normal', 'WI': 'Page Break Preview', 'WP': 'Page Layout', 'POP': 'Portrait', 'POL': 'Landscape', 'PI': 'Print Titles…',
   'AGG': 'Group…', 'AUU': 'Ungroup…', 'AUC': 'Clear outline', 'AH': 'Hide detail', 'AJ': 'Show detail', 'MH': 'Show formulas',
   'HFDF': 'Find…', 'HFDR': 'Replace…', 'HFDS': 'Go To Special…', 'HFDU': 'Select formulas', 'HFDN': 'Select constants',
   'HOH': 'Row height…', 'HOUR': 'Hide rows', 'HOUC': 'Hide columns', 'HOUO': 'Unhide rows', 'HOUL': 'Unhide columns',

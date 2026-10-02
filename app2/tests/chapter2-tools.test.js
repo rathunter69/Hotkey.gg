@@ -58,3 +58,23 @@ test('conditional formatting › Highlight Cells › Duplicate Values (Alt H L H
   s.run('Alt H L H D Down Enter'); assert.equal(S.condFmt[0].unique, true); const m2 = S.condFmtMap(); assert.deepEqual(['B1', 'B2', 'B3'].map(k => !!m2[k]), [false, false, true]);
   const back = new Sheet(JSON.parse(JSON.stringify(S.toJSON()))); assert.equal(back.condFmt[0].kind, 'duplicate');
 });
+
+test('Page Setup belongs to each sheet: a print area (Alt P R S), a custom header (Alt+C), manual page breaks (Alt P B I) and Page Break Preview (Alt W I)', () => {
+  const cells = {}; for (let r = 1; r <= 120; r++) for (let c = 1; c <= 6; c++) cells[String.fromCharCode(64 + c) + r] = { value: r * c };
+  const s = fresh(cells, { rows: 200 }); s.addSheet('Notes'); const S = s.sheet;
+  s.run('Alt P O L'); assert.equal(s.settings.pageSetup.orientation, 'landscape');
+  s.switchSheet(1); assert.equal(s.settings.pageSetup.orientation, 'portrait', 'the other sheet keeps its own setup'); s.switchSheet(0);
+  S.select('A1:F80'); s.run('Alt P R S'); assert.equal(S.pageSetup.printArea, '$A$1:$F$80');
+  s.run('Alt P S P H Alt+C "Project Rinse" Tab "&[Tab]" Enter Enter'); assert.deepEqual(S.pageSetup.header, { left: 'Project Rinse', centre: '&[Tab]', right: '' });
+  s.run('Alt P S P S Alt+A'); assert.equal(s.dlg.focus, 'printArea'); assert.equal(s.dlg.printArea, '$A$1:$F$80'); s.run('Escape'); if (s.mode !== 'normal') s.run('Escape Escape Escape');
+  s.run('Alt W I'); assert.equal(S.view, 'pagebreak');
+  let pages = S.pages(); assert.equal(pages.length, 3, 'landscape letter: 80 rows of 20px run to three pages'); assert.equal(pages[0].r1, 1); assert.equal(pages.at(-1).r2, 80);
+  S.goTo(41, 1); s.run('Alt P B I'); assert.deepEqual(S.breaks, { rows: [41], cols: [] });
+  pages = S.pages(); assert.deepEqual(pages.map(p => [p.r1, p.r2]), [[1, 33], [34, 40], [41, 73], [74, 80]], 'the automatic breaks every 33 rows, restarted by the manual one'); assert.equal(pages[2].manual.top, true); assert.deepEqual(pages.auto.rows, [34, 74]);
+  S.goTo(10, 4); s.run('Alt P B I'); assert.deepEqual(S.breaks, { rows: [10, 41], cols: [4] }); assert.equal(S.pages().find(p => p.c1 === 4 && p.r1 === 1).page > 1, true, 'pages run down, then over');
+  s.run('Alt P B R'); assert.deepEqual(S.breaks, { rows: [41], cols: [] }); s.run('Alt P B A'); assert.deepEqual(S.breaks, { rows: [], cols: [] });
+  s.run('Ctrl+Z'); assert.deepEqual(S.breaks, { rows: [41], cols: [] }, 'undo brings the breaks back');
+  s.run('Alt P S P P Alt+F Enter'); assert.equal(S.pages().length, 1, 'Fit to 1 page ignores the manual breaks');
+  const back = new Sheet(JSON.parse(JSON.stringify(S.toJSON()))); assert.equal(back.pageSetup.printArea, '$A$1:$F$80'); assert.equal(back.view, 'pagebreak'); assert.deepEqual(back.breaks.rows, [41]);
+  s.run('Alt P R C'); assert.equal(S.pageSetup.printArea, undefined); s.run('Alt W L'); assert.equal(S.view, 'normal');
+});

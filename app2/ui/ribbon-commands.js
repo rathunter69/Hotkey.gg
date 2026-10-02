@@ -349,6 +349,14 @@ export const RIBBON_COMMANDS = {
   'WFC': C('Freeze first column', 'Window', 'W', ICON.freeze, direct(S => { S.freeze = { r: 0, c: 1 }; S.commit('layout'); })),
   // Page Layout · Page Setup
   'PSP': C('Page Setup…', 'Page Setup', 'P', ICON.launcher, s => { leaveRibbon(s); s.openPageSetup(); }),
+  'PRS': C('Set Print Area', 'Page Setup', 'P', ICON.printArea, direct(S => S.setPrintArea())),
+  'PRC': C('Clear Print Area', 'Page Setup', 'P', ICON.printArea, direct(S => S.clearPrintArea())),
+  'PBI': C('Insert Page Break', 'Page Setup', 'P', ICON.printTitles, direct(S => S.insertPageBreak())),
+  'PBR': C('Remove Page Break', 'Page Setup', 'P', ICON.printTitles, direct(S => S.removePageBreak())),
+  'PBA': C('Reset All Page Breaks', 'Page Setup', 'P', ICON.breaks, direct(S => S.resetPageBreaks())),
+  'WL': C('Normal', 'Workbook Views', 'W', ICON.gridlines, direct((S, s) => { S.view = 'normal'; s.emit('settings'); })),
+  'WI': C('Page Break Preview', 'Workbook Views', 'W', ICON.gridlines, direct((S, s) => { S.view = 'pagebreak'; s.emit('settings'); })),
+  'WP': C('Page Layout', 'Workbook Views', 'W', ICON.gridlines, direct((S, s) => { S.view = 'layout'; s.emit('settings'); })),
   'PI': C('Print Titles…', 'Page Setup', 'P', ICON.printTitles, s => { leaveRibbon(s); s.openPageSetup('sheet'); }),
   'POP': C('Portrait', 'Page Setup', 'P', ICON.portrait, direct((S, s) => { s.setOrientation('portrait'); S.commit('ribbon'); })),
   'POL': C('Landscape', 'Page Setup', 'P', ICON.landscape, direct((S, s) => { s.setOrientation('landscape'); S.commit('ribbon'); })),
@@ -444,7 +452,7 @@ export const MENU_META = {
   'E': { label: 'Edit', icon: ICON.paste }, 'O': { label: 'Format', icon: ICON.format },
   'HSF': { label: 'Sort & Filter', icon: ICON.filter, items: [{ cmd: 'ASA' }, { cmd: 'ASD' }, { dead: 'Filter' }] },
   'F': { label: 'File', icon: ICON.options }, 'HFD': { label: 'Find & Select', icon: ICON.find },
-  'PO': { label: 'Orientation', icon: ICON.pageOrient }, 'PS': { label: 'Page Setup', icon: ICON.launcher, virtual: true },
+  'PO': { label: 'Orientation', icon: ICON.pageOrient }, 'PR': { label: 'Print Area', icon: ICON.printArea }, 'PB': { label: 'Breaks', icon: ICON.breaks }, 'PS': { label: 'Page Setup', icon: ICON.launcher, virtual: true },
   'HOU': { label: 'Hide & Unhide', icon: ICON.rowHeight }, 'WF': { label: 'Freeze Panes', icon: ICON.freeze },
   'HL': { label: 'Conditional Formatting', icon: ICON.condFmt }, 'HLH': { label: 'Highlight Cells Rules', icon: ICON.condFmt }, 'HLC': { label: 'Clear Rules', icon: ICON.clearFormats },
 };
@@ -492,7 +500,7 @@ export const RIBBON_LAYOUT = {
   // Orientation ▾ is a real menu (Alt P O P / L); the rest render disabled
   P: [
     { name: 'Themes', cols: [big({ dead: 'Themes', caret: true }), { rows: [[{ dead: 'ThemeColors', caret: true }], [{ dead: 'ThemeFonts', caret: true }], [{ dead: 'ThemeEffects', caret: true }]] }] },
-    { name: 'Page Setup', launcher: 'PSP', cols: [big({ dead: 'Margins', caret: true }), big({ menu: 'PO' }), big({ dead: 'PageSize', caret: true }), big({ dead: 'PrintArea', caret: true }), big({ dead: 'Breaks', caret: true }), big({ dead: 'Background' }), big({ cmd: 'PI' })] },
+    { name: 'Page Setup', launcher: 'PSP', cols: [big({ dead: 'Margins', caret: true }), big({ menu: 'PO' }), big({ dead: 'PageSize', caret: true }), big({ menu: 'PR' }), big({ menu: 'PB' }), big({ dead: 'Background' }), big({ cmd: 'PI' })] },
     { name: 'Scale to Fit', cols: [{ rows: [[{ box: 'Width: Automatic', dead: 'ScaleWidth', w: 110 }], [{ box: 'Height: Automatic', dead: 'ScaleHeight', w: 110 }], [{ box: 'Scale: 100%', dead: 'ScaleScale', w: 110 }]] }] },
     { name: 'Sheet Options', cols: [{ rows: [[{ dead: 'SheetGridlines' }], [{ dead: 'SheetHeadings' }]] }] },
   ],
