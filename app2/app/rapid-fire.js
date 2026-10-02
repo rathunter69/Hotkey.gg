@@ -188,7 +188,9 @@ export function mountRapidPage(root) {
   };
   document.addEventListener('keydown', onKey);
 
-  renderPick();
+  // '#/rapid?len=60' (the Rapid-fire page's Enter) starts the round straight away; a bare '#/rapid' shows the pick
+  const asked = Number((/[?&]len=(\d+)/.exec(location.hash) || [])[1]);
+  if (RAPID_DURATIONS.includes(asked)) startRound(asked); else renderPick();
   return {
     destroy() {
       document.removeEventListener('keydown', onKey);

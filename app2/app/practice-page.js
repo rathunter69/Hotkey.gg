@@ -231,20 +231,43 @@ export function bestRounds(attempts) {
   return Object.values(by).sort((a, b) => a.secs - b.secs);
 }
 
+const RAPID_LENS = [30, 60, 120];
+const RAPID_LEN_KEY = 'hk2_rapid_len';   // the last length played: a per-viewer convenience, so Enter starts it again
+const lastRapidLen = () => { try { const n = Number(localStorage.getItem(RAPID_LEN_KEY)); return RAPID_LENS.includes(n) ? n : 60; } catch (e) { return 60; } };
+const keepRapidLen = n => { try { localStorage.setItem(RAPID_LEN_KEY, String(n)); } catch (e) { /* private window */ } };
+
+/**
+ * Rapid-fire: one keystroke from here to a round (Wolf, 19). Enter plays the last length, 1, 2 and
+ * 3 play that length; the three lengths as tiles with your best at each; how it scores at the side;
+ * the deck of commands below with their keys, so the page teaches before the round asks.
+ */
 function rapidPage(el, ctx) {
-  let len = 60;
+  let len = lastRapidLen();
+  let RAPID_DECK = [];   // the round's module loads the sheet engine, so the deck arrives after the page draws
+  const go = n => { keepRapidLen(n); location.hash = '#/rapid?len=' + n; };
   function render() {
-    const control = `<label class="picker"><select id="rapidLen">${[30, 60, 120].map(n => `<option value="${n}"${n === len ? ' selected' : ''}>${esc(t('rapid_len_' + n))}</option>`).join('')}</select></label>`;
     const rounds = bestRounds(store.attempts({ kind: 'rapid' }));
-    const table = rounds.length ? tableHtml({ columns: [{ key: 'len', label: t('col_length') }, { key: 'hits', label: t('col_hits'), align: 'right' }, { key: 'combo', label: t('col_combo'), align: 'right' }], rows: rounds.map(r => ({ cells: { len: esc(t('rapid_len_' + r.secs)), hits: String(r.hits), combo: String(r.combo) }, cursor: false })), cls: 'tbl-rounds' }) : `<p class="panel-line">${esc(t('rapid_none'))}</p>`;
-    el.innerHTML = `${headerBlockHtml({ title: t('rapid_title'), line: esc(siteCopy('rapid_intro', '')), control, button: buttonHtml({ label: t('rapid_start'), key: 'Enter', href: '#/rapid?len=' + len, primary: true, id: 'startRound' }), cls: 'hdr-rapid' })}<div class="pg-two"><div class="pg-main">${panelHtml({ heading: esc(t('rapid_best')), body: table, cls: 'rounds' })}</div></div>`;
-    const sel = el.querySelector('#rapidLen'); if (sel) sel.onchange = () => { len = Number(sel.value); render(); };
+    const tiles = RAPID_LENS.map((n, i) => { const r = rounds.find(x => x.secs === n);
+      return `<button type="button" class="rf-len${n === len ? ' on' : ''}" data-len="${n}" data-cursor tabindex="-1"><span class="rf-len-top"><kbd class="key">${i + 1}</kbd><span class="rf-len-n">${esc(t('rapid_len_' + n))}</span></span><span class="rf-len-best">${r ? `<span><b>${r.hits}</b> ${esc(t('col_hits'))}</span><span><b>${r.combo}</b> ${esc(t('col_combo'))}</span>` : `<span>${esc(t('rapid_none'))}</span>`}</span></button>`; }).join('');
+    const deck = RAPID_DECK.map(d => `<div class="rf-card"><span class="rf-card-t">${esc(d.text)}</span>${keysRowHtml(d.keys.split(' '), { max: 3 })}</div>`).join('');
+    const how = ['rapid_how_1', 'rapid_how_2', 'rapid_how_3'].map((k, i) => `<li><kbd class="key set-n">${i + 1}</kbd><span>${esc(t(k))}</span></li>`).join('');
+    el.innerHTML = `${headerBlockHtml({ title: t('rapid_title'), line: esc(siteCopy('rapid_intro', '')), button: buttonHtml({ label: t('rapid_start_len', { len: t('rapid_len_' + len) }), key: 'Enter', href: '#/rapid?len=' + len, primary: true, id: 'startRound' }), cls: 'hdr-rapid' })}
+      <div class="pg-two"><div class="pg-main">${panelHtml({ heading: esc(t('rapid_lengths')), facts: esc(t('rapid_keys_hint')), body: `<div class="rf-lens" data-cursor-cols="3">${tiles}</div>`, cls: 'rounds' })}${panelHtml({ heading: esc(t('rapid_deck')), facts: esc(t('rapid_deck_n', { n: RAPID_DECK.length })), body: `<div class="rf-deck">${deck}</div>`, cls: 'rf-deck-panel', stretch: true })}</div>
+      <div class="pg-side">${panelHtml({ heading: esc(t('rapid_how')), body: `<ol class="how-list">${how}</ol><p class="panel-line ink-2">${esc(siteCopy('rapid_fine', ''))}</p>`, cls: 'rf-how', stretch: true })}</div></div>`;
+    const startBtn = el.querySelector('#startRound'); if (startBtn) startBtn.onclick = e => { e.preventDefault(); go(len); };
+    el.querySelectorAll('.rf-len').forEach(b => { b.onclick = () => go(Number(b.dataset.len)); });
     if (ctx.keytips) ctx.keytips.register([{ id: 'start', label: t('rapid_start'), el: el.querySelector('#startRound') }]);
     if (ctx.cursor) ctx.cursor.refresh();
   }
   render();
+  import('./rapid-fire.js').then(m => { RAPID_DECK = m.RAPID_DECK || []; if (el.isConnected || el.parentNode) render(); }).catch(() => {});
+  const onKey = e => {
+    if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey || /^(INPUT|TEXTAREA|SELECT)$/.test((e.target && e.target.tagName) || '')) return;
+    if (/^[123]$/.test(e.key)) { e.preventDefault(); go(RAPID_LENS[Number(e.key) - 1]); }
+  };
+  document.addEventListener('keydown', onKey);
   setTimeout(() => { if (ctx.cursor) ctx.cursor.select(el.querySelector('.hdr'), { focus: false }); }, 0);
-  return () => {};
+  return () => document.removeEventListener('keydown', onKey);
 }
 
 /** The challenges table: [{ id, n, title, module, length, best, tier, passed }], in curriculum order. Pure over the challenge drills. */
@@ -257,18 +280,58 @@ export function challengeRows(challengeDrills, all = {}, bests = {}) {
   });
 }
 
+/**
+ * Challenges: the same chapter cards as Learn and Drills, each module's challenge as a tile with the
+ * keys it calls on and your tier, and at the side the next one's three pars, so the page says what
+ * each tier takes instead of a lone button.
+ */
 function challengesPage(el, ctx) {
   const all = store.all();
-  const rows = challengeRows(DRILLS.filter(d => d.kind === 'challenge'), all, bestsOf());
+  const drills = DRILLS.filter(d => d.kind === 'challenge');
+  const rows = challengeRows(drills, all, bestsOf());
   const open = rows.filter(r => !r.locked);
   const next = open.find(r => !r.passed) || open[0] || null;
-  const columns = [{ key: 'n', label: '', cls: 'n' }, { key: 'title', label: t('col_module') }, { key: 'length', label: t('col_length'), align: 'right', cls: 'min' }, { key: 'best', label: t('col_best'), align: 'right', cls: 'best' }, { key: 'tier', label: '', align: 'right', cls: 'tier' }];
-  const table = tableHtml({ columns, rows: rows.map(r => ({ cells: { n: esc(r.n), title: `<span class="row-name">${esc(r.module)}</span><span class="row-sub">${esc(r.title)}</span>`, length: r.length ? fmtLength(r.length) : '', best: r.locked ? esc(t('practice_pro')) : r.best != null ? fmtClock(r.best, true) : esc(t('practice_not_played')), tier: r.locked ? '' : tierMarksHtml(r.tier) }, cls: `row-challenge${r.locked ? ' pro' : ''}${next && r.id === next.id ? ' next' : ''}`, href: r.locked ? '#/pricing' : `#/lesson/${r.id}?seed=new` })), cls: 'tbl-challenges' });
-  el.innerHTML = `${headerBlockHtml({ title: t('challenges_title'), line: esc(t('challenges_line')), facts: esc(t('challenges_fact', { n: rows.filter(r => r.passed).length, m: rows.length })), button: next ? buttonHtml({ label: t('challenges_start'), key: 'Enter', href: `#/lesson/${next.id}?seed=new`, primary: true, id: 'startChallenge' }) : '', cls: 'hdr-challenges' })}<div class="pg-two"><div class="pg-main">${panelHtml({ body: table, cls: 'challenges' })}</div></div>`;
-  const unwire = wireRows(el);
-  if (ctx.keytips) ctx.keytips.register([{ id: 'start', label: t('challenges_start'), el: el.querySelector('#startChallenge') }].filter(i => i.el));
+  const tabs = chapterTabs();
+  const chOf = id => (drills.find(d => d.id === id) || {}).chapter;
+  let chapterKey = (next && chOf(next.id)) || tabs[0].key;
+  let paywall = false;
+  let unwire = null;
+  const keysOf = id => { const l = lessonById(id); const d = drills.find(x => x.id === id); return routeKeys((l && l.solution) || (d && d.solution), 6); };
+  function render(focusTab) {
+    const cards = tabs.map(c => {
+      const mine = rows.filter(r => chOf(r.id) === c.key);
+      const locked = c.access === 'paid' && !entitlement.entitled();
+      const passed = mine.filter(r => r.passed).length;
+      return { key: c.key, n: c.n, title: c.title, on: c.key === chapterKey, locked, pct: mine.length ? 100 * passed / mine.length : 0,
+        note: c.access === 'free' ? t('learn_free') : locked ? t('paywall_pro') : '', count: mine.length ? t('chapter_modules_done', { d: passed, m: mine.length }) : t('learn_being_written') };
+    });
+    const tab = tabs.find(c => c.key === chapterKey) || tabs[0];
+    const mine = rows.filter(r => chOf(r.id) === tab.key);
+    const tiles = mine.map(r => drillTileHtml({ id: r.id, title: r.module, sub: r.title, keys: keysOf(r.id), length: r.length ? fmtLength(r.length) : '', best: r.best != null ? fmtClock(r.best, true) : '', tier: r.tier, open: true, pro: r.locked, href: `#/lesson/${r.id}?seed=new`, next: !!(next && r.id === next.id), mode: 'challenges' },
+      { notPlayed: r.passed ? t('status_done') : t('practice_not_played'), full: t('paywall_pro') })).join('');
+    const main = panelHtml({ heading: esc(t('chapter_heading', { n: tab.n, name: tab.title })), facts: mine.length ? esc(t('challenges_passed', { n: mine.filter(r => r.passed).length, m: mine.length })) : '', body: mine.length ? `<div class="dt-grid" data-cursor-cols="3">${tiles}</div>` : `<p class="panel-line">${esc(t('learn_coming', { n: tab.n }))}</p>`, cls: 'challenges', stretch: true });
+    // the side: what each tier takes on the next challenge, from its pars
+    const nd = next ? drills.find(d => d.id === next.id) : null;
+    const pars = nd && nd.pars ? nd.pars : null;
+    const tierRows = pars ? [['pass', 'tier_pass', pars.pass], ['pro', 'tier_expert', pars.pro], ['legendary', 'tier_legendary', pars.legendary]].map(([tier, k, secs]) => `<div class="tier-row${next && tierAtLeast(next.tier, tier) ? ' on' : ''}">${tierMarksHtml(tier)}<span class="row-name">${esc(t(k))}</span><span class="tier-time">${esc(fmtClock(secs, true))}</span></div>`).join('') : '';
+    const lockedTab = tab.access === 'paid' && !entitlement.entitled();
+    const side = paywall || lockedTab ? paywallHtml({ heading: t('paywall_chapter', { n: tab.n, name: tab.title }), signedIn: auth.state() === 'in', mode: 'challenges', ids: { go: 'chGoPro', notNow: 'chNotNow' } })
+      : panelHtml({ heading: esc(next ? next.module : t('challenges_title')), facts: next ? esc(next.n) : '', body: `${next ? `<p class="panel-line">${esc(next.title)}</p>` : ''}${tierRows ? `<div class="tier-list">${tierRows}</div>` : ''}<p class="panel-line ink-2">${esc(t('challenges_line'))}</p>`, cls: 'ch-side', stretch: true });
+    el.innerHTML = `${headerBlockHtml({ title: t('challenges_title'), line: esc(t('challenges_intro')), button: next ? buttonHtml({ label: t('challenges_start'), key: 'Enter', href: `#/lesson/${next.id}?seed=new`, primary: true, id: 'startChallenge' }) : '', cls: 'hdr-challenges' })}${chapterCardsHtml(cards, t('rail_challenges'))}<div class="pg-two"><div class="pg-main">${main}</div><div class="pg-side">${side}</div></div>`;
+    wireTabs(el, (key, viaKeys) => { chapterKey = key; paywall = false; render(viaKeys); });
+    el.querySelectorAll('[data-pro]').forEach(r => r.addEventListener('click', () => { paywall = true; render(); }));
+    const nn = el.querySelector('#chNotNow'); if (nn) nn.onclick = () => { if (!paywall) chapterKey = tabs[0].key; paywall = false; render(); };
+    if (unwire) unwire();
+    unwire = wireRows(el);
+    if (focusTab) { const on = el.querySelector('.tab.on'); if (on) on.focus(); }
+    if (ctx.keytips) ctx.keytips.register([{ id: 'start', label: t('challenges_start'), el: el.querySelector('#startChallenge') }, ...tabs.map(x => ({ id: x.key, label: t('learn_tab', { n: x.n }), el: el.querySelector(`.tab[data-tab="${x.key}"]`) }))].filter(i => i.el));
+    if (ctx.cursor) ctx.cursor.refresh();
+  }
+  render();
+  const onKey = e => { if (e.key === 'Escape' && !e.defaultPrevented) { const nn = el.querySelector('#chNotNow'); if (nn) { e.preventDefault(); nn.click(); } } };
+  document.addEventListener('keydown', onKey);
   setTimeout(() => { if (ctx.cursor) ctx.cursor.select(el.querySelector('.hdr'), { focus: false }); }, 0);
-  return () => unwire();
+  return () => { document.removeEventListener('keydown', onKey); if (unwire) unwire(); };
 }
 
 export function mountPracticePage(root, ctx = {}) {

@@ -287,7 +287,7 @@ a.pn:focus-visible{outline:var(--cursor-w) solid var(--mode); outline-offset:var
 /* the badge a module pays out, under its page */
 .learn-reward{display:flex; align-items:center; gap:var(--s3); padding-top:var(--s3); border-top:1px solid var(--line)}
 .learn-reward .px{flex:none}
-@media (max-width:900px){ .ch-cards, .dt-grid{grid-template-columns:repeat(2, minmax(0,1fr))} .learn-continue{flex-wrap:wrap} }
+@media (max-width:900px){ .rf-deck{grid-template-columns:minmax(0,1fr)} .ch-cards, .dt-grid{grid-template-columns:repeat(2, minmax(0,1fr))} .learn-continue{flex-wrap:wrap} }
 
 /* a drill as a tile (the catalog, the Challenges page): the keys it drills lead, your best and tier at its foot */
 .dt-grid{display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:var(--s3)}
@@ -319,6 +319,27 @@ a.pn:focus-visible{outline:var(--cursor-w) solid var(--mode); outline-offset:var
 .set-n{min-width:var(--s6); text-align:center}
 .set-main{display:flex; flex-direction:column; min-width:0}
 .set-len{font-size:var(--fs-min); color:var(--ink-2); text-align:right; font-variant-numeric:tabular-nums}
+
+/* Rapid-fire: the three lengths as tiles, the deck, how a round works */
+.rf-lens{display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:var(--s3)}
+.rf-len{display:flex; flex-direction:column; align-items:stretch; gap:var(--s3); padding:var(--s4); text-align:left; background:var(--sheet); color:var(--ink); border:1px solid var(--line); border-top:var(--mode-rule) solid var(--line); cursor:pointer; font:inherit}
+.rf-len:hover{background:var(--chrome)}
+.rf-len.on{border-top-color:var(--mode); background:var(--mode-tint)}
+.rf-len-top{display:flex; align-items:center; gap:var(--s3)}
+.rf-len-n{font-size:var(--fs-item); font-weight:var(--fw-bold)}
+.rf-len-best{display:flex; gap:var(--s4); font-size:var(--fs-label); color:var(--ink-2)}
+.rf-len-best b{color:var(--ink); font-size:var(--fs-panel); font-variant-numeric:tabular-nums}
+.rf-deck{display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); column-gap:var(--s6); border-top:var(--bw-2) solid var(--ink)}
+.rf-card{display:flex; justify-content:space-between; align-items:center; gap:var(--s3); min-height:var(--row-h); border-bottom:1px solid var(--line); font-size:var(--fs-name)}
+.rf-card-t{min-width:0}
+.how-list{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:var(--s3)}
+.how-list li{display:grid; grid-template-columns:auto minmax(0,1fr); gap:var(--s3); align-items:start; font-size:var(--fs-name); line-height:1.45}
+
+/* the tiers a challenge pays, with the times they take */
+.tier-list{display:flex; flex-direction:column; border-top:var(--bw-2) solid var(--ink)}
+.tier-row{display:grid; grid-template-columns:auto minmax(0,1fr) auto; align-items:center; gap:var(--s3); min-height:var(--row-h); border-bottom:1px solid var(--line)}
+.tier-row.on .row-name{color:var(--challenges-ink)}
+.tier-time{font-family:var(--mono); font-weight:var(--fw-bold); font-size:var(--fs-key); font-variant-numeric:tabular-nums}
 
 /* below 900px the columns stack */
 @media (max-width:900px){

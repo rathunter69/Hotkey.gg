@@ -11,6 +11,12 @@ export const RIBBON_WORDS = [
 
 export const SITE_KEYS = [
   // the interface match (2026-10-02)
+  'challenges_passed',
+  // the interface match (2026-10-02)
+  'challenges_intro',
+  // the interface match (2026-10-02)
+  'rapid_start_len', 'rapid_lengths', 'rapid_keys_hint', 'rapid_deck', 'rapid_deck_n', 'rapid_how', 'rapid_how_1', 'rapid_how_2', 'rapid_how_3',
+  // the interface match (2026-10-02)
   'home_xp_why', 'save_title', 'save_line', 'save_go',
   // the interface match (2026-10-02)
   'learn_keys_n',

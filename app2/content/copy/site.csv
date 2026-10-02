@@ -669,3 +669,14 @@ home_xp_why,"Lessons, drills and the Daily pay XP. Every level opens a reward."
 save_title,Save your progress
 save_line,Your progress lives in this browser for now. A free account keeps it on any device and puts your times on the boards.
 save_go,Make a free account
+rapid_start_len,Play {len}
+rapid_lengths,Pick a length
+rapid_keys_hint,"Press 1, 2 or 3 to play"
+rapid_deck,The deck
+rapid_deck_n,{n} commands
+rapid_how,How a round works
+rapid_how_1,We name a command. Press its keys; they show only if you stall.
+rapid_how_2,"Every hit scores, and every fifth hit in a row scores more."
+rapid_how_3,"When the clock runs out, your hits and best combo are your score."
+challenges_intro,"Each module ends on a challenge: the whole module on a fresh file, against the clock."
+challenges_passed,{n} of {m} passed

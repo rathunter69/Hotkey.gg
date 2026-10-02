@@ -155,7 +155,7 @@ try {
     const home = await page.evaluate(() => ({
       next: (document.querySelector('.panel-h-page') || {}).textContent || '',
       empty: [...document.querySelectorAll('.panel')].filter(c => !c.innerText.trim()).map(c => c.className),
-      panels: ['.home-chapter', '.home-level', '.home-today', '.home-ach', '.tbl-chapter tr.current'].filter(sel => !document.querySelector(sel)),
+      panels: ['.home-chapter', '.home-level', '.home-today', '.home-ach', '.home-chapter .row-module.current'].filter(sel => !document.querySelector(sel)),
       coach: !!document.querySelector('.coach'),
     }));
     if (!/Know the screen/.test(home.next)) fail('journey: Home\'s next lesson reads "' + home.next + '", not the next lesson');
