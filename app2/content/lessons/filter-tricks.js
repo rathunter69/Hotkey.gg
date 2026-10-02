@@ -1,4 +1,4 @@
-// Chapter 4 · 4.2.5 Filter tricks: visible cells only, wildcards, skip blanks (clearcoat-pack, S425start → S425)
+// Chapter 4 · 4.2.5 Filter tricks: visible cells only, wildcards, skip blanks (clearcoat-pack, S424 → S425; the corrections column arrives as a planting)
 // Three traps a list sets. Rows 20:34 of the sorted copy are hidden by hand; Alt+; before the copy
 // leaves them behind, and the seventy-five rows land on a new Scratch sheet; then the rows come
 // back. Beside the export, COUNTIF and SUMIFS take wildcards. Last, a column of hours corrections
@@ -11,6 +11,7 @@ import { CORRECTIONS } from '../workbooks/clearcoat-pack.js';
 const WILD = ['I96', 'I97', 'I98', 'J96', 'J97', 'J98'];
 const F = { austin: '=COUNTIF(B5:B94,"AUS-*")', domain: '=COUNTIF(B5:B94,"AUS-?O?")', endsR: '=SUMIFS(F5:F94,B5:B94,"*R")' };
 const HID = { from: 20, to: 34 };
+const CORRECTION_CELLS = (() => { const c = workbookState('clearcoat-pack', 'S425start').sheets.find(s => s.name === 'Export sort').cells; const out = {}; for (const r of ['4', ...Object.keys(CORRECTIONS.rows)]) out['Export sort!' + CORRECTIONS.col + r] = { ...c[CORRECTIONS.col + r] }; return out; })();
 const HOURS = (() => { const sh = workbookState('clearcoat-pack', 'S425start').sheets.find(s => s.name === 'Export sort'); const out = {}; for (let r = 5; r <= 94; r++) out[r] = sh.cells['G' + r] ? sh.cells['G' + r].value : null; return out; })();
 const hiddenBand = sh => !!sh && sh.hiddenRows.size === HID.to - HID.from + 1 && [...sh.hiddenRows].every(r => r >= HID.from && r <= HID.to);
 const scratch = ses => sheetIn(ses, 'Scratch');
@@ -35,8 +36,8 @@ export default {
   section: 'Lists and tables',
   module: 'lists-and-tables',
   workbook: 'clearcoat-pack',
-  state: { before: 'S425start', after: 'S425' },
-  plant: shellOf('S425', { Export: WILD }, { keepText: true }),
+  state: { before: 'S424', after: 'S425' },
+  plant: { ...CORRECTION_CELLS, ...shellOf('S425', { Export: WILD }, { keepText: true }) },
   title: 'Filter tricks: visible cells only, wildcards, skip blanks',
   difficulty: 'hard',
   tags: ['data', 'lists', 'paste-special'],

@@ -176,7 +176,7 @@ test('each state carries what its lesson reads', () => {
   assert.match(cells('S425', 'Scratch').E2.formula, /^=C2\+D2$/, 'the scratch paste re-points its formulas');
   assert.equal(cells('S42C', 'Export sort').A5.value, cells('S42C', 'Export').A5.value, 'the challenge copy is in export order');
   // 4.3: the cube live, the KPI block, the window, the title from Inputs, the ranking, the roll-up
-  assert.equal(stateOf('S43').sheets.some(s => s.name === 'Scratch' || s.name === 'Export sort'), false);
+  assert.equal(stateOf('S43').sheets.filter(s => s.name === 'Scratch' || s.name === 'Export sort').length, 2, 'the working sheets stay in the book, so 4.3.1 starts where 4.2.6 ended'); assert.equal(cells('S43', 'Export').I96, undefined, 'the wildcard counts are cleared');
   assert.match(sm('S431').C15.formula, /^=SUMIFS\(Export!\$E\$5:\$E\$94,Export!\$B\$5:\$B\$94,\$B15,Export!\$H\$5:\$H\$94,C\$14\)$/);
   assert.match(sm('S431').B15.formula, /^=\$B5$/); assert.match(sm('S431').C25.formula, /Export!\$F\$5/); assert.ok(sm('S431')['C' + S.checkRows[0]]); assert.equal(sm('S431')['C' + S.checkRows[2]], undefined);
   assert.equal(sm('S431').E5, undefined); assert.match(sm('S432').I5.formula, /^=H5\/\(F5\*G5\)$/); assert.match(sm('S432').J5.formula, /^=MAXIFS/);

@@ -1,4 +1,4 @@
-// Chapter 4 · 4.3.1 The SUMIFS cube: site × week, filled both ways (clearcoat-pack, S43 → S431)
+// Chapter 4 · 4.3.1 The SUMIFS cube: site × week, filled both ways (clearcoat-pack, S426 → S431; the module's start, S43, arrives as a planting)
 // The Summary arrives with the washes cube typed in blue, pasted from someone's pivot. The site
 // block links to the unique list on Lists, the cube's labels link to the site block, and one SUMIFS
 // in the corner, anchored $B15 and C$14, fills eighteen cells; the totals come from AutoSum and the
@@ -6,6 +6,7 @@
 // checks tie both cubes to the export. Built by week, not month: the export covers one fortnight.
 import { summary, exportRows, sumWhere, atSite, inWeek, calls, live, near, settled, shellOf, refsIn, sameText } from './lib/pack-checks.js';
 import { workbookState } from '../workbooks/index.js';
+import { S43_PLANT } from '../workbooks/clearcoat-pack.js';
 
 const SITES = [5, 6, 7, 8, 9, 10];
 const CUBE = { w: { first: 15, header: 14, total: 21, field: 'total', col: 'E' }, r: { first: 25, header: 24, total: 31, field: 'revenue', col: 'F' } };
@@ -40,8 +41,8 @@ export default {
   section: 'Summaries from raw rows',
   module: 'summaries-from-raw-rows',
   workbook: 'clearcoat-pack',
-  state: { before: 'S43', after: 'S431' },
-  plant: shellOf('S431', { Summary: PLANT }, { keepText: true }),
+  state: { before: 'S426', after: 'S431' },
+  plant: { ...S43_PLANT, ...shellOf('S431', { Summary: PLANT }, { keepText: true }) },
   title: 'The SUMIFS cube: site × week, filled both ways',
   difficulty: 'medium',
   tags: ['formulas', 'sumifs', 'summary'],

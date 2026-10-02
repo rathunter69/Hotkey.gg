@@ -813,8 +813,10 @@ const S42C = derive(S425, s => { s.sheets = s.sheets.filter(x => x.name !== 'Scr
 
 /* ---------------- module 4.3: summaries from raw rows ---------------- */
 
-// S43: the module's start: the working sheets gone, the picker back on Base
-const S43 = derive(S425, s => { s.sheets = s.sheets.filter(x => x.name !== 'Scratch' && x.name !== 'Export sort'); drop(s, 'Export', Object.keys(EXPORT_WORK.wildcards)); take(s, SOLVED, 'Scenarios', ['C' + SCENARIOS.picker]); });
+// S43: the module's start: 4.2.6's end with the wildcard counts cleared off the export and the picker back on Base
+// (4.3.1 plants exactly this onto S426, so the chain runs on; the working sheets stay in the book)
+const S43 = derive(S426, s => { drop(s, 'Export', Object.keys(EXPORT_WORK.wildcards)); take(s, SOLVED, 'Scenarios', ['C' + SCENARIOS.picker]); });
+export const S43_PLANT = { ['Scenarios!C' + SCENARIOS.picker]: sheetOf(S43, 'Scenarios').cells['C' + SCENARIOS.picker] ? clone(sheetOf(S43, 'Scenarios').cells['C' + SCENARIOS.picker]) : null, ...Object.fromEntries(Object.keys(EXPORT_WORK.wildcards).map(ref => ['Export!' + ref, null])) };
 
 const S = SUMMARY;
 // 4.3.1 The SUMIFS cube: the washes cube live (the codes link to the unique list), the revenue cube, the checks block started

@@ -1359,18 +1359,6 @@ export const COPY = {
    "mac_note": "",
    "story_beat": ""
   },
-  "remix-format-on-the-pnl": {
-   "id": "remix-format-on-the-pnl",
-   "module": "remixes",
-   "order": "2.R.C",
-   "title": "Remix: the team’s format on a site P&L",
-   "brief": "Chapter 1’s format challenge on a P&L: a cluster’s FY26E site P&L arrived as a bordered grid of General numbers, with one new site at a loss. Give it the team’s format, figures to title, in three minutes.",
-   "closing": "",
-   "wow": "",
-   "convention_line": "Negatives in parentheses, one decimals setting per line, a top border on the total, inputs blue and nothing merged.",
-   "mac_note": "",
-   "story_beat": ""
-  },
   "sort-multi-level": {
    "id": "sort-multi-level",
    "module": "lists-and-tables",
@@ -1536,6 +1524,18 @@ export const COPY = {
    "closing": "",
    "wow": "",
    "convention_line": "The check is a live difference → 0; Write once, fill right",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "remix-format-on-the-pnl": {
+   "id": "remix-format-on-the-pnl",
+   "module": "remixes",
+   "order": "2.R.C",
+   "title": "Remix: the team’s format on a site P&L",
+   "brief": "Chapter 1’s format challenge on a P&L: a cluster’s FY26E site P&L arrived as a bordered grid of General numbers, with one new site at a loss. Give it the team’s format, figures to title, in three minutes.",
+   "closing": "",
+   "wow": "",
+   "convention_line": "Negatives in parentheses, one decimals setting per line, a top border on the total, inputs blue and nothing merged.",
    "mac_note": "",
    "story_beat": ""
   }
