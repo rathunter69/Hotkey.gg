@@ -1887,6 +1887,18 @@ export const COPY = {
    "mac_note": "",
    "story_beat": ""
   },
+  "how-the-statements-link": {
+   "id": "how-the-statements-link",
+   "module": "the-three-statements",
+   "order": "5.1.5",
+   "title": "How the three statements link",
+   "brief": "Three statements, three questions: the income statement asks what the business earned over the period, the cash flow statement where the cash went, the balance sheet what it owns and owes at the end. They are one system, joined by five links: net income, depreciation, capex, debt and closing cash. Each link is a formula, so Ctrl+[ follows it from the cell that reads it to the cell it reads. Walk all five on Domain’s page. The key is `Ctrl+[`.",
+   "closing": "Five links join three statements, and you followed each one with Ctrl+[. || Net income, depreciation, capex, debt and closing cash: every model you build or inherit joins its statements with these five. Best practice: when the check leaves zero, follow the links in this order with Ctrl+[ and the break shows itself.",
+   "wow": "Five links join three statements, and you followed each one with Ctrl+[.",
+   "convention_line": "Cash balances the sheet; nothing is forced; Go To Special, show formulas, trace",
+   "mac_note": "",
+   "story_beat": ""
+  },
   "remix-format-on-the-pnl": {
    "id": "remix-format-on-the-pnl",
    "module": "remixes",
@@ -11943,6 +11955,56 @@ export const COPY = {
     "teach": "",
     "why": "",
     "hint_stuck": "pulse cell C91 · Net income, cash and equity all move by the same story."
+   }
+  ],
+  "how-the-statements-link": [
+   {
+    "lesson_id": "how-the-statements-link",
+    "goal_index": "0",
+    "text": "Net income, both ways: land on C88 in equity and press Ctrl+[, then on C64 in the cash flow and press it again.",
+    "teach": "Link one: net income ends the income statement, starts the cash flow statement and grows equity on the balance sheet. Ctrl+[ jumps from a formula to the cells it reads, so from either end it lands on the same cell.",
+    "why": "",
+    "hint_stuck": "pulse cell C52 · Both formulas read C52, the bottom of the income statement."
+   },
+   {
+    "lesson_id": "how-the-statements-link",
+    "goal_index": "1",
+    "text": "Depreciation: jump down to the add-back in C65 and press Ctrl+[ to land on the charge in C47.",
+    "teach": "Link two: depreciation is a cost on the income statement, added back on the cash flow because no cash left for it, and taken off the tunnel on the balance sheet.",
+    "why": "",
+    "hint_stuck": "pulse cell C65 · Ctrl+↓ hops block to block; the add-back is the second line of the cash flow."
+   },
+   {
+    "lesson_id": "how-the-statements-link",
+    "goal_index": "2",
+    "text": "Capex: jump to PP&E in C81 and press Ctrl+[, which selects the build, the wear, depreciation in C47 and capex in C70.",
+    "teach": "Link three: capex leaves on the cash flow and lands in PP&E on the balance sheet. PP&E reads the build, the wear so far, this month’s depreciation and this month’s capex, so one Ctrl+[ selects all four.",
+    "why": "",
+    "hint_stuck": "pulse cell C81 · The balance sheet is the block after the cash flow; PP&E is its third line."
+   },
+   {
+    "lesson_id": "how-the-statements-link",
+    "goal_index": "3",
+    "text": "Debt: land on the loan in C85 and press Ctrl+[, which selects the opening loan and the repayment in C72.",
+    "teach": "Link four: a loan drawn or repaid moves cash on the cash flow and the balance on the balance sheet, by the same amount.",
+    "why": "",
+    "hint_stuck": "pulse cell C85 · The loan is the third liability."
+   },
+   {
+    "lesson_id": "how-the-statements-link",
+    "goal_index": "4",
+    "text": "Cash: Ctrl+End, climb to cash in C79 and press Ctrl+[ to land on closing cash in C76.",
+    "teach": "Link five: closing cash on the cash flow is the cash line on the balance sheet. That is why the balance check proves everything upstream: every other link has to be right for the two sides to agree.",
+    "why": "",
+    "hint_stuck": "pulse cell C79 · From the end of the page, Ctrl+↑ climbs a block at a time."
+   },
+   {
+    "lesson_id": "how-the-statements-link",
+    "goal_index": "5",
+    "text": "Does it tie? Watch the cost per wash in C8 go to $2: the five links carry it to the balance sheet, and the check stays at zero.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C91 · Net income falls, so equity and cash fall by the same story."
    }
   ]
  },
