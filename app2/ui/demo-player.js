@@ -29,14 +29,14 @@ const NUM_HEADERS = ['C4', 'D4', 'E4', 'F4', 'G4', 'H4', 'I4'];
 
 /** The demo lesson: four goals on the weekly Report (1.5.3's page before its alignment pass), each one real, each graded on the sheet's end state. */
 export const DEMO_LESSON = {
-  id: 'demo', kind: 'lesson', chapter: 'foundations', section: 'Format', title: 'Alignment and titles', difficulty: 'easy', tags: [], access: 'free',
+  id: 'demo', kind: 'lesson', chapter: 'foundations', section: 'Format', title: siteCopy('demo_title', 'Alignment and titles'), difficulty: 'easy', tags: [], access: 'free',
   workbook: 'clearcoat-weekly', state: { before: 'S5b', after: 'S5b' }, minutes: 1,
-  brief: 'The Report’s figures are in. Make the units line a note, right-align the headers over the figures and turn the gridlines off.',
+  brief: siteCopy('demo_brief', 'The Report’s figures are in. Make the units line a note, right-align the headers over the figures and turn the gridlines off.'),
   goals: [
-    { id: 'units', teach: 'Ctrl+I sets italic, so a note reads as a note.', text: 'Make the units line italic, A2.', keys: '↓ Ctrl+I', requires: ['bold-italic-underline'], check: s => !!s.cellAt('A2').it },
-    { id: 'headers', teach: 'Ctrl+Shift+→ selects to the edge in one press.', text: 'Select the headers over the figures, C4:I4.', keys: '↓ ×2 → ×2 Ctrl+Shift+→', requires: ['ctrl-shift-arrow'], check: s => s.selectionText() === 'C4:I4' },
-    { id: 'right', teach: 'Alt walks the Ribbon: H for Home, A for Align, R for Right.', text: 'Right-align the headers, C4:I4.', keys: 'Alt H A R', requires: ['align-command'], check: s => NUM_HEADERS.every(ref => s.cellAt(ref).align === 'r') },
-    { id: 'grid', teach: 'Alt walks the Ribbon: W for View, V then G for Gridlines.', text: 'Turn the gridlines off.', keys: 'Alt W V G', requires: ['gridlines'], check: s => s.gridlines === false },
+    { id: 'units', teach: siteCopy('demo_teach_1', 'Ctrl+I sets italic, so a note reads as a note.'), text: siteCopy('demo_goal_1', 'Make the units line italic, A2.'), keys: '↓ Ctrl+I', requires: ['bold-italic-underline'], check: s => !!s.cellAt('A2').it },
+    { id: 'headers', teach: siteCopy('demo_teach_2', 'Ctrl+Shift+→ selects to the edge in one press.'), text: siteCopy('demo_goal_2', 'Select the headers over the figures, C4:I4.'), keys: '↓ ×2 → ×2 Ctrl+Shift+→', requires: ['ctrl-shift-arrow'], check: s => s.selectionText() === 'C4:I4' },
+    { id: 'right', teach: siteCopy('demo_teach_3', 'Alt walks the Ribbon: H for Home, A for Align, R for Right.'), text: siteCopy('demo_goal_3', 'Right-align the headers, C4:I4.'), keys: 'Alt H A R', requires: ['align-command'], check: s => NUM_HEADERS.every(ref => s.cellAt(ref).align === 'r') },
+    { id: 'grid', teach: siteCopy('demo_teach_4', 'Alt walks the Ribbon: W for View, V then G for Gridlines.'), text: siteCopy('demo_goal_4', 'Turn the gridlines off.'), keys: 'Alt W V G', requires: ['gridlines'], check: s => s.gridlines === false },
   ],
   solution: 'Down Ctrl+I Down Down Right Right Ctrl+Shift+Right Alt H A R Alt W V G',
 };

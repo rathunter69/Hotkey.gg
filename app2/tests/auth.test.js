@@ -60,7 +60,7 @@ test('auth in Node (no window): unavailable and harmless', async () => {
   assert.equal(auth.user(), null);
   assert.equal(auth.current(auth.token()), true);
   const r = await auth.signInPassword('a@b.co', 'pw');
-  assert.equal(r.error, 'Sign-in is not configured');
+  assert.equal(r.error, 'Sign-in is not configured.');
 });
 
 test('validateHandle mirrors the server rules', () => {

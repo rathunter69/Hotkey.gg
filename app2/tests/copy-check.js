@@ -18,6 +18,8 @@
 //   R13 a lesson goal's stuck cue reads "pulse <target> · <one subtle line>" (M27)
 //   R14 no tells in anything a learner reads (M94; content/copy/tells.js): a dash as punctuation, an emoji or
 //       icon symbol, facts joined by middle dots or pipes, a word in capitals off the whitelist
+//   R15 every keyed drill has a drills.csv row and a drill_goals.csv row for each goal, end-state and what-if
+//       line (R8, M1): a drill's words live in the sheets, the drill file keeps only the fallback
 // Rows written before the screenplay (content/copy/legacy.js) report R3, R13 and R14 as warnings until
 // run R1 rewrites them.
 import { resolve } from 'node:path';
@@ -27,6 +29,8 @@ import { LESSONS } from '../content/index.js';
 import { WORKBOOKS } from '../content/workbooks/index.js';
 import { RIBBON_WORDS, SITE_KEYS } from '../content/copy/rules.js';
 import { MICRO } from '../app/schedule.js';
+import { DRILLS } from '../content/drills.js';
+import { drillLines } from '../content/copy/apply.js';
 import { tells } from '../content/copy/tells.js';
 import { LEGACY_LESSONS, LEGACY_MODULES, LEGACY_SITE, LEGACY_MICRO } from '../content/copy/legacy.js';
 
@@ -63,7 +67,7 @@ export function namesVisibleThing(text) {
 }
 
 /** Every finding: { level: 'error' | 'warn', rule, where, text }. Pure over the copy and the catalog. */
-export function checkCopy(copy, lessons = LESSONS) {
+export function checkCopy(copy, lessons = LESSONS, drills = DRILLS) {
   const out = [];
   const err = (rule, where, text) => out.push({ level: 'error', rule, where, text });
   const warn = (rule, where, text) => out.push({ level: 'warn', rule, where, text });
@@ -126,6 +130,21 @@ export function checkCopy(copy, lessons = LESSONS) {
   for (const k of SITE_KEYS) if (!(k in copy.site)) warn('R11', `site.csv ${k}`, 'missing key (the screen falls back to its built-in line)');
   for (const id in copy.micro || {}) { const m = copy.micro[id]; textFields(`micro.csv ${id}`, [['prompt', m.prompt], ['teach', m.teach]]); tellFields(`micro.csv ${id}`, [['prompt', m.prompt], ['teach', m.teach]], LEGACY_MICRO.has(id)); if (m.teach && sentenceCount(m.teach) > 3) err('R10', `micro.csv ${id}`, `teach is up to three sentences: "${m.teach}"`); }
   if (copy.micro) for (const id in MICRO) if (!copy.micro[id]) warn('R12', `micro.csv ${id}`, 'missing row (the drill keeps its JS prompt)');
+  // drills (R8, M1)
+  if (copy.drills) {
+    for (const d of drills) {
+      if (d.kind === 'challenge') continue;   // a challenge is a lesson: lessons.csv carries it
+      const row = copy.drills[d.id];
+      if (!row || !row.title || !row.task) { err('R15', `drills.csv ${d.id}`, 'missing row or an empty title or task: run node app2/tests/copy-export.js'); continue; }
+      const rows = (copy.drillGoals && copy.drillGoals[d.id]) || [];
+      for (const line of drillLines(d)) if (!rows.some(r => r.kind === line.kind && Number(r.index) === line.index && r.text)) err('R15', `drill_goals.csv ${d.id} ${line.kind} ${line.index}`, 'missing row: run node app2/tests/copy-export.js');
+    }
+    for (const id in copy.drills) { const r = copy.drills[id]; const f = [['title', r.title], ['task', r.task]]; textFields(`drills.csv ${id}`, f); tellFields(`drills.csv ${id}`, f, false); }
+    for (const id in copy.drillGoals || {}) for (const g of copy.drillGoals[id]) {
+      const where = `drill_goals.csv ${id} ${g.kind} ${g.index}`;
+      textFields(where, [['text', g.text]]); tellFields(where, [['text', g.text]], false);
+    }
+  }
   return out;
 }
 

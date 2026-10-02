@@ -26,8 +26,8 @@ const t = (key, fb) => siteCopy(key, fb);
 /** The headline and its two alternates (?h=2 and ?h=3 still show them; screenplay 3.1). */
 export const HEADLINES = [
   () => t('landing_headline', 'The better way to master Excel'),
-  () => 'Excel isn’t learned. It’s practiced.',
-  () => 'The better way to learn Excel',
+  () => t('landing_headline_2', 'Excel isn’t learned. It’s practiced.'),
+  () => t('landing_headline_3', 'The better way to learn Excel'),
 ];
 export const SUBHEAD = () => t('landing_subhead', 'Learn like an analyst at a top firm, and build the muscle memory to make it stick.');
 

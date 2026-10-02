@@ -75,6 +75,7 @@ import ch6_cap_the_amort from './drills/ch6-cap-the-amort.js';
 import ch6_lenders_return from './drills/ch6-lenders-return.js';
 import ch6_ceiling_price from './drills/ch6-ceiling-price.js';
 import { LESSONS } from './index.js';
+import { applyDrillCopy } from './copy/apply.js';
 
 /**
  * Chapter 1's eleven drills (screenplay 6.1, resized 2026-10-01; M108), in the order the chapter
@@ -162,6 +163,9 @@ export const DRILLS = [
   ch6_ceiling_price,
   puzzle_ch6,
 ];
+// The words come from the copy sheets (drills.csv, drill_goals.csv; R8, M1): the drill files keep
+// the mechanics, and their lines are only the fallback
+for (const d of DRILLS) applyDrillCopy(d);
 
 /**
  * The module challenges (C2 Run 4) registered as drills: each entry is a thin catalogue record

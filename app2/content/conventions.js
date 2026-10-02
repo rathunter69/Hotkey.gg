@@ -2,8 +2,10 @@
 // docs/screenplay/screenplay.md section 7 with its name and the short line the goal chip
 // shows. Lessons carry `conventions: ['B1', …]`; graders and chips read this table. The full
 // sources, recurrence counts and taught/enforced mapping live in the canon document.
+import { siteCopy } from './copy/apply.js';
 
-export const CONVENTIONS = {
+/** The canon's built-in lines: the fallbacks for site.csv conv_<id>_name and conv_<id>_short (M1). */
+const CANON = {
   // A. Set-up and workspace
   A1: { name: 'Set Excel up before you model', short: 'Set up once: calc mode, iteration, defaults' },
   A2: { name: 'The QAT holds your formatting commands', short: 'Alt+number beats a long Alt chord' },
@@ -19,7 +21,7 @@ export const CONVENTIONS = {
   B5: { name: 'Actuals and estimates look different', short: 'Mark the A/E divider' },
   B6: { name: 'Document every hardcode', short: 'Label the source ("per utility contract")' },
   // C. Layout and flow
-  C1: { name: 'Inputs → calculations → outputs', short: 'Inputs, calcs, outputs — in that order' },
+  C1: { name: 'Inputs → calculations → outputs', short: 'Inputs, calcs, outputs, in that order' },
   C2: { name: 'One timeline row, equal period columns', short: 'Timeline on top, equal widths' },
   C3: { name: 'One formula per row, filled right', short: 'Write once, fill right' },
   C4: { name: 'One sign convention, stated', short: 'Income positive, costs negative' },
@@ -59,5 +61,11 @@ export const CONVENTIONS = {
   G2: { name: 'A page reads like an MD reads', short: 'Title, units, timeline, then the answer' },
   G3: { name: 'Consistent labels and footnotes', short: 'Attention to detail is judged first' },
 };
+
+/** The words come from the sheet (site.csv conv_<id>_name, conv_<id>_short); the lines above are fallbacks. */
+export const CONVENTIONS = Object.fromEntries(Object.entries(CANON).map(([id, c]) => [id, Object.defineProperties({}, {
+  name: { enumerable: true, get() { return siteCopy('conv_' + id + '_name', c.name); } },
+  short: { enumerable: true, get() { return siteCopy('conv_' + id + '_short', c.short); } },
+})]));
 
 export const CONVENTION_IDS = Object.keys(CONVENTIONS);

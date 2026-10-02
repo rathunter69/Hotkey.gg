@@ -11,6 +11,7 @@
 // same page functions from different data.
 import { buildPage, formatOf } from './page.js';
 import * as M from './clearcoat-model.js';
+import { unclip } from './unclip.js';
 
 export const CHAPTER = 6;
 export const COMPANY = M.COMPANY;
@@ -900,7 +901,7 @@ export const STANDARD = {
 export function stateOf(id) {
   const s = STATES[id];
   if (!s) throw new Error('unknown workbook state ' + id);
-  return clone(s);
+  return unclip('clearcoat-valuation', clone(s));   // the fit: no label clipped, no #### (content/workbooks/fit.js)
 }
 
 /** The paper LBO solved (6.3.C's answer key): the whole page on its given inputs, as a one-sheet state. */
@@ -910,7 +911,10 @@ export function paperState() {
 }
 
 /* ---------------- the replay's state shape: the Chapter 5 model's pair, since the pack is that workbook grown ---------------- */
-export { diffStates, sessionToState } from './clearcoat-model.js';
+export { diffStates } from './clearcoat-model.js';
+import { modelSessionState as modelState } from './clearcoat-model.js';
+/** A live session in the authored-state shape, with the fit the next lesson opens it with. */
+export function sessionToState(ses) { return unclip('clearcoat-valuation', modelState(ses)); }
 
 /* ---------------- the module challenges and their seeds (one table, one dispatcher) ---------------- */
 

@@ -158,11 +158,12 @@ export function createRunPanel(host, opts = {}) {
   el.addEventListener('click', e => { const b = e.target.closest('[data-act]'); if (b && opts.onAct) opts.onAct(b.dataset.act); });
 
   /** Change the panel's contents in place: the old fades, the new lands (the beat moment). */
-  function swap(name, bodyHtml, btns, after) {
+  // `pinned` sits above the buttons and never scrolls away (lesson complete's XP and quest ticks, R8)
+  function swap(name, bodyHtml, btns, after, pinned = '') {
     const changed = beat !== name;
     beat = name; buttons = btns || [];
     el.dataset.beat = name; el.hidden = false;
-    const paint = () => { body.innerHTML = bodyHtml; foot.innerHTML = buttonsHtml(buttons, platform()); foot.hidden = !buttons.length; body.scrollTop = 0; el.classList.remove('rp-out'); if (after) after(); };
+    const paint = () => { body.innerHTML = bodyHtml; foot.innerHTML = (pinned ? `<div class="rp-pinned">${pinned}</div>` : '') + buttonsHtml(buttons, platform()); foot.hidden = !buttons.length && !pinned; body.scrollTop = 0; el.classList.remove('rp-out'); if (after) after(); };
     clearTimeout(swapH);
     if (changed && !el.hidden && body.innerHTML) { el.classList.add('rp-out'); swapH = setTimeout(paint, durationMs('--d-beat', 140)); } else paint();
   }
@@ -260,11 +261,12 @@ export function createRunPanel(host, opts = {}) {
       (d.marks || []).map(m => `<div class="rp-note">${esc(m)}</div>`).join('') +
       usedHtml(d.shortcuts) +
       (d.mouse ? `<div class="rp-note">${esc(d.mouse)}</div>` : '') +
-      xpHtml(d.xp, true) + levelUpHtml(d.levelUp, platform()) +
-      ((d.quests && d.quests.length) || (d.bonus && d.bonus.length) ? `<div class="rp-quests">${questRowsHtml(d.quests, d.bonus)}</div>` : '') +
       (d.lines || []).map(l => `<div class="rp-note rp-quiet">${esc(l)}</div>`).join('') +
       (d.extra || '');
-    swap('complete', html, d.buttons);
+    // the payoff stays in view over Next lesson, however long the paragraphs and the shortcuts run
+    const pinned = xpHtml(d.xp, true) + levelUpHtml(d.levelUp, platform()) +
+      ((d.quests && d.quests.length) || (d.bonus && d.bonus.length) ? `<div class="rp-quests">${questRowsHtml(d.quests, d.bonus)}</div>` : '');
+    swap('complete', html, d.buttons, null, pinned);
     el.classList.remove('rp-animate');
   }
   /** A module's story card: Wolf's line, then Enter starts the job. */

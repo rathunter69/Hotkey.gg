@@ -293,7 +293,11 @@ test('every grader line a learner reads is free of the tells (M94)', async () =>
   const { readFileSync } = await import('node:fs');
   const { tells } = await import('../content/copy/tells.js');
   const src = readFileSync(new URL('../app/graders.js', import.meta.url), 'utf8');
-  const lines = [...src.matchAll(/fail\(`([^`]*)`\)/g)].map(m => m[1].replace(/\$\{[^}]*\}/g, 'B5'));
-  assert.ok(lines.length > 20);
+  // the lines are site.csv rows grade_* (M1); the fallbacks in the code are checked too
+  const { COPY } = await import('../content/copy/index.js');
+  const fallbacks = [...src.matchAll(/say\('grade_\w+', '((?:\\'|[^'])*)'/g)].map(m => m[1].replace(/\\'/g, "'"));
+  const rows = Object.entries(COPY.site).filter(([k]) => k.startsWith('grade_')).map(([, v]) => v);
+  const lines = [...fallbacks, ...rows].map(l => l.replace(/\{\w+\}/g, 'B5'));
+  assert.ok(fallbacks.length > 20 && rows.length > 20);
   for (const l of lines) assert.deepEqual(tells(l), [], l);
 });

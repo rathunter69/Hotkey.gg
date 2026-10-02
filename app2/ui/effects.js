@@ -266,8 +266,8 @@ export function mountEffects(opts = {}) {
     for (const b of buttons) {
       b.setAttribute('aria-pressed', muted ? 'false' : 'true');
       b.classList.toggle('on', !muted);
-      b.title = muted ? 'Sound is off — click to turn it on' : 'Sound is on — click to mute';
-      b.innerHTML = (muted ? ICO_OFF : ICO_ON) + '<span class="fx-mute-lbl">' + (muted ? 'Sound off' : 'Sound on') + '</span>';
+      b.title = muted ? siteCopy('fx_sound_off_title', 'Sound is off. Click to turn it on.') : siteCopy('fx_sound_on_title', 'Sound is on. Click to mute.');
+      b.innerHTML = (muted ? ICO_OFF : ICO_ON) + '<span class="fx-mute-lbl">' + (muted ? siteCopy('fx_sound_off', 'Sound off') : siteCopy('fx_sound_on', 'Sound on')) + '</span>';
     }
   }
   function setMuted(v) { muted = !!v; writeMuted(muted); paintButtons(); return muted; }

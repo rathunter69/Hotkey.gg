@@ -17,12 +17,12 @@ const fixed = ses => { const bs = sheetIn(ses, 'BS'); return C.every(c => reads(
 export default modelDrill({
   id: 'ch5-balance-it',
   title: 'Balance it',
-  task: 'The balance sheet is out from FY27: find the first year the check fails, then fix the break at its source with no plug.',
+  task: 'The balance sheet is out from FY27: find the earliest year the check fails, then fix the break at its source with no plug.',
   module: 'linking-the-statements',
   state: { before: 'DONE' },
   plant: () => planting({ set: BROKEN }),
   goals: [
-    { id: 'find', text: 'Find the first year the balance check on Checks row 6 is not 0, and land on that cell.', keys: 'Ctrl+G "Checks!F6" ↵',
+    { id: 'find', text: 'Find the earliest year the balance check on Checks row 6 is not 0, and land on that cell.', keys: 'Ctrl+G "Checks!F6" ↵',
       check: (s, ses) => ses.sheets[ses.sheetIndex].name === 'Checks' && s.active.r === 6 && s.active.c === 6 },
     { id: 'fix', text: 'Fix total liabilities on BS C18:J18 so it adds every liability, the delayed-draw loan in row 16 included.', keys: 'Ctrl+G "BS!C18:J18" ↵ "=SUM(C13:C17)" Ctrl+↵',
       check: (s, ses) => settled(ses) && fixed(ses) },

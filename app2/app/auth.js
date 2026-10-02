@@ -16,6 +16,7 @@
 // Importable in Node (no DOM/localStorage at top level): the tests drive bumpOwner/signOutWipe.
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js';
 import { prefs } from './prefs.js';
+import { siteCopy } from '../content/copy/apply.js';
 
 let client = null;
 let owner = '';           // the signed-in user id, '' for guest
@@ -141,12 +142,12 @@ export const auth = {
   },
 
   async signInPassword(email, password) {
-    if (!client) return { error: 'Sign-in is not configured' };
+    if (!client) return { error: siteCopy('acct_unavailable', 'Sign-in is not configured.') };
     const { error } = await client.auth.signInWithPassword({ email, password });
     return { error: error ? error.message : null };
   },
   async signUpPassword(email, password) {
-    if (!client) return { error: 'Sign-in is not configured' };
+    if (!client) return { error: siteCopy('acct_unavailable', 'Sign-in is not configured.') };
     const { data, error } = await client.auth.signUp({ email, password });
     if (error) return { error: error.message };
     // Supabase with email confirmation on: a user but no session until the link is clicked
@@ -154,7 +155,7 @@ export const auth = {
     return {};
   },
   async magicLink(email) {
-    if (!client) return { error: 'Sign-in is not configured' };
+    if (!client) return { error: siteCopy('acct_unavailable', 'Sign-in is not configured.') };
     const { error } = await client.auth.signInWithOtp({ email, options: { emailRedirectTo: redirectTo() } });
     return error ? { error: error.message } : { confirm: true };
   },
@@ -164,17 +165,17 @@ export const auth = {
    * template to carry {{ .Token }}.
    */
   async sendCode(email) {
-    if (!client) return { error: 'Sign-in is not configured' };
+    if (!client) return { error: siteCopy('acct_unavailable', 'Sign-in is not configured.') };
     const { error } = await client.auth.signInWithOtp({ email, options: { shouldCreateUser: true } });
     return error ? { error: error.message } : {};
   },
   async verifyCode(email, code) {
-    if (!client) return { error: 'Sign-in is not configured' };
+    if (!client) return { error: siteCopy('acct_unavailable', 'Sign-in is not configured.') };
     const { error } = await client.auth.verifyOtp({ email, token: String(code || '').trim(), type: 'email' });
     return { error: error ? error.message : null };
   },
   async google() {
-    if (!client) return { error: 'Sign-in is not configured' };
+    if (!client) return { error: siteCopy('acct_unavailable', 'Sign-in is not configured.') };
     const { error } = await client.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: redirectTo() } });
     return { error: error ? error.message : null };
   },

@@ -11,6 +11,10 @@ import { parseRef, refKey, colLetter } from '../engine/refs.js';
 import { dispText } from '../engine/format.js';
 import { codeDecimals, builtinCode } from '../engine/numfmt.js';
 import { FSZ_BASE } from '../engine/sheet.js';
+import { siteCopy } from '../content/copy/apply.js';
+
+/** A correction line (M1): the site.csv row grade_*, its {placeholders} filled; the fallback is the built-in line. */
+const say = (key, fallback, vars) => siteCopy(key, fallback).replace(/\{(\w+)\}/g, (m, k) => (vars && vars[k] != null ? String(vars[k]) : m));
 
 const ok = () => ({ ok: true, why: '' });
 const fail = why => ({ ok: false, why });
@@ -47,11 +51,11 @@ export function roleColour(sheet, range) {
     const cell = sheet.cells[ref];
     if (isBlank(cell)) continue;
     const colour = cell.fontColor || null;
-    if (isNumCell(cell) && colour !== 'blue') return fail(`${cellName(ref)} is an input shown ${colour || 'black'}. Inputs are blue`);
+    if (isNumCell(cell) && colour !== 'blue') return fail(say('grade_an_input_shown', '{cell} is an input shown {color}. Inputs are blue', { cell: cellName(ref), color: colour || 'black' }));
     if (isFormulaCell(cell)) {
-      if (colour === 'blue') return fail(`${cellName(ref)} is a formula shown in blue`);
-      if (colour === 'green' && !readsAnotherSheet(cell)) return fail(`${cellName(ref)} is green but reads nothing on another sheet`);
-      if (colour && colour !== 'green' && colour !== 'black') return fail(`${cellName(ref)} is a formula shown in ${colour}`);
+      if (colour === 'blue') return fail(say('grade_formula_shown_blue', '{cell} is a formula shown in blue', { cell: cellName(ref) }));
+      if (colour === 'green' && !readsAnotherSheet(cell)) return fail(say('grade_green_but_reads', '{cell} is green but reads nothing on another sheet', { cell: cellName(ref) }));
+      if (colour && colour !== 'green' && colour !== 'black') return fail(say('grade_formula_shown', '{cell} is a formula shown in {color}', { cell: cellName(ref), color: colour }));
     }
   }
   return ok();
@@ -66,7 +70,7 @@ export function noLiteralInFormula(sheet, ref) {
   try { toks = tokenize(cell.formula.replace(/^\s*=/, '')); } catch (e) { return ok(); }
   for (const t of toks) {
     if (t.t === 'num' && !t.abs && !LITERAL_ALLOWED.has(Math.abs(t.v)))
-      return fail(`${cellName(ref)} has ${t.v} typed inside the formula. Inputs live in their own cell`);
+      return fail(say('grade_has_typed_inside', '{cell} has {number} typed inside the formula. Inputs live in their own cell', { cell: cellName(ref), number: t.v }));
   }
   return ok();
 }
@@ -85,7 +89,7 @@ export function rowConsistent(sheet, range) {
       const cell = sheet.cells[ref];
       const want = translateFormula(base.formula, 0, c - c1);
       if (!isFormulaCell(cell) || cell.formula.replace(/\s+/g, '') !== want.replace(/\s+/g, ''))
-        return fail(`${cellName(ref)} breaks its row's formula. One formula per row, filled right`);
+        return fail(say('grade_breaks_row_s', '{cell} breaks its row\'s formula. One formula per row, filled right', { cell: cellName(ref) }));
     }
   }
   return ok();
@@ -108,7 +112,7 @@ export function negativesParen(sheet, range) {
     if (isPercentCell(cell)) continue;
     if (['comma', 'currency', 'acct'].includes(cell.fmtStyle)) continue;
     if (cell.fmtStyle === 'custom' && /\(/.test(shown(cell))) continue;
-    return fail(`${cellName(ref)} shows a minus. The house uses parentheses`);
+    return fail(say('grade_shows_minus_standard', '{cell} shows a minus. The standard uses parentheses', { cell: cellName(ref) }));
   }
   return ok();
 }
@@ -124,7 +128,7 @@ export function decimalsConsistent(sheet, range) {
     if (!cell || cell.fmtStyle === undefined || cell.fmtStyle === 'general' || cell.fmtStyle == null) continue;
     const d = cellDecimals(cell);
     if (want === null) { want = d; first = ref; continue; }
-    if (d !== want) return fail(`${cellName(ref)} shows ${d} decimals against ${want} at ${first}. Decimals are consistent down a line`);
+    if (d !== want) return fail(say('grade_shows_decimals_against', '{cell} shows {decimals} decimals against {want} at {first}. Decimals are consistent down a line', { cell: cellName(ref), decimals: d, want: want, first: first }));
   }
   return ok();
 }
@@ -135,7 +139,7 @@ export function zeroAsDash(sheet, range) {
     const cell = sheet.cells[ref];
     if (!cell || typeof cell.value !== 'number' || cell.value !== 0) continue;
     const txt = shown(cell);
-    if (/\d/.test(txt)) return fail(`${cellName(ref)} shows a zero as ${txt.trim()}. Zero is a dash`);
+    if (/\d/.test(txt)) return fail(say('grade_shows_zero_zero', '{cell} shows a zero as {shown}. Zero is a dash', { cell: cellName(ref), shown: txt.trim() }));
   }
   return ok();
 }
@@ -150,8 +154,8 @@ export function dollarRows(sheet, range, rows) {
     const cell = sheet.cells[ref];
     if (!cell || typeof cell.value !== 'number' || cell.value === 0) continue;
     const has = /\$/.test(shown(cell));
-    if (has && !want.has(r)) return fail(`${cellName(ref)} carries a $. The currency sign sits on the first and total rows only`);
-    if (!has && want.has(r) && !isPercentCell(cell)) return fail(`${cellName(ref)} has no $. The first and total rows carry the currency sign`);
+    if (has && !want.has(r)) return fail(say('grade_carries_currency_sign', '{cell} carries a $. The currency sign sits on the first and total rows only', { cell: cellName(ref) }));
+    if (!has && want.has(r) && !isPercentCell(cell)) return fail(say('grade_has_no_first', '{cell} has no $. The first and total rows carry the currency sign', { cell: cellName(ref) }));
   }
   return ok();
 }
@@ -161,7 +165,7 @@ export function costsNegative(sheet, range) {
   for (const [, , ref] of eachRef(range)) {
     const cell = sheet.cells[ref];
     if (!cell || typeof cell.value !== 'number') continue;
-    if (cell.value > 0) return fail(`${cellName(ref)} shows a cost as a positive. Costs are negative, stated once up top`);
+    if (cell.value > 0) return fail(say('grade_shows_cost_positive', '{cell} shows a cost as a positive. Costs are negative, stated once up top', { cell: cellName(ref) }));
   }
   return ok();
 }
@@ -172,12 +176,12 @@ export function signStated(sheet) {
     const cell = sheet.cells[refKey(r, c)];
     if (cell && typeof cell.value === 'string' && /negative/i.test(cell.value)) return ok();
   }
-  return fail('the sign convention is not stated — say once in the top rows that costs are shown as negatives');
+  return fail(say('grade_sign_convention_stated', 'the sign convention is not stated. Say once in the top rows that costs are shown as negatives'));
 }
 
 /** A3: gridlines off on a page someone else will read; borders carry structure instead. */
 export function gridlinesOff(sheet) {
-  return sheet.gridlines === false ? ok() : fail('gridlines are on — a page someone else reads has them off');
+  return sheet.gridlines === false ? ok() : fail(say('grade_gridlines_page_someone', 'gridlines are on. A page someone else reads has them off'));
 }
 
 /** D5: nothing in the range carries a grid border; a total's top border (or a double bottom) is the only border a block gets. */
@@ -185,7 +189,7 @@ export function noGrid(sheet, range) {
   for (const [, , ref] of eachRef(range)) {
     const cell = sheet.cells[ref];
     if (!cell) continue;
-    if (cell.ball || cell.bb || cell.bl || cell.br) return fail(`${cellName(ref)} carries a grid border. A total gets a top border, the block gets none`);
+    if (cell.ball || cell.bb || cell.bl || cell.br) return fail(say('grade_carries_grid_border', '{cell} carries a grid border. A total gets a top border, the block gets none', { cell: cellName(ref) }));
   }
   return ok();
 }
@@ -193,9 +197,9 @@ export function noGrid(sheet, range) {
 /** D7: the title is centred across `span` columns (Center Across Selection), not padded with spaces. */
 export function titleAcross(sheet, ref, span) {
   const cell = sheet.cells[ref];
-  if (!cell || (cell.value == null && cell.formula == null)) return fail(`${cellName(ref)} has no title`);
-  if (typeof cell.value === 'string' && cell.value !== cell.value.trim()) return fail(`${cellName(ref)} is padded with spaces. Center Across Selection, never a merge`);
-  if ((cell.ca | 0) !== span) return fail(`${cellName(ref)} is not centered across ${span} columns. Center Across Selection, never a merge`);
+  if (!cell || (cell.value == null && cell.formula == null)) return fail(say('grade_has_no_title', '{cell} has no title', { cell: cellName(ref) }));
+  if (typeof cell.value === 'string' && cell.value !== cell.value.trim()) return fail(say('grade_padded_spaces_center', '{cell} is padded with spaces. Center Across Selection, never a merge', { cell: cellName(ref) }));
+  if ((cell.ca | 0) !== span) return fail(say('grade_centered_across_columns', '{cell} is not centered across {span} columns. Center Across Selection, never a merge', { cell: cellName(ref), span: span }));
   return ok();
 }
 
@@ -204,8 +208,8 @@ export function headersRight(sheet, range) {
   for (const [, , ref] of eachRef(range)) {
     const cell = sheet.cells[ref];
     if (isBlank(cell)) continue;
-    if (typeof cell.value === 'string' && cell.align !== 'r') return fail(`${cellName(ref)} is a header over numbers that is not right-aligned`);
-    if (typeof cell.value === 'number' && cell.align && cell.align !== 'r') return fail(`${cellName(ref)} is a header over numbers that is not right-aligned`);
+    if (typeof cell.value === 'string' && cell.align !== 'r') return fail(say('grade_header_over_numbers', '{cell} is a header over numbers that is not right-aligned', { cell: cellName(ref) }));
+    if (typeof cell.value === 'number' && cell.align && cell.align !== 'r') return fail(say('grade_header_over_numbers', '{cell} is a header over numbers that is not right-aligned', { cell: cellName(ref) }));
   }
   return ok();
 }
@@ -215,7 +219,7 @@ export function italicLines(sheet, range) {
   for (const [, , ref] of eachRef(range)) {
     const cell = sheet.cells[ref];
     if (isBlank(cell)) continue;
-    if (!cell.it) return fail(`${cellName(ref)} is a percentage line that is not italic`);
+    if (!cell.it) return fail(say('grade_percentage_line_italic', '{cell} is a percentage line that is not italic', { cell: cellName(ref) }));
   }
   return ok();
 }
@@ -225,7 +229,7 @@ export function indented(sheet, range, level = 1) {
   for (const [, , ref] of eachRef(range)) {
     const cell = sheet.cells[ref];
     if (isBlank(cell)) continue;
-    if ((cell.indent | 0) < level) return fail(`${cellName(ref)} is a sub-item that is not indented`);
+    if ((cell.indent | 0) < level) return fail(say('grade_sub_item_indented', '{cell} is a sub-item that is not indented', { cell: cellName(ref) }));
   }
   return ok();
 }
@@ -239,9 +243,9 @@ export function oneFontSize(sheet, range, title = null) {
     if (isBlank(cell)) continue;
     if (ref === title) { titleCell = cell; continue; }
     if (want === null) { want = size(cell); first = ref; continue; }
-    if (size(cell) !== want) return fail(`${cellName(ref)} is a different font size from ${first}. One size across the page`);
+    if (size(cell) !== want) return fail(say('grade_different_font_size', '{cell} is a different font size from {first}. One size across the page', { cell: cellName(ref), first: first }));
   }
-  if (titleCell && want !== null && size(titleCell) < want) return fail(`${cellName(title)} is a title smaller than the page. One size across, the title may be larger`);
+  if (titleCell && want !== null && size(titleCell) < want) return fail(say('grade_title_smaller_than', '{cell} is a title smaller than the page. One size across, the title may be larger', { cell: cellName(title) }));
   return ok();
 }
 
@@ -269,7 +273,7 @@ export function oneFontSize(sheet, range, title = null) {
  *   check       a check cell ref (checkCell)
  */
 export function fullCanon(sheet, spec = {}) {
-  if (!sheet) return fail('the sheet is missing');
+  if (!sheet) return fail(say('grade_sheet_missing', 'the sheet is missing'));
   const list = v => v == null ? [] : Array.isArray(v) ? v : [v];
   const run = r => { if (!r.ok) throw r; };
   try {
@@ -322,7 +326,7 @@ function linesOf(range, lines = 'rows') {
 export function totalsTopBorder(sheet, refs) {
   for (const ref of Array.isArray(refs) ? refs : [refs]) {
     const cell = sheet.cells[ref];
-    if (!cell || (!cell.bt && !cell.bdbl)) return fail(`${cellName(ref)} is a total without a top border`);
+    if (!cell || (!cell.bt && !cell.bdbl)) return fail(say('grade_total_without_top', '{cell} is a total without a top border', { cell: cellName(ref) }));
   }
   return ok();
 }
@@ -333,31 +337,31 @@ export function unitsLabel(sheet) {
     const cell = sheet.cells[refKey(r, c)];
     if (cell && typeof cell.value === 'string' && /USD|\$|000s|thousands/i.test(cell.value)) return ok();
   }
-  return fail('no units line — state the currency once in the top rows ("USD unless stated")');
+  return fail(say('grade_no_units_line', 'no units line. State the currency once in the top rows ("USD unless stated")'));
 }
 
 /** F1: a live check cell that evaluates to 0 (or TRUE) — two things that must agree, agreeing. */
 export function checkCell(sheet, ref) {
   const cell = sheet.cells[ref];
-  if (!isFormulaCell(cell)) return fail(`${cellName(ref)} is not a formula. A check is a live difference, not a typed 0`);
-  if (!isLiveFormula(sheet, ref)) return fail(`${cellName(ref)} does not move with its inputs`);
+  if (!isFormulaCell(cell)) return fail(say('grade_formula_check_live', '{cell} is not a formula. A check is a live difference, not a typed 0', { cell: cellName(ref) }));
+  if (!isLiveFormula(sheet, ref)) return fail(say('grade_does_move_inputs', '{cell} does not move with its inputs', { cell: cellName(ref) }));
   const v = cell.value;
   if (v === true || (typeof v === 'number' && Math.abs(v) < 1e-6)) return ok();
-  return fail(`${cellName(ref)} reads ${v}. The check does not tie`);
+  return fail(say('grade_reads_check_does', '{cell} reads {value}. The check does not tie', { cell: cellName(ref), value: v }));
 }
 
 /** C7: nothing hidden on the sheet (grouped outlines are allowed; hiding is how columns get lost). */
 export function noHidden(sheet) {
-  if (sheet.hiddenCols && sheet.hiddenCols.size) return fail(`column ${colLetter([...sheet.hiddenCols][0])} is hidden. Group it instead`);
-  if (sheet.hiddenRows && sheet.hiddenRows.size) return fail(`row ${[...sheet.hiddenRows][0]} is hidden. Group it instead`);
+  if (sheet.hiddenCols && sheet.hiddenCols.size) return fail(say('grade_column_hidden_group', 'column {col} is hidden. Group it instead', { col: colLetter([...sheet.hiddenCols][0]) }));
+  if (sheet.hiddenRows && sheet.hiddenRows.size) return fail(say('grade_row_hidden_group', 'row {row} is hidden. Group it instead', { row: [...sheet.hiddenRows][0] }));
   return ok();
 }
 
 /** The liveness rule as a grader: perturb an input, the result must move (never a regex). */
 export function liveness(sheet, ref) {
   const cell = sheet.cells[ref];
-  if (!isFormulaCell(cell)) return fail(`${cellName(ref)} is a typed number where a live formula belongs`);
-  if (!isLiveFormula(sheet, ref)) return fail(`${cellName(ref)} does not move with its inputs`);
+  if (!isFormulaCell(cell)) return fail(say('grade_typed_number_where', '{cell} is a typed number where a live formula belongs', { cell: cellName(ref) }));
+  if (!isLiveFormula(sheet, ref)) return fail(say('grade_does_move_inputs', '{cell} does not move with its inputs', { cell: cellName(ref) }));
   return ok();
 }
 
@@ -403,7 +407,7 @@ export function unchangedExcept(sheet, before, allowed = []) {
   const refs = new Set([...Object.keys(before || {}), ...Object.keys(sheet.cells || {})]);
   for (const ref of refs) {
     if (allow.has(ref)) continue;
-    if (norm(before[ref]) !== norm(sheet.cells[ref])) return fail(`${cellName(ref)} changed. Fix the faults and nothing else`);
+    if (norm(before[ref]) !== norm(sheet.cells[ref])) return fail(say('grade_changed_fix_faults', '{cell} changed. Fix the faults and nothing else', { cell: cellName(ref) }));
   }
   return ok();
 }
@@ -428,19 +432,19 @@ export function sheetStandard(sheet, { chapter = 1, read = true } = {}) {
     if (p.r > lastRow) lastRow = p.r; if (p.c > lastCol) lastCol = p.c;
   }
   const title = sheet.cells.A1, units = sheet.cells.A2;
-  if (!title || typeof title.value !== 'string' || !title.value.trim()) out.push('A1 has no title');
-  else if (!title.bold) out.push('A1 is a title that is not bold');
-  if (!units || typeof units.value !== 'string' || !units.value.trim()) out.push('A2 has no units line');
-  else if (!units.it) out.push('A2 is the units line and is not italic');
-  for (let c = 1; c <= lastCol; c++) if (!isBlank(cellAt(3, c))) { out.push(`${refKey(3, c)} is filled, row 3 is the spacer`); break; }
+  if (!title || typeof title.value !== 'string' || !title.value.trim()) out.push(say('grade_has_no_title_2', 'A1 has no title'));
+  else if (!title.bold) out.push(say('grade_title_bold', 'A1 is a title that is not bold'));
+  if (!units || typeof units.value !== 'string' || !units.value.trim()) out.push(say('grade_has_no_units', 'A2 has no units line'));
+  else if (!units.it) out.push(say('grade_units_line_italic', 'A2 is the units line and is not italic'));
+  for (let c = 1; c <= lastCol; c++) if (!isBlank(cellAt(3, c))) { out.push(say('grade_filled_row_spacer', '{cell} is filled, row 3 is the spacer', { cell: refKey(3, c) })); break; }
   let anyHeader = false;
   for (let c = 1; c <= lastCol; c++) {
     const h = cellAt(4, c);
     if (isBlank(h)) continue;
     anyHeader = true;
-    if (!h.bold) out.push(`${refKey(4, c)} is a header that is not bold`);
+    if (!h.bold) out.push(say('grade_header_bold', '{cell} is a header that is not bold', { cell: refKey(4, c) }));
   }
-  if (!anyHeader) out.push('row 4 has no headers');
+  if (!anyHeader) out.push(say('grade_row_has_no', 'row 4 has no headers'));
   // a header over a column of figures sits right; a header over a text column (a week label) may sit left
   let tableEnd = 5;   // the first table: row 5 down to the first empty row
   while (tableEnd <= lastRow) { let any = false; for (let c = 1; c <= lastCol && !any; c++) any = !isBlank(cellAt(tableEnd + 1, c)); if (!any) break; tableEnd++; }
@@ -452,11 +456,11 @@ export function sheetStandard(sheet, { chapter = 1, read = true } = {}) {
   if (labelCol === 2) for (let r = 5; r <= lastRow; r++) {
     const c = cellAt(r, 1);
     // A is the narrow helper column: a code or a helper beside a label in B is fine; text in A with nothing in B is a label in the wrong column
-    if (c && typeof c.value === 'string' && c.value.length > 3 && isBlank(cellAt(r, 2))) { out.push(`${refKey(r, 1)} holds a label, labels sit in column B from Chapter 2 on`); break; }
+    if (c && typeof c.value === 'string' && c.value.length > 3 && isBlank(cellAt(r, 2))) { out.push(say('grade_holds_label_labels', '{cell} holds a label, labels sit in column B from Chapter 2 on', { cell: refKey(r, 1) })); break; }
   }
   for (let r = 5; r <= lastRow; r++) {
     const l = cellAt(r, labelCol);
-    if (l && typeof l.value === 'string' && /^\s/.test(l.value)) out.push(`${refKey(r, labelCol)} is indented with spaces, use the indent button`);
+    if (l && typeof l.value === 'string' && /^\s/.test(l.value)) out.push(say('grade_indented_spaces_use', '{cell} is indented with spaces, use the indent button', { cell: refKey(r, labelCol) }));
   }
   if (lastRow >= 5 && lastCol >= figCol) {
     const block = `${refKey(5, figCol)}:${refKey(lastRow, lastCol)}`;
@@ -466,11 +470,11 @@ export function sheetStandard(sheet, { chapter = 1, read = true } = {}) {
       const cell = sheet.cells[ref];
       if (!cell || isBlank(cell)) continue;
       const num = typeof cell.value === 'number' || isFormulaCell(cell);
-      if (num && typeof cell.value !== 'string' && (!cell.fmtStyle || cell.fmtStyle === 'general')) { out.push(`${ref} is a figure with no number format`); break; }
+      if (num && typeof cell.value !== 'string' && (!cell.fmtStyle || cell.fmtStyle === 'general')) { out.push(say('grade_figure_no_number', '{cell} is a figure with no number format', { cell: ref })); break; }
     }
     for (const [, , ref] of eachRef(block)) {
       const cell = sheet.cells[ref];
-      if (cell && !isBlank(cell) && isPercentCell(cell) && !cell.it) { out.push(`${ref} is a percentage that is not italic`); break; }
+      if (cell && !isBlank(cell) && isPercentCell(cell) && !cell.it) { out.push(say('grade_percentage_italic', '{cell} is a percentage that is not italic', { cell: ref })); break; }
     }
   }
   // no grid: a total's top border and the final double bottom are the only lines a block gets, plus the one
@@ -479,10 +483,10 @@ export function sheetStandard(sheet, { chapter = 1, read = true } = {}) {
     const dividerCols = new Set();
     for (const k in sheet.cells) {
       const cell = sheet.cells[k]; if (!cell) continue;
-      if (cell.ball || cell.bb || cell.bl) { out.push(`${k} carries a grid border. A total gets a top border, the block gets none`); break; }
+      if (cell.ball || cell.bb || cell.bl) { out.push(say('grade_carries_grid_border', '{cell} carries a grid border. A total gets a top border, the block gets none', { cell: k })); break; }
       if (cell.br) dividerCols.add(parseRef(k).c);
     }
-    if (dividerCols.size > 1) out.push(`${colLetter([...dividerCols][1])} carries a vertical border. The A/E divider is the one vertical line a page allows`);
+    if (dividerCols.size > 1) out.push(say('grade_carries_vertical_border', '{col} carries a vertical border. The A/E divider is the one vertical line a page allows', { col: colLetter([...dividerCols][1]) }));
   }
   add(oneFontSize(sheet, `A1:${refKey(Math.max(lastRow, 1), Math.max(lastCol, 1))}`, 'A1'));
   add(noHidden(sheet));
@@ -492,11 +496,11 @@ export function sheetStandard(sheet, { chapter = 1, read = true } = {}) {
     for (let c = figCol; c <= lastCol; c++) {
       const f = cellAt(r, c);
       if (isBlank(f)) continue;
-      if (!f.bold || !(f.bt || f.bdbl)) { out.push(`${refKey(r, c)} is a total that is not bold with a top border`); break; }
+      if (!f.bold || !(f.bt || f.bdbl)) { out.push(say('grade_total_bold_top', '{cell} is a total that is not bold with a top border', { cell: refKey(r, c) })); break; }
     }
   }
   const fz = sheet.freeze || { r: 0, c: 0 };
-  if (fz.r !== 4 || fz.c !== labelCol) out.push(`panes are not frozen at ${refKey(5, figCol)}`);
+  if (fz.r !== 4 || fz.c !== labelCol) out.push(say('grade_panes_frozen', 'panes are not frozen at {cell}', { cell: refKey(5, figCol) }));
   if (read) add(gridlinesOff(sheet));
   return out;
 }
@@ -535,7 +539,7 @@ export function isDeskNumberFormat(code, opts = {}) {
 /** Grade cells' format as the desk number format: { ok, why }. */
 export function deskNumberFormat(sheet, range, opts = {}) {
   for (const [r, c, ref] of eachRef(range)) {
-    if (!isDeskNumberFormat(cellFormatCode(sheet.get(r, c)), opts)) return fail(cellName(ref) + ' is not in the desk number format: thousands separator, no decimals, negatives in brackets');
+    if (!isDeskNumberFormat(cellFormatCode(sheet.get(r, c)), opts)) return fail(say('grade_desk_number_format', '{cell} is not in the desk number format: thousands separator, no decimals, negatives in brackets', { cell: cellName(ref) }));
   }
   return ok();
 }
