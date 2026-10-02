@@ -1995,6 +1995,18 @@ export const COPY = {
    "mac_note": "",
    "story_beat": ""
   },
+  "drivers-block": {
+   "id": "drivers-block",
+   "module": "model-setup",
+   "order": "5.2.6",
+   "title": "The drivers block: three cases by year, one selector, one live block",
+   "brief": "A buyer doesn’t want one forecast; they want the company’s case, their own, and the one they can live with, and they want to flip between them without opening a second file. So the drivers, the handful of inputs that move everything, live on Inputs three times, one block per case, by year, and a live block beneath reads whichever case the Cover’s switch names (4.5.1). Every schedule reads the live block and only the live block. The key is `CHOOSE`.",
+   "closing": "Three cases live on one Inputs page, and one cell on the Cover runs the whole model. || A buyer types Downside on the Cover and every schedule you build from 5.3 on answers, while the three years of history stay where the accountants put them. CHOOSE reads plainest with the cases in separate blocks; INDEX does the same job when each driver’s cases are stacked.",
+   "wow": "Three cases on one Inputs page, and one cell on the Cover runs the whole model.",
+   "convention_line": "Inputs blue, formulas black; One input, one cell; formulas reference it",
+   "mac_note": "",
+   "story_beat": ""
+  },
   "remix-format-on-the-pnl": {
    "id": "remix-format-on-the-pnl",
    "module": "remixes",
@@ -12549,6 +12561,56 @@ export const COPY = {
     "teach": "",
     "why": "",
     "hint_stuck": "pulse cell E5 · The IS reads Data by name and year."
+   }
+  ],
+  "drivers-block": [
+   {
+    "lesson_id": "drivers-block",
+    "goal_index": "0",
+    "text": "The Downside’s ticket growth: 0 in F30, then =F30 in G30 filled right to J30.",
+    "teach": "A driver held flat is typed once, in FY27, and each later year points at the one before, in black because it is a formula: one edit rolls through. It is the one accepted link to a link (1.6.4).",
+    "why": "",
+    "hint_stuck": "pulse range F30:J30 · Only FY27 is typed."
+   },
+   {
+    "lesson_id": "drivers-block",
+    "goal_index": "1",
+    "text": "Live new sites in C35: =IF(Inputs!C$6=0,Schedules!C7,CHOOSE(Case,C14,C21,C28)), filled right to J35.",
+    "teach": "CHOOSE(Case, …) picks the Management, Base or Downside figure by the Cover’s case number. Case is a name, so it holds still wherever the formula goes, and the three block references move with the fill. The flag hands the actual years their actuals, so history never moves with the switch.",
+    "why": "",
+    "hint_stuck": "pulse range C35:J35 · Rows 14, 21 and 28 are new sites in the three blocks."
+   },
+   {
+    "lesson_id": "drivers-block",
+    "goal_index": "2",
+    "text": "Live washes a day in C36: =IF(Inputs!C$6=0,Schedules!C16,CHOOSE(Case,C15,C22,C29)), filled right to J36.",
+    "teach": "Best practice: from 5.3 on, every schedule reads a driver from the live block, never from one of the three cases. A typed input beside a live one is the fault an audit finds first.",
+    "why": "",
+    "hint_stuck": "pulse range C36:J36 · The actual reads Schedules row 16."
+   },
+   {
+    "lesson_id": "drivers-block",
+    "goal_index": "3",
+    "text": "The Cover title in A1 takes the case: =Inputs!$C$104&\": operating model, \"&C5&\" case\".",
+    "teach": "Every page says which case it shows (2.6.3), so a printed page can’t be mistaken for another case.",
+    "why": "",
+    "hint_stuck": "pulse cell A1 · The switch’s word is in C5."
+   },
+   {
+    "lesson_id": "drivers-block",
+    "goal_index": "4",
+    "text": "The IS title in A1 the same way: =Inputs!$C$104&\": income statement, \"&Cover!$C$5&\" case\".",
+    "teach": "A scenario moves several drivers together and tells a story; a sensitivity moves one at a time (4.5.2). The drivers block is for scenarios, the data tables for sensitivities, and a model a buyer trusts has both.",
+    "why": "",
+    "hint_stuck": "pulse cell A1 · The case word lives on the Cover."
+   },
+   {
+    "lesson_id": "drivers-block",
+    "goal_index": "5",
+    "text": "Does it tie? Watch the Cover switch to Downside: the live block moves in FY27 to FY31 and holds in FY24 to FY26.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C35:J39 · Only the projected years read the cases."
    }
   ]
  },
