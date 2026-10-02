@@ -42,7 +42,7 @@ test('only the Stripe publishable key is in client code: no secret or restricted
 test('pricing, flag OFF (hotkey.gg): the three plans, Full Access recommended, its action waiting for launch', () => {
   const html = pricingHtml({ payments: false });
   const t = text(html);
-  for (const s of ['Pricing', 'Free', '$0', 'Full Access', 'Recommended', '$15', 'a month', 'Students $9 a month with your school email', 'Teams', '$12', 'a seat a month', '5 seats or more', 'Talk to us', 'Start learning', 'Get full access', 'Checkout opens at launch.']) assert.ok(t.includes(s), s);
+  for (const s of ['Pricing', 'Free', '$0', 'Full Access', 'Recommended', '$15', 'a month', 'Students $9 a month with your school email', 'Teams', '$12', 'a seat a month', '5 seats or more', 'Talk to us', 'Start learning', 'Get Full Access', 'Checkout opens at launch.']) assert.ok(t.includes(s), s);
   for (const s of TRUST_LINES()) assert.ok(t.includes(s), s);
   // the old figures, the toggle and the yearly terms are gone
   for (const s of ['$90', '$70', '$7 ', 'Yearly', 'Monthly', 'Go Pro', 'a year']) assert.ok(!t.includes(s), 'no ' + s);
@@ -66,7 +66,7 @@ test('pricing, flag OFF (hotkey.gg): the three plans, Full Access recommended, i
   for (const line of t.split(/(?<=[.!?])\s+/)) assert.deepEqual(tells(line), [], line);
 });
 
-test('pricing, flag ON (previews): Get full access goes to checkout and Enter does it; a subscriber sees Manage billing', () => {
+test('pricing, flag ON (previews): Get Full Access goes to checkout and Enter does it; a subscriber sees Manage billing', () => {
   const html = pricingHtml({ payments: true });
   assert.match(html, /<a class="btn2 btn2-primary\s*" href="#\/checkout" id="goFull"/);
   assert.ok(!text(html).includes('Checkout opens at launch.'));
@@ -96,7 +96,7 @@ test('checkout: the summary, the code sign-in, the form placeholder, already sub
   assert.ok(formHtml().includes('id="coStripe"') && text(formHtml()).includes('Opening the secure payment form'));
   assert.ok(text(formHtml({ error: 'x' })).includes('Try again'));
   const have = text(haveHtml({ kind: 'subscription', plan: 'monthly', renews: true, date: '2026-11-02T12:00:00Z' }));
-  assert.ok(have.includes('You already have full access') && have.includes('Full Access, renews November 2, 2026') && have.includes('Manage billing'));
+  assert.ok(have.includes('You already have Full Access') && have.includes('Full Access, renews November 2, 2026') && have.includes('Manage billing'));
   assert.ok(text(closedHtml()).includes('Checkout opens at launch.') && closedHtml().includes('#/pricing'));
   assert.ok(checkoutHtml('<p>x</p>').includes('class="cols-2"'), 'the form at the left, the summary at the right');
   for (const h of [summaryHtml(), signinHtml(), signinHtml({ step: 'code', email: 'a@b.com' }), formHtml(), closedHtml()]) assert.equal((h.match(/btn2-primary/g) || []).length <= 1, true, 'at most one primary');
@@ -140,7 +140,7 @@ test('account: Plan and billing shows the plan, Cancel subscription and Manage b
   const ending = text(billingPanelHtml({ kind: 'subscription', plan: 'student_monthly', student: true, renews: false, date: '2026-11-02T12:00:00Z' }));
   assert.ok(ending.includes('Ends November 2, 2026') && ending.includes('Student price') && !ending.includes('Cancel subscription'), 'already cancelling: no second cancel');
   const free = billingPanelHtml({ kind: 'free' }, { payments: true });
-  assert.ok(free.includes('href="#/checkout"') && text(free).includes('Get full access'));
+  assert.ok(free.includes('href="#/checkout"') && text(free).includes('Get Full Access'));
   assert.ok(text(billingPanelHtml({ kind: 'granted', endsAt: null })).includes('From a code or a grant'));
   assert.ok(text(billingPanelHtml(null)).includes('Plan and billing'), 'loading');
 });

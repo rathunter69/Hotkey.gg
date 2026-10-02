@@ -110,7 +110,7 @@ export function titleFor(name, extra) {
     lesson: (extra ? extra + ' · ' : '') + 'hotkey.gg', locked: (extra ? extra + ' · ' : '') + 'Full Access · hotkey.gg', practice: 'Practice · hotkey.gg', drill: (extra ? extra + ' · ' : '') + 'Practice · hotkey.gg', leaderboard: 'Leaderboards · hotkey.gg',
     reference: 'Reference · hotkey.gg', pricing: 'Pricing · hotkey.gg', teams: 'Teams · hotkey.gg', account: 'Account · hotkey.gg', about: 'About · hotkey.gg',
     terms: 'Terms · hotkey.gg', privacy: 'Privacy · hotkey.gg', eula: 'EULA · hotkey.gg', contact: 'Contact · hotkey.gg', notfound: 'Page not found · hotkey.gg',
-    due: 'Due today · hotkey.gg', checkout: 'Get full access · hotkey.gg' };
+    due: 'Due today · hotkey.gg', checkout: 'Get Full Access · hotkey.gg' };
   return T[name] || 'hotkey.gg';
 }
 

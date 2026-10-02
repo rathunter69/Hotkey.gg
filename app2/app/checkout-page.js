@@ -75,7 +75,7 @@ export function haveHtml(plan) {
   const body = `${line ? `<p class="panel-line">${esc(line)}</p>` : ''}${plan && plan.student ? `<p class="panel-line">${esc(t('account_plan_student', 'Student price'))}</p>` : ''}<p class="panel-line">${esc(t('checkout_have_line', 'Your plan is on the Account page, with your card and receipts under Manage billing.'))}</p>
     <p class="co-err" id="coPortalMsg" role="status"></p>
     <div class="btn-row">${buttonHtml({ label: t('account_manage', 'Manage billing'), key: 'Enter', primary: true, id: 'coManage' })}</div>`;
-  return panelHtml({ heading: esc(t('checkout_have_head', 'You already have full access')), body, cls: 'co-main', id: 'coMain' });
+  return panelHtml({ heading: esc(t('checkout_have_head', 'You already have Full Access')), body, cls: 'co-main', id: 'coMain' });
 }
 
 /** The account's plan in one line: "Full Access, renews November 2, 2026". Pure. */
@@ -93,7 +93,7 @@ export function planLine(plan) {
 /** The checkout page's frame: the title, the main panel at the left, the summary at the right. Pure. */
 export function checkoutHtml(main, { student = false } = {}) {
   return `<div class="page checkout">
-    <h1 class="h-title">${esc(t('checkout_title', 'Get full access'))}</h1>
+    <h1 class="h-title">${esc(t('checkout_title', 'Get Full Access'))}</h1>
     <div class="cols-2"><div class="col" id="coLeft">${main}</div><div class="col">${summaryHtml({ student })}</div></div>
   </div>`;
 }
@@ -101,7 +101,7 @@ export function checkoutHtml(main, { student = false } = {}) {
 /** With the flag off: checkout waits for launch, and Pricing is the way back. Pure. */
 export function closedHtml() {
   const body = `<p class="panel-line">${esc(t('checkout_unavailable', 'Checkout opens at launch.'))}</p><div class="btn-row">${buttonHtml({ label: t('checkout_see_pricing', 'See pricing'), key: 'Enter', href: '#/pricing', primary: true, id: 'coPricing' })}</div>`;
-  return `<div class="page checkout"><h1 class="h-title">${esc(t('checkout_title', 'Get full access'))}</h1>${panelHtml({ heading: esc(t('checkout_summary', 'Full Access')), body, mode: 'learn', cls: 'co-main' })}</div>`;
+  return `<div class="page checkout"><h1 class="h-title">${esc(t('checkout_title', 'Get Full Access'))}</h1>${panelHtml({ heading: esc(t('checkout_summary', 'Full Access')), body, mode: 'learn', cls: 'co-main' })}</div>`;
 }
 
 const friendly = code => (code === 'network' ? t('checkout_err_network', 'Network error. Check your connection and try again.') : t('checkout_err_failed', 'Checkout didn’t open. Try again in a minute.'));
@@ -221,7 +221,7 @@ export function mountCheckoutPage(root, ctx = {}) {
 export function doneHtml({ phase = 'wait', chapters = [], firstHref = '#/learn' } = {}) {
   let body;
   if (phase === 'ok') {
-    body = `<p class="panel-line co-done-line">${esc(t('checkout_done_ok', 'You have full access, and Chapters 2 to 6 are open.'))}</p>
+    body = `<p class="panel-line co-done-line">${esc(t('checkout_done_ok', 'You have Full Access, and Chapters 2 to 6 are open.'))}</p>
       ${chapters.length ? `<ul class="ticks" aria-label="${esc(t('checkout_done_chapters', 'Your chapters'))}">${chapters.map(c => `<li><i class="plan-tick" aria-hidden="true"></i><a href="${esc(c.href)}">${esc(c.label)}</a></li>`).join('')}</ul>` : ''}
       <div class="btn-row">${buttonHtml({ label: t('checkout_done_go', 'Start Chapter 2'), key: 'Enter', href: firstHref, primary: true, id: 'coStart' })}</div>`;
   } else if (phase === 'timeout') {

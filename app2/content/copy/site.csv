@@ -13,7 +13,7 @@ orientation_title,Where things are.
 orientation_learn,"Learn is the course: six chapters of short modules, each ending in a timed challenge on a fresh file."
 orientation_practice,"Drills, the Daily, rapid-fire and the challenges all live under Practice, on the clock."
 orientation_leaderboard,"Each drill and challenge has a board, the Daily too, and only a run with no help and no mouse posts a time."
-orientation_level,"Everything you finish earns XP toward your next level, and speed is what puts you on the boards."
+orientation_level,"Lessons, challenges, drills, the Daily, rapid-fire and quests all pay XP toward your next level. Speed is what puts you on the boards."
 orientation_fine,"Use the arrows and Enter. Sound comes on quietly with your first key, and the sound button at the top of a lesson turns it off."
 first_run_demo_title,This is a lesson.
 first_run_demo_body,"Real keys on a real sheet. You’re graded on how the sheet ends up, so any route that gets there counts."
@@ -73,8 +73,8 @@ account_guest,"You’re a guest, so everything here is saved on this device only
 account_title,Account
 account_level,Level {n}
 account_data,Your data
-paywall_line,Get full access for the rest of the content.
-paywall_signed_in,"This account doesn’t have full access yet. Get it here, or redeem a code on the Account page."
+paywall_line,Get Full Access for the rest of the content.
+paywall_signed_in,"This account doesn’t have Full Access yet. Get it here, or redeem a code on the Account page."
 teams_desk_signin,"Desks need an account, and desk creation isn’t open yet."
 page_failed,{page} didn’t load.
 rail_home,Home
@@ -90,7 +90,7 @@ rail_level,Level {n}
 rail_xp,{n} of {next} XP
 rail_streak,Day {n} of your streak
 rail_streak_none,Your streak starts with today’s practice.
-rail_go_pro,Get full access
+rail_go_pro,Get Full Access
 rail_account,Account
 rail_sign_in,Sign in
 rail_guest,Guest
@@ -249,7 +249,7 @@ home_streak_day,Day {n}
 home_achievements,Achievements
 home_count_of,{n} of {m}
 home_ach_next,Next: {badge}
-paywall_go_pro,Get full access
+paywall_go_pro,Get Full Access
 paywall_not_now,Not now
 learn_tab,Chapter {n}
 learn_page_fill,Pass its challenge to finish the module and earn its badge.
@@ -402,7 +402,7 @@ footer_eula,EULA
 footer_trademarks,Microsoft and Excel are trademarks of the Microsoft group of companies. LinkedIn is a trademark of LinkedIn Corporation. hotkey.gg isn’t affiliated with either.
 footer_business,
 paywall_pro,Full Access
-paywall_go,Get full access
+paywall_go,Get Full Access
 paywall_chapter,Chapter {n}: {name}
 paywall_this_lesson,This lesson
 pricing_title,Pricing
@@ -439,14 +439,14 @@ pricing_full_4,Everything added to the course later
 pricing_teams_1,Full Access for every seat
 pricing_teams_2,One monthly invoice for the team
 pricing_teams_3,Seats added as the team grows
-pricing_full_go,Get full access
+pricing_full_go,Get Full Access
 pricing_teams_go,Talk to us
 pricing_teams_note,Email us the team size and we set it up.
 pricing_teams_subject,hotkey.gg for a team
 pricing_trust_cancel,Cancel any time from your account.
 pricing_trust_refund,Full refund on your first payment within 14 days.
 pricing_trust_stripe,Payment is handled by Stripe.
-pricing_signed_in_note,You have full access. Manage it on the Account page.
+pricing_signed_in_note,You have Full Access. Manage it on the Account page.
 paywall_price,"Full Access is $15 a month, or $9 with a school email. Cancel any time."
 ref_title,Reference
 ref_loading,Loading the keys.
@@ -628,7 +628,7 @@ panel_result_copied,Result copied
 panel_copy_blocked,Couldn’t copy: the clipboard is blocked
 due_none_title,Nothing to drill here.
 due_none_body,That item is not in today’s queue.
-checkout_title,Get full access
+checkout_title,Get Full Access
 checkout_signin_head,Sign in to subscribe
 checkout_signin_line,Enter your email and we send you a 6-digit code. Sign in with a school email for the student price.
 checkout_email,Email
@@ -655,11 +655,11 @@ checkout_inc_3,"The certificate, with a page anyone can check"
 checkout_cancel,Cancel any time from your account.
 checkout_guarantee,"If it’s not for you, you get your money back within 14 days."
 checkout_stripe,Payment is handled by Stripe. Your receipt comes from Link.
-checkout_have_head,You already have full access
+checkout_have_head,You already have Full Access
 checkout_have_line,"Your plan is on the Account page, with your card and receipts under Manage billing."
 checkout_done_title,Unlocking your course
 checkout_done_wait,Payment received. Opening Chapters 2 to 6.
-checkout_done_ok,"You have full access, and Chapters 2 to 6 are open."
+checkout_done_ok,"You have Full Access, and Chapters 2 to 6 are open."
 checkout_done_go,Start Chapter 2
 checkout_done_timeout,Payment received. Unlocking can take a minute; refresh this page.
 checkout_done_support,Still locked after that? Email {email} and we sort it out.
@@ -677,7 +677,7 @@ account_plan_granted_until,"From a code or a grant, until {date}"
 account_plan_free_line,Chapter 1 is yours in full. Full Access opens Chapters 2 to 6.
 account_cancel,Cancel subscription
 account_manage,Manage billing
-account_get,Get full access
+account_get,Get Full Access
 account_cancel_note,Cancelling keeps your access to the end of the month you paid for.
 account_billing_err,Billing didn’t open. Try again in a minute.
 account_billing_none,There is no subscription on this account yet.
@@ -689,7 +689,7 @@ learn_reward,Finish {module} to earn it
 learn_reward_earned,Earned
 practice_chapter_coming,Chapter {n} is being written. Its drills land here as its lessons do.
 learn_keys_n,{n} keys
-home_xp_why,"Lessons, drills, the Daily and quests pay XP. Every level opens a piece of flair."
+home_xp_why,"Lessons, challenges, drills, the Daily, rapid-fire and quests pay XP. Every level opens a piece of flair."
 save_title,Save your progress
 save_line,Your progress lives in this browser for now. A free account keeps it on any device and puts your times on the boards.
 save_go,Make a free account
@@ -1054,7 +1054,7 @@ flair_cur-ink,Ink ghost
 flair_top-bucket,"Crimson, with the Top Bucket frame"
 ach_shelf_label,Achievements: {n} of {m} earned
 ach_banner,Achievement
-orientation_home_level,"Lessons, drills, the Daily and quests all pay XP, and every level opens a piece of flair, drawn here."
+orientation_home_level,"Lessons, challenges, drills, the Daily, rapid-fire and quests all pay XP, and every level opens a piece of flair, drawn here."
 orientation_home_today,"Three quests a day and three a week each pay XP, with a bonus when all three land."
 panel_equipped,Equipped
 profile_xp_head,Where XP comes from

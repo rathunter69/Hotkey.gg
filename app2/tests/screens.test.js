@@ -15,11 +15,11 @@ import { tells } from '../content/copy/tells.js';
 
 const text = html => String(html).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 
-test('the paywall (M105) is one panel: the heading with Full Access at its right, the line, the price, Get full access on Enter and Not now on Esc', () => {
+test('the paywall (M105) is one panel: the heading with Full Access at its right, the line, the price, Get Full Access on Enter and Not now on Esc', () => {
   const html = paywallHtml({ heading: 'Chapter 2: Formatting', signedIn: false, payments: false });
   assert.ok(html.startsWith('<section class="panel panel-mode paywall"'));
   const t = text(html);
-  assert.ok(t.includes('Chapter 2: Formatting') && t.includes('Full Access') && t.includes(PAID_LINE()) && t.includes('Get full access Enter') && t.includes('Not now Esc'));
+  assert.ok(t.includes('Chapter 2: Formatting') && t.includes('Full Access') && t.includes(PAID_LINE()) && t.includes('Get Full Access Enter') && t.includes('Not now Esc'));
   assert.ok(t.includes('$15 a month') && t.includes('$9'), 'the price line matches Pricing');
   assert.ok(!t.includes('redeem'), 'a guest sees no redeem line');
   assert.ok(text(paywallHtml({ heading: 'x', signedIn: true, payments: false })).includes('redeem a code'));

@@ -45,7 +45,7 @@ export function billingPanelHtml(plan, { payments = true } = {}) {
     acts = buttonHtml({ label: t('account_manage', 'Manage billing'), id: 'billManage' });
   } else if (kind === 'free') {
     rows.push(t('account_plan_free_line', 'Chapter 1 is yours in full. Full Access opens Chapters 2 to 6.'));
-    acts = buttonHtml({ label: t('account_get', 'Get full access'), href: payments ? '#/checkout' : '#/pricing', primary: true, id: 'billGet' });
+    acts = buttonHtml({ label: t('account_get', 'Get Full Access'), href: payments ? '#/checkout' : '#/pricing', primary: true, id: 'billGet' });
   }
   return `<section class="panel acct-panel acct-billing" id="sec-billing" aria-label="${esc(t('account_plan', 'Plan and billing'))}">
       <div class="panel-head"><h2 class="panel-h">${esc(t('account_plan', 'Plan and billing'))}</h2>${name ? `<span class="panel-facts" id="billPlan">${esc(name)}</span>` : ''}</div>
