@@ -65,6 +65,7 @@ import member_tenure from './lessons/member-tenure.js';
 import period_keys from './lessons/period-keys.js';
 import yearfrac_and_fiscal_periods from './lessons/yearfrac-and-fiscal-periods.js';
 import trading_calendar from './lessons/trading-calendar.js';
+import challenge_timeline_and_age from './lessons/challenge-timeline-and-age.js';
 
 export const CHAPTERS = [
   {
@@ -127,7 +128,7 @@ export const CHAPTERS = [
     ],
     lessons: [
       if_on_a_threshold, nested_if_ifs_min_max, and_or_not, iferror_and_the_override, challenge_flags_block,
-      date_serials, member_tenure, period_keys, yearfrac_and_fiscal_periods, trading_calendar,
+      date_serials, member_tenure, period_keys, yearfrac_and_fiscal_periods, trading_calendar, challenge_timeline_and_age,
     ],
   },
 ];
