@@ -1046,7 +1046,8 @@ export class Session {
     if (key === 'Backspace') { d[d.focus] = d.focus === 'find' && d.findSel ? '' : d[d.focus].slice(0, -1); d.findSel = false; this.note = ''; return; }
     if (key.length === 1) { d[d.focus] = ((d.focus === 'find' && d.findSel ? '' : d[d.focus]) + key).slice(0, 64); if (d.focus === 'find') d.findSel = false; this.note = ''; return; }   // letters keep their typed case (dialogKey exempts 'find'); the last search, selected, is replaced by typing (Excel)
     if (key === 'ReplaceAll' && d.replace) {
-      const n = S.replaceAll(d.find, d.repl);
+      const rects = S.selRects(); const one = rects.length === 1 && rects[0].r1 === rects[0].r2 && rects[0].c1 === rects[0].c2;
+      const n = S.replaceAll(d.find, d.repl, one ? null : rects);   // a range selected: Replace All stays inside it, as Excel's does
       this.note = n ? 'All done. We made ' + n + ' replacement' + (n === 1 ? '' : 's') + '.' : FIND_NONE_NOTE;
     }
   }
@@ -1893,7 +1894,10 @@ export class Session {
     if (k === 'F9') {
       if (this.editSel && this.bufIsFormula()) {   // F9 on a selected part: the part becomes its value (Esc restores the formula)
         const { start, end } = this.editSel; const part = this.editBuf.slice(start, end);
-        try { const v = evalFormula('=' + part.replace(/^=/, ''), S.evalCtx({ cell: this.editCell() })); const t = valueText(v);
+        // a range turns into its whole array constant, {"a";"b";…}, as Excel's F9 writes it (the spill hook hands the block over)
+        try { const ctx = S.evalCtx({ cell: this.editCell() }); let block = null; ctx.onSpill = rows => { block = rows; };
+          const v = evalFormula('=' + part.replace(/^=/, ''), ctx);
+          const t = block ? '{' + block.map(r => r.map(valueText).join(',')).join(';') + '}' : valueText(v);
           this.editBuf = this.editBuf.slice(0, start) + t + this.editBuf.slice(end); this.editCaret = start + t.length; this.editSel = null; this.endPoint(); this.logKey('F9'); } catch (err) { /* keep buffer */ }
         return true;
       }

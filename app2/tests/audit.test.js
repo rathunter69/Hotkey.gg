@@ -31,7 +31,10 @@ test('Evaluate Formula (Alt M V) steps through the formula, underlining the next
   s.run('Escape'); S.goTo(1, 1); s.run('Alt M V'); assert.equal(s.dialog, null, 'a cell without a formula opens nothing');
   // F9 in the formula bar: Shift+← selects the tail, F9 replaces it with its value; Esc restores the formula
   S.goTo(4, 4); s.run('F2 Shift+Left Shift+Left'); assert.deepEqual([s.editSel.start, s.editSel.end], [4, 6]); s.run('F9'); assert.equal(s.editBuf, '=C4*20'); s.run('Escape'); assert.equal(S.formula('D4'), '=C4*B1');
-  s.run('F2 F9'); assert.equal(s.editBuf, '24820', 'F9 with nothing selected: the whole formula'); s.run('Enter'); assert.equal(S.formula('D4'), null); assert.equal(S.value('D4'), 24820);
+  // a selected range becomes its whole array constant, as Excel writes it; Esc puts the formula back
+  S.goTo(3, 2); s.run('F2 Home Ctrl+Right Ctrl+Right Shift+Right Shift+Right Shift+Right Shift+Right Shift+Right F9');
+  assert.equal(s.editBuf, '=SUM({10;20;1240})', 'F9 on A1:A3 writes the three values, not the first'); s.run('Escape'); assert.equal(S.formula('B3'), '=SUM(A1:A3)');
+  S.goTo(4, 4); s.run('F2 F9'); assert.equal(s.editBuf, '24820', 'F9 with nothing selected: the whole formula'); s.run('Enter'); assert.equal(S.formula('D4'), null); assert.equal(S.value('D4'), 24820);
 });
 
 test('Error Checking (Alt M K) walks the error cells of the active sheet only; Next, Previous, Ignore Error, Edit in Formula Bar; then the sheet is complete', () => {

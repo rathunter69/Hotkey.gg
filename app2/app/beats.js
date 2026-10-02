@@ -65,6 +65,13 @@ const BEATS_DEFAULT = {
     body: 'The buyers want washes and revenue by site and by package, the busiest sites, the blended ticket, and the question that decides whether they believe anything: whether the POS export agrees with what the managers sent. Every one of those is a count or a sum with a condition on it. Build them, then build the reconciliation and drive its check to zero.' },
   text: { eyebrow: 'Module 3.4 · text', title: 'The codes have to become words.',
     body: 'The POS writes AUS-DOM where a buyer wants Austin and Domain in their own columns, it packs the package and channel into one memo, and when the terminal hiccups it sends amounts as text. Text functions take a string apart and put it back together, Text to Columns does the same for a whole column at once, and nothing gets retyped.' },
+  // Chapter 3 · Formulas
+  'time-value-of-money': { eyebrow: 'Module 3.5 · time value of money', title: 'What is a new site worth?',
+    body: 'Cedar Park cost $5m all in (the land, which Clearcoat owns there, and the build) and was funded with a $3.5m loan, and the buyers want two things: the loan’s schedule, and whether a site like it is worth building at all. A dollar next year is worth less than a dollar today, and the functions in this module say how much less: PMT for the loan, NPV and IRR for the site.' },
+  auditing: { eyebrow: 'Module 3.6 · auditing', title: 'Somebody else’s Summary doesn’t tie.',
+    body: 'Before you built yours, someone started a Summary sheet and left. It has a SUMIF pointing at a range a row short, a typed number in a formula column, a text "12", and a total that agrees with nothing. Chapter 1 taught the three looks; this module adds the tools a reviewer uses on a sheet they didn’t build, and the checks block that says, in one cell, whether the databook ties.' },
+  'ch3-project-and-assessment': { eyebrow: 'Module 3.7 · project and assessment', title: 'The databook, tied out.',
+    body: 'A fresh export, a fresh site list, a Summary someone else abandoned. Rebuild it so every number reads the export and the flag reads OK, then value the next site on the list. Build it, then build it again on the clock. The assessment is the test-out.' },
   'project-and-assessment': { eyebrow: 'Module 1.8 · project, assessment, test-out', title: 'Management’s next feed is in.',
     body: 'A fresh week, a blank Report, and everything the chapter taught. Build the page start to finish, then prove it against the clock on Monday morning; or test out of the chapter in five minutes.' },
 };

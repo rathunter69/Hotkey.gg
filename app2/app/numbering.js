@@ -15,6 +15,7 @@ export const MODULE_NUMBERS = {
   // Chapter 3 · Formulas and functions (script-ch3.md)
   logic: '3.1', dates: '3.2',
   'math-and-aggregation': '3.3', text: '3.4',
+  'time-value-of-money': '3.5', auditing: '3.6', 'ch3-project-and-assessment': '3.7',
 };
 /** The catalogue section the chapter's project, assessment and test-out sit in (module 1.8). */
 export const FINAL_SECTION = 'Project and assessment';

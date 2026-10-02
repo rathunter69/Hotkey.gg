@@ -265,6 +265,18 @@ export const CONCEPTS = {
   'substitute-upper': 'SUBSTITUTE(text, old, new) swaps text for text and UPPER capitalizes every letter, so a parsed piece reads one way',
   'value-datevalue': 'VALUE turns a number stored as text into a number and DATEVALUE turns a text date into a date serial',
   'text-to-columns': 'Text to Columns (Alt, A, E) splits a column by a delimiter or a fixed width in one pass, and writes values',
+  // Chapter 3 · 3.5 Time value of money and 3.6 Auditing (the databook)
+  'pmt-pv-fv': 'PMT(rate, periods, principal) is a loan’s level payment, shown as cash out; PV runs it backwards to the loan a payment supports, FV forwards to what a sum grows to; the rate and the periods are per payment',
+  'npv': 'NPV(rate, flows) discounts each flow from one period out, so year 0 is added outside it; XNPV(rate, flows, dates) discounts by the dates',
+  'irr': 'IRR(flows) is the rate at which the NPV of the flows is zero, year 0 included; XIRR takes the dates; payback is the year the cumulative cash turns positive',
+  'loan-schedule': 'a loan schedule: opening balance, interest at the period rate, principal as the payment less interest, closing balance, one row written once and filled down; IPMT and PPMT give the split directly',
+  'running-total': 'a running total anchors the start and lets the end move: =SUM($E$44:E44) filled down adds one more row each time',
+  'trace-arrows': 'Trace Precedents (Alt M P) draws arrows from the cells a formula reads, Trace Dependents (Alt M D) to the cells that read it, and Remove Arrows (Alt M A A) clears them',
+  'evaluate-formula': 'Evaluate Formula (Alt M V) works through a formula one calculation at a time, showing each piece’s value before the next',
+  'f9-part': 'in an open formula, F9 on a selected part shows that part’s value; Esc puts the formula back, Enter would keep the value for good',
+  'goto-special-types': 'Go To Special’s Numbers, Text, Logicals and Errors boxes narrow Constants or Formulas to one kind of value',
+  'edit-links': 'Edit Links (Alt A K) lists every other workbook the file reads; when no cell reads one, Excel says the workbook has no links',
+  'rollup-flag': 'a roll-up flag: COUNTIF counts the checks that are not zero and IF turns the count into OK or CHECK, so one cell says whether the book ties',
 };
 
 /**

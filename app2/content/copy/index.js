@@ -1215,6 +1215,150 @@ export const COPY = {
    "mac_note": "",
    "story_beat": ""
   },
+  "pv-fv-pmt": {
+   "id": "pv-fv-pmt",
+   "module": "time-value-of-money",
+   "order": "3.5.1",
+   "title": "PV, FV and PMT: the site-build loan",
+   "brief": "The Cedar Park loan is $3.5m at 7% over ten years, paid monthly. PMT gives the payment from the rate, the number of periods and the principal, and the trap is periods: a monthly payment needs the monthly rate (7% over 12) and 120 periods, not 10. PV runs it backwards to the loan a payment can support, and FV runs it forwards to what a sum grows to. Build the three on Loans and read the signs. The key is `PMT`.",
+   "closing": "The Cedar Park loan costs $40,638 a month for ten years, and the bank earns about $1.38m of interest on the $3.5m it lent. Every figure reads the four blue inputs, so a new rate or term runs straight through. || Read the signs the way Excel writes them: money going out is negative, money coming in is positive. PMT, PV and FV all follow that rule, so a minus in the right place is what makes the page read the way a buyer expects.",
+   "wow": "Three inputs gave you the payment, the total interest and the sign convention.",
+   "convention_line": "The rate, the term and the principal are blue inputs, and the payment shows as a positive figure, the sign stated once.",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "npv-xnpv": {
+   "id": "npv-xnpv",
+   "module": "time-value-of-money",
+   "order": "3.5.2",
+   "title": "NPV and XNPV: a new-site case",
+   "brief": "A site costs $5m all in today, land included, and earns cash for years. To compare the two you discount the future cash back to today at the return an investor requires, the discount rate, and NPV is the sum of those discounted cash flows less the cost: positive means the site earns more than that return. NPV in Excel starts one period out, so the year 0 build sits outside it, and XNPV takes dates for uneven timing. Value the Cedar Park case both ways. The key is `NPV`.",
+   "closing": "At 10% the Cedar Park case is worth about $3.5m more than the $5m it cost: by hand, by NPV with the build outside, and by XNPV on the dates, all three agree within a rounding. || The trap is worth remembering because it is everywhere: NPV over a range that starts with today’s cost discounts the whole case one year too far. Keep year 0 outside, or use XNPV with the dates.",
+   "wow": "Five years of cash discounted to today say the site is worth more than it cost.",
+   "convention_line": "One discount factor formula is written once and filled right, with the rate anchored by F4.",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "irr-xirr": {
+   "id": "irr-xirr",
+   "module": "time-value-of-money",
+   "order": "3.5.3",
+   "title": "IRR and XIRR",
+   "brief": "The rate where NPV is zero is the internal rate of return: the return the site itself earns. IRR takes the cash flows, year 0 included, and finds it; XIRR takes dates and does the same for uneven timing. Payback is simpler and buyers ask for it too: the year the cash out is recovered. Add all three to the case and read them the way a buyer does. The key is `IRR`.",
+   "closing": "Cedar Park earns about 26% a year on its own cash, well above the 10% a buyer asks for, and the build is paid back a little over five years in, most of it by the sale. || Read the two together the way a buyer does: IRR against the discount rate says whether the site is worth building, and payback against the hold says how long the money is out.",
+   "wow": "You have the site’s own return now, and the year it pays itself back.",
+   "convention_line": "One formula per row, filled right: the cumulative cash and the crossing fraction are each written once.",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "payment-schedule": {
+   "id": "payment-schedule",
+   "module": "time-value-of-money",
+   "order": "3.5.4",
+   "title": "A payment schedule with anchors",
+   "brief": "A loan schedule shows every month: the opening balance, the interest, the principal and the closing balance that opens the next month. The payment stays the same while the split shifts toward principal as the balance falls. Write one row with every input anchored, fill it down 120 times, then check it two ways: IPMT and PPMT give the same split, and the interest adds up to the total from 3.5.1. The key is `F4`.",
+   "closing": "Every month of the Cedar Park loan is on the page now, and the interest it adds up to is the $1.38m from the first lesson to the cent. The first month is half interest; by the last, nearly all of the payment is principal. || The row was written once, with the rate and the payment anchored and the balance free to move, and the fill did the other 119. That is how a schedule stays right when the terms change.",
+   "wow": "One anchored row filled a hundred and twenty times, and the balance lands on zero.",
+   "convention_line": "The month numbers are blue inputs, and the anchors on the rate, the payment and the first row hold as the schedule fills down.",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "challenge-new-site-case": {
+   "id": "challenge-new-site-case",
+   "module": "time-value-of-money",
+   "order": "3.5.C",
+   "title": "Challenge: a new-site case valued with NPV and IRR",
+   "brief": "A different site’s numbers on Loans: build the loan payment, the case with NPV by hand and by function, IRR, payback, and the first twelve months of the schedule.",
+   "closing": "",
+   "wow": "",
+   "convention_line": "No number inside a formula, one sign convention for the payment, and anchors that hold as the rows fill.",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "trace-arrows-evaluate": {
+   "id": "trace-arrows-evaluate",
+   "module": "auditing",
+   "order": "3.6.1",
+   "title": "Trace precedents and dependents",
+   "brief": "Ctrl+[ jumps to what a cell reads; the trace arrows draw it on the sheet, so a whole chain shows at once, and Evaluate Formula steps through a formula one calculation at a time. On a sheet someone else built, those two tell you what a number is made of before you decide whether it is right. Trace the old Summary’s total back to its ranges. The key is `Alt M P`.",
+   "closing": "The arrows showed what the total was made of, and Evaluate showed the Airport SUMIF stopping a row short: the export’s last wash never reached the block. Five ranges fixed in one Replace. || The typed 1,240, the text 12, the link to last year’s file and the 1.05 inside the formula are still there. The next two lessons find them with sweeps that cover the whole sheet.",
+   "wow": "The arrows showed the chain, and Evaluate showed where the number went wrong.",
+   "convention_line": "Trace the chain before you trust a total, and read what Evaluate Formula shows you at each step.",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "f9-show-formulas-at-scale": {
+   "id": "f9-show-formulas-at-scale",
+   "module": "auditing",
+   "order": "3.6.2",
+   "title": "F9 on a part, show formulas, Go To Special at scale",
+   "brief": "Inside an open formula, select any part and press F9, and it turns into its value, so a long SUMIF can be read piece by piece. Then press Esc and never Enter, or that piece is hardcoded for good. Show formulas and Go To Special you already know, and on a databook they sweep whole blocks, so run them before anyone else does. Audit the old Summary with all three. The key is `F9`.",
+   "closing": "The 1,240 was a figure someone typed over a formula, and the \"12\" was a count that could never be added. Neither shows on the page as anything but a number, which is why the sweeps exist. || Tip from the desk: a leading apostrophe parks a half-built formula as text while you work on its pieces. Type ' in front of the = and the cell shows the formula without running it or raising an error box. Delete the apostrophe and it is live again.",
+   "wow": "Three sweeps made the two dead numbers in the block give themselves up.",
+   "convention_line": "Hunt the hardcodes with Go To Special and Show Formulas, and point every figure back at its input.",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "hardcode-external-link-hunt": {
+   "id": "hardcode-external-link-hunt",
+   "module": "auditing",
+   "order": "3.6.3",
+   "title": "The hardcode and external-link hunt",
+   "brief": "Two things travel badly: a number typed inside a formula, and a link to another workbook, which breaks the day the file is moved and shows a path nobody can follow. Data › Edit Links (Alt, A, K) lists every outside workbook a file reads, and Find for a bracket shows which cell reads it. The old Summary has one of each. Find them and bring both inside. The key is `Alt A K`.",
+   "closing": "The link would have shown #REF! on the buyer’s screen the day the file left the desk, and the 1.05 would have stayed 1.05 whatever the price list said. Both are inputs now, blue, labelled and sourced. || Run Alt A K on every file before it goes out. An empty Edit Links is the quickest proof that a workbook stands on its own.",
+   "wow": "Nothing in the file reaches outside it, and nothing hides a number inside a formula.",
+   "convention_line": "Nothing in the file reaches outside it, and a figure brought inside is blue with its source written beside it.",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "checks-block-rollup": {
+   "id": "checks-block-rollup",
+   "module": "auditing",
+   "order": "3.6.4",
+   "title": "The checks block with a roll-up flag",
+   "brief": "A databook has a dozen things that must agree, and a reviewer wants one cell that says whether they all do. Each check is a live difference that reads zero; the roll-up is a count of the checks that do not, and a flag that reads OK or CHECK. Finish the Summary’s Checks block, put the flag at the top of the page and turn it red when it fails. The key is `COUNTIF`.",
+   "closing": "The databook now says, in its top row, whether it ties: six live checks, one count, one word. A reviewer reads C2 first and only goes looking when it is red. || Add a check whenever two numbers in the file must agree, and point the count at it. The flag is only as good as the list it counts.",
+   "wow": "Six checks feed one flag, and the databook says whether it ties before anyone asks.",
+   "convention_line": "Every check is a live difference that reads zero, and the links to other sheets are green.",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "challenge-six-faults": {
+   "id": "challenge-six-faults",
+   "module": "auditing",
+   "order": "3.6.C",
+   "title": "Challenge: six faults in a summary",
+   "brief": "Six faults in the old Summary block: a short range, a typed number, a text number, an external link, a number inside a formula and a dead check. Fix every one.",
+   "closing": "",
+   "wow": "",
+   "convention_line": "Hunt the faults with Go To Special and Show Formulas, keep links inside the file and leave every check live.",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "ch3-project": {
+   "id": "ch3-project",
+   "module": "ch3-project-and-assessment",
+   "order": "3.7.P",
+   "title": "Project: the KPI databook",
+   "brief": "The San Antonio cluster has sent the same fortnight’s export, and its databook is the Austin one with every formula taken out. Build it again in one sitting: the export cleaned, the keys and dates, the counts and revenue, the reconciliation, the loan and the case, the old block fixed and the checks reading OK. No clock, and nothing here is new. The key is `Ctrl+Enter`.",
+   "closing": "A raw export in, a databook out: the data cleaned and keyed, every count and sum a live formula, the gaps to the tallies explained, the case valued and the checks rolled up to one flag. || A buyer’s analyst reads the flag first and then the reconciliation. Now the same databook on a fresh export, on the clock.",
+   "wow": "A raw export in, a databook out that says OK at the top, and that is Chapter 3.",
+   "convention_line": "Inputs blue, links to other sheets green, no number inside a formula, every gap explained with its source, and the checks live.",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "ch3-assessment": {
+   "id": "ch3-assessment",
+   "module": "ch3-project-and-assessment",
+   "order": "3.7.A",
+   "title": "Assessment: the databook on fresh figures",
+   "brief": "Another fortnight’s export has landed, with the managers’ tallies already in: the same faults in other rows and figures you have not seen. Build the same databook on the clock with no help and the keyboard only, until the flag at the top reads OK. Pass, and the chapter is Verified; this is also the test-out. The key is `Ctrl+Enter`.",
+   "closing": "A fortnight you had never seen, a databook to the standard: the export cleaned, every figure a live formula, the gaps explained, the case valued and the flag at OK. || That is the databook a buyer’s analyst opens first, and you built it under a clock.",
+   "wow": "You built the databook on figures you had never seen, on the clock, and the chapter is Verified.",
+   "convention_line": "Inputs blue, links to other sheets green, no number inside a formula, every gap explained with its source, and the checks live.",
+   "mac_note": "",
+   "story_beat": ""
+  },
   "remix-format-on-the-pnl": {
    "id": "remix-format-on-the-pnl",
    "module": "remixes",
@@ -7784,6 +7928,902 @@ export const COPY = {
     "why": "",
     "hint_stuck": ""
    }
+  ],
+  "pv-fv-pmt": [
+   {
+    "lesson_id": "pv-fv-pmt",
+    "goal_index": "0",
+    "text": "On Loans, select the four blue inputs in C6:C9: the principal, the annual rate, the term in years and the payments a year.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C6:C9 · The inputs are the blue block under the loan’s heading."
+   },
+   {
+    "lesson_id": "pv-fv-pmt",
+    "goal_index": "1",
+    "text": "Turn the terms monthly: =C7/C9 in C12 for the monthly rate, then =C8*C9 in C13 for the number of payments.",
+    "teach": "A loan is paid per period, so its rate and its term have to be per period too. The rate a month is the annual rate over the payments a year, and the periods are the years times the payments a year, so a reader can change either input and both follow.",
+    "why": "",
+    "hint_stuck": "pulse cell C12 · Twelve payments a year: the rate divides by C9, the term multiplies by it."
+   },
+   {
+    "lesson_id": "pv-fv-pmt",
+    "goal_index": "2",
+    "text": "In C16 build the monthly payment as =-PMT(C12,C13,C6), the minus turning the cash out into a positive payment.",
+    "teach": "PMT(rate, periods, principal) returns the level payment that clears the loan, and it comes back negative because it is cash going out. A minus in front makes the page read a positive payment. PMT, PV and FV also take an optional last argument, type: left out, the payment falls at the end of each month, as a loan’s does; 1 puts it at the start, the way rent is paid.",
+    "why": "",
+    "hint_stuck": "pulse cell C16 · The rate and the periods are the monthly ones you just built, and the principal is C6."
+   },
+   {
+    "lesson_id": "pv-fv-pmt",
+    "goal_index": "3",
+    "text": "In C17 total what the loan costs as =C16*C13, then in C18 take the principal off it, =C17-C6, to read the interest.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C18 · Everything paid less what was borrowed is what the bank earns."
+   },
+   {
+    "lesson_id": "pv-fv-pmt",
+    "goal_index": "4",
+    "text": "Prove the payment with PV: in C21 =PV(C12,C13,-C16) turns the monthly payment back into the $3.5m loan in C6.",
+    "teach": "PV runs PMT backwards: given the rate, the periods and a payment, it returns the loan that payment clears. The payment goes in as a negative, cash out, so the loan reads positive.",
+    "why": "",
+    "hint_stuck": "pulse cell C21 · The same rate and periods, and the payment from C16 as cash out."
+   },
+   {
+    "lesson_id": "pv-fv-pmt",
+    "goal_index": "5",
+    "text": "Now ask PV a real question: change C21 to =PV(C12,C13,-35000) for the loan a $35,000 monthly payment supports.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C21 · A smaller payment than C16 supports a smaller loan."
+   },
+   {
+    "lesson_id": "pv-fv-pmt",
+    "goal_index": "6",
+    "text": "In C22 check the loan clears: =FV(C12,C13,C16,-C6) is the balance after the last payment, and it reads zero.",
+    "teach": "FV runs it forwards: FV(rate, periods, payment, present value) is what is left after the last period. With the loan going in as cash out and the payment coming back, it reads the balance after 120 payments.",
+    "why": "",
+    "hint_stuck": "pulse cell C22 · The payment is cash in this time, the loan cash out."
+   },
+   {
+    "lesson_id": "pv-fv-pmt",
+    "goal_index": "7",
+    "text": "Put FV to work on growth: change C22 to =FV(C7,C8,0,-1000000), what $1m grows to in ten years at the loan’s annual rate.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C22 · This one compounds once a year, so it takes the annual rate and the years, and no payment."
+   },
+   {
+    "lesson_id": "pv-fv-pmt",
+    "goal_index": "8",
+    "text": "Does it tie? Watch the rate in C7 change to 6% and the payment in C16 and the interest in C18 both fall.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C16 · Every figure on the loan reads the four inputs."
+   }
+  ],
+  "npv-xnpv": [
+   {
+    "lesson_id": "npv-xnpv",
+    "goal_index": "0",
+    "text": "On Loans, in C31 write the discount factor =1/(1+$C$30)^C25, the rate anchored with F4, then fill it across to H31 with Ctrl+R.",
+    "teach": "A dollar a year from now is worth 1/(1+rate) today, two years out 1/(1+rate)^2, and that fraction is the discount factor (^ raises to a power). Anchor the rate with F4 so the formula fills right and every year reads the same C30, while the year moves with each column.",
+    "why": "",
+    "hint_stuck": "pulse range C31:H31 · Year 0’s factor is 1; every later one is smaller."
+   },
+   {
+    "lesson_id": "npv-xnpv",
+    "goal_index": "1",
+    "text": "In C32 multiply the cash flow by its factor, =C29*C31, and fill it right to H32.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C32:H32 · Each year’s cash times that year’s factor."
+   },
+   {
+    "lesson_id": "npv-xnpv",
+    "goal_index": "2",
+    "text": "NPV by hand is the sum of the discounted flows: =SUM(C32:H32) in C33.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C33 · Add the six discounted flows, the build included."
+   },
+   {
+    "lesson_id": "npv-xnpv",
+    "goal_index": "3",
+    "text": "In C34 =NPV(C30,D29:H29)+C29 keeps years 1 to 5 inside and adds year 0 outside: read it against C33.",
+    "teach": "NPV(rate, flows) discounts the first flow it is given one period out, the next two, and so on. A cost paid today is not discounted at all, so it goes outside: years 1 to 5 inside NPV, year 0 added after it.",
+    "why": "",
+    "hint_stuck": "pulse cell C34 · The range starts at year 1, in column D."
+   },
+   {
+    "lesson_id": "npv-xnpv",
+    "goal_index": "4",
+    "text": "In C35 try the trap, =NPV(C30,C29:H29): with the build inside NPV every year is discounted once too often, so it reads lower than C34.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C35 · This time the range starts at year 0, in column C."
+   },
+   {
+    "lesson_id": "npv-xnpv",
+    "goal_index": "5",
+    "text": "Replace the trap in C35 with the dated version, =XNPV(C30,C29:H29,C26:H26), which discounts each flow by its date.",
+    "teach": "XNPV(rate, flows, dates) discounts each flow by the days between its date and the first one, so year 0 sits inside it and uneven timing is handled. On dates a year apart it lands close to the NPV in C34.",
+    "why": "",
+    "hint_stuck": "pulse cell C35 · XNPV takes the rate, the flows from year 0, then the dates in row 26."
+   },
+   {
+    "lesson_id": "npv-xnpv",
+    "goal_index": "6",
+    "text": "Put XNPV to work: the sale slips a year, so type 10/1/2032 over the year 5 date in H26 and watch C35 fall while C34 stays.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell H26 · NPV only knows the order of the flows; XNPV reads the dates."
+   },
+   {
+    "lesson_id": "npv-xnpv",
+    "goal_index": "7",
+    "text": "Put the sale date back with Ctrl+Z, and XNPV lands next to NPV again.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell H26 · One undo takes the date back to the case."
+   },
+   {
+    "lesson_id": "npv-xnpv",
+    "goal_index": "8",
+    "text": "Does it tie? Watch the discount rate in C30 change to 15% and the NPV in C33 and C34 fall together.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C34 · A higher required return makes future cash worth less today."
+   }
+  ],
+  "irr-xirr": [
+   {
+    "lesson_id": "irr-xirr",
+    "goal_index": "0",
+    "text": "On Loans, in C36 find the site’s own return with =IRR(C29:H29), year 0 included, and read it against the 10% discount rate.",
+    "teach": "IRR(flows) finds the rate at which the flows discount to zero, so year 0 goes inside this time. It returns #NUM! when every flow has the same sign, or when its search fails from its 10% starting guess; an optional second argument, guess, gives it a new place to start.",
+    "why": "",
+    "hint_stuck": "pulse cell C36 · All six flows go in, from the build in C29 to the sale year in H29."
+   },
+   {
+    "lesson_id": "irr-xirr",
+    "goal_index": "1",
+    "text": "Prove it: point the discount rate at the IRR with =C36 in C30, and the NPV in C34 reads zero.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C30 · At the IRR the discounted flows cancel out exactly."
+   },
+   {
+    "lesson_id": "irr-xirr",
+    "goal_index": "2",
+    "text": "Put the 10% discount rate back in C30 with Ctrl+Z.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C30 · One undo takes the cell back to the blue 10% input."
+   },
+   {
+    "lesson_id": "irr-xirr",
+    "goal_index": "3",
+    "text": "In C37 build the dated return, =XIRR(C29:H29,C26:H26).",
+    "teach": "XIRR(flows, dates) finds the same rate on the actual dates, by the days between them, the way XNPV discounts. On flows a year apart it lands close to IRR.",
+    "why": "",
+    "hint_stuck": "pulse cell C37 · The flows first, then the dates in row 26."
+   },
+   {
+    "lesson_id": "irr-xirr",
+    "goal_index": "4",
+    "text": "Put XIRR to work: the sale slips a year, so type 10/1/2032 over the year 5 date in H26 and watch C37 fall while C36 stays.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell H26 · IRR only knows the order of the flows; XIRR reads the dates."
+   },
+   {
+    "lesson_id": "irr-xirr",
+    "goal_index": "5",
+    "text": "Put the date back with Ctrl+Z, then run cumulative cash along row 38: =C29 in C38, =C38+D29 in D38, filled right to H38.",
+    "teach": "Payback reads the cash added up year by year: year 0 is its own flow, and every later year is the last running total plus that year’s flow. The year the running total turns positive is the year the build is paid back.",
+    "why": "",
+    "hint_stuck": "pulse range C38:H38 · Each year adds its own flow to the total before it."
+   },
+   {
+    "lesson_id": "irr-xirr",
+    "goal_index": "6",
+    "text": "In C39 write =IF(AND(C38<0,D38>=0),-C38/D29,0) for the fraction of the crossing year, and fill it right to G39.",
+    "teach": "In the year the total crosses zero, the part of the year it took is what was still owed at the start over that year’s flow. =IF(AND(C38<0,D38>=0),-C38/D29,0) gives that fraction in the crossing year and zero everywhere else.",
+    "why": "",
+    "hint_stuck": "pulse range C39:G39 · Only one year crosses, so only one cell reads more than zero."
+   },
+   {
+    "lesson_id": "irr-xirr",
+    "goal_index": "7",
+    "text": "In C40 the payback is the years still negative plus the fraction: =COUNTIF(C38:H38,\"<0\")+SUM(C39:G39).",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C40 · COUNTIF counts the years before the crossing, and the fraction finishes it."
+   },
+   {
+    "lesson_id": "irr-xirr",
+    "goal_index": "8",
+    "text": "Does it tie? Watch the sale value in H28 halve and the IRR, the NPV and the payback all answer.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C36 · Most of the case’s value is in the sale."
+   }
+  ],
+  "payment-schedule": [
+   {
+    "lesson_id": "payment-schedule",
+    "goal_index": "0",
+    "text": "On Loans, type 1 in C44, make it blue, then select down column C and Fill Series to a stop value of 120.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C44:C163 · Alt+O in the Series dialog sets where the series stops."
+   },
+   {
+    "lesson_id": "payment-schedule",
+    "goal_index": "1",
+    "text": "Write month 1 across D44:G44: opening =C6, interest =D44*$C$12, principal =$C$16-E44, closing =D44-F44.",
+    "teach": "Each month’s interest is the opening balance times the monthly rate in C12, and the principal is the payment in C16 less that interest. The rate and the payment are the same every month, so anchor both with F4 before the row is filled down; the balance is not anchored, because it moves.",
+    "why": "",
+    "hint_stuck": "pulse range D44:G44 · Opening, interest, principal, closing: four formulas with a Tab between them."
+   },
+   {
+    "lesson_id": "payment-schedule",
+    "goal_index": "2",
+    "text": "Make month 2 the pattern: in D45 the opening reads the last closing, =G44, then copy E44:G44 and paste only its formulas into E45.",
+    "teach": "Paste Special Formulas (Ctrl+Alt+V, then F) pastes the formulas and leaves the cell’s own format alone, so month 2 keeps its plain number format while the dollar sign stays on the first row.",
+    "why": "",
+    "hint_stuck": "pulse range D45:G45 · Only the opening changes from month 1; the other three formulas move down a row as they are."
+   },
+   {
+    "lesson_id": "payment-schedule",
+    "goal_index": "3",
+    "text": "Select D45:G163 and fill month 2 down to month 120 with Ctrl+D, then read the closing balance in G163: zero.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range D45:G163 · The month column runs to row 163, so the fill stops where the months do."
+   },
+   {
+    "lesson_id": "payment-schedule",
+    "goal_index": "4",
+    "text": "Check the split with the functions: in H44 =-IPMT($C$12,C44,$C$13,$C$6) and in I44 =-PPMT($C$12,C44,$C$13,$C$6).",
+    "teach": "IPMT(rate, period, periods, principal) and PPMT with the same arguments return one month’s interest and principal directly. Like PMT they come back negative, so a minus in front matches the schedule.",
+    "why": "",
+    "hint_stuck": "pulse range H44:I44 · Only the month, C44, moves down the schedule; the rate, the periods and the principal are anchored."
+   },
+   {
+    "lesson_id": "payment-schedule",
+    "goal_index": "5",
+    "text": "In J44 total the interest to date, =SUM($E$44:E44), then copy H44:J44 and paste its formulas down to row 163.",
+    "teach": "A running total anchors the start of its range and lets the end move: =SUM($E$44:E44) reads one month, and filled down it reads every month so far. The same pattern totals anything that accumulates, capex to date or cash paid so far.",
+    "why": "",
+    "hint_stuck": "pulse range H44:J163 · Paste formulas over the whole block, row 44 included, and every format stays as it was."
+   },
+   {
+    "lesson_id": "payment-schedule",
+    "goal_index": "6",
+    "text": "In the checks at C167 and C168 tie the schedule out: =ROUND(SUM(E44:E163)-C18,2), then =ROUND(G163,2); both read zero.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C167:C168 · The interest in the schedule is the interest from 3.5.1, and the last balance is nothing."
+   },
+   {
+    "lesson_id": "payment-schedule",
+    "goal_index": "7",
+    "text": "Does it tie? Watch the rate in C7 change to 6%, the whole schedule run again, and month 120 still close at zero.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell G163 · Every row reads the inputs, so the schedule always clears the loan."
+   }
+  ],
+  "challenge-new-site-case": [
+   {
+    "lesson_id": "challenge-new-site-case",
+    "goal_index": "0",
+    "text": "On Loans, build the monthly rate and periods in C12 and C13, then the monthly payment in C16 as a positive figure.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-new-site-case",
+    "goal_index": "1",
+    "text": "Discount the case by hand: factors in C31:H31, discounted flows in C32:H32 and their sum, the NPV, in C33.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-new-site-case",
+    "goal_index": "2",
+    "text": "In C34 take the NPV with the function, the year 0 build kept outside it.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-new-site-case",
+    "goal_index": "3",
+    "text": "In C36 find the site’s IRR over all six cash flows.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-new-site-case",
+    "goal_index": "4",
+    "text": "Work out the payback in C40: the cumulative cash in row 38, the crossing fraction in row 39, then the years.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-new-site-case",
+    "goal_index": "5",
+    "text": "Build the first twelve months of the schedule in C44:G55: months 1 to 12, opening, interest, principal and closing.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "trace-arrows-evaluate": [
+   {
+    "lesson_id": "trace-arrows-evaluate",
+    "goal_index": "0",
+    "text": "On the Summary, land on the old block’s total in D72, which does not tie, and draw its precedents with Alt M P.",
+    "teach": "Formulas › Trace Precedents (Alt, M, P) draws an arrow into the active cell from every cell it reads, and a box around a range it reads whole. Press it again and it traces one level further back.",
+    "why": "",
+    "hint_stuck": "pulse cell D72 · The total reads the six site cells above it."
+   },
+   {
+    "lesson_id": "trace-arrows-evaluate",
+    "goal_index": "1",
+    "text": "Airport’s cell D70 is a SUMIF, so trace its precedents too and read where its ranges end.",
+    "teach": "A formula that reads another sheet draws its arrow to a small sheet icon, and the range it names is in the formula itself: Transactions rows 5 to 93, while the export runs to row 94.",
+    "why": "",
+    "hint_stuck": "pulse cell D70 · The export’s last row is an Airport wash in row 94."
+   },
+   {
+    "lesson_id": "trace-arrows-evaluate",
+    "goal_index": "2",
+    "text": "D67 is a typed 1,240 in a column of formulas: draw its dependents with Alt M D and count the three cells it feeds.",
+    "teach": "Trace Dependents (Alt, M, D) works the other way: arrows out of the active cell to every cell that reads it, so you see how far one wrong number has travelled.",
+    "why": "",
+    "hint_stuck": "pulse cell D67 · The new price, the share and the total all read it."
+   },
+   {
+    "lesson_id": "trace-arrows-evaluate",
+    "goal_index": "3",
+    "text": "Press Alt M D again for the next level: the total in D72 feeds the growth, the check and every share, so the 1,240 reached them all.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell D72 · Each press of Trace Dependents follows the chain one step further."
+   },
+   {
+    "lesson_id": "trace-arrows-evaluate",
+    "goal_index": "4",
+    "text": "Clear every arrow off the sheet with Remove Arrows, Alt M A A.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell D67 · The arrows are drawings, so removing them changes nothing in a cell."
+   },
+   {
+    "lesson_id": "trace-arrows-evaluate",
+    "goal_index": "5",
+    "text": "Step through Airport’s SUMIF in D70 with Evaluate Formula, Alt M V, until it reads its short total.",
+    "teach": "Evaluate Formula (Alt, M, V) shows the formula with the next part to calculate underlined; each Enter replaces it with its result, until the formula is one value. Enter again closes it.",
+    "why": "",
+    "hint_stuck": "pulse cell D70 · First the criterion becomes the site code, then the SUMIF its total."
+   },
+   {
+    "lesson_id": "trace-arrows-evaluate",
+    "goal_index": "6",
+    "text": "Close Evaluate, select the site rows D66:D71 and replace $93 with $94, so all five SUMIFs read the whole export.",
+    "teach": "Replace with a range selected works inside the selection only, so one Replace All moves every range end in the block and leaves the rest of the sheet alone.",
+    "why": "",
+    "hint_stuck": "pulse range D66:D71 · Only the five SUMIFs carry $93; the typed 1,240 is the next lesson’s."
+   },
+   {
+    "lesson_id": "trace-arrows-evaluate",
+    "goal_index": "7",
+    "text": "Evaluate Airport’s SUMIF in D70 again with Alt M V: it now reads the export’s last wash too, then close it.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell D70 · The ranges run to row 94 now, so the total is larger."
+   },
+   {
+    "lesson_id": "trace-arrows-evaluate",
+    "goal_index": "8",
+    "text": "Does it tie? Watch a Domain wash on Transactions change and Domain’s fixed total in D66 move with it.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell D66 · The SUMIF reads every row of the export now."
+   }
+  ],
+  "f9-show-formulas-at-scale": [
+   {
+    "lesson_id": "f9-show-formulas-at-scale",
+    "goal_index": "0",
+    "text": "Open Domain’s SUMIF in D66 with F2, select its criteria range Transactions!$B$5:$B$94, press F9 to read the codes, then Esc.",
+    "teach": "In Edit mode Ctrl+→ jumps the insertion point a word at a time and Shift extends a selection inside the formula. F9 then calculates only what is selected: a range becomes its values in braces. Esc leaves the cell as it was; Enter would keep the values.",
+    "why": "",
+    "hint_stuck": "pulse cell D66 · The criteria range runs from after the bracket to the first comma."
+   },
+   {
+    "lesson_id": "f9-show-formulas-at-scale",
+    "goal_index": "1",
+    "text": "Open it again, select the criterion B66 alone and press F9 to see the site code it tests, then Esc.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell D66 · The criterion sits between the two commas."
+   },
+   {
+    "lesson_id": "f9-show-formulas-at-scale",
+    "goal_index": "2",
+    "text": "Show formulas with Ctrl+` and read the block: a typed 1,240 and a text \"12\" stand out among the formulas.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C66:F71 · Every other cell in the block starts with =."
+   },
+   {
+    "lesson_id": "f9-show-formulas-at-scale",
+    "goal_index": "3",
+    "text": "Select the site rows C66:F71 and Go To Special, Constants with Numbers only: the 1,240 in D67 lights alone.",
+    "teach": "In Go To Special, Constants and Formulas each carry four boxes, Numbers (U), Text (X), Logicals (G) and Errors (E), all ticked at first. Untick three and the sweep picks only the fourth kind.",
+    "why": "",
+    "hint_stuck": "pulse range C66:F71 · O picks Constants, then X, G and E untick everything but Numbers."
+   },
+   {
+    "lesson_id": "f9-show-formulas-at-scale",
+    "goal_index": "4",
+    "text": "Replace the 1,240 with the SUMIF its neighbours use: copy D68 and paste only its formula into D67 with Ctrl+Alt+V, F.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell D67 · The SUMIF reads the site code in column B, so it moves up a row with the paste."
+   },
+   {
+    "lesson_id": "f9-show-formulas-at-scale",
+    "goal_index": "5",
+    "text": "Sweep C66:F71 again with Constants and Text only: the \"12\" in C69 lights, a number stored as text.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C66:F71 · This time U unticks Numbers and leaves Text."
+   },
+   {
+    "lesson_id": "f9-show-formulas-at-scale",
+    "goal_index": "6",
+    "text": "Link C69 to South Lamar’s wash count the way its neighbours do, =C18.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C69 · C66 reads C15, so each row reads the count fifty-one rows above it."
+   },
+   {
+    "lesson_id": "f9-show-formulas-at-scale",
+    "goal_index": "7",
+    "text": "Turn show formulas off with Ctrl+` and read the block as values again.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C66:F71 · The same key turns it back."
+   },
+   {
+    "lesson_id": "f9-show-formulas-at-scale",
+    "goal_index": "8",
+    "text": "Does it tie? Watch a Mueller wash on Transactions change and the block move with it, D67 included.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell D67 · Every cell in the block reads the export or the counts now."
+   }
+  ],
+  "hardcode-external-link-hunt": [
+   {
+    "lesson_id": "hardcode-external-link-hunt",
+    "goal_index": "0",
+    "text": "Open Data › Edit Links with Alt A K and read the one external link: last year’s databook, Databook FY25.xlsx.",
+    "teach": "A stray link like this is born when someone types =, switches to another open file (Ctrl+Tab cycles the open workbooks, even with a formula open) and points. Edit Links shows the file it reads, and #REF! is what a reader sees once that file has moved.",
+    "why": "",
+    "hint_stuck": "pulse cell C73 · The list shows every other workbook this file reads."
+   },
+   {
+    "lesson_id": "hardcode-external-link-hunt",
+    "goal_index": "1",
+    "text": "Close it, then find the cell that carries the link with Ctrl+F for [ and close Find.",
+    "teach": "An external reference always starts with the file name in square brackets, so Find for [ lands on it. The same search finds what reads a sheet: before deleting a tab, Find its name with Within set to Workbook and Look in to Formulas, Find All, and repoint every cell in the list.",
+    "why": "",
+    "hint_stuck": "pulse cell C73 · The prior year sits under the total, in the block’s last rows."
+   },
+   {
+    "lesson_id": "hardcode-external-link-hunt",
+    "goal_index": "2",
+    "text": "Type the 710 the link fetched into C73, its source Databook FY25, Summary F21 in D73, and make both blue.",
+    "teach": "A figure from outside the file becomes an input: typed, blue, and documented, with the source in the next cell so a reader can check it.",
+    "why": "",
+    "hint_stuck": "pulse range C73:D73 · The value goes where the link was, the source beside it."
+   },
+   {
+    "lesson_id": "hardcode-external-link-hunt",
+    "goal_index": "3",
+    "text": "Press Alt A K again: with no cell reading it, the link has gone and Excel says the workbook has no links.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C73 · Excel drops a link as soon as the last formula reading it is gone."
+   },
+   {
+    "lesson_id": "hardcode-external-link-hunt",
+    "goal_index": "4",
+    "text": "Move the 1.05 out of the formulas: label B75 Price uplift (x), type 1.05 blue in C75, two decimals with the separator and (1,234).",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range B75:C75 · An input gets its own labelled cell, two rows under the block’s total."
+   },
+   {
+    "lesson_id": "hardcode-external-link-hunt",
+    "goal_index": "5",
+    "text": "Select E66:E71 and replace 1.05 with $C$75, so all six new-price formulas read the input.",
+    "teach": "Replace inside the selection rewrites every formula at once: 1.05 becomes $C$75, anchored, so each row reads the same input.",
+    "why": "",
+    "hint_stuck": "pulse range E66:E71 · The column beside Retail revenue is the one at new prices."
+   },
+   {
+    "lesson_id": "hardcode-external-link-hunt",
+    "goal_index": "6",
+    "text": "Does it tie? Watch the uplift in C75 change to 1.08 and the whole new-price column answer.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C75 · One input, six formulas reading it."
+   }
+  ],
+  "checks-block-rollup": [
+   {
+    "lesson_id": "checks-block-rollup",
+    "goal_index": "0",
+    "text": "Fill the last two checks: =Loans!C167 in C84, then in C85 members active plus cancelled less the list, and make both green.",
+    "teach": "A check that reads another sheet is a link, so it is green like any link. The loan’s check already sits on Loans at C167; the Summary only points at it.",
+    "why": "",
+    "hint_stuck": "pulse range C84:C85 · Both are differences that should read zero."
+   },
+   {
+    "lesson_id": "checks-block-rollup",
+    "goal_index": "1",
+    "text": "In C86 count the checks not at zero with =COUNTIF(C80:C85,\"<>0\").",
+    "teach": "COUNTIF with \"<>0\" counts the cells that are not zero, so the roll-up reads how many checks fail. A count can be fooled by nothing, but a plain SUM of the checks can: one check off by +1 and another by -1 add to zero. =SUMPRODUCT(ABS(C80:C85)) adds the sizes of the misses instead, and is the safer total when a reader wants the amount.",
+    "why": "",
+    "hint_stuck": "pulse cell C86 · The range is the six checks above it."
+   },
+   {
+    "lesson_id": "checks-block-rollup",
+    "goal_index": "2",
+    "text": "In C87 turn the count into one word with =IF(C86=0,\"OK\",\"CHECK\").",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C87 · No checks off reads OK; anything else reads CHECK."
+   },
+   {
+    "lesson_id": "checks-block-rollup",
+    "goal_index": "3",
+    "text": "Link the flag to the top of the Summary, =C87 in C2, so it is the first thing a reader sees.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C2 · The page’s first row under the title."
+   },
+   {
+    "lesson_id": "checks-block-rollup",
+    "goal_index": "4",
+    "text": "Select column C and pick both flags at once with Go To Special, Formulas, Text only: C2 and C87 light.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C87 · The only formulas in column C that return words are the two flags."
+   },
+   {
+    "lesson_id": "checks-block-rollup",
+    "goal_index": "5",
+    "text": "Give both a conditional format with Alt H L H E so CHECK turns red.",
+    "teach": "Home › Conditional Formatting › Highlight Cells Rules › Equal To (Alt, H, L, H, E) formats every selected cell whose value equals what you type; light red fill with dark red text is its first style.",
+    "why": "",
+    "hint_stuck": "pulse cell C2 · Equal To, then type the word that should turn red."
+   },
+   {
+    "lesson_id": "checks-block-rollup",
+    "goal_index": "6",
+    "text": "Does it tie? Watch a member’s status typed over on Members turn the flag in C2 to a red CHECK, then go back.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C2 · A status the members check does not know breaks the tie."
+   }
+  ],
+  "challenge-six-faults": [
+   {
+    "lesson_id": "challenge-six-faults",
+    "goal_index": "0",
+    "text": "Airport’s SUMIF in D70 stops a row short of the export: make the ranges in D66:D71 run to row 94.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-six-faults",
+    "goal_index": "1",
+    "text": "One site’s retail revenue in D66:D71 is a typed number: give every row the same live SUMIF.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-six-faults",
+    "goal_index": "2",
+    "text": "One wash count in C66:C71 is a number stored as text: link every row to its site count again.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-six-faults",
+    "goal_index": "3",
+    "text": "C73 reads last year’s databook through an external link: replace it with the 710 it fetched, typed blue.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-six-faults",
+    "goal_index": "4",
+    "text": "One new-price formula in E66:E71 multiplies by a typed 1.05: point it at the uplift input in C75.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-six-faults",
+    "goal_index": "5",
+    "text": "The loan check in C84 is a typed 0: link it to the schedule’s check on Loans, and the flag in C2 reads OK.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "ch3-project": [
+   {
+    "lesson_id": "ch3-project",
+    "goal_index": "0",
+    "text": "On Transactions trim the codes in B, turn the text amounts in E into numbers, then LEN, LEFT, RIGHT and the MID channel in R, S, T and W.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch3-project",
+    "goal_index": "1",
+    "text": "Give every export row its period keys in G:K: the month key by TEXT, the month end, the quarter, the quarter label and the week of.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch3-project",
+    "goal_index": "2",
+    "text": "Age the sites on Sites J:K, link Summary L5:L10 to the years in green, then set the $30 fee blue in Members L2 and build its tenure block.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch3-project",
+    "goal_index": "3",
+    "text": "Fill the flags block: the flag, on target and above target in E:G, sites on target in F12, the Bonus ($/day) by IFS in I and Concern in M:N.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch3-project",
+    "goal_index": "4",
+    "text": "Count the export: washes, member washes and retail washes by site in C15:E21, then washes and retail washes by package in C25:D28.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch3-project",
+    "goal_index": "5",
+    "text": "Add retail revenue by SUMIF and the average ticket by AVERAGEIFS in F15:G21, and a note in C22 that member washes carry $0.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch3-project",
+    "goal_index": "6",
+    "text": "Count active members by site in L15:L20, then membership revenue, total revenue and washes from Daily, with totals in row 21.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch3-project",
+    "goal_index": "7",
+    "text": "Fill site by package: washes by COUNTIFS in C34:E39 and retail revenue by SUMIFS in F34:H39, one formula each, totals in row 40.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch3-project",
+    "goal_index": "8",
+    "text": "Rank the sites by LARGE, SMALL and RANK in J15:K20, then retail revenue by SUMPRODUCT and the blended ticket in C29:C30.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch3-project",
+    "goal_index": "9",
+    "text": "Reconcile C44:I50: link the counts, type the tallies 10, 16, 22, 16, 16, 11 blue, then explain each gap in blue until I reads 0.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch3-project",
+    "goal_index": "10",
+    "text": "On Loans build the rate, periods, payment and totals in C12:C18, then the case: factors, NPV both ways, IRR and payback.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch3-project",
+    "goal_index": "11",
+    "text": "Build the schedule’s first twelve months in rows 38 to 49, months blue, with IPMT, PPMT and the running interest, and its check in C53.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch3-project",
+    "goal_index": "12",
+    "text": "Fix the old block: full ranges in D54:D59, a link in C57, 610 blue with its source in C61, the 1.05 uplift a blue input in C63.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch3-project",
+    "goal_index": "13",
+    "text": "Fill the checks in C68:C75, the two reading other sheets green, link the flag into C2, and turn CHECK red in both cells.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch3-project",
+    "goal_index": "14",
+    "text": "Does it tie? Watch the first amount on Transactions change to 150 and the flag in C2 turn to CHECK in red.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "ch3-assessment": [
+   {
+    "lesson_id": "ch3-assessment",
+    "goal_index": "0",
+    "text": "On Transactions trim the codes in B, turn the text amounts in E into numbers, then LEN, LEFT, RIGHT and the MID channel in R, S, T and W.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch3-assessment",
+    "goal_index": "1",
+    "text": "Give every export row its period keys in G:K: the month key by TEXT, the month end, the quarter, the quarter label and the week of.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch3-assessment",
+    "goal_index": "2",
+    "text": "Age the sites on Sites J:K, link Summary L5:L10 to the years in green, then set the $30 fee blue in Members L2 and build its tenure block.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch3-assessment",
+    "goal_index": "3",
+    "text": "Fill the flags block: the flag, on target and above target in E:G, sites on target in F12, the Bonus ($/day) by IFS in I and Concern in M:N.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch3-assessment",
+    "goal_index": "4",
+    "text": "Count the export: washes, member washes and retail washes by site in C15:E21, then washes and retail washes by package in C25:D28.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch3-assessment",
+    "goal_index": "5",
+    "text": "Add retail revenue by SUMIF and the average ticket by AVERAGEIFS in F15:G21, and a note in C22 that member washes carry $0.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch3-assessment",
+    "goal_index": "6",
+    "text": "Count active members by site in L15:L20, then membership revenue, total revenue and washes from Daily, with totals in row 21.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch3-assessment",
+    "goal_index": "7",
+    "text": "Fill site by package: washes by COUNTIFS in C34:E39 and retail revenue by SUMIFS in F34:H39, one formula each, totals in row 40.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch3-assessment",
+    "goal_index": "8",
+    "text": "Rank the sites by LARGE, SMALL and RANK in J15:K20, then retail revenue by SUMPRODUCT and the blended ticket in C29:C30.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch3-assessment",
+    "goal_index": "9",
+    "text": "Reconcile C44:I50 to the blue tallies in D: link the counts, take the gaps, then explain and adjust each in blue until I reads 0.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch3-assessment",
+    "goal_index": "10",
+    "text": "On Loans build the rate, periods, payment and totals in C12:C18, then the case: factors, NPV both ways, IRR and payback.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch3-assessment",
+    "goal_index": "11",
+    "text": "Build the schedule’s first twelve months in rows 38 to 49, months blue, with IPMT, PPMT and the running interest, and its check in C53.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch3-assessment",
+    "goal_index": "12",
+    "text": "Fix the old block: full ranges in D54:D59, a link in C57, 610 blue with its source in C61, the 1.05 uplift a blue input in C63.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch3-assessment",
+    "goal_index": "13",
+    "text": "Fill the checks in C68:C75, the two reading other sheets green, link the flag into C2, and turn CHECK red in both cells.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch3-assessment",
+    "goal_index": "14",
+    "text": "Does it tie? Watch the first amount on Transactions change to 150 and the flag in C2 turn to CHECK in red.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
   ]
  },
  "modules": {
@@ -7933,6 +8973,27 @@ export const COPY = {
    "objective": "LEFT, RIGHT and MID to split the codes, FIND and SUBSTITUTE to parse the memo, VALUE for a text export, Text to Columns and Flash Fill.",
    "story_beat": "The codes have to become words. || The POS writes AUS-DOM where a buyer wants Austin and Domain in their own columns, it packs the package and channel into one memo, and when the terminal hiccups it sends amounts as text. Text functions take a string apart and put it back together, Text to Columns does the same for a whole column at once, and nothing gets retyped.",
    "page_name": "The export, in columns"
+  },
+  "time-value-of-money": {
+   "id": "time-value-of-money",
+   "name": "Time value of money",
+   "objective": "PMT, PV and FV on the site loan, NPV and IRR on a new-site case, and the payment schedule.",
+   "story_beat": "What is a new site worth? || Cedar Park cost $5m all in (the land, which Clearcoat owns there, and the build) and was funded with a $3.5m loan, and the buyers want two things: the loan’s schedule, and whether a site like it is worth building at all. A dollar next year is worth less than a dollar today, and the functions in this module say how much less: PMT for the loan, NPV and IRR for the site.",
+   "page_name": "The new-site case"
+  },
+  "auditing": {
+   "id": "auditing",
+   "name": "Auditing",
+   "objective": "Trace arrows, Evaluate Formula and F9, the hardcode and external link hunt, and a checks block that rolls up to one flag.",
+   "story_beat": "Somebody else’s Summary doesn’t tie. || Before you built yours, someone started a Summary sheet and left. It has a SUMIF pointing at a range a row short, a typed number in a formula column, a text \"12\", and a total that agrees with nothing. Chapter 1 taught the three looks; this module adds the tools a reviewer uses on a sheet they didn’t build, and the checks block that says, in one cell, whether the databook ties.",
+   "page_name": "The Summary, rebuilt"
+  },
+  "ch3-project-and-assessment": {
+   "id": "ch3-project-and-assessment",
+   "name": "Project and assessment",
+   "objective": "Build the San Antonio databook end to end, then prove it against the clock; or test out of the chapter.",
+   "story_beat": "The databook, tied out. || A fresh export, a fresh site list, a Summary someone else abandoned. Rebuild it so every number reads the export and the flag reads OK, then value the next site on the list. Build it, then build it again on the clock. The assessment is the test-out.",
+   "page_name": "The KPI databook"
   }
  },
  "site": {

@@ -299,3 +299,10 @@ test('a bracket inside a string literal is text: the entry commits, and only rea
   s.commitInput(channel, 1, 2);
   assert.equal(s.value('B1'), 'kiosk');
 });
+
+test('a bracket inside a string literal is text: the auto-close counts only real brackets', () => {
+  const mid = '=MID(F5,FIND("(",F5)+1,FIND(")",F5)-FIND("(",F5)-1)';
+  assert.deepEqual(Sheet.classifyInput(mid), { kind: 'formula', formula: mid });
+  assert.deepEqual(Sheet.classifyInput('=LEN("(")'), { kind: 'formula', formula: '=LEN("(")' });
+  assert.deepEqual(Sheet.classifyInput('=LEN("("'), { kind: 'formula', formula: '=LEN("(")' }, 'a missing close is still added');
+});

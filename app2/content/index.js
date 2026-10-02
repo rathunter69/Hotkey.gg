@@ -82,6 +82,19 @@ import one_page_summary from './lessons/one-page-summary.js';
 import challenge_print_pack from './lessons/challenge-print-pack.js';
 import ch2_project from './lessons/ch2-project.js';
 import ch2_assessment from './lessons/ch2-assessment.js';
+// Chapter 3 · Formulas and functions (Run R3): 3.5 Time value of money, 3.6 Auditing, 3.7 Project and assessment
+import pv_fv_pmt from './lessons/pv-fv-pmt.js';
+import npv_xnpv from './lessons/npv-xnpv.js';
+import irr_xirr from './lessons/irr-xirr.js';
+import payment_schedule from './lessons/payment-schedule.js';
+import challenge_new_site_case from './lessons/challenge-new-site-case.js';
+import trace_arrows_evaluate from './lessons/trace-arrows-evaluate.js';
+import f9_show_formulas_at_scale from './lessons/f9-show-formulas-at-scale.js';
+import hardcode_external_link_hunt from './lessons/hardcode-external-link-hunt.js';
+import checks_block_rollup from './lessons/checks-block-rollup.js';
+import challenge_six_faults from './lessons/challenge-six-faults.js';
+import ch3_project from './lessons/ch3-project.js';
+import ch3_assessment from './lessons/ch3-assessment.js';
 import remix_format_on_the_pnl from './remixes/formatting-on-the-pnl.js';   // Chapter 1's format challenge, re-clothed (content/remix.js)
 // Chapter 3 · Formulas and functions (Run R3, the KPI databook on clearcoat-databook): 3.1 logic, 3.2 dates
 import if_on_a_threshold from './lessons/if-on-a-threshold.js';
@@ -185,6 +198,9 @@ export const CHAPTERS = [
       date_serials, member_tenure, period_keys, yearfrac_and_fiscal_periods, trading_calendar, challenge_timeline_and_age,
       round_family, countif_countifs, sumif_sumifs_averageifs, busiest_sites, sumproduct_blended_ticket, the_reconciliation, challenge_site_package_summary,
       split_the_codes, parse_the_memo, text_to_numbers, text_to_columns_flash_fill, challenge_text_dump,
+      pv_fv_pmt, npv_xnpv, irr_xirr, payment_schedule, challenge_new_site_case,
+      trace_arrows_evaluate, f9_show_formulas_at_scale, hardcode_external_link_hunt, checks_block_rollup, challenge_six_faults,
+      ch3_project, ch3_assessment,
     ],
   },
 ];
