@@ -372,6 +372,7 @@ export class Sheet {
     if (opts.gridlines === false) this.gridlines = false;
     if (opts.names) for (const k in opts.names) { const n = opts.names[k]; if (n && n.ref) this.names[String(n.name || k).toUpperCase()] = { name: String(n.name || k), ref: String(n.ref) }; }
     if (opts.zoom) this.zoom = clampZoom(opts.zoom);
+    if (opts.validation && typeof opts.validation === 'object') this.validation = clone(opts.validation);
     if (opts.active) this.active = this.clamp(opts.active.r, opts.active.c);
     this.recalc();
   }
@@ -1677,6 +1678,7 @@ export class Sheet {
     if (this.condFmt.length) out.condFmt = clone(this.condFmt);
     if (Object.keys(this.names).length) out.names = clone(this.names);
     if (this.zoom !== ZOOM_DEFAULT) out.zoom = this.zoom;
+    if (this.validation && Object.keys(this.validation).length) out.validation = clone(this.validation);
     return out;
   }
 }

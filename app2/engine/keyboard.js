@@ -370,8 +370,8 @@ export class Session {
     const cls = Sheet.classifyInput(buf, S.get(r, c), S.today);
     if (cls.kind === 'fix') { this.fxfixPend = { fixed: cls.fixed, dr, dc, all: false, via: via || null }; this.dialog = 'fxfix'; return false; }
     if (cls.kind === 'bad') { this.refuse(); return false; }
-    const dv = this.validationCheck(r, c, cls);   // Data Validation: the entry fails the cell's rule: Excel's alert, Retry (keeps the editor) or Cancel
-    if (dv) { this.dvPend = dv; this.dialog = 'dvalert'; this.logKey('⚠'); if (this.opts.onRefuse) this.opts.onRefuse(); return false; }
+    const dv = this.dvBypass ? null : this.validationCheck(r, c, cls); this.dvBypass = false;   // Data Validation: the entry fails the cell's rule: Excel's alert, Retry (keeps the editor) or Cancel
+    if (dv) { this.dvPend = Object.assign(dv, { dr, dc, via: via || null }); this.dialog = 'dvalert'; this.logKey('⚠'); if (this.opts.onRefuse) this.opts.onRefuse(); return false; }
     if (S.get(r, c).table) { this.toast(TABLE_CELL_NOTE); this.logKey('⚠'); return false; }   // part of a data table: Excel refuses the entry
     this.editing = false; this.editBuf = ''; this.editAnchor = null; this.endPoint();
     if (cls.kind !== 'empty') { S.pushUndo(); S.applyInput(S.ensure(r, c), cls, r, c); }
@@ -1786,7 +1786,10 @@ export class Session {
       if (k === 'Escape') { this.dialog = null; this.fxfixPend = null; return true; }
       return true;
     }
-    if (this.dialog === 'dvalert') {   // the Data Validation alert over the open editor: Retry (Enter, R) keeps the entry to fix, Cancel (Esc, C) discards it
+    if (this.dialog === 'dvalert') {   // the Data Validation alert over the open editor: Stop has Retry (Enter, R) to keep the entry and Cancel (Esc, C) to discard it; Warning asks Continue? (Enter, Y: Yes keeps the entry; N: No goes back to it); Information has OK (Enter) to keep it
+      const pend = this.dvPend;
+      if (pend && pend.style !== 'stop' && (k === 'Enter' || k.toLowerCase() === 'y')) { this.logKey(k === 'Enter' ? '↵' : 'Y'); this.dialog = null; this.dvPend = null; this.dvBypass = true; this.commitEdit(pend.dr, pend.dc, pend.via); return true; }
+      if (pend && pend.style === 'warning' && k.toLowerCase() === 'n') { this.logKey('N'); this.dialog = null; this.dvPend = null; return true; }
       if (k === 'Enter' || k.toLowerCase() === 'r') { this.logKey(k === 'Enter' ? '↵' : 'R'); this.dialog = null; this.dvPend = null; return true; }
       if (k === 'Escape' || k.toLowerCase() === 'c') { this.logKey(k === 'Escape' ? 'Esc' : 'C'); this.dialog = null; this.dvPend = null; this.cancelEdit(); return true; }
       return true;

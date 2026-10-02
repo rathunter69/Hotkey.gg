@@ -82,3 +82,11 @@ test('Data Validation (Alt A V V): a list from a range or a name with the Alt+Do
   S.goTo(3, 4); s.run('Alt A V V Alt+C Enter'); assert.equal(S.validation.D3, undefined, 'Clear All removes the rule');
   s.run('Ctrl+Z'); assert.ok(S.validation.D3, 'undo brings the rule back');
 });
+
+test('Data Validation: a Warning alert lets the entry in on Yes, No goes back to it; the rules survive toJSON', () => {
+  const s = fresh({}); const S = s.sheet;
+  s.run('Alt A V V W Alt+M 1 Alt+X 10 Ctrl+PageDown Ctrl+PageDown Down Enter'); assert.equal(S.validation.A1.errStyle, 'warning');
+  s.run('"50" Enter'); assert.equal(s.dialog, 'dvalert'); s.run('N'); assert.equal(s.editing, true); assert.equal(s.dialog, null);
+  s.run('Enter'); assert.equal(s.dialog, 'dvalert'); s.run('Enter'); assert.equal(S.value('A1'), 50, 'Yes keeps the entry'); assert.equal(s.editing, false);
+  const back = new Sheet(JSON.parse(JSON.stringify(S.toJSON()))); assert.equal(back.validation.A1.max, '10');
+});
