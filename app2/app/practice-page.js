@@ -48,6 +48,13 @@ export const DRILL_MODULE = {
   'format-the-weekly-page': 'format',
   'insert-and-amend': 'formulas', 'formula-sprint': 'formulas', 'combine-two-tabs': 'formulas',
   'before-you-send': 'present-and-audit', 'weekly-sales-report': 'present-and-audit',
+  // Chapter 2 (script-ch2.md's module ids)
+  'ch2-format-sprint': 'number-formats', 'ch2-to-thousands': 'number-formats', 'ch2-flip-and-tie': 'number-formats',
+  'ch2-custom-code': 'custom-number-formats', 'ch2-the-divider': 'the-page-a-buyer-reads', 'ch2-top-and-bottom': 'the-page-a-buyer-reads',
+  'ch2-flag-it': 'conditional-formatting', 'ch2-print-it': 'printing-and-page-layout', 'ch2-pnl-to-standard': 'printing-and-page-layout', 'puzzle-ch2': 'custom-number-formats',
+  // Chapter 3 (script-ch3.md's module ids)
+  'ch3-if-ladder': 'logic', 'ch3-override': 'logic', 'ch3-date-math': 'dates', 'ch3-sumifs-sprint': 'math-and-aggregation', 'ch3-bands': 'math-and-aggregation',
+  'ch3-text-split': 'text', 'ch3-loan-schedule': 'time-value-of-money', 'ch3-trace-the-error': 'auditing', 'ch3-tie-it-out': 'auditing', 'puzzle-ch3': 'dates',
   // Chapter 5 (script-ch5.md's module ids)
   'ch5-statement-link': 'linking-the-statements', 'ch5-schedule-fill': 'schedules', 'ch5-balance-it': 'linking-the-statements',
   'ch5-discount-it': 'dcf', 'ch5-sweep': 'linking-the-statements', 'ch5-checks': 'auditing-a-model',
