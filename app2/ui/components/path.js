@@ -55,7 +55,7 @@ export function keysRowHtml(keys, { max = 4 } = {}) {
 export function chapterCardsHtml(cards, label = '') {
   return `<div class="ch-cards tabs" role="tablist"${label ? ` aria-label="${esc(label)}"` : ''}>${cards.map(c => {
     const pct = Math.max(0, Math.min(100, Math.round(c.pct || 0)));
-    return `<button type="button" role="tab" class="tab ch-card${c.on ? ' on' : ''}${c.locked ? ' locked' : ''}${pct >= 100 ? ' full' : ''}" aria-selected="${c.on ? 'true' : 'false'}" tabindex="${c.on ? 0 : -1}" data-tab="${esc(c.key)}" data-keytip-label="${esc(c.title)}">
+    return `<button type="button" role="tab" class="tab ch-card${c.on ? ' on' : ''}${c.locked ? ' locked' : ''}${pct >= 100 ? ' full' : ''}" aria-selected="${c.on ? 'true' : 'false'}"${c.locked && c.note ? ` title="${esc(c.note)}"` : ''} tabindex="${c.on ? 0 : -1}" data-tab="${esc(c.key)}" data-keytip-label="${esc(c.title)}">
       <span class="ch-top"><kbd class="ch-n">${esc(c.n)}</kbd><span class="ch-note">${esc(c.note || '')}</span></span>
       <span class="ch-title">${esc(c.title)}</span>
       <span class="ch-bar" aria-hidden="true"><i style="width:${pct}%"></i></span>
@@ -85,27 +85,6 @@ export function moduleRowHtml(row, { open = false, locked = false, status = '', 
     <span class="mod-main"><span class="mod-head"><span class="mod-title">${esc(row.title)}</span>${minutes ? `<span class="mod-min">${esc(minutes)}</span>` : ''}</span>${pathNodesHtml(row.nodes)}</span>
     <span class="mod-end">${status ? `<span class="mod-status">${esc(status)}</span>` : ''}${tierMarksHtml(row.tier || 'none')}</span>
   </div>`;
-}
-
-/**
- * A drill as a tile (the catalog, the Challenges page): its name, the keys it drills as keycaps
- * (the lead fact), its length, and at the foot your best with its tier, or why it is closed: the
- * module to finish first, or Full Access with a lock. d: { id, title, keys, length, best, tier, open,
- * after, pro, href, mode, sub, next }; words: { notPlayed, after, full }.
- */
-export function drillTileHtml(d, words = {}) {
-  const closed = d.pro || !d.open;
-  const foot = d.pro ? `<span class="dt-lock">${esc(words.full || '')}</span>`
-    : !d.open ? `<span class="dt-lock dt-after">${esc(words.after || '')}</span>`
-    : d.best ? `<span class="dt-time">${esc(d.best)}</span>${tierMarksHtml(d.tier || 'none')}` : `<span class="dt-new">${esc(words.notPlayed || '')}</span>${tierMarksHtml('none')}`;
-  const attrs = d.pro ? ` data-pro="${esc(d.id)}" data-cursor tabindex="-1"` : closed ? '' : ' data-cursor tabindex="-1"';
-  const tag = d.href && !closed ? 'a' : 'div';
-  return `<${tag} class="dt row-drill${d.pro ? ' pro' : ''}${!d.open && !d.pro ? ' later' : ''}${d.best ? ' played' : ''}${d.next ? ' next' : ''}"${tag === 'a' ? ` href="${esc(d.href)}" data-href="${esc(d.href)}"` : ''}${attrs}${d.mode ? ` style="--mode:var(--${esc(d.mode)})"` : ''}>
-    <span class="dt-head"><span class="dt-title">${esc(d.title)}</span>${d.length ? `<span class="dt-len">${esc(d.length)}</span>` : ''}</span>
-    ${d.sub ? `<span class="dt-sub">${esc(d.sub)}</span>` : ''}
-    ${keysRowHtml(d.keys || [], { max: 4 })}
-    <span class="dt-foot">${foot}</span>
-  </${tag}>`;
 }
 
 /**

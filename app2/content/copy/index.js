@@ -4334,7 +4334,7 @@ export const COPY = {
   "col_field": "Time against the field",
   "col_time": "Time",
   "col_gap": "Gap",
-  "col_keys": "Keys",
+  "col_keys": "Keys it drills",
   "boards_keys_route": "Keys ({n} on the route)",
   "boards_up": "up {k}",
   "boards_down": "down {k}",

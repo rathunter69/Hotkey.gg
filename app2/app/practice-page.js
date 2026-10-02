@@ -23,7 +23,7 @@ import { COURSE } from './progress-model.js';
 import { siteCopy } from '../content/copy/apply.js';
 import { esc, fill, fmtClock, fmtLength, numberWord, prettyDay } from '../ui/components/format.js';
 import { panelHtml, tableHtml, buttonHtml, headerBlockHtml, wireRows, wireTabs } from '../ui/components/table.js';
-import { routeKeys, keysRowHtml, chapterCardsHtml, drillTileHtml } from '../ui/components/path.js';
+import { routeKeys, keysRowHtml, chapterCardsHtml } from '../ui/components/path.js';
 import { saveNudgeHtml, wireSaveNudge } from '../ui/components/nudge.js';
 import { tierMarksHtml } from '../ui/components/marks.js';
 import { paywallHtml } from '../ui/components/paywall.js';
@@ -144,6 +144,21 @@ export function dueDrills(catalog, dueConcepts) {
 
 const bestsOf = () => { const out = {}; for (const d of DRILLS) { const pb = store.pb(d.id); if (pb) out[d.id] = { secs: pb.secs, tier: bestTier(store.attempts({ ref: d.id })) }; } return out; };
 
+/**
+ * The catalog as a worksheet (the drills, the challenges): A the name (and the module under it), B the
+ * keys it drills as keycaps, C the length, D your time or why it is closed, E the tier. rows: [{ id,
+ * title, sub, keys, length, best, tier, open, after, pro, href, next, done }].
+ */
+function drillSheetHtml(rows, label) {
+  const lock = (word, cls = '') => `<span class="dt-lock${cls}">${esc(word)}</span>`;
+  const columns = [{ key: 'name', label: t('col_drill') }, { key: 'keys', label: t('col_keys') }, { key: 'len', label: t('col_length'), align: 'right', cls: 'min' }, { key: 'best', label: t('col_best'), align: 'right', cls: 'best' }, { key: 'tier', label: '', align: 'right', cls: 'tier' }];
+  return tableHtml({ sheet: true, columns, label, cls: 'tbl-drills', rows: rows.map(r => ({
+    cells: { name: `<span class="row-name">${esc(r.title)}</span>${r.sub ? `<span class="row-sub">${esc(r.sub)}</span>` : ''}`, keys: keysRowHtml(r.keys || [], { max: 3 }), len: esc(r.length || ''),
+      best: r.pro ? lock(t('paywall_pro')) : !r.open ? lock(t('practice_after', { n: r.after }), ' dt-after') : r.best ? `<span class="dt-time">${esc(r.best)}</span>` : `<span class="dt-new">${esc(r.done ? t('status_done') : t('practice_not_played'))}</span>`,
+      tier: r.pro || !r.open ? '' : tierMarksHtml(r.tier || 'none') },
+    cls: `row-drill${r.pro ? ' pro' : ''}${!r.open && !r.pro ? ' later' : ''}${r.next ? ' next' : ''}`, href: r.pro || !r.open ? '' : r.href, attrs: r.pro ? { 'data-pro': r.id } : null, cursor: r.pro || r.open })) });
+}
+
 /* ---------------- the four pages ---------------- */
 
 function drillsPage(el, ctx) {
@@ -177,9 +192,8 @@ function drillsPage(el, ctx) {
     const g = groups.find(x => x.id === chapterKey) || { id: tab.key, n: tab.n, title: tab.title, rows: [], passed: 0, of: 0 };
     const chLocked = tab.access === 'paid' && !pro;
     const nextId = (g.rows.find(r => r.open && !r.pro && r.best == null) || {}).id;
-    const tiles = g.rows.map(r => drillTileHtml({ id: r.id, title: r.title, keys: keysOf(r.id), length: fmtLength(r.length), best: r.best != null ? fmtClock(r.best) : '', tier: r.tier, open: r.open, pro: r.pro, href: '#/drill/' + r.id, next: r.id === nextId },
-      { notPlayed: t('practice_not_played'), after: t('practice_after', { n: r.after }), full: t('paywall_pro') })).join('');
-    const main = panelHtml({ heading: esc(t('chapter_heading', { n: g.n, name: g.title })), facts: g.of ? esc(t('practice_chapter_fact', { done: g.passed, of: g.of })) : '', body: g.rows.length ? `<div class="dt-grid" data-cursor-cols="3">${tiles}</div>` : `<p class="panel-line">${esc(t('practice_chapter_coming', { n: g.n }))}</p>`, cls: 'catalog', stretch: true });
+    const tiles = drillSheetHtml(g.rows.map(r => ({ id: r.id, title: r.title, keys: keysOf(r.id), length: fmtLength(r.length), best: r.best != null ? fmtClock(r.best) : '', tier: r.tier, open: r.open, after: r.after, pro: r.pro, href: '#/drill/' + r.id, next: r.id === nextId })), g.title);
+    const main = panelHtml({ heading: esc(t('chapter_heading', { n: g.n, name: g.title })), facts: g.of ? esc(t('practice_chapter_fact', { done: g.passed, of: g.of })) : '', body: g.rows.length ? tiles : `<p class="panel-line">${esc(t('practice_chapter_coming', { n: g.n }))}</p>`, cls: 'catalog', stretch: true });
     // the set, inline: what Start drilling plays, in order, and why each is in it
     const setRows = set.ids.map((id, i) => { const e = CATALOG.find(x => x.id === id); return `<a class="set-row" href="#/drill/${esc(id)}"><kbd class="key set-n">${i + 1}</kbd><span class="set-main"><span class="row-name">${esc(e.title)}</span><span class="row-sub">${esc(t('reason_' + String(set.reasons[id]).replace('-', '_')))}</span></span><span class="set-len">${esc(fmtLength(e.length))}</span></a>`; }).join('');
     const setPanel = panelHtml({ heading: esc(t('practice_set_heading')), facts: set.ids.length ? esc(fmtLength(set.secs)) : '', body: set.ids.length ? `<div class="set-list">${setRows}</div>` : `<p class="panel-line">${esc(t('practice_set_none'))}</p>`, cls: 'set-panel', stretch: true });
@@ -321,9 +335,8 @@ function challengesPage(el, ctx) {
     });
     const tab = tabs.find(c => c.key === chapterKey) || tabs[0];
     const mine = rows.filter(r => chOf(r.id) === tab.key);
-    const tiles = mine.map(r => drillTileHtml({ id: r.id, title: r.module, sub: r.title, keys: keysOf(r.id), length: r.length ? fmtLength(r.length) : '', best: r.best != null ? fmtClock(r.best, true) : '', tier: r.tier, open: true, pro: r.locked, href: `#/lesson/${r.id}?seed=new`, next: !!(next && r.id === next.id), mode: 'challenges' },
-      { notPlayed: r.passed ? t('status_done') : t('practice_not_played'), full: t('paywall_pro') })).join('');
-    const main = panelHtml({ heading: esc(t('chapter_heading', { n: tab.n, name: tab.title })), facts: mine.length ? esc(t('challenges_passed', { n: mine.filter(r => r.passed).length, m: mine.length })) : '', body: mine.length ? `<div class="dt-grid" data-cursor-cols="3">${tiles}</div>` : `<p class="panel-line">${esc(t('learn_coming', { n: tab.n }))}</p>`, cls: 'challenges', stretch: true });
+    const tiles = drillSheetHtml(mine.map(r => ({ id: r.id, title: `${r.n} ${r.module}`, sub: r.title, keys: keysOf(r.id), length: r.length ? fmtLength(r.length) : '', best: r.best != null ? fmtClock(r.best, true) : '', tier: r.tier, open: true, pro: r.locked, href: `#/lesson/${r.id}?seed=new`, next: !!(next && r.id === next.id), done: r.passed })), tab.title);
+    const main = panelHtml({ heading: esc(t('chapter_heading', { n: tab.n, name: tab.title })), facts: mine.length ? esc(t('challenges_passed', { n: mine.filter(r => r.passed).length, m: mine.length })) : '', body: mine.length ? tiles : `<p class="panel-line">${esc(t('learn_coming', { n: tab.n }))}</p>`, cls: 'challenges', stretch: true });
     // the side: what each tier takes on the next challenge, from its pars
     const nd = next ? drills.find(d => d.id === next.id) : null;
     const pars = nd && nd.pars ? nd.pars : null;
