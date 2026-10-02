@@ -1,16 +1,14 @@
 // app2/app/billing.js — the browser side of checkout (docs/phases/E-checkout.md, section 6). It
 // never holds a secret: it invokes the two signed-in edge functions with the user's own session,
-// loads Stripe.js from Stripe's host for the embedded form, and reads the account's OWN
+// leaves the payment form to checkout.js and its processor adapter, and reads the account's OWN
 // entitlement rows (RLS) to say what plan it holds. Fulfilment is the webhook's job alone; nothing
 // here grants anything.
 //
 //   startCheckout()           → { clientSecret, student } | { error }      ('already_subscribed', 'not_signed_in', 'network', …)
 //   openPortal(flow)          → navigates to Stripe's Customer Portal; resolves { error } if it couldn't
 //   planDetails()             → planSummary of this account's rows, or null for a guest or offline
-//   loadStripe()              → window.Stripe, the script added once
 //   planSummary(rows, now)    pure: { kind:'free' } | { kind:'subscription', plan, student, renews, date } | { kind:'granted', endsAt }
 import { auth } from './auth.js';
-import { STRIPE_JS_URL } from './config.js';
 import { isLive } from './entitlement.js';
 import { track } from './telemetry.js';
 
@@ -86,19 +84,8 @@ export async function planDetails() {
   } catch (e) { return null; }
 }
 
-let stripeLoad = null;
-export function loadStripe() {
-  if (typeof window !== 'undefined' && window.Stripe) return Promise.resolve(window.Stripe);
-  if (stripeLoad) return stripeLoad;
-  stripeLoad = new Promise((resolve, reject) => {
-    const s = document.createElement('script');
-    s.src = STRIPE_JS_URL; s.async = true;
-    s.onload = () => (window.Stripe ? resolve(window.Stripe) : reject(new Error('Stripe.js loaded without Stripe')));
-    s.onerror = () => { stripeLoad = null; s.remove(); reject(new Error('Stripe.js did not load')); };
-    document.head.appendChild(s);
-  });
-  return stripeLoad;
-}
+/** Stripe.js now loads in the Stripe adapter (processors/stripe.js), behind checkout.js. */
+export { loadStripe } from './processors/stripe.js';
 
 /**
  * When a subscriber finishes the last chapter, the course-complete email is due (brief section 6):

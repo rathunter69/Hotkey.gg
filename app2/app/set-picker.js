@@ -9,7 +9,8 @@
 //
 //   catalog   catalog entries (CATALOG, or a subset)
 //   minutes   5 | 10 | 20 (SET_LENGTHS)
-//   pro       true when the account is Pro; a free account never sees a paid drill
+//   pro       true when the account holds Full Access, or a function chapterId → open (M58);
+//             a paid drill in a chapter the account can't open is never picked
 //   due       drill ids whose keys are due a refresher (the schedule), in due order
 //   unlocked  drill ids whose teaching lesson is done, in catalog order; a drill off the list is locked
 //   bests     { [id]: { secs, tier } } the learner's best clean runs
@@ -20,7 +21,8 @@ const TIER_UP = { none: 'pass', pass: 'pro', pro: 'legendary' };
 export function pickSet({ catalog = [], minutes = 10, pro = false, due = [], unlocked = [], bests = {} } = {}) {
   const budget = (SET_LENGTHS.includes(minutes) ? minutes : 10) * 60;
   const open = new Set(unlocked);
-  const playable = catalog.filter(e => e.mode === 'drill' && (pro || e.access === 'free') && open.has(e.id) && !e.tags.includes('long'));
+  const opens = typeof pro === 'function' ? pro : () => !!pro;   // M58: true/false for every chapter, or a chapter test
+  const playable = catalog.filter(e => e.mode === 'drill' && (e.access === 'free' || opens(e.chapter)) && open.has(e.id) && !e.tags.includes('long'));
   const byId = Object.fromEntries(playable.map(e => [e.id, e]));
   const best = id => bests && bests[id] && Number.isFinite(bests[id].secs) ? bests[id] : null;
 

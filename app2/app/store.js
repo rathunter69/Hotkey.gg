@@ -207,6 +207,7 @@ async function sendOne(sb, t, rpc, args) {
     if (isAuthError(error, status)) return 'auth';
     const msg = String(error.message || '');
     if (msg.includes('bad attempt')) return 'drop';
+    if (msg.includes('no access')) return 'drop';   // 0013: a paid chapter's run from an account that can't open it; retrying can't change that
     if (/does not exist|schema cache|PGRST202/i.test(msg)) return 'missing';
     return 'retry';
   } catch (e) {
@@ -498,7 +499,8 @@ export const store = {
       const { data, error } = await sb.rpc('rpc_board', { p_ref: ref, p_limit: limit, p_seed: seed == null ? null : seed });
       if (!auth.current(t) || error || !Array.isArray(data)) return null;
       const me = profile && profile.handle;
-      const v = { me: me || null, rows: data.map(r => ({ pos: Number(r.pos), handle: r.handle, level: r.level, secs: Number(r.secs), keys: r.keys, tier: r.tier, mine: !!me && r.handle === me })) };
+      // 0014: the server marks the caller's own row (pinned under the top rows when it sits lower) and the field's size; before it, the handle decides
+      const v = { me: me || null, field: data.length && data[0].field != null ? Number(data[0].field) : null, rows: data.map(r => ({ pos: Number(r.pos), handle: r.handle, level: r.level, secs: Number(r.secs), keys: r.keys, mine: typeof r.mine === 'boolean' ? r.mine : !!me && r.handle === me })) };
       boardCache.set(key, { at: Date.now(), v });
       return v;
     } catch (e) { return null; }

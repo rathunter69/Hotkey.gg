@@ -68,14 +68,13 @@ drill_daily_attempt,"That was attempt {n} today, and the board stays open until 
 rapid_intro,"We name a command and you press its keys, which stay hidden until you stall."
 rapid_fine,A round counts as practice and pays a little XP; it never sets a drill best.
 boards_closed,Desk and school boards aren’t open yet.
-boards_desk_prompt,Start a desk to compete with your own group.
+boards_desk_prompt,You aren’t on a desk. A desk comes with Teams: a private board for a class or a team.
 account_guest,"You’re a guest, so everything here is saved on this device only."
 account_title,Account
 account_level,Level {n}
 account_data,Your data
 paywall_line,Get full access for the rest of the content.
 paywall_signed_in,"This account doesn’t have full access yet. Get it here, or redeem a code on the Account page."
-teams_desk_signin,"Desks need an account, and desk creation isn’t open yet."
 page_failed,{page} didn’t load.
 rail_home,Home
 rail_learn,Learn
@@ -325,7 +324,7 @@ boards_seconds,{n} seconds
 boards_none_yet,No clean run on this board yet.
 boards_signed_out,Your own clean runs. The field opens when you sign in.
 boards_desks_signed_out,Sign in to see your desk’s board.
-boards_desk_link,Teams and desks
+boards_desk_link,Teams
 boards_loading,Loading the board
 boards_failed,Couldn’t load the board.
 boards_retry,Try again
@@ -796,40 +795,9 @@ save_line_ch1,Chapter 1 is nearly done. A free account keeps your progress on an
 certificate_name,hotkey.gg Certified
 certificate_course,Excel for Finance
 certificate_progress,{n} of 6 chapters Verified
-teams_title,Teams and schools
-teams_sub,"For banks, training providers, finance clubs, classes and friend groups. There are two things a group can do here."
-teams_desk_cap,Start a desk
-teams_desk_tag,Free to create
-teams_desk_heading,A private group with its own board
-teams_desk_body,"A desk is a private group: its own leaderboard, assignments set by a captain, and progress the captain can see (your times on assignments, nothing else)."
-teams_desk_who,"For a study group, a finance club, an analyst class or a team at work."
-teams_desk_create,Create a desk
+teams_title,Teams
+teams_sub,"Full Access for a class or a team, with a desk of its own."
 teams_code_head,Have a code?
-teams_code_line,Join a desk by invite code or link.
-teams_code_join,Join
-teams_code_kept,Code {code} is kept on this device until desks open.
-teams_code_empty,Enter a code or paste an invite link.
-teams_code_failed,Couldn’t save the code on this device.
-teams_group_cap,Group access
-teams_group_tag,Full Access for organizations
-teams_group_heading,"One code, a number of seats, one end date"
-teams_group_body,"Group access opens Full Access for everyone on the code or link, with a progress view for the organizer and invoice-friendly billing. Groups don’t check out on the site yet: send a request and we reply by email."
-teams_field_name,Name
-teams_field_org,Organization
-teams_field_email,Email
-teams_field_seats,Seats
-teams_field_start,Start date
-teams_request,Request group access
-teams_req_local,"For now a request is saved on this device and isn’t sent to us, so write to us as well:"
-teams_req_link,Contact
-teams_req_count,{n} saved on this device.
-teams_req_saved,"Saved on this device. It isn’t sent anywhere yet, so write to us from the contact page as well."
-teams_req_failed,Couldn’t save on this device. Write to us from the contact page.
-teams_err_name,Your name is needed.
-teams_err_org,The organization is needed.
-teams_err_email,A valid email is needed.
-teams_err_seats,"Seats must be a whole number, 1 or more."
-teams_err_start,A start date is needed.
 account_public_note,"Shows your handle, level and best times on the boards and on your profile page. Turned off, nothing is public."
 account_time_saved,Estimated time saved against the mouse-and-menus route: about {d}. It’s an estimate: your key counts against a slow route at half a second an action.
 about_title,About
@@ -1231,3 +1199,93 @@ rapid_cmd_name-manager,Name Manager
 rapid_cmd_define-name,Define Name
 rapid_cmd_pivot-table,PivotTable
 rapid_cmd_calc-except-tables,Automatic Except for Data Tables
+boards_desk_open,Open your desk
+boards_desk_code,Have a code?
+teams_desk_head,A Teams desk
+teams_by_hand,Set up by hand
+teams_row_1,Full Access for every seat
+teams_row_2,A private board for the desk on every drill
+teams_row_3,A seat view for whoever runs the desk
+teams_row_4,One monthly invoice for the team
+teams_talk_line,Tell us the team and how many seats. We set up the desk and send you its code.
+teams_how_head,How a desk works
+teams_how_1_k,We set it up
+teams_how_1,You get the desk’s code to pass round your team.
+teams_how_2_k,Your team joins
+teams_how_2,Each person signs in and enters the code. Their seat opens all six chapters.
+teams_how_3_k,You see the seats
+teams_how_3,"Lessons done, chapters Verified and when each person was last active."
+teams_how_4_k,The desk races
+teams_how_4,"Every drill has a board for the desk alone, next to the global one."
+teams_your_desk,Open your desk
+teams_code_signin,You sign in or make a free account when you join.
+desk_title,Your desk
+desk_mark,Teams
+desk_signed_out,"Sign in to see your desk. A desk comes with Teams, and you join one with its code."
+desk_none,You aren’t on a desk yet. Enter the code your team was sent.
+desk_failed,Couldn’t load the desk.
+desk_teams_head,Teams
+desk_teams_line,"A desk is how a class or a team takes the course together: a seat each, a board of its own, and a seat view for whoever runs it."
+desk_teams_link,About Teams
+desk_code_head,Join a desk
+desk_code_label,Desk code
+desk_code_go,Join
+desk_join_title,Join a desk
+desk_join_owner_k,Run by
+desk_join_seats_k,Seats left
+desk_join_until_k,Paid until
+desk_join_line,Your seat opens all six chapters for as long as the desk runs.
+desk_join_go,Join the desk
+desk_join_signin,Sign in to join
+desk_join_signin_line,A free account is all it takes. Anything you did on this device comes with you.
+desk_joined,You joined {name}.
+desk_sees_head,What the owner sees
+desk_sees_1,Your handle and level
+desk_sees_2,How many lessons you’ve done
+desk_sees_3,How many chapters you’ve Verified
+desk_sees_4,When you were last active
+desk_sees_not,"Nothing else: not your runs, your mistakes or your settings. Your times show on the desk’s board, as they do on the global ones."
+desk_seats_used,{used} of {seats} seats taken
+desk_until,Paid until {date}
+desk_seats_head,Seats
+desk_col_lessons,Lessons done
+desk_col_verified,Chapters Verified
+desk_col_active,Last active
+desk_role_owner,Owner
+desk_you,You
+desk_free_seat,Free the seat
+desk_free_confirm,Press again to remove {handle}
+desk_freed,"{handle} left the desk, and the seat is free."
+desk_seat_left,1 seat left
+desk_seats_left,{n} seats left
+desk_seats_full,Every seat is taken
+desk_seats_line,"A freed seat ends that person’s access from the desk. To add seats, write to us."
+desk_invite_head,Invite
+desk_invite_line,"Send the link, or the code on its own. Anyone with it can take a free seat."
+desk_copy_link,Copy the invite link
+desk_copied,Invite link copied
+desk_copy_blocked,Couldn’t copy: the clipboard is blocked
+desk_new_code,New code
+desk_new_code_line,A new code stops the old one working. Everyone on the desk stays.
+desk_new_code_done,The desk has a new code.
+desk_members_head,On the desk
+desk_leave,Leave the desk
+desk_leave_confirm,Press again to leave
+desk_leave_line,"Leaving frees your seat, and the chapters it opened close again."
+desk_left,You left the desk.
+desk_board_head,The desk’s board
+desk_active_today,Today
+desk_active_yesterday,Yesterday
+desk_active_days,{n} days ago
+desk_active_never,Not yet
+desk_err_bad_code,That code doesn’t match a desk. Check it and try again.
+desk_err_tries,Too many tries. Wait an hour and try again.
+desk_err_ended,This desk has ended. Ask whoever runs it.
+desk_err_on_desk,You’re already on a desk. Leave it first to join this one.
+desk_err_full,Every seat on this desk is taken. Ask whoever runs it for another.
+desk_err_signin,Sign in first.
+desk_err_not_on,You aren’t on a desk.
+desk_err_not_owner,Only the desk’s owner can do that.
+desk_err_owner_stays,The owner can’t leave the desk. Write to us to hand it on.
+desk_err_no_member,That person isn’t on your desk.
+desk_err_failed,Something went wrong. Try again.

@@ -7,7 +7,7 @@ import { normalisePrefs, defaultPrefs, detectPlatform, keyLabel, PREFS_KEY } fro
 import { statusOf, pickNextLesson, matchesFilters, groupBySection, CHAPTER_PLAN } from '../app/learn-page.js';
 import { parseRoute, navKeyFor, titleFor } from '../app/main.js';
 import { LESSONS } from '../content/index.js';
-import { validateRequest } from '../app/teams-page.js';
+import { teamsHtml, HOW_ROWS } from '../app/teams-page.js';
 import { FOOTER_LINKS } from '../ui/footer.js';
 import { ACCOUNT_ITEMS } from '../ui/nav.js';
 
@@ -147,14 +147,14 @@ test('navKeyFor and titleFor', () => {
   assert.equal(titleFor('whatever'), 'hotkey.gg');
 });
 
-/* ---------------- teams form, shell lists ---------------- */
-test('teams: the group-access request validates every field', () => {
-  const ok = validateRequest({ name: 'A', org: 'Bank', email: 'a@b.co', seats: '25', start: '2026-10-01' });
-  assert.equal(ok.ok, true); assert.equal(ok.data.seats, 25);
-  const bad = validateRequest({ name: '', org: ' ', email: 'nope', seats: '0', start: 'soon' });
-  assert.equal(bad.ok, false);
-  assert.deepEqual(Object.keys(bad.errors).sort(), ['email', 'name', 'org', 'seats', 'start']);
-  assert.equal(validateRequest({ name: 'A', org: 'B', email: 'a@b.co', seats: '2.5', start: '2026-10-01' }).ok, false, 'seats must be whole');
+/* ---------------- teams, shell lists ---------------- */
+test('teams: desks are sold by hand, so the page has Talk to us and a code box, and no create or request form', () => {
+  const h = teamsHtml({ signedIn: false });
+  assert.match(h, /mailto:teams@hotkey\.gg/);
+  assert.match(h, /id="teamsCode"/);
+  assert.equal(HOW_ROWS.length, 4);
+  assert.doesNotMatch(h, /<form[^>]*request|teams_request/);
+  assert.match(teamsHtml({ signedIn: true }), /href="#\/desk"/);
 });
 
 test('the footer and account menu carry the spec lists', () => {

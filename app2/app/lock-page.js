@@ -1,4 +1,4 @@
-// app2/app/lock-page.js — the page a Pro lesson's URL shows an account that does not hold Pro
+// app2/app/lock-page.js — the page a paid lesson's or drill's URL shows an account that can't open its chapter
 // (Chapter 2 on: a guest, a free account). Not a 404: the lesson exists, the door is shut. The
 // door is the one paywall panel (ui/components/paywall.js), on the page, never a pop-up (3.0,
 // Pricing and the paywall; M105): the chapter as the heading, Pro at the right, Wolf's line,
@@ -19,12 +19,14 @@ export function lockHeading(lesson, chapter, chapterN, number) {
 }
 
 export function mountLockPage(root, ctx = {}) {
+  // a paid lesson, or a paid drill (M58): either way the chapter names the door
   const lesson = ctx.lesson || null;
-  const ch = lesson ? chapterOf(lesson) : null;
+  const item = lesson || ctx.drill || null;
+  const ch = item ? chapterOf(item) : null;
   const n = lesson ? itemNumber(lesson, moduleOf(lesson)) : '';
   const el = document.createElement('div');
   el.className = 'page locked';
   root.appendChild(el);
-  const pw = mountPaywall(el, { heading: lockHeading(lesson, ch, ch ? CHAPTERS.indexOf(ch) + 1 : 0, n), signedIn: auth.state() === 'in', notNowHref: '#/learn' });
+  const pw = mountPaywall(el, { heading: lockHeading(item, ch, ch ? CHAPTERS.indexOf(ch) + 1 : 0, n), signedIn: auth.state() === 'in', notNowHref: lesson ? '#/learn' : '#/practice/drills' });
   return { destroy() { pw.destroy(); el.remove(); } };
 }

@@ -10,6 +10,8 @@ export const RIBBON_WORDS = [
 ];
 
 export const SITE_KEYS = [
+  // R8: Teams desks and the join page (Phase F desks v1)
+  'boards_desk_open', 'boards_desk_code', 'teams_desk_head', 'teams_by_hand', 'teams_row_1', 'teams_row_2', 'teams_row_3', 'teams_row_4', 'teams_talk_line', 'teams_how_head', 'teams_how_1_k', 'teams_how_1', 'teams_how_2_k', 'teams_how_2', 'teams_how_3_k', 'teams_how_3', 'teams_how_4_k', 'teams_how_4', 'teams_your_desk', 'teams_code_signin', 'desk_title', 'desk_mark', 'desk_signed_out', 'desk_none', 'desk_failed', 'desk_teams_head', 'desk_teams_line', 'desk_teams_link', 'desk_code_head', 'desk_code_label', 'desk_code_go', 'desk_join_title', 'desk_join_owner_k', 'desk_join_seats_k', 'desk_join_until_k', 'desk_join_line', 'desk_join_go', 'desk_join_signin', 'desk_join_signin_line', 'desk_joined', 'desk_sees_head', 'desk_sees_1', 'desk_sees_2', 'desk_sees_3', 'desk_sees_4', 'desk_sees_not', 'desk_seats_used', 'desk_until', 'desk_seats_head', 'desk_col_lessons', 'desk_col_verified', 'desk_col_active', 'desk_role_owner', 'desk_you', 'desk_free_seat', 'desk_free_confirm', 'desk_freed', 'desk_seat_left', 'desk_seats_left', 'desk_seats_full', 'desk_seats_line', 'desk_invite_head', 'desk_invite_line', 'desk_copy_link', 'desk_copied', 'desk_copy_blocked', 'desk_new_code', 'desk_new_code_line', 'desk_new_code_done', 'desk_members_head', 'desk_leave', 'desk_leave_confirm', 'desk_leave_line', 'desk_left', 'desk_board_head', 'desk_active_today', 'desk_active_yesterday', 'desk_active_days', 'desk_active_never', 'desk_err_bad_code', 'desk_err_tries', 'desk_err_ended', 'desk_err_on_desk', 'desk_err_full', 'desk_err_signin', 'desk_err_not_on', 'desk_err_not_owner', 'desk_err_owner_stays', 'desk_err_no_member', 'desk_err_failed', 'teams_title', 'teams_sub', 'teams_code_head',
   // the interface match (2026-10-02)
   'certificate_name', 'certificate_course', 'certificate_progress',
   // the interface match (2026-10-02)
@@ -65,7 +67,7 @@ export const SITE_KEYS = [
   'times_up', 'times_up_note', 'over_limit', 'over_limit_assessment', 'review_clean', 'review_flag',
   'learn_testout', 'learn_verified', 'learn_replay',
   'drill_finished_assisted', 'drill_help_used', 'drill_mouse_used', 'drill_daily_attempt', 'rapid_intro', 'rapid_fine',
-  'boards_closed', 'boards_desk_prompt', 'account_guest', 'paywall_line', 'paywall_signed_in', 'teams_desk_signin',
+  'boards_closed', 'boards_desk_prompt', 'account_guest', 'paywall_line', 'paywall_signed_in',
   // the rail, the level table and the settings table (R1b: M88, M101, M103)
   'rail_home', 'rail_learn', 'rail_practice', 'rail_daily', 'rail_drills', 'rail_rapid', 'rail_challenges', 'rail_boards', 'rail_reference',
   'rail_level', 'rail_xp', 'rail_streak', 'rail_streak_none', 'rail_go_pro', 'rail_account', 'rail_sign_in', 'rail_guest', 'rail_profile',

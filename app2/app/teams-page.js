@@ -1,99 +1,59 @@
-// app2/app/teams-page.js — Teams (SITE_SPEC §11a): the two paths (Start a desk, free; Group
-// access, paid), a "Have a code?" box and a "Request group access" form. Until the server side
-// lands (Phases B, E, F) the code and the request are stored on this device, and the page says so.
-export const REQUESTS_KEY = 'hk2_group_requests';
-export const CODE_KEY = 'hk2_pending_code';
+// app2/app/teams-page.js — Teams (screenplay 3.0 page rules; 3.13; Phase F desks v1). Teams is sold
+// by hand (docs/phases/E-checkout.md, decision 6): $12 a seat a month, 5 seats or more, Talk to us by
+// email, and Wolf sets the desk up and sends its code. The page says what a Teams desk is, how it
+// works in four rows, and what its owner sees about each seat (the join page's promise, word for
+// word); the side holds the code box, which goes to the desk's join page. There is no create button:
+// desks are made by hand. Every line is a site.csv row.
 import { siteCopy } from '../content/copy/apply.js';
+import { esc, fill } from '../ui/components/format.js';
+import { panelHtml, buttonHtml } from '../ui/components/table.js';
+import { PRICES } from './plans.js';
+import { codeBoxHtml, wireCodeBox, OWNER_SEES } from './desk-page.js';
+import { auth } from './auth.js';
 
-const t = (key, vars) => { let v = siteCopy(key, ''); for (const k in (vars || {})) v = v.split('{' + k + '}').join(String(vars[k])); return v; };
-const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const t = (key, vars) => fill(siteCopy(key, key), vars);
+/** Where Talk to us writes to (the pricing page's address). */
+export const TEAMS_EMAIL = 'teams@hotkey.gg';
 
-function readList(key) { try { const v = JSON.parse(localStorage.getItem(key) || '[]'); return Array.isArray(v) ? v : []; } catch (e) { return []; } }
-function writeList(key, list) { try { localStorage.setItem(key, JSON.stringify(list)); return true; } catch (e) { return false; } }
+/** How a desk works, in order: [heading key, line key]. */
+export const HOW_ROWS = [['teams_how_1_k', 'teams_how_1'], ['teams_how_2_k', 'teams_how_2'], ['teams_how_3_k', 'teams_how_3'], ['teams_how_4_k', 'teams_how_4']];
+/** What a Teams desk includes, each a ticked row. */
+export const DESK_ROWS = () => ['teams_row_1', 'teams_row_2', 'teams_row_3', 'teams_row_4'].map(k => t(k));
 
-/** Validate the request form. Returns { ok, errors:{field:msg}, data }. Pure. */
-export function validateRequest(f) {
-  const errors = {};
-  const data = { name: String(f.name || '').trim(), org: String(f.org || '').trim(), email: String(f.email || '').trim(), seats: Number(f.seats), start: String(f.start || '').trim() };
-  if (!data.name) errors.name = t('teams_err_name');
-  if (!data.org) errors.org = t('teams_err_org');
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) errors.email = t('teams_err_email');
-  if (!Number.isInteger(data.seats) || data.seats < 1 || data.seats > 100000) errors.seats = t('teams_err_seats');
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(data.start)) errors.start = t('teams_err_start');
-  return { ok: Object.keys(errors).length === 0, errors, data };
+/** The page's markup. Pure. */
+export function teamsHtml({ signedIn = false } = {}) {
+  const mail = `mailto:${TEAMS_EMAIL}?subject=${encodeURIComponent(t('pricing_teams_subject'))}`;
+  const ticks = `<ul class="ticks">${DESK_ROWS().map(r => `<li><i class="plan-tick" aria-hidden="true"></i><span>${esc(r)}</span></li>`).join('')}</ul>`;
+  const plan = panelHtml({ heading: esc(t('teams_desk_head')), facts: `<span class="plan-mark">${esc(t('teams_by_hand'))}</span>`, mode: 'learn', cls: 'plan teams-plan',
+    attrs: { 'data-cursor': true, 'data-cursor-enter': '#teamsTalk', tabindex: '-1' },
+    body: `<div class="plan-price"><span class="plan-figure mono">${esc(t('pricing_teams_figure', '$' + PRICES.seat))}</span><span class="ink-2">${esc(t('pricing_teams_unit'))}</span></div>
+      <p class="plan-sub ink-2">${esc(t('pricing_teams_seats'))}</p>
+      ${ticks}
+      <div class="plan-foot">${buttonHtml({ label: t('pricing_teams_go'), key: 'Enter', href: mail, primary: true, id: 'teamsTalk' })}<p class="fine">${esc(t('teams_talk_line'))}</p></div>` });
+  const how = panelHtml({ heading: esc(t('teams_how_head')), cls: 'teams-how', stretch: true,
+    body: `<table class="tbl rows-only"><tbody>${HOW_ROWS.map(([k, v], i) => `<tr><td class="num teams-step">${i + 1}</td><td class="name">${esc(t(k))}</td><td>${esc(t(v))}</td></tr>`).join('')}</tbody></table>` });
+  const code = panelHtml({ heading: esc(t('teams_code_head')), cls: 'teams-code',
+    body: `${codeBoxHtml({ id: 'teamsCode', primary: false })}${signedIn ? `<a class="panel-link" href="#/desk">${esc(t('teams_your_desk'))}</a>` : `<p class="fine">${esc(t('teams_code_signin'))}</p>`}` });
+  const sees = panelHtml({ heading: esc(t('desk_sees_head')), cls: 'desk-sees-panel', stretch: true,
+    body: `<ul class="desk-sees">${OWNER_SEES().map(x => `<li>${esc(x)}</li>`).join('')}</ul><p class="panel-line ink-2">${esc(t('desk_sees_not'))}</p>` });
+  return `<div class="page teams">
+    <div class="pr-head"><h1 class="h-title">${esc(t('teams_title'))}</h1><p class="pr-line">${esc(t('teams_sub'))}</p></div>
+    <div class="pg-two"><div class="pg-main">${plan}${how}</div><div class="pg-side">${code}${sees}</div></div>
+  </div>`;
 }
 
-export function mountTeamsPage(root) {
+export function mountTeamsPage(root, ctx = {}) {
   const el = document.createElement('div');
-  el.className = 'page teams';
-  const pendingCode = readList(CODE_KEY)[0];
-  const requests = readList(REQUESTS_KEY);
-  el.innerHTML = `<div class="page-head"><h1>${esc(t('teams_title'))}</h1><p class="page-sub">${esc(t('teams_sub'))}</p></div>
-    <div class="teams-grid">
-      <section class="tcard">
-        <div class="tcard-cap"><span>${esc(t('teams_desk_cap'))}</span><span class="pcard-tag on">${esc(t('teams_desk_tag'))}</span></div>
-        <div class="tcard-body">
-          <h2>${esc(t('teams_desk_heading'))}</h2>
-          <p>${esc(t('teams_desk_body'))}</p>
-          <p class="muted">${esc(t('teams_desk_who'))}</p>
-          <a class="btn btn-primary" href="#/account?section=desks">${esc(t('teams_desk_create'))}</a>
-          <p class="page-fine">${esc(t('teams_desk_signin'))}</p>
-          <form class="code-box" id="codeForm" novalidate>
-            <label for="codeInput"><b>${esc(t('teams_code_head'))}</b> ${esc(t('teams_code_line'))}</label>
-            <div class="code-row"><input id="codeInput" type="text" placeholder="e.g. DESK-4K7Q" autocomplete="off" value="${esc(pendingCode || '')}"><button class="btn btn-ghost" type="submit">${esc(t('teams_code_join'))}</button></div>
-            <p class="form-msg" id="codeMsg" role="status">${pendingCode ? esc(t('teams_code_kept', { code: pendingCode })) : ''}</p>
-          </form>
-        </div>
-      </section>
-      <section class="tcard">
-        <div class="tcard-cap"><span>${esc(t('teams_group_cap'))}</span><span class="pcard-tag">${esc(t('teams_group_tag'))}</span></div>
-        <div class="tcard-body">
-          <h2>${esc(t('teams_group_heading'))}</h2>
-          <p>${esc(t('teams_group_body'))}</p>
-          <form class="req-form" id="reqForm" novalidate>
-            <div class="req-grid">
-              <label>${esc(t('teams_field_name'))}<input name="name" type="text" autocomplete="name" required></label>
-              <label>${esc(t('teams_field_org'))}<input name="org" type="text" autocomplete="organization" required></label>
-              <label>${esc(t('teams_field_email'))}<input name="email" type="email" autocomplete="email" required></label>
-              <label>${esc(t('teams_field_seats'))}<input name="seats" type="number" min="1" step="1" inputmode="numeric" required></label>
-              <label>${esc(t('teams_field_start'))}<input name="start" type="date" required></label>
-            </div>
-            <div class="req-actions"><button class="btn btn-primary" type="submit">${esc(t('teams_request'))}</button></div>
-            <p class="form-msg" id="reqMsg" role="status" aria-live="polite">${requests.length ? esc(t('teams_req_count', { n: requests.length === 1 ? '1 request' : requests.length + ' requests' })) : ''}</p>
-            <p class="page-fine">${esc(t('teams_req_local'))} <a href="#/contact">${esc(t('teams_req_link'))}</a></p>
-          </form>
-        </div>
-      </section>
-    </div>`;
+  el.innerHTML = teamsHtml({ signedIn: auth.state() === 'in' });
   root.appendChild(el);
-
-  const codeForm = el.querySelector('#codeForm');
-  codeForm.onsubmit = e => {
-    e.preventDefault();
-    const v = el.querySelector('#codeInput').value.trim().toUpperCase();
-    const msg = el.querySelector('#codeMsg');
-    if (!v) { msg.textContent = t('teams_code_empty'); return; }
-    const code = (v.match(/[A-Z0-9-]{4,}$/) || [v])[0];
-    const ok = writeList(CODE_KEY, [code]);
-    msg.textContent = ok ? t('teams_code_kept', { code }) : t('teams_code_failed');
+  wireCodeBox(el, 'teamsCode');
+  // Enter does the page's one primary action, Talk to us, unless the focus is in the code box (3.0, rule 2)
+  const onKey = e => {
+    if (e.defaultPrevented || e.key !== 'Enter') return;
+    if (e.target && e.target.closest && e.target.closest('a, button, input, select, textarea')) return;
+    const go = el.querySelector('#teamsTalk'); if (go) { e.preventDefault(); go.click(); }
   };
-  const form = el.querySelector('#reqForm');
-  form.onsubmit = e => {
-    e.preventDefault();
-    const f = Object.fromEntries(new FormData(form).entries());
-    const { ok, errors, data } = validateRequest(f);
-    form.querySelectorAll('label').forEach(l => l.classList.remove('bad'));
-    const msg = el.querySelector('#reqMsg');
-    if (!ok) {
-      for (const k in errors) { const inp = form.querySelector(`[name="${k}"]`); if (inp) inp.closest('label').classList.add('bad'); }
-      msg.textContent = Object.values(errors).join(' ');
-      const first = form.querySelector('label.bad input'); if (first) first.focus();
-      return;
-    }
-    const list = readList(REQUESTS_KEY); list.push({ ...data, at: new Date().toISOString() });
-    const saved = writeList(REQUESTS_KEY, list);
-    msg.textContent = saved ? t('teams_req_saved') : t('teams_req_failed');
-    if (saved) form.reset();
-  };
-  return { destroy() { el.remove(); } };
+  document.addEventListener('keydown', onKey);
+  if (ctx.cursor) ctx.cursor.refresh();
+  return { destroy() { document.removeEventListener('keydown', onKey); el.remove(); } };
 }
