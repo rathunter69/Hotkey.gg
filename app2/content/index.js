@@ -54,6 +54,9 @@ import dynamic_headers_with_text from './lessons/dynamic-headers-with-text.js';
 import conditional_codes_and_hidden_zeros from './lessons/conditional-codes-and-hidden-zeros.js';
 import challenge_house_format_set from './lessons/challenge-house-format-set.js';
 import remix_format_on_the_pnl from './remixes/formatting-on-the-pnl.js';   // Chapter 1's format challenge, re-clothed (content/remix.js)
+// Chapter 3 · Formulas and functions (Run R3, the KPI databook on clearcoat-databook): 3.1 logic, 3.2 dates
+import if_on_a_threshold from './lessons/if-on-a-threshold.js';
+import nested_if_ifs_min_max from './lessons/nested-if-ifs-min-max.js';
 
 export const CHAPTERS = [
   {
@@ -97,6 +100,25 @@ export const CHAPTERS = [
       built_in_formats_on_a_pnl, sign_convention_costs_negative, currency_and_percent_lines, dates_on_the_timeline, challenge_format_the_numbers,
       the_four_section_format, units_in_the_format, dynamic_headers_with_text, conditional_codes_and_hidden_zeros, challenge_house_format_set,
       remix_format_on_the_pnl,
+    ],
+  },
+  {
+    id: 'formulas',
+    title: 'Formulas and functions',
+    access: 'paid',
+    blurb: 'Logic, dates, math and aggregation, text, time value of money and auditing: the point-of-sale export rolled up into a KPI databook where every number reconciles.',
+    // Chapter 3's sections in order (script-ch3.md): the six modules and the closing project block.
+    sections: [
+      { name: 'Logic', blurb: 'IF on a threshold; nested IF against IFS against MIN and MAX; AND, OR and NOT for compound flags; IFERROR and the override pattern.' },
+      { name: 'Dates', blurb: 'Serial numbers and DATE, YEAR, MONTH, DAY; member tenure from join and cancel dates; period keys for grouping; YEARFRAC and fiscal periods; NETWORKDAYS and WEEKDAY for the trading calendar.' },
+      { name: 'Math and aggregation', blurb: 'ROUND and its family; COUNTIFS, SUMIFS and AVERAGEIFS; MAXIFS, MINIFS, LARGE, SMALL and RANK; SUMPRODUCT; the reconciliation.' },
+      { name: 'Text', blurb: 'LEN, LEFT, RIGHT and MID; FIND, SEARCH and SUBSTITUTE; VALUE and DATEVALUE; Text to Columns and Flash Fill.' },
+      { name: 'Time value of money', blurb: 'PV, FV and PMT on the site-build loan; NPV and XNPV; IRR and XIRR; a payment schedule with anchors.' },
+      { name: 'Auditing', blurb: 'Trace precedents and dependents; F9 on a part and Go To Special at scale; the hardcode and external-link hunt; the checks block with a roll-up flag.' },
+      { name: 'Project and assessment', blurb: 'Rebuild the Summary so every number ties, then a fresh export against the clock.' },
+    ],
+    lessons: [
+      if_on_a_threshold, nested_if_ifs_min_max,
     ],
   },
 ];

@@ -30,6 +30,11 @@ const BEATS_DEFAULT = {
     body: 'The owners have hired advisers to run the sale, and the first document is the book: the information memorandum that describes the company to buyers. Its financials section starts with three years of P&L, and what the accounting system exported is account codes in capitals, costs as positives and numbers to four decimal places. Before anyone reads it, the figures have to read like figures.' },
   'custom-number-formats': { eyebrow: 'Module 2.2 · custom number formats', title: 'Every number on the page has to say what it is.',
     body: 'A buyer flips to the financials and reads margins, multiples and thousands without a legend, so the number format has to carry the unit. A format code can write k or m after a figure, show a zero as a dash, color a negative and turn a plain date into FY26E, with the value underneath untouched. This module is the format code, one section at a time.' },
+  // Chapter 3 · Formulas and functions (script-ch3.md story cards)
+  logic: { eyebrow: 'Module 3.1 · logic', title: 'Which sites are pulling their weight?',
+    body: 'The buyers’ first question is the CFO’s oldest one: which sites clear their daily target, which don’t, and what the managers earn when they do. The point-of-sale export has every wash; the Sites sheet has every target. A formula that can ask a question and act on the answer turns ninety rows into a page of flags.' },
+  dates: { eyebrow: 'Module 3.2 · dates', title: 'How old is each site, and how long do members stay?',
+    body: 'Two of the buyers’ questions are about time: how old each site is, because new ones ramp for two years, and how long a member stays before cancelling, because that’s what a $30-a-month fee is worth. Excel keeps a date as a number, days since the start of 1900, so dates subtract, add and compare like any figure once you know the functions that build and break them.' },
   'project-and-assessment': { eyebrow: 'Module 1.8 · project, assessment, test-out', title: 'Management’s next feed is in.',
     body: 'A fresh week, a blank Report, and everything the chapter taught. Build the page start to finish, then prove it against the clock on Monday morning; or test out of the chapter in five minutes.' },
 };

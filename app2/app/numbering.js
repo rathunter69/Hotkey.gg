@@ -12,6 +12,8 @@ export const MODULE_NUMBERS = {
   // Chapter 2 · Formatting and presentation (SITE_SPEC's table; 2.3–2.7 land in Run 2)
   'number-formats': '2.1', 'custom-number-formats': '2.2', 'model-formatting-standards': '2.3', 'alignment-and-structure': '2.4',
   'conditional-formatting': '2.5', 'dates-and-text': '2.6', 'printing-and-page-layout': '2.7', remixes: '2.R',
+  // Chapter 3 · Formulas and functions (script-ch3.md)
+  logic: '3.1', dates: '3.2',
 };
 /** The catalogue section the chapter's project, assessment and test-out sit in (module 1.8). */
 export const FINAL_SECTION = 'Project and assessment';
