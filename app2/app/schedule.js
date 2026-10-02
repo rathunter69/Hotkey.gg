@@ -267,14 +267,24 @@ export const MICRO = {
 /** The ids the queue knows (the concept ids with a micro-drill). */
 export const MICRO_IDS = Object.keys(MICRO);
 
-/** The rapid-fire deck's prompt ids mapped to the concept the queue scores them under. */
+/** Rapid-fire's prompt ids (content/rapid-deck.js) mapped to the concept the queue scores them under: a hit or a miss there is a review. */
 export const RAPID_CONCEPT = {
-  bold: 'bold-command', 'edge-down': 'ctrl-arrow', home: 'ctrl-home-end', region: 'ctrl-a', col: 'row-col-select', row: 'row-col-select',
-  'copy-paste': 'copy-cut-paste', 'cut-paste': 'copy-cut-paste', 'fill-down': 'fill-down-right', 'fill-right': 'fill-down-right',
-  percent: 'number-formats', currency: 'number-formats', 'undo-redo': 'undo-redo',
+  bold: 'bold-command', 'edge-down': 'ctrl-arrow', 'edge-right': 'ctrl-arrow', 'edge-up': 'ctrl-arrow', 'edge-left': 'ctrl-arrow',
+  'go-home': 'ctrl-home-end', 'go-last': 'ctrl-home-end', 'select-region': 'ctrl-a', 'select-row': 'row-col-select', 'select-column': 'row-col-select',
+  'select-down': 'ctrl-shift-arrow', 'select-right': 'ctrl-shift-arrow', 'select-up': 'ctrl-shift-arrow',
+  copy: 'copy-cut-paste', cut: 'copy-cut-paste', paste: 'copy-cut-paste', 'fill-down': 'fill-down-right', 'fill-right': 'fill-down-right',
+  'paste-values': 'paste-special', 'paste-formats': 'paste-special', transpose: 'paste-special',
+  'number-format': 'number-formats', percent: 'number-formats', currency: 'number-formats', 'comma-style': 'number-formats',
+  undo: 'undo-redo', redo: 'undo-redo', 'go-to': 'go-to', replace: 'find-replace', find: 'find-replace',
+  'special-blanks': 'go-to-special', 'special-constants': 'go-to-special', 'special-formulas': 'go-to-special',
+  'insert-row': 'insert-delete-rows', 'delete-row': 'insert-delete-rows', 'autofit-column': 'autofit', 'wrap-text': 'wrap-text',
+  'hide-rows': 'hide-unhide', 'hide-columns': 'hide-unhide', 'unhide-rows': 'hide-unhide', 'unhide-columns': 'hide-unhide',
+  'group-rows': 'group-ungroup', 'ungroup-rows': 'group-ungroup', 'freeze-panes': 'freeze-panes', repeat: 'f4-repeat', 'absolute-ref': 'f4-anchor',
+  autosum: 'autosum', 'show-formulas': 'show-formulas', landscape: 'orientation', gridlines: 'gridlines', 'format-cells': 'format-cells-dialog',
+  'font-color': 'font-color', 'fill-series': 'fill-series',
+  'bottom-border': 'borders-menu', 'top-border': 'borders-menu', 'all-borders': 'borders-menu', 'outside-borders': 'borders-menu', 'thick-box-border': 'borders-menu',
+  'double-bottom-border': 'borders-menu', 'top-bottom-border': 'borders-menu', 'no-border': 'borders-menu',
 };
-/** Rapid-fire prompts no Chapter 1 micro-drill covers: played, never scored into the queue. */
-export const RAPID_UNSCORED = ['italic', 'underline', 'strike'];
 
 /** A micro-drill as a lesson object the lesson workspace can mount (kind 'micro'). Null for an unknown id. */
 export function microLesson(id) {
