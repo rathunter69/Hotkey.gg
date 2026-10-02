@@ -1,6 +1,7 @@
 // app2/app/pricing-page.js — Pricing (screenplay 3.0 "Pricing and the paywall"; 3.13; M105), with
-// the plans Wolf agreed on 2026-10-01 (docs/phases/E-checkout.md, decision 3): three columns, Free,
-// Full Access and Teams. Full Access is the recommended plan: the mode's rule on its panel, the
+// the plans Wolf agreed on 2026-10-01 (docs/phases/E-checkout.md, decision 3): Free and Full Access
+// side by side with the course as a sheet beside them (what each plan opens, chapter by chapter),
+// Teams as one row under them, the terms under that. Full Access is the recommended plan: the mode's rule on its panel, the
 // "Recommended" mark and the page's one primary button (Enter). Each column holds its price, its
 // ticked rows and one action; the trust lines sit under the action; the terms follow as rows.
 //
@@ -10,7 +11,8 @@
 // Talk to us is an email.
 import { siteCopy } from '../content/copy/apply.js';
 import { PRICES, FREE_ROWS, FULL_ROWS, TEAMS_ROWS } from './plans.js';
-import { buttonHtml } from '../ui/components/table.js';
+import { buttonHtml, tableHtml } from '../ui/components/table.js';
+import { COURSE } from './progress-model.js';
 import { paymentsOn } from './config.js';
 import { auth } from './auth.js';
 import { entitlement } from './entitlement.js';
@@ -29,6 +31,22 @@ export const TEAMS_EMAIL = 'teams@hotkey.gg';
 export const TRUST_LINES = () => [t('pricing_trust_cancel', 'Cancel any time from your account.'), t('pricing_trust_refund', 'Full refund on your first payment within 14 days.'), t('pricing_trust_stripe', 'Payment is handled by Stripe.')];
 
 const tick = () => '<i class="plan-tick" aria-hidden="true"></i>';
+
+/**
+ * What each plan opens, as a sheet: the six chapters by number and name, then the play everyone
+ * has and the certificate, with a mark in the column of each plan that opens it. A blank cell is
+ * a no, the way a blank cell reads in a workbook. Pure.
+ */
+export function courseSheetHtml() {
+  const yes = `<i class="inc-tick" role="img" aria-label="${esc(t('pricing_included', 'Included'))}"></i>`;
+  const no = `<span class="sr-only">${esc(t('pricing_not_included', 'Not included'))}</span>`;
+  const rows = COURSE.chapters.map(c => ({ what: `<span class="cs-what"><span class="cs-n">${c.n}</span><span class="row-name">${esc(c.title)}</span></span>`, free: c.n === 1, full: true }))
+    .concat([{ what: `<span class="cs-what"><span class="cs-n"></span><span class="row-name">${esc(t('pricing_row_play', 'Rapid-fire, the Daily and the boards'))}</span></span>`, free: true, full: true },
+      { what: `<span class="cs-what"><span class="cs-n"></span><span class="row-name">${esc(t('pricing_row_cert', 'The certificate'))}</span></span>`, free: false, full: true }]);
+  return tableHtml({ sheet: true, cls: 'tbl-course', label: t('pricing_sheet_head', 'What each plan opens'),
+    columns: [{ key: 'what', label: t('pricing_col_what', 'In the course') }, { key: 'free', label: t('pricing_free', 'Free'), align: 'center', cls: 'free' }, { key: 'full', label: t('pricing_full', 'Full Access'), align: 'center', cls: 'full' }],
+    rows: rows.map(r => ({ cells: { what: r.what, free: r.free ? yes : no, full: r.full ? yes : no }, cls: r.free ? '' : 'paid', cursor: false })) });
+}
 const rows = list => `<ul class="ticks">${list.map(r => `<li>${tick()}<span>${esc(r)}</span></li>`).join('')}</ul>`;
 const lines = list => `<ul class="plan-trust">${list.map(r => `<li class="fine">${esc(r)}</li>`).join('')}</ul>`;
 
@@ -48,7 +66,7 @@ function fullFoot({ payments, entitled }) {
 export function pricingHtml({ payments = false, entitled = false } = {}) {
   const mail = `mailto:${TEAMS_EMAIL}?subject=${encodeURIComponent(t('pricing_teams_subject', 'hotkey.gg for a team'))}`;
   return `<div class="page pricing">
-    <h1 class="h-title">${esc(t('pricing_title', 'Pricing'))}</h1>
+    <div class="pr-head"><h1 class="h-title">${esc(t('pricing_title', 'Pricing'))}</h1><p class="pr-line">${esc(t('pricing_line', 'Chapter 1 is free in full. Full Access opens the other five chapters and the certificate.'))}</p></div>
     <div class="plans">
       <section class="panel plan" aria-label="${esc(t('pricing_free', 'Free'))}">
         <div class="h-row"><h2 class="h-panel">${esc(t('pricing_free', 'Free'))}</h2></div>
@@ -64,10 +82,11 @@ export function pricingHtml({ payments = false, entitled = false } = {}) {
         ${rows(FULL_ROWS())}
         ${fullFoot({ payments, entitled })}
       </section>
+      <section class="panel pr-course" aria-label="${esc(t('pricing_sheet_head', 'What each plan opens'))}"><div class="panel-head"><h2 class="panel-h">${esc(t('pricing_sheet_head', 'What each plan opens'))}</h2></div>${courseSheetHtml()}</section>
       <section class="panel plan" aria-label="${esc(t('pricing_teams_col', 'Teams'))}">
-        <div class="h-row"><h2 class="h-panel">${esc(t('pricing_teams_col', 'Teams'))}</h2></div>
+        <div class="pt-who"><h2 class="h-panel">${esc(t('pricing_teams_col', 'Teams'))}</h2>
         <div class="plan-price"><span class="plan-figure mono">${esc(t('pricing_teams_figure', '$' + PRICES.seat))}</span><span class="ink-2">${esc(t('pricing_teams_unit', 'a seat a month'))}</span></div>
-        <p class="plan-sub ink-2">${esc(t('pricing_teams_seats', '5 seats or more'))}</p>
+        <p class="plan-sub ink-2">${esc(t('pricing_teams_seats', '5 seats or more'))}</p></div>
         ${rows(TEAMS_ROWS())}
         <div class="plan-foot">${buttonHtml({ label: t('pricing_teams_go', 'Talk to us'), href: mail, id: 'goTeams' })}<p class="fine">${esc(t('pricing_teams_note', 'Email us the team size and we set it up.'))}</p></div>
       </section>

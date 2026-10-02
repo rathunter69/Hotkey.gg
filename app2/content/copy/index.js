@@ -4716,7 +4716,14 @@ export const COPY = {
   "setting_on": "On",
   "setting_off": "Off",
   "theme_light": "Light",
-  "theme_dark": "Dark"
+  "theme_dark": "Dark",
+  "pricing_line": "Chapter 1 is free in full. Full Access opens the other five chapters and the certificate.",
+  "pricing_sheet_head": "What each plan opens",
+  "pricing_col_what": "In the course",
+  "pricing_row_play": "Rapid-fire, the Daily and the boards",
+  "pricing_row_cert": "The certificate",
+  "pricing_included": "Included",
+  "pricing_not_included": "Not included"
  },
  "micro": {
   "enter-tab-direction": {

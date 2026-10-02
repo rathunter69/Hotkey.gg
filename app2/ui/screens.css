@@ -226,8 +226,28 @@ html[data-effects="off"] .lp-in .lp-mod i, html[data-effects="off"] .lp-in .lp-m
 
 /* ---------- pricing ---------- */
 /* three columns that end on the same line; Full Access carries the mode's rule, the mark and the one primary button */
-.plans{display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:var(--s5); align-items:stretch}
+.pricing{display:flex; flex-direction:column; gap:var(--s5)}
+.pr-head{display:flex; flex-direction:column; gap:var(--s2)}
+.pr-head .h-title{margin:0}
+.pr-line{margin:0; font-size:var(--fs-body); color:var(--ink-2)}
+.plans{display:grid; grid-template-columns:minmax(0,0.72fr) minmax(0,0.95fr) minmax(0,1.3fr); gap:var(--s5); align-items:start}
+.plans > .plan:first-child .plan-foot{margin-top:var(--s2)}
+/* Teams: the third plan, one row across the page under the two */
+.plans > .plan:last-child{grid-column:1 / -1; display:grid; grid-template-columns:minmax(0,0.72fr) minmax(0,0.95fr) minmax(0,1.3fr); gap:var(--s5); align-items:center}
+.plans > .plan:last-child .ticks{flex-direction:column}
+.plans > .plan:last-child .plan-foot{margin:0}
+.pt-who{display:flex; flex-direction:column; gap:var(--s2)}
+.pt-who .plan-sub{margin:0}
+.plan-full .plan-figure{font-size:var(--fs-landing-narrow)}
+.tbl-course td[data-col="free"], .tbl-course td[data-col="full"]{width:1%; white-space:nowrap; padding-left:var(--s3); padding-right:var(--s3)}
+.tbl-course .cs-what{display:flex; align-items:baseline; padding:var(--s1) 0; line-height:1.3}
+.tbl-course .row-name{white-space:normal}
+.tbl-course .cs-n{flex:none; min-width:var(--s5); font-weight:var(--fw-heavy); color:var(--ink-2)}
+.tbl-course tr.paid .row-name{font-weight:var(--fw-semi)}
+.tbl.tbl-course th[data-col="full"], .tbl.tbl-course tr.sh-labels td[data-col="full"]{background:var(--learn-tint); color:var(--learn-ink)}
+.inc-tick{display:inline-block; width:var(--s3); height:var(--s2); border:solid var(--learn); border-width:0 0 var(--bw-3) var(--bw-3); transform:rotate(-45deg) translate(var(--bw-1-5), calc(-1 * var(--bw-1-5)))}
 .plan{gap:var(--s4)}
+.sr-only{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
 .plan-price{display:flex; align-items:baseline; gap:var(--s3)}
 .plan-figure{font-size:var(--fs-time); font-weight:var(--fw-heavy); font-variant-numeric:tabular-nums}
 .plan-sub{margin:calc(-1 * var(--s2)) 0 0; font-size:var(--fs-name); line-height:var(--lh-body)}
