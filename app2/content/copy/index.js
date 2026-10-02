@@ -1383,6 +1383,18 @@ export const COPY = {
    "mac_note": "",
    "story_beat": ""
   },
+  "validation-list-by-name": {
+   "id": "validation-list-by-name",
+   "module": "names-and-structure",
+   "order": "4.6.3",
+   "title": "A validation list driven by a name",
+   "brief": "The case picker you built in 4.2.4 reads a range on Lists, so it breaks the day someone moves the list. Name the list Cases and the picker reads =Cases: the name follows the list wherever it goes, and works from any sheet. It is the pattern for every drop-down in the pack, a named list on Lists, a validation that reads the name, a MATCH that turns the choice into a number. The key is `Alt A V V`.",
+   "closing": "Two pickers now read names instead of addresses. Move the case list down five rows, or onto another sheet, and the name moves with it; the picker never notices. || Every drop-down in a model you build should look like this: a named list on Lists, a validation that reads the name, and a MATCH beside it that turns the choice into a number the formulas use.",
+   "wow": "Both pickers read a name, so the lists can move and the pickers won’t notice.",
+   "convention_line": "Name toggles and key inputs only; A case toggle, never copies of the file",
+   "mac_note": "",
+   "story_beat": ""
+  },
   "remix-format-on-the-pnl": {
    "id": "remix-format-on-the-pnl",
    "module": "remixes",
@@ -8947,6 +8959,56 @@ export const COPY = {
     "teach": "",
     "why": "",
     "hint_stuck": "pulse cell C24 on Scenarios · Every name in the list lands where it says."
+   }
+  ],
+  "validation-list-by-name": [
+   {
+    "lesson_id": "validation-list-by-name",
+    "goal_index": "0",
+    "text": "Name the case list on Lists L5:L7 Cases with Define Name.",
+    "teach": "Define Name works on a range as well as a cell: select the three cases and the name covers all of them. A list that a drop-down reads is the other kind of cell that earns a name.",
+    "why": "",
+    "hint_stuck": "pulse range L5:L7 on Lists · Select the three cases first, then Alt M M D."
+   },
+   {
+    "lesson_id": "validation-list-by-name",
+    "goal_index": "1",
+    "text": "Point the case picker on Scenarios C10 at the name: Data Validation, List, Source =Cases.",
+    "teach": "Data Validation (Alt, A, V, V) on the picker: Clear All (Alt+C) empties the old rule, L picks List, and Source (Alt+S) takes =Cases. The = matters; without it the drop-down would offer the word Cases.",
+    "why": "",
+    "hint_stuck": "pulse cell C10 on Scenarios · Alt A V V, Alt+C to clear, L for List, Alt+S, then =Cases."
+   },
+   {
+    "lesson_id": "validation-list-by-name",
+    "goal_index": "2",
+    "text": "Name the unique site list on Lists N5:N10 Sites.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range N5:N10 on Lists · The six codes 4.2.3 left, one row each."
+   },
+   {
+    "lesson_id": "validation-list-by-name",
+    "goal_index": "3",
+    "text": "Point the site picker on Summary C34 at =Sites the same way.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C34 on Summary · The site code the two-way lookup reads."
+   },
+   {
+    "lesson_id": "validation-list-by-name",
+    "goal_index": "4",
+    "text": "Paste the names list again from Inputs B19 so it shows all five names.",
+    "teach": "Paste List writes what the names are now, not what they were, so a list on the page goes stale the moment a name is added. Paste it over the old one.",
+    "why": "",
+    "hint_stuck": "pulse cell B19 on Inputs · F3, then Alt+L for Paste List."
+   },
+   {
+    "lesson_id": "validation-list-by-name",
+    "goal_index": "5",
+    "text": "Does it tie? Watch the case picker drop down the three cases it reads through Cases, and the live column follow the pick.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C10 on Scenarios · The drop-down lists whatever the name Cases covers."
    }
   ]
  },
