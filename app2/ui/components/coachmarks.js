@@ -19,8 +19,8 @@ export const COACH_MARKS = [
   { key: 'reference', at: '.rail-item[data-page="reference"]', copy: 'orientation_reference', fallback: 'Reference has every key the course teaches, and shows which ones you’ve practiced.' },
   { key: 'level', at: '#railLevel', copy: 'orientation_level', fallback: 'Everything you finish earns XP toward your next level, and speed is what puts you on the boards.' },
   { key: 'streak', at: '#railStreak', copy: 'orientation_streak', fallback: 'Your first practice each day fills that day’s cell and adds a day to your streak.' },
-  { key: 'pro', at: '#railPro', copy: 'orientation_pro', fallback: 'Chapter 1 is free, all of it. Full Access opens Chapters 2 to 6 and their timed play.' },
-  { key: 'account', at: '#railAcctBtn', copy: 'orientation_account', fallback: 'Your progress saves in this browser. A free account keeps it on any device and puts your times on the boards.', guest: true },
+  { key: 'pro', at: '#railPro', copy: 'orientation_pro', fallback: 'Chapter 1 is free in full, and Full Access opens Chapters 2 to 6 with their timed play.' },
+  { key: 'account', at: '#railAcctBtn', copy: 'orientation_account', fallback: 'Progress saves in this browser until a free account keeps it on any device and puts your times on the boards.', guest: true },
 ];
 
 /** The marks show on the first visit to Home after a lesson, once. Pure. */
