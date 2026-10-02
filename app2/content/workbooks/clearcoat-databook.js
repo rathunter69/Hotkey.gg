@@ -18,8 +18,12 @@
 import { mulberry32 } from '../../engine/rng.js';
 import { dateToSerial } from '../../engine/format.js';
 import { buildPage, FMT } from './page.js';
+import { unclip } from './unclip.js';
 // the chain test and the lessons' replay read states through the shared diff (module-states.test.js)
-export { diffStates, sessionToState } from './clearcoat-weekly.js';
+export { diffStates } from './clearcoat-weekly.js';
+import { sessionToState as weeklyState } from './clearcoat-weekly.js';
+/** A live session in the authored-state shape, with the fit the next lesson opens it with (a header the learner typed wraps there). */
+export function sessionToState(ses) { return unclip('clearcoat-databook', weeklyState(ses)); }
 
 export const CHAPTER = 3;
 const D = (y, m, d) => dateToSerial(y, m, d);
@@ -612,5 +616,5 @@ export const STANDARD = {
 export function stateOf(id) {
   const s = STATES[id];
   if (!s) throw new Error('unknown workbook state ' + id);
-  return clone(s);
+  return unclip('clearcoat-databook', clone(s));   // the fit: no label clipped, no #### (content/workbooks/fit.js)
 }

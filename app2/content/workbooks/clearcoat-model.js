@@ -13,6 +13,7 @@
 import { buildPage, FMT } from './page.js';
 import { Sheet } from '../../engine/sheet.js';
 import { diffStates as diffCells, sessionToState as sessionCells } from './clearcoat-weekly.js';
+import { unclip } from './unclip.js';
 
 export const CHAPTER = 5;
 export const COLS = ['C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
@@ -1366,7 +1367,7 @@ export const STANDARD = {
 export function stateOf(id) {
   const s = STATES[id];
   if (!s) throw new Error('unknown workbook state ' + id);
-  return clone(s);
+  return unclip('clearcoat-model', clone(s));   // the fit: no label clipped, no #### (content/workbooks/fit.js)
 }
 
 /* ---------------- the replay's state shape (one pair every caller shares) ---------------- */
@@ -1380,7 +1381,9 @@ const normState = st => {
 /** What differs between two states (clearcoat-weekly's diff), with the names and settings compared whatever their key order. */
 export function diffStates(a, b) { return diffCells(normState(a), normState(b)); }
 /** A live session in the authored-state shape: clearcoat-weekly's extraction, with the iteration limits the model carries. */
-export function sessionToState(ses) {
+export function sessionToState(ses) { return unclip('clearcoat-model', modelSessionState(ses)); }   // with the fit the next lesson opens it with
+/** The same, before any workbook's fit (the valuation lays its own). */
+export function modelSessionState(ses) {
   const st = sessionCells(ses);
   st.settings = { ...st.settings, maxIterations: ses.settings.maxIterations, maxChange: ses.settings.maxChange };
   return st;
