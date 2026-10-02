@@ -44,7 +44,7 @@ ol.goals,ul.list{padding-left:22px;margin:0}ol.goals li,ul.list li{margin:5px 0}
 footer{border-top:1px solid var(--line);margin-top:30px;padding:18px 20px;font-family:var(--mono);font-size:12px;color:var(--muted);display:flex;gap:16px;flex-wrap:wrap}footer a{color:var(--muted);text-decoration:none}footer a:hover{color:var(--text)}
 `.trim();
 
-const THEME_PRELOAD = `<script>try{var v=JSON.parse(localStorage.getItem('hotkey_theme_vars'));if(v&&v.vars){var r=document.documentElement;for(var k in v.vars)r.style.setProperty('--'+k,v.vars[k]);r.setAttribute('data-dark',v.dark?'1':'0');}}catch(e){}</script>`;
+const THEME_PRELOAD = `<script>try{var v=JSON.parse(localStorage.getItem('hk2_theme_vars'));if(v&&v.vars){var r=document.documentElement;for(var k in v.vars)r.style.setProperty('--'+k,v.vars[k]);r.setAttribute('data-dark',v.dark?'1':'0');}}catch(e){}</script>`;
 
 /** The shared frame. `up` is the relative path from the page to app2/ ('../'). */
 function frame({ title, description, up, body }) {

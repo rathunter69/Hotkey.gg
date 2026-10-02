@@ -9,7 +9,7 @@
 // Importing this module applies NOTHING. The page calls loadTheme() as early as it can (an
 // inline module in <head>) so the saved palette lands before first paint; applyTheme() writes
 // every token as --<name> on <html>, sets html[data-dark] and refreshes every [data-theme-label].
-// Persistence is saveTheme() (localStorage 'hotkey_theme'), kept apart from applyTheme().
+// Persistence is saveTheme() (localStorage 'hk2_theme'), kept apart from applyTheme().
 
 /** The token names every theme supplies (the contrast test checks them all). */
 export const TOKEN_NAMES = ['paper', 'sheet', 'chrome', 'line', 'grid', 'edge', 'ink', 'ink-2', 'rail', 'rail-hi', 'rail-text', 'rail-sub', 'note', 'note-ink', 'note-edge', 'red', 'on-fill', 'plate-neutral',
@@ -196,7 +196,8 @@ export function themeList() {
   return out;
 }
 
-export const STORAGE_KEY = 'hotkey_theme';
+export const STORAGE_KEY = 'hk2_theme';
+const LEGACY_KEY = 'hotkey_theme';   // the old build's key, dropped at load
 export const DEFAULT_THEME = 'workbook';
 
 let current = DEFAULT_THEME;
@@ -310,7 +311,7 @@ function ensureScrollbarStyle() {
 }
 
 /** Apply a theme: every token as --<name> on <html>, html[data-dark], labels. Does not persist. */
-export const VARS_KEY = 'hotkey_theme_vars';   // the applied tokens, for the no-flash inline restore in index.html
+export const VARS_KEY = 'hk2_theme_vars';   // the applied tokens, for the no-flash inline restore in index.html
 export function applyTheme(name) {
   const key = THEMES[name] ? name : DEFAULT_THEME;
   const t = THEMES[key];
@@ -326,9 +327,12 @@ export function applyTheme(name) {
   syncThemeLabels();
 }
 
-/** Apply the saved theme (localStorage 'hotkey_theme') or Workbook, the default. */
+/** Apply the saved theme (localStorage 'hk2_theme') or Workbook, the default. */
 export function loadTheme() {
   let saved = null;
+  // the old build saved its pick under 'hotkey_theme' (its default was Graphite, a dark palette): the
+  // rebuild ignores and drops that key, so a returning visitor lands on Workbook, the approved look
+  try { localStorage.removeItem(LEGACY_KEY); localStorage.removeItem(LEGACY_KEY + '_vars'); } catch (e) { /* storage blocked */ }
   try { saved = localStorage.getItem(STORAGE_KEY); } catch (e) { /* storage blocked */ }
   applyTheme(saved && THEMES[saved] ? saved : DEFAULT_THEME);
   return current;
