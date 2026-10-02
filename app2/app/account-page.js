@@ -18,6 +18,7 @@ import { siteCopy } from '../content/copy/apply.js';
 import { paymentsOn } from './config.js';
 import { buttonHtml } from '../ui/components/table.js';
 import { planDetails, openPortal, planDate } from './billing.js';
+import { consentHtml } from '../ui/components/consent.js';
 
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const SECTIONS = ['stats', 'profile', 'data', 'billing'];
@@ -106,7 +107,8 @@ export function mountAccountPage(root, ctx = {}) {
             <button class="btn btn-ghost" type="button" id="googleBtn"${unavailable || busy ? ' disabled' : ''}>Google</button>
           </div>
           ${unavailable ? '<p class="form-msg" role="status">Sign-in is not configured.</p>' : ''}
-          ${tab === 'signup' ? '<p class="fine">You pick a handle right after, and one is suggested. Minimum age 13.</p>' : ''}
+          ${tab === 'signup' ? '<p class="fine">You pick a handle right after, and one is suggested.</p>' : ''}
+          ${consentHtml('account')}
         </form>`;
     return `<section class="panel acct-panel" id="sec-profile">
           <div class="panel-head"><h2 class="panel-h">Keep your progress across devices.</h2></div>
@@ -175,6 +177,7 @@ export function mountAccountPage(root, ctx = {}) {
   function deleteConfirmHtml() {
     return `<div class="acct-form acct-delete" role="group" aria-labelledby="delTitle">
         <p id="delTitle"><b>Delete your account for good.</b> Profile, attempts, bests and board entries go, and it cannot be undone. Type <kbd>${esc(deleteWord())}</kbd> to confirm.</p>
+        ${plan && plan.kind === 'subscription' && plan.renews ? `<p class="form-msg form-err" id="deleteSubNote" role="status">${esc(siteCopy('account_delete_sub', 'Your subscription still renews. Deleting the account does not stop it, so cancel it first under Plan and billing.'))}</p>` : ''}
         <label>Confirm<input id="deleteWordInput" type="text" autocomplete="off" spellcheck="false" autocapitalize="off"></label>
         <p class="form-msg form-err" id="deleteMsg" role="alert"></p>
         <div class="data-actions">

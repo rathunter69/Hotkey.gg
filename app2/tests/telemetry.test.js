@@ -14,7 +14,14 @@ test('track and installErrorLog are no-ops without a client and never throw', ()
   assert.doesNotThrow(() => track('BAD NAME!'));
   assert.doesNotThrow(() => track(null));
   assert.doesNotThrow(() => installErrorLog());
-  assert.equal(sessionKey(), null, 'no sessionStorage in Node: null, not a throw');
+  const k = sessionKey();
+  assert.ok(k === null || /^[0-9a-f-]{36}$/.test(k), 'a uuid, or null without crypto');
+  assert.equal(sessionKey(), k, 'one key for the page load');
+});
+
+test('the analytics key is never written to the device (no cookie banner needed: R9)', () => {
+  const src = readFileSync(resolve(app2, 'app/telemetry.js'), 'utf8');
+  assert.ok(!/\b(localStorage|sessionStorage|document\.cookie|indexedDB)\b/.test(src.replace(/\/\/.*$|\/\*[\s\S]*?\*\//gm, '')), 'telemetry.js touches no browser storage');
 });
 
 test('error dedupe: identical messages once per page load, capped', () => {

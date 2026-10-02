@@ -16,6 +16,7 @@ import { startCheckout, openPortal, loadStripe, planDetails, planDate } from './
 import { track } from './telemetry.js';
 import { siteCopy } from '../content/copy/apply.js';
 import { buttonHtml, panelHtml } from '../ui/components/table.js';
+import { consentHtml } from '../ui/components/consent.js';
 
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const t = (key, fb) => siteCopy(key, fb);
@@ -57,6 +58,7 @@ export function signinHtml({ step = 'email', email = '', error = '', busy = fals
         <input class="input" id="coEmail" name="email" type="email" autocomplete="email" value="${esc(email)}" required>
         ${err}
         <div class="btn-row">${buttonHtml({ label: t('checkout_send_code', 'Send code'), key: 'Enter', primary: true, id: 'coSend', attrs: { type: 'submit', disabled: busy } })}</div>
+        ${consentHtml('account')}
       </form>`;
   return panelHtml({ heading: esc(t('checkout_signin_head', 'Sign in to subscribe')), body, cls: 'co-main', id: 'coMain' });
 }

@@ -4,6 +4,7 @@
 export const REQUESTS_KEY = 'hk2_group_requests';
 export const CODE_KEY = 'hk2_pending_code';
 import { siteCopy } from '../content/copy/apply.js';
+import { consentHtml } from '../ui/components/consent.js';
 
 const t = (key, vars) => { let v = siteCopy(key, ''); for (const k in (vars || {})) v = v.split('{' + k + '}').join(String(vars[k])); return v; };
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -59,6 +60,7 @@ export function mountTeamsPage(root) {
               <label>${esc(t('teams_field_start'))}<input name="start" type="date" required></label>
             </div>
             <div class="req-actions"><button class="btn btn-primary" type="submit">${esc(t('teams_request'))}</button></div>
+            ${consentHtml('teams')}
             <p class="form-msg" id="reqMsg" role="status" aria-live="polite">${requests.length ? esc(t('teams_req_count', { n: requests.length === 1 ? '1 request' : requests.length + ' requests' })) : ''}</p>
             <p class="page-fine">${esc(t('teams_req_local'))} <a href="#/contact">${esc(t('teams_req_link'))}</a></p>
           </form>
