@@ -106,6 +106,12 @@ export function typeDown(id, name, refs) {
   const runs = refs.map(ref => { const c = cells[ref]; return quoted(c.formula || String(c.value)); });
   return `Ctrl+G "${name}!${refs[0]}" ↵ ` + runs.join(' ↵ ↓ ') + ' ↵';
 }
+/** A run of cells across one row from the first, each typed as state `id` holds it: Tab between, Enter at the end. */
+export function typeAcross(id, name, refs) {
+  const cells = cellsAt(id, name);
+  const runs = refs.map(ref => { const c = cells[ref]; return quoted(c.formula || String(c.value)); });
+  return `Ctrl+G "${name}!${refs[0]}" ↵ ` + runs.join(' Tab ') + ' ↵';
+}
 /** A hint as a replayable script: glyphs become key names, ×N expands, quoted runs stay. */
 export function toScript(hint) {
   const out = [];
