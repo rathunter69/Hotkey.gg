@@ -4033,30 +4033,38 @@ export const COPY = {
    {
     "lesson_id": "nested-if-ifs-min-max",
     "goal_index": "3",
-    "text": "Replace the tower: with I5:I10 selected, type =IFS(C5>=350,150,C5>=300,100,C5>=250,50,TRUE,0) and press Ctrl+Enter.",
+    "text": "Replace Domain’s tower first: type =IFS(C5>=350,150,C5>=300,100,C5>=250,50,TRUE,0) over I5 and press Enter.",
     "teach": "IFS takes the tests in pairs, a test and its answer, and returns the answer beside the first test that holds; TRUE at the end catches everything left. Same answers as the tower, read top to bottom.",
     "why": "",
-    "hint_stuck": "pulse range I5:I10 · Ctrl+Enter writes the formula into every selected cell."
+    "hint_stuck": "pulse cell I5 · Type straight over the tower; Enter commits it."
    },
    {
     "lesson_id": "nested-if-ifs-min-max",
     "goal_index": "4",
-    "text": "Floor the gap with MAX: select G5:G10 and rewrite it as =MAX(C5-D5,0) with Ctrl+Enter; the figures do not move.",
-    "teach": "MAX(x,0) floors a figure at zero and MIN(x,150) caps it at 150, each in one call. When a test only floors or caps, MAX or MIN says it without an IF.",
+    "text": "Fill the IFS down over the other five towers, I5:I10 with Ctrl+D, then head the column you kept Bonus ($/day) in I4.",
+    "teach": "",
     "why": "",
-    "hint_stuck": "pulse range G5:G10 · Above target is two columns left of the bonus."
+    "hint_stuck": "pulse range I5:I10 · Ctrl+D copies I5 down the selection."
    },
    {
     "lesson_id": "nested-if-ifs-min-max",
     "goal_index": "5",
-    "text": "Head the column you kept: type Bonus ($/day) in I4.",
-    "teach": "When the test picks from a list of bands, IFS says it; when it only caps or floors, MIN or MAX does. In Chapter 4 a lookup on the tier table replaces both.",
+    "text": "The gap in G5 only floors at zero, so MAX says it without an IF: type =MAX(C5-D5,0) over G5 and press Enter.",
+    "teach": "MAX(x,0) floors a figure at zero and MIN(x,150) caps it at 150, each in one call. When a test only floors or caps, MAX or MIN says it without an IF.",
     "why": "",
-    "hint_stuck": "pulse cell I4 · The header row is row 4."
+    "hint_stuck": "pulse cell G5 · Above target is two columns left of the bonus."
    },
    {
     "lesson_id": "nested-if-ifs-min-max",
     "goal_index": "6",
+    "text": "Fill the MAX down G5:G10 with Ctrl+D: Cedar Park washed nothing against 200, and its gap reads 0, not minus 200.",
+    "teach": "When the test picks from a list of bands, IFS says it; when it only caps or floors, MIN or MAX does. In Chapter 4 a lookup on the tier table replaces both.",
+    "why": "",
+    "hint_stuck": "pulse cell G10 · Cedar Park is the last site row."
+   },
+   {
+    "lesson_id": "nested-if-ifs-min-max",
+    "goal_index": "7",
     "text": "Does it tie? Watch Domain’s washes in C5 rise to 360 and its bonus in I5 step up to $150.",
     "teach": "",
     "why": "",
@@ -4091,30 +4099,38 @@ export const COPY = {
    {
     "lesson_id": "and-or-not",
     "goal_index": "3",
-    "text": "A site needs a visit if it is below target OR under 110 cars an hour: O5 =IF(OR(C5<D5,Sites!F5<110),\"Visit\",\"-\"), filled down.",
-    "teach": "OR(test, test) is TRUE when any one test holds, so one IF covers two reasons to send someone out.",
+    "text": "A site needs a visit if it is below target OR under 110 cars an hour: type =OR(C5<D5,Sites!F5<110) bare in O5 and fill it to O10.",
+    "teach": "OR(test, test) is TRUE when any one test holds, so one IF can cover two reasons to send someone out.",
     "why": "",
     "hint_stuck": "pulse range O5:O10 · Capacity sits on Sites in column F, a row per site in the same order."
    },
    {
     "lesson_id": "and-or-not",
     "goal_index": "4",
-    "text": "The ramping sites are the ones NOT over two years old: P5 =IF(NOT(L5>2),\"Ramping\",\"-\"), filled down to P10.",
+    "text": "Wrap it for the page: with O5:O10 still selected, type =IF(OR(C5<D5,Sites!F5<110),\"Visit\",\"-\") and press Ctrl+Enter.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range O5:O10 · The OR you just read becomes the IF’s test."
+   },
+   {
+    "lesson_id": "and-or-not",
+    "goal_index": "5",
+    "text": "The ramping sites are the ones NOT over two years old: type =NOT(L5>2) bare in P5 and fill it to P10.",
     "teach": "NOT(test) flips TRUE to FALSE and back: NOT(L5>2) is TRUE for a site two years old or younger.",
+    "why": "",
+    "hint_stuck": "pulse range P5:P10 · Only Cedar Park reads TRUE."
+   },
+   {
+    "lesson_id": "and-or-not",
+    "goal_index": "6",
+    "text": "Wrap it for the page: with P5:P10 still selected, type =IF(NOT(L5>2),\"Ramping\",\"-\") and press Ctrl+Enter.",
+    "teach": "",
     "why": "",
     "hint_stuck": "pulse range P5:P10 · Only Cedar Park is young enough."
    },
    {
     "lesson_id": "and-or-not",
-    "goal_index": "5",
-    "text": "Open Riverside’s Visit in O7 with F2 and read the OR, then Esc: it is on target, so the 100 cars an hour on Sites carried it.",
-    "teach": "",
-    "why": "",
-    "hint_stuck": "pulse cell O7 · One true test is enough for OR."
-   },
-   {
-    "lesson_id": "and-or-not",
-    "goal_index": "6",
+    "goal_index": "7",
     "text": "Does it tie? Watch Cedar Park’s age in L10 change to 3 and its flags move: Ramping goes, and Concern comes up in N10.",
     "teach": "",
     "why": "",
@@ -4125,22 +4141,30 @@ export const COPY = {
    {
     "lesson_id": "iferror-and-the-override",
     "goal_index": "0",
-    "text": "Select revenue per wash in Q5:Q10: Cedar Park washed nothing on Sep 15, so Q10 divides by zero and reads #DIV/0!.",
+    "text": "Go to Cedar Park’s revenue per wash, Q10: it washed nothing on Sep 15, so H10/C10 divides by zero and reads #DIV/0!.",
     "teach": "",
     "why": "",
-    "hint_stuck": "pulse range Q5:Q10 · Revenue per wash is the last filled column on row 5."
+    "hint_stuck": "pulse cell Q10 · Revenue per wash is the last filled column on row 5; Cedar Park is the last site."
    },
    {
     "lesson_id": "iferror-and-the-override",
     "goal_index": "1",
-    "text": "With Q5:Q10 selected, type =IFERROR(H5/C5,0) and press Ctrl+Enter: Q10 reads 0 and the column adds.",
+    "text": "Type =IFERROR(H10/C10,0) over Q10 and press Enter: the #DIV/0! becomes a 0 the column can add.",
     "teach": "IFERROR(value, fallback) shows the fallback wherever the value is an error. It hides every error, so use it only where one is expected, a zero denominator, never to silence a #REF!. A 0 suits a line that gets added up; a ratio that feeds nothing reads NM, not meaningful, instead.",
     "why": "",
-    "hint_stuck": "pulse cell Q10 · Ctrl+Enter rewrites every selected cell and keeps each one’s format."
+    "hint_stuck": "pulse cell Q10 · Type straight over the error; Enter commits it."
    },
    {
     "lesson_id": "iferror-and-the-override",
     "goal_index": "2",
+    "text": "Now the whole column, so the next site to open can’t break it: Shift+↑ from Q10 up to Q5, type =IFERROR(H10/C10,0), Ctrl+Enter.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range Q5:Q10 · Ctrl+Enter rewrites every selected cell from the active one and keeps each one’s format."
+   },
+   {
+    "lesson_id": "iferror-and-the-override",
+    "goal_index": "3",
     "text": "Head R4 Override (washes) and color R5:R10 blue with Font Color, Alt H F C, ready for typed overrides.",
     "teach": "An override is a number someone typed, so it is an input, and inputs are blue: a reader sees at a glance which figures a person chose.",
     "why": "",
@@ -4148,7 +4172,7 @@ export const COPY = {
    },
    {
     "lesson_id": "iferror-and-the-override",
-    "goal_index": "3",
+    "goal_index": "4",
     "text": "In S5, =IF(ISNUMBER(R5),R5,C5) is the washes the page uses, the override if one is typed and the link if not; fill it down to S10.",
     "teach": "ISNUMBER(R5) is TRUE only when R5 holds a number, so the formula reads the override when one is typed and the link when not. Inherited models write the test bare, =IF(R5,R5,C5), where a blank or a 0 counts as false and text returns #VALUE!: read it, write ISNUMBER.",
     "why": "",
@@ -4156,7 +4180,7 @@ export const COPY = {
    },
    {
     "lesson_id": "iferror-and-the-override",
-    "goal_index": "4",
+    "goal_index": "5",
     "text": "Type 240 into Mueller’s override R6 and watch S6 take it over the link.",
     "teach": "",
     "why": "",
@@ -4164,7 +4188,7 @@ export const COPY = {
    },
    {
     "lesson_id": "iferror-and-the-override",
-    "goal_index": "5",
+    "goal_index": "6",
     "text": "Clear R6 with Delete and watch S6 go back to the link.",
     "teach": "Its sibling ISTEXT catches a cell that holds a word: =IF(ISTEXT(C5),\"Closed\",H5/C5) returns a status instead of #VALUE! down a row.",
     "why": "",
@@ -4172,7 +4196,7 @@ export const COPY = {
    },
    {
     "lesson_id": "iferror-and-the-override",
-    "goal_index": "6",
+    "goal_index": "7",
     "text": "Point the flags at the washes used: select E5:E10, type =IF(S5>=D5,\"On target\",\"Below\") and press Ctrl+Enter.",
     "teach": "",
     "why": "",
@@ -4180,7 +4204,7 @@ export const COPY = {
    },
    {
     "lesson_id": "iferror-and-the-override",
-    "goal_index": "7",
+    "goal_index": "8",
     "text": "Does it tie? Watch an override of 200 go into Mueller’s R6, under its target of 220, and its flag in E6 turn to Below.",
     "teach": "",
     "why": "",
@@ -4273,22 +4297,30 @@ export const COPY = {
    {
     "lesson_id": "date-serials",
     "goal_index": "4",
-    "text": "Build the first of the opening month in O5 with =DATE(L5,M5,1), the date you group by when you group by month, and fill it down.",
-    "teach": "DATE(year, month, day) builds a date from three numbers, and it rolls over: DATE(2026,13,1) is January 1, 2027.",
+    "text": "Put YEAR to work: the vintage in P5 is =YEAR(E5), filled down to P10, so the page can be read by the year each site opened.",
+    "teach": "A vintage is the year a site opened. A buyer reads sites by vintage because the 2019 sites have had seven years to ramp and the 2026 one has had a week.",
     "why": "",
-    "hint_stuck": "pulse range O5:O10 · Month opened is right of Day."
+    "hint_stuck": "pulse range P5:P10 · Vintage is two columns right of Day."
    },
    {
     "lesson_id": "date-serials",
     "goal_index": "5",
-    "text": "Vintage in P5 is =YEAR(E5), filled down to P10, so the page can be read by the year each site opened.",
-    "teach": "A vintage is the year a site opened. A buyer reads sites by vintage because the 2019 sites have had seven years to ramp and the 2026 one has had a week.",
+    "text": "Build Domain’s month opened in O5 from the parts: =DATE(L5,M5,1) is the first of its opening month, 3/1/2019.",
+    "teach": "DATE(year, month, day) builds a date from three numbers, and it rolls over: DATE(2026,13,1) is January 1, 2027.",
     "why": "",
-    "hint_stuck": "pulse range P5:P10 · Vintage is the column after Month opened."
+    "hint_stuck": "pulse cell O5 · Month opened sits between Day and Vintage."
    },
    {
     "lesson_id": "date-serials",
     "goal_index": "6",
+    "text": "Fill it down O5:O10 with Ctrl+D: every site gets the first of its opening month, the date a count by month groups on.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range O5:O10 · Ctrl+D copies O5 down the selection."
+   },
+   {
+    "lesson_id": "date-serials",
+    "goal_index": "7",
     "text": "Replace the typed ages on Summary: select L5:L10, type =Sites!K5, press Ctrl+Enter and color them green as links with Alt H F C.",
     "teach": "The ages on Summary were typed in 3.1.3 for want of this lesson. Now they link to Sites, so a new as-of date moves every flag that reads them.",
     "why": "",
@@ -4296,7 +4328,7 @@ export const COPY = {
    },
    {
     "lesson_id": "date-serials",
-    "goal_index": "7",
+    "goal_index": "8",
     "text": "Does it tie? Watch the as-of date in Sites!I5 move to 12/31/2026 and every age in J and K move with it.",
     "teach": "",
     "why": "",
@@ -4381,7 +4413,7 @@ export const COPY = {
    {
     "lesson_id": "period-keys",
     "goal_index": "0",
-    "text": "Go to Transactions and give G5 the month key as text: =TEXT(A5,\"yyyy-mm\"), then Tab on.",
+    "text": "Go to Transactions and give G5 the month key as text: =TEXT(A5,\"yyyy-mm\"), then Enter.",
     "teach": "TEXT(value, \"format\") writes a number through a format code as text: the date stays a date in A, and G holds the label 2026-09, which sorts in order.",
     "why": "",
     "hint_stuck": "pulse cell Transactions!G5 · Month key is the first empty column after Memo."
@@ -4389,46 +4421,62 @@ export const COPY = {
    {
     "lesson_id": "period-keys",
     "goal_index": "1",
-    "text": "The month end in H5 is =EOMONTH(A5,0), a real date shown as mmm-yy; Tab on.",
+    "text": "Key every wash by month: Go To G94, Ctrl+Shift+↑ up to G5 and Ctrl+D, and all ninety rows read 2026-09.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range G5:G94 · Ninety rows of washes end on row 94."
+   },
+   {
+    "lesson_id": "period-keys",
+    "goal_index": "2",
+    "text": "The month end in H5 is =EOMONTH(A5,0), a real date shown as mmm-yy that sorts and subtracts; Enter.",
     "teach": "EOMONTH(date, 0) is the last day of the date’s own month; EOMONTH(date, 1) of the next. Its sibling EDATE(date, n) keeps the day and moves n months.",
     "why": "",
     "hint_stuck": "pulse cell H5 · Month end sits right of the month key."
    },
    {
     "lesson_id": "period-keys",
-    "goal_index": "2",
-    "text": "Quarter number in I5, =ROUNDUP(MONTH(A5)/3,0), and its label in J5, =\"Q\"&I5&\" \"&YEAR(A5), both with Tab.",
-    "teach": "ROUNDUP(x, 0) rounds up to the next whole number, so months 7 to 9 over 3 give quarter 3. & joins text and values into one label. The desk’s other test: MOD(MONTH(A5),3)=0 is TRUE in a quarter-end month.",
-    "why": "",
-    "hint_stuck": "pulse cell J5 · The label reads Q3 2026."
-   },
-   {
-    "lesson_id": "period-keys",
     "goal_index": "3",
-    "text": "The week key in K5 is the Monday of the week: =A5-WEEKDAY(A5,2)+1, then Enter.",
-    "teach": "WEEKDAY(date, 2) numbers Monday as 1 through Sunday as 7, so the date less its weekday, plus one, is that week’s Monday.",
+    "text": "Fill the month end down: Ctrl+↓ on the month keys finds row 94, then → and Ctrl+Shift+↑ select H5:H94 for Ctrl+D.",
+    "teach": "",
     "why": "",
-    "hint_stuck": "pulse cell K5 · Week of is the fifth key column."
+    "hint_stuck": "pulse range H5:H94 · The filled column beside it shows where the data ends."
    },
    {
     "lesson_id": "period-keys",
     "goal_index": "4",
-    "text": "Fill the five keys to the last row: Go To G94, widen to K, Ctrl+Shift+↑ up to row 5 and Ctrl+D.",
-    "teach": "",
+    "text": "The quarter number in I5 is =ROUNDUP(MONTH(A5)/3,0): September is month 9, so quarter 3; Tab on.",
+    "teach": "ROUNDUP(x, 0) rounds up to the next whole number, so months 7 to 9 over 3 give quarter 3. The desk’s other test: MOD(MONTH(A5),3)=0 is TRUE in a quarter-end month.",
     "why": "",
-    "hint_stuck": "pulse range G5:K94 · Ninety rows of washes end on row 94."
+    "hint_stuck": "pulse cell I5 · Quarter sits right of the month end."
    },
    {
     "lesson_id": "period-keys",
     "goal_index": "5",
-    "text": "Open the week key on the last row, K94, with F2, read that it works on A94 alone, then Esc.",
-    "teach": "",
+    "text": "Label the quarter in J5 from I5: =\"Q\"&I5&\" \"&YEAR(A5) reads Q3 2026; Enter.",
+    "teach": "& joins text and values into one string: \"Q\" and the quarter number and a space and the year read Q3 2026.",
     "why": "",
-    "hint_stuck": "pulse cell K94 · Every key is a formula on column A."
+    "hint_stuck": "pulse cell J5 · Quarter label is right of the quarter number."
    },
    {
     "lesson_id": "period-keys",
     "goal_index": "6",
+    "text": "Fill the quarter and its label down together: find row 94 from the month end, select I5:J94 and Ctrl+D.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range I5:J94 · Widen to J on row 94 before you climb."
+   },
+   {
+    "lesson_id": "period-keys",
+    "goal_index": "7",
+    "text": "The week key in K5 is the Monday of the week, =A5-WEEKDAY(A5,2)+1; fill it to K94 the same way.",
+    "teach": "WEEKDAY(date, 2) numbers Monday as 1 through Sunday as 7, so the date less its weekday, plus one, is that week’s Monday.",
+    "why": "",
+    "hint_stuck": "pulse range K5:K94 · Week of is the last key column."
+   },
+   {
+    "lesson_id": "period-keys",
+    "goal_index": "8",
     "text": "Does it tie? Watch the first wash move to 10/5/2026: its month key reads 2026-10, its quarter Q4 2026 and its week that Monday.",
     "teach": "",
     "why": "",
@@ -4464,7 +4512,7 @@ export const COPY = {
     "lesson_id": "yearfrac-and-fiscal-periods",
     "goal_index": "3",
     "text": "The half in M5 is =IF(MONTH(A5)>=7,\"H1\",\"H2\") and the label in N5 is =\"FY\"&RIGHT(L5,2)&\" \"&M5, a Tab run.",
-    "teach": "",
+    "teach": "RIGHT(L5,2) keeps the last two characters, 27 from 2027, so the label reads FY27; the text functions come in full in 3.4.",
     "why": "",
     "hint_stuck": "pulse cell N5 · The label reads FY27 H1."
    },

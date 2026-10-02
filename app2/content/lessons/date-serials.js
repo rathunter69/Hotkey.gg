@@ -23,7 +23,8 @@ const days = sh => column(sh, 'J', (s, r) => s.value('I5') - s.value('E' + r));
 const years = sh => column(sh, 'K', (s, r) => s.value('J' + r) / 365.25);
 const apart = sh => column(sh, 'L', (s, r) => opened(s, r).y) && column(sh, 'M', (s, r) => opened(s, r).m) && column(sh, 'N', (s, r) => opened(s, r).d);
 const firstOfMonth = sh => column(sh, 'O', (s, r) => serial(s.value('L' + r), s.value('M' + r), 1));
-const vintage = sh => column(sh, 'P', (s, r) => opened(s, r).y);
+const firstRow = (sh, r) => same(sh.value('O' + r), serial(sh.value('L' + r), sh.value('M' + r), 1)) && liveness(sh, 'O' + r).ok;
+const vintage = sh =>column(sh, 'P', (s, r) => opened(s, r).y);
 const linked = ses => { const sm = sheetOf(ses, 'Summary'), si = sheetOf(ses, 'Sites'); return !!sm && !!si && column(sm, 'L', (s, r) => si.value('K' + r)) && ROWS.every(r => sm.cellAt('L' + r).fontColor === 'green'); };
 const sites = ses => sheetOf(ses, 'Sites');
 
@@ -60,14 +61,17 @@ export default {
       text: 'Take the opening date apart in L5:N5 as a Tab run, =YEAR(E5), =MONTH(E5) and =DAY(E5), then fill the three down to row 10.', keys: '→ "=YEAR(E5)" Tab "=MONTH(E5)" Tab "=DAY(E5)" ↵ ↑ Shift+→ ×2 Shift+↓ ×5 Ctrl+D', requires: ['year-month-day', 'tab-commits', 'fill-down-right', 'shift-arrow', 'arrow-keys'],
       hintStuck: 'pulse range L5:N10 · Year, Month and Day sit side by side after the ages.',
       check: (s, ses) => { const si = sites(ses); return settled(ses) && !!si && apart(si); } },
-    { id: 'build-date', teach: 'DATE(year, month, day) builds a date from three numbers, and it rolls over: DATE(2026,13,1) is January 1, 2027.',
-      text: 'Build the first of the opening month in O5 with =DATE(L5,M5,1), the date you group by when you group by month, and fill it down.', keys: '→ ×3 "=DATE(L5,M5,1)" ↵ ↑ Shift+↓ ×5 Ctrl+D', requires: ['date-function', 'fill-down-right', 'shift-arrow', 'arrow-keys'],
-      hintStuck: 'pulse range O5:O10 · Month opened is right of Day.',
-      check: (s, ses) => { const si = sites(ses); return settled(ses) && !!si && firstOfMonth(si); } },
     { id: 'vintage', teach: 'A vintage is the year a site opened. A buyer reads sites by vintage because the 2019 sites have had seven years to ramp and the 2026 one has had a week.',
-      text: 'Vintage in P5 is =YEAR(E5), filled down to P10, so the page can be read by the year each site opened.', keys: '→ "=YEAR(E5)" ↵ ↑ Shift+↓ ×5 Ctrl+D', requires: ['year-month-day', 'fill-down-right', 'shift-arrow', 'arrow-keys'],
-      hintStuck: 'pulse range P5:P10 · Vintage is the column after Month opened.',
+      text: 'Put YEAR to work: the vintage in P5 is =YEAR(E5), filled down to P10, so the page can be read by the year each site opened.', keys: 'Ctrl+→ → ×2 "=YEAR(E5)" ↵ ↑ Shift+↓ ×5 Ctrl+D', requires: ['year-month-day', 'fill-down-right', 'ctrl-arrow', 'shift-arrow', 'arrow-keys'],
+      hintStuck: 'pulse range P5:P10 · Vintage is two columns right of Day.',
       check: (s, ses) => { const si = sites(ses); return settled(ses) && !!si && vintage(si); } },
+    { id: 'build-date', teach: 'DATE(year, month, day) builds a date from three numbers, and it rolls over: DATE(2026,13,1) is January 1, 2027.',
+      text: 'Build Domain’s month opened in O5 from the parts: =DATE(L5,M5,1) is the first of its opening month, 3/1/2019.', keys: '← "=DATE(L5,M5,1)" ↵', requires: ['date-function', 'arrow-keys'],
+      hintStuck: 'pulse cell O5 · Month opened sits between Day and Vintage.',
+      check: (s, ses) => { const si = sites(ses); return settled(ses) && !!si && firstRow(si, 5); } },
+    { id: 'date-fill', text: 'Fill it down O5:O10 with Ctrl+D: every site gets the first of its opening month, the date a count by month groups on.', keys: '↑ Shift+↓ ×5 Ctrl+D', requires: ['date-function', 'fill-down-right', 'shift-arrow', 'arrow-keys'],
+      hintStuck: 'pulse range O5:O10 · Ctrl+D copies O5 down the selection.',
+      check: (s, ses) => { const si = sites(ses); return settled(ses) && !!si && firstOfMonth(si); } },
     { id: 'link-ages', teach: 'The ages on Summary were typed in 3.1.3 for want of this lesson. Now they link to Sites, so a new as-of date moves every flag that reads them.',
       text: 'Replace the typed ages on Summary: select L5:L10, type =Sites!K5, press Ctrl+Enter and color them green as links with Alt H F C.', keys: 'Ctrl+G "Summary!L5" ↵ Shift+↓ ×5 "=Sites!K5" Ctrl+↵ Alt H F C → ×8 ↵', requires: ['cross-sheet-ref', 'ctrl-enter-fill', 'font-color', 'link-colour-convention', 'go-to', 'shift-arrow'], convention: 'B2',
       hintStuck: 'pulse range Summary!L5:L10 · Age (years) on Summary is column L, the blue typed figures.',
@@ -85,5 +89,5 @@ export default {
     'A date is a number, so age is a subtraction.',
     'Every age comes from one blue as-of date and the opening dates, and the Summary reads them through green links (B2), so moving the date a quarter on moves the whole page.',
   ],
-  solution: `Ctrl+G "Sites!I5" Enter Ctrl+Shift+~ Ctrl+Z Right "=$I$5-E5" Enter Up Shift+Down Shift+Down Shift+Down Shift+Down Shift+Down Ctrl+D Right "=J5/365.25" Enter Up Shift+Down Shift+Down Shift+Down Shift+Down Shift+Down Ctrl+D Right "=YEAR(E5)" Tab "=MONTH(E5)" Tab "=DAY(E5)" Enter Up Shift+Right Shift+Right Shift+Down Shift+Down Shift+Down Shift+Down Shift+Down Ctrl+D Right Right Right "=DATE(L5,M5,1)" Enter Up Shift+Down Shift+Down Shift+Down Shift+Down Shift+Down Ctrl+D Right "=YEAR(E5)" Enter Up Shift+Down Shift+Down Shift+Down Shift+Down Shift+Down Ctrl+D Ctrl+G "Summary!L5" Enter Shift+Down Shift+Down Shift+Down Shift+Down Shift+Down "=Sites!K5" Ctrl+Enter Alt H F C Right Right Right Right Right Right Right Right Enter`,
+  solution: `Ctrl+G "Sites!I5" Enter Ctrl+Shift+~ Ctrl+Z Right "=$I$5-E5" Enter Up Shift+Down Shift+Down Shift+Down Shift+Down Shift+Down Ctrl+D Right "=J5/365.25" Enter Up Shift+Down Shift+Down Shift+Down Shift+Down Shift+Down Ctrl+D Right "=YEAR(E5)" Tab "=MONTH(E5)" Tab "=DAY(E5)" Enter Up Shift+Right Shift+Right Shift+Down Shift+Down Shift+Down Shift+Down Shift+Down Ctrl+D Ctrl+Right Right Right "=YEAR(E5)" Enter Up Shift+Down Shift+Down Shift+Down Shift+Down Shift+Down Ctrl+D Left "=DATE(L5,M5,1)" Enter Up Shift+Down Shift+Down Shift+Down Shift+Down Shift+Down Ctrl+D Ctrl+G "Summary!L5" Enter Shift+Down Shift+Down Shift+Down Shift+Down Shift+Down "=Sites!K5" Ctrl+Enter Alt H F C Right Right Right Right Right Right Right Right Enter`,
 };

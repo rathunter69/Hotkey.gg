@@ -1,7 +1,7 @@
 // Chapter 3 · 3.1.2 Nested IF, IFS, and MIN and MAX instead (clearcoat-databook, S1a → S1b)
 // The manager bonus steps up in tiers (the table in J5:K8). The learner builds it as a nested-IF
-// tower in I5:I10 first, reads its parentheses, then replaces it with IFS over the same cells; the
-// gap above target in G5:G10 becomes MAX(C5-D5,0), and I4 is headed Bonus ($/day). The bonus
+// tower in I5:I10 first, reads its parentheses, then types IFS over I5 and fills it over the rest; the
+// gap above target becomes MAX(C5-D5,0) in G5, then down G5:G10, and I4 is headed Bonus ($/day). The bonus
 // is graded on its values and liveness; the tower and the IFS goals also read the parsed tokens of
 // the cells they name (E6: no nested-IF towers). The closer lifts Domain to 360 washes.
 import { liveness } from '../../app/graders.js';
@@ -25,6 +25,9 @@ const ifs = sh => bonus(sh) && ROWS.every(r => { const f = fns(sh, 'I' + r); ret
 const GAP = (sh, r) => Math.max(sh.value('C' + r) - sh.value('D' + r), 0);
 const floored = sh => column(sh, 'G', GAP) && ROWS.every(r => { const f = fns(sh, 'G' + r); return f.includes('MAX') && !f.includes('IF'); });
 const HEAD = 'Bonus ($/day)';
+/** One row rewritten: the value and liveness, and the parsed tokens of that cell. */
+const ifsAt = (sh, r) => same(sh.value('I' + r), BONUS(sh, r)) && liveness(sh, 'I' + r).ok && (f => f.includes('IFS') && !f.includes('IF'))(fns(sh, 'I' + r));
+const maxAt = (sh, r) => same(sh.value('G' + r), GAP(sh, r)) && liveness(sh, 'G' + r).ok && (f => f.includes('MAX') && !f.includes('IF'))(fns(sh, 'G' + r));
 
 export default {
   id: 'nested-if-ifs-min-max',
@@ -57,17 +60,20 @@ export default {
       hintStuck: 'pulse cell I5 · F2 shows the formula in the cell, Esc leaves it as it was.',
       check: (s, ses) => { const sh = summary(ses); const k = windowKeys(ses); return settled(ses) && !!sh && k.includes('F2') && k.includes('Esc') && tower(sh); } },
     { id: 'ifs', teach: 'IFS takes the tests in pairs, a test and its answer, and returns the answer beside the first test that holds; TRUE at the end catches everything left. Same answers as the tower, read top to bottom.',
-      text: 'Replace the tower: with I5:I10 selected, type =IFS(C5>=350,150,C5>=300,100,C5>=250,50,TRUE,0) and press Ctrl+Enter.', keys: '"=IFS(C5>=350,150,C5>=300,100,C5>=250,50,TRUE,0)" Ctrl+↵', requires: ['ifs-function', 'ctrl-enter-fill'], convention: 'E6',
-      hintStuck: 'pulse range I5:I10 · Ctrl+Enter writes the formula into every selected cell.',
-      check: (s, ses) => { const sh = summary(ses); return settled(ses) && !!sh && ifs(sh); } },
-    { id: 'floor-max', teach: 'MAX(x,0) floors a figure at zero and MIN(x,150) caps it at 150, each in one call. When a test only floors or caps, MAX or MIN says it without an IF.',
-      text: 'Floor the gap with MAX: select G5:G10 and rewrite it as =MAX(C5-D5,0) with Ctrl+Enter; the figures do not move.', keys: '← ×2 Ctrl+Shift+↓ "=MAX(C5-D5,0)" Ctrl+↵', requires: ['min-max-cap', 'sum-family', 'ctrl-enter-fill', 'ctrl-shift-arrow', 'arrow-keys'], convention: 'E6',
-      hintStuck: 'pulse range G5:G10 · Above target is two columns left of the bonus.',
+      text: 'Replace Domain’s tower first: type =IFS(C5>=350,150,C5>=300,100,C5>=250,50,TRUE,0) over I5 and press Enter.', keys: '"=IFS(C5>=350,150,C5>=300,100,C5>=250,50,TRUE,0)" ↵', requires: ['ifs-function'], convention: 'E6',
+      hintStuck: 'pulse cell I5 · Type straight over the tower; Enter commits it.',
+      check: (s, ses) => { const sh = summary(ses); return settled(ses) && !!sh && ifsAt(sh, 5); } },
+    { id: 'ifs-fill', text: 'Fill the IFS down over the other five towers, I5:I10 with Ctrl+D, then head the column you kept Bonus ($/day) in I4.', keys: '↑ Shift+↓ ×5 Ctrl+D ↑ "Bonus ($/day)" ↵', requires: ['ifs-function', 'fill-down-right', 'type-to-enter', 'shift-arrow', 'arrow-keys'], convention: 'E6',
+      hintStuck: 'pulse range I5:I10 · Ctrl+D copies I5 down the selection.',
+      check: (s, ses) => { const sh = summary(ses); return settled(ses) && !!sh && ifs(sh) && sh.value('I4') === HEAD; } },
+    { id: 'max', teach: 'MAX(x,0) floors a figure at zero and MIN(x,150) caps it at 150, each in one call. When a test only floors or caps, MAX or MIN says it without an IF.',
+      text: 'The gap in G5 only floors at zero, so MAX says it without an IF: type =MAX(C5-D5,0) over G5 and press Enter.', keys: '← ×2 "=MAX(C5-D5,0)" ↵', requires: ['min-max-cap', 'sum-family', 'arrow-keys'], convention: 'E6',
+      hintStuck: 'pulse cell G5 · Above target is two columns left of the bonus.',
+      check: (s, ses) => { const sh = summary(ses); return settled(ses) && !!sh && maxAt(sh, 5); } },
+    { id: 'max-fill', teach: 'When the test picks from a list of bands, IFS says it; when it only caps or floors, MIN or MAX does. In Chapter 4 a lookup on the tier table replaces both.',
+      text: 'Fill the MAX down G5:G10 with Ctrl+D: Cedar Park washed nothing against 200, and its gap reads 0, not minus 200.', keys: '↑ Shift+↓ ×5 Ctrl+D', requires: ['min-max-cap', 'fill-down-right', 'shift-arrow', 'arrow-keys'], convention: 'E6',
+      hintStuck: 'pulse cell G10 · Cedar Park is the last site row.',
       check: (s, ses) => { const sh = summary(ses); return settled(ses) && !!sh && floored(sh); } },
-    { id: 'label', teach: 'When the test picks from a list of bands, IFS says it; when it only caps or floors, MIN or MAX does. In Chapter 4 a lookup on the tier table replaces both.',
-      text: 'Head the column you kept: type Bonus ($/day) in I4.', keys: '→ ×2 ↑ "Bonus ($/day)" ↵', requires: ['type-to-enter', 'arrow-keys'],
-      hintStuck: 'pulse cell I4 · The header row is row 4.',
-      check: (s, ses) => { const sh = summary(ses); return settled(ses) && !!sh && sh.value('I4') === HEAD; } },
     { id: 'tie', closer: true, demo: { script: 'Ctrl+G "Summary!C5" Enter "360" Enter Ctrl+G "Summary!I5" Enter Escape Escape Escape', cadence: 320 }, text: 'Does it tie? Watch Domain’s washes in C5 rise to 360 and its bonus in I5 step up to $150.', requires: [],
       hintStuck: 'pulse cell I5 · The first test that holds wins.',
       check: (s, ses) => ses.demoDone.has('tie') },
@@ -81,5 +87,5 @@ export default {
     'You wrote the same test three ways, and only the one a reviewer can read survived.',
     'The bonus reads top to bottom in IFS, the gap is floored with MAX, and neither column has an IF tower left in it (E6). The tiers are still typed inside the formula; Chapter 4 reads them from the table instead.',
   ],
-  solution: 'Down Down Down Ctrl+Right Ctrl+Right Ctrl+Right Down Shift+Right Ctrl+Shift+Down Left "=IF(C5>=350,150,IF(C5>=300,100,IF(C5>=250,50,0)))" Enter Up Shift+Down Shift+Down Shift+Down Shift+Down Shift+Down Ctrl+D F2 Escape "=IFS(C5>=350,150,C5>=300,100,C5>=250,50,TRUE,0)" Ctrl+Enter Left Left Ctrl+Shift+Down "=MAX(C5-D5,0)" Ctrl+Enter Right Right Up "Bonus ($/day)" Enter',
+  solution: 'Down Down Down Ctrl+Right Ctrl+Right Ctrl+Right Down Shift+Right Ctrl+Shift+Down Left "=IF(C5>=350,150,IF(C5>=300,100,IF(C5>=250,50,0)))" Enter Up Shift+Down Shift+Down Shift+Down Shift+Down Shift+Down Ctrl+D F2 Escape "=IFS(C5>=350,150,C5>=300,100,C5>=250,50,TRUE,0)" Enter Up Shift+Down Shift+Down Shift+Down Shift+Down Shift+Down Ctrl+D Up "Bonus ($/day)" Enter Left Left "=MAX(C5-D5,0)" Enter Up Shift+Down Shift+Down Shift+Down Shift+Down Shift+Down Ctrl+D',
 };
