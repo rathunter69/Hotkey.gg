@@ -177,6 +177,7 @@ import unlevered_free_cash_flow from './lessons/unlevered-free-cash-flow.js';
 import wacc_block from './lessons/wacc-block.js';
 import terminal_value from './lessons/terminal-value.js';
 import discounting_mid_year from './lessons/discounting-mid-year.js';
+import dcf_sensitivity from './lessons/dcf-sensitivity.js';
 
 export const CHAPTERS = [
   {
@@ -311,7 +312,7 @@ export const CHAPTERS = [
     ],
     lessons: [
       tie_outs_cross_foots, error_flags_checks_summary, model_wide_sweep, stress_tests, challenge_eight_faults,
-      what_a_dcf_is, unlevered_free_cash_flow, wacc_block, terminal_value, discounting_mid_year,
+      what_a_dcf_is, unlevered_free_cash_flow, wacc_block, terminal_value, discounting_mid_year, dcf_sensitivity,
     ],
   },
 ];

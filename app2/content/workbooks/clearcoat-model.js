@@ -26,7 +26,7 @@ export const UNITS = 'USD thousands unless stated; fiscal years end December 31'
 const serial = (y, m, d) => Math.round((Date.UTC(y, m - 1, d) - Date.UTC(1899, 11, 30)) / 86400000);
 export const FIRST_YEAR_END = serial(2024, 12, 31), LAST_HISTORICAL = serial(2026, 12, 31), VALUATION_DATE = serial(2026, 12, 31);
 const FY_FMT = { fmtStyle: 'custom', numFmt: '"FY"yy' }, DATE_FMT = { fmtStyle: 'custom', numFmt: 'm/d/yyyy' };
-const MILLIONS = { fmtStyle: 'custom', numFmt: '#,##0.0,_);(#,##0.0,)' };
+const MILLIONS = { fmtStyle: 'custom', numFmt: '#,##0.0,_);(#,##0.0,)', decimals: 1 };
 const NODASH = { fmtStyle: 'comma', decimals: 0 };
 const prev = col => String.fromCharCode(col.charCodeAt(0) - 1);
 const clone = v => (typeof structuredClone === 'function' ? structuredClone(v) : JSON.parse(JSON.stringify(v)));
@@ -739,6 +739,8 @@ function pageDCF() {
   timeline(sheet);
   sheet.cells.K4 = { value: 'FY31 normalized', bold: true, align: 'r' };
   for (const prefix of ['sg', 'sm']) for (let i = 0; i < 5; i++) for (const col of ['D', 'E', 'F', 'G', 'H']) Object.assign(sheet.cells[col + R(me, prefix + i)], MILLIONS);
+  // each table's edge across is bold, and its base case (the middle cell) bold inside a box (2.3.3)
+  for (const prefix of ['sg', 'sm']) { for (const col of ['D', 'E', 'F', 'G', 'H']) sheet.cells[col + R(me, prefix + 'H')].bold = true; Object.assign(sheet.cells['F' + R(me, prefix + '2')], { bold: true, ball: true }); }
   titled(sheet, caseTitle('DCF'));
   return sheet;
 }
