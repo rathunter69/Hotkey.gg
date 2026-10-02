@@ -213,4 +213,8 @@ if (failed.length || sum.fail) fail('unit tests failed');
 
 const secs = ((Date.now() - t0) / 1000).toFixed(1);
 console.log(`\nCHECK PASSED in ${secs}s`);
-if (!FULL && Date.now() - t0 > 30000) fail(`check took ${secs}s — the budget is 30s`);   // --full is not the gate: no budget
+// The 30 s budget keeps the local gate fast. On Cloudflare's build machine (CF_PAGES) and on CI the
+// machine's speed is not ours to set, so going over is a warning there, never a failed deploy.
+const overBudget = !FULL && Date.now() - t0 > 30000;   // --full is not the gate: no budget
+if (overBudget && (process.env.CF_PAGES || process.env.CI)) console.log(`warning: check took ${secs}s, over the 30s budget (not fatal on ${process.env.CF_PAGES ? 'Cloudflare' : 'CI'})`);
+else if (overBudget) fail(`check took ${secs}s — the budget is 30s`);
