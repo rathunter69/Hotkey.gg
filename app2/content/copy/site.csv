@@ -257,6 +257,8 @@ learn_coming,Chapter {n} is being written. Its modules land here.
 practice_drills,Drills
 practice_set_line,"{count} drills picked for you, about {minutes}."
 practice_set_line_one,"One drill picked for you, about {minutes}."
+practice_set_short,"{count} drills open so far, about {minutes}. Each lesson you finish opens more."
+practice_set_short_one,"One drill open so far, about {minutes}. Each lesson you finish opens more."
 practice_one_minute,one minute
 practice_minutes,{n} minutes
 practice_set_none,Finish a lesson and its drills unlock here.

@@ -167,8 +167,7 @@ export function createRunPanel(host, opts = {}) {
     const html = `<div class="rp-head"><div class="rp-head-row"><span class="rp-clock">${fmtClock(d.secs || 0)}</span><span class="rp-pace">${esc(paceLabel(d.pace))}</span></div>${trackHtml(model)}</div>` +
       `<div class="rp-check"></div>` +
       `<div class="rp-line rp-run-foot"><span class="rp-keys">${esc(t('panel_keys_so_far', 'Keys so far: {n}', { n: d.keys || 0 }))}</span><span class="rp-esc">${kbd('Esc', platform())} ${esc(siteCopy('panel_esc_ends', 'ends the run'))}</span></div>`;
-    swap('run', html, []);
-    checklist(d.checklist, d.showKeys);
+    swap('run', html, [], () => checklist(d.checklist, d.showKeys));   // the checklist paints into the run beat once it has painted, not into the Ready it replaces
   }
   /** The checklist from app/checklist.js: done tasks folded into one line, the current one with the cursor, the next three, "{n} more after these". */
   function checklist(state, showKeys) {

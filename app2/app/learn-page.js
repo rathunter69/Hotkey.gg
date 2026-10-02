@@ -200,7 +200,8 @@ export function chapterTabs() {
 /** The page a module builds: its project's sheet when it has one, else its last lesson's; `delivered` shows the after state. */
 export function modulePreview(chapter, moduleId, delivered) {
   const lessons = chapter.lessons.filter(l => l.module === moduleId && l.kind !== 'testout' && l.kind !== 'assessment');
-  const last = lessons.find(l => l.kind === 'project') || lessons[lessons.length - 1];
+  const built = lessons.filter(l => l.kind !== 'challenge');   // a module's challenge runs on another location's file, not the page this module builds
+  const last = lessons.find(l => l.kind === 'project') || built[built.length - 1] || lessons[lessons.length - 1];
   const first = lessons[0];
   if (!last) return null;
   return previewOfLesson(delivered ? last : first, delivered ? 'after' : 'before');
@@ -242,7 +243,7 @@ export function mountLearnPage(root, ctx = {}) {
     const paywall = locked && tab.built ? panelHtml({ heading: esc(t('learn_pro_chapter', { n: tab.n })), body: `<p class="panel-line">${esc(siteCopy('paywall_line', 'Go Pro for the rest of the content.'))}</p><div class="btn-row">${buttonHtml({ label: t('paywall_go_pro'), key: 'Enter', href: '#/pricing', primary: true, id: 'learnGoPro' })}${buttonHtml({ label: t('paywall_not_now'), key: 'Esc', quiet: true, id: 'learnNotNow' })}</div>`, cls: 'paywall', mode: 'learn', attrs: { 'data-cursor': true, 'data-cursor-enter': '#learnGoPro', tabindex: '-1' } }) : '';
     let side = '';
     if (open && tab.built && !locked) {
-      const delivered = open.status === 'complete';
+      const delivered = open.status === 'complete' || prefs.get().pagesDelivered.includes(open.id);   // the module's challenge hands the page in (lesson-view.js), so Learn shows it built from then
       const sheet = modulePreview(tab.built, open.id, delivered);
       const copy = moduleCopy(open.id);
       const pageName = (copy && copy.page_name) || open.title;

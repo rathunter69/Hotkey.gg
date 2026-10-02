@@ -118,11 +118,16 @@ export function catalogRows(catalog, { all = {}, skipped = [], bests = {}, pro =
   return groups;
 }
 
-/** The header's line: "Six drills picked for you, about ten minutes." Pure. */
-export function setLine(count, secs) {
+/**
+ * The header's line: "Six drills picked for you, about ten minutes." When the open drills cannot fill the chosen
+ * length (`budgetMins`), the line says so instead of reading as a short set for a long choice. Pure.
+ */
+export function setLine(count, secs, budgetMins) {
   if (!count) return t('practice_set_none');
   const mins = Math.max(1, Math.round(secs / 60));
   const minutes = mins === 1 ? t('practice_one_minute') : t('practice_minutes', { n: numberWord(mins) });
+  const short = budgetMins && secs < budgetMins * 60 * 0.75;
+  if (short) return count === 1 ? t('practice_set_short_one', { minutes }) : t('practice_set_short', { count: numberWord(count, { capital: true }), minutes });
   return count === 1 ? t('practice_set_line_one', { minutes }) : t('practice_set_line', { count: numberWord(count, { capital: true }), minutes });
 }
 
@@ -153,7 +158,7 @@ function drillsPage(el, ctx) {
     const first = set.ids[0] || null;
     const href = first ? `#/drill/${first}?set=${set.ids.join(',')}&len=${minutes}` : '';
     const control = `<label class="picker"><select id="setLen">${SET_LENGTHS.map(n => `<option value="${n}"${n === minutes ? ' selected' : ''}>${esc(t('setting_setLength_' + n))}</option>`).join('')}</select></label>`;
-    const header = headerBlockHtml({ title: t('practice_drills'), line: `${esc(setLine(set.ids.length, set.secs))} ${set.ids.length ? `<button type="button" class="link-btn" id="seeSet">${esc(showSet ? t('practice_hide_set') : t('practice_see_set'))}</button>` : ''}`, control, button: first ? buttonHtml({ label: t('practice_start'), key: 'Enter', href, primary: true, id: 'startDrilling' }) : '', cls: 'hdr-drills' });
+    const header = headerBlockHtml({ title: t('practice_drills'), line: `${esc(setLine(set.ids.length, set.secs, minutes))} ${set.ids.length ? `<button type="button" class="link-btn" id="seeSet">${esc(showSet ? t('practice_hide_set') : t('practice_see_set'))}</button>` : ''}`, control, button: first ? buttonHtml({ label: t('practice_start'), key: 'Enter', href, primary: true, id: 'startDrilling' }) : '', cls: 'hdr-drills' });
     const setPanel = showSet && set.ids.length ? panelHtml({ heading: esc(t('practice_set_heading')), facts: esc(fmtLength(set.secs)), body: tableHtml({ columns: [{ key: 'n', label: '', cls: 'n' }, { key: 'title', label: t('col_drill') }, { key: 'why', label: '' }, { key: 'length', label: t('col_length'), align: 'right', cls: 'min' }], rows: set.ids.map((id, i) => { const e = CATALOG.find(x => x.id === id); return { cells: { n: String(i + 1), title: esc(e.title), why: esc(t('reason_' + String(set.reasons[id]).replace('-', '_'))), length: fmtLength(e.length) }, href: '#/drill/' + id }; }), cls: 'tbl-set' }), cls: 'set-panel' }) : '';
     const paywallPanel = paywall ? panelHtml({ heading: esc(paywall.title), body: `<p class="panel-line">${esc(siteCopy('paywall_line', 'Go Pro for the rest of the content.'))}</p><div class="btn-row">${buttonHtml({ label: t('paywall_go_pro'), key: 'Enter', href: '#/pricing', primary: true, id: 'practiceGoPro' })}${buttonHtml({ label: t('paywall_not_now'), key: 'Esc', quiet: true, id: 'practiceNotNow' })}</div>`, cls: 'paywall', mode: 'drills', attrs: { 'data-cursor': true, 'data-cursor-enter': '#practiceGoPro', tabindex: '-1' } }) : '';
     const columns = [{ key: 'title', label: t('col_drill') }, { key: 'length', label: t('col_length'), align: 'right', cls: 'min' }, { key: 'best', label: t('col_best'), align: 'right', cls: 'best' }, { key: 'tier', label: '', align: 'right', cls: 'tier' }];

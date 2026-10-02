@@ -33,6 +33,7 @@ body[data-route="landing"] #navMount{position:static; width:auto; bottom:auto}
 .rail-children{display:flex; flex-direction:column; gap:var(--s1); padding-left:var(--s6)}
 .rail-mode{font-weight:var(--fw-body); color:var(--rail-sub); padding-top:var(--s2); padding-bottom:var(--s2)}
 .rail-mode.on{color:var(--sheet)}
+.rail-item:has(+ .rail-children .rail-item.on){color:var(--sheet)}   /* Practice reads open while one of its modes is the page */
 .rail-dot{display:inline-block; width:var(--mode-mark); height:var(--mode-mark); background:var(--mark); flex:none}
 /* the KeyTips letters: small green keys at the right of each item, shown on Alt */
 .kt{display:none; font-family:var(--mono); font-weight:var(--fw-key); font-size:var(--fs-min); line-height:1; color:var(--on-fill); background:var(--learn); border-radius:var(--r-btn); padding:var(--s1) var(--s2); margin-left:auto}

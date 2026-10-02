@@ -113,14 +113,14 @@ try {
     if (!fr) fail('journey: Enter on the landing did not open the first run');
     else {
       if (!(await page.$('.fr-opt.cursor-on'))) fail('journey: the first run opens with no option under the cursor');
-      await page.keyboard.press('ArrowDown'); await page.waitForTimeout(80);   // the arrows move through the options
+      await page.keyboard.press('ArrowDown'); await page.waitForTimeout(80);   // the arrows move through the options: the highlight starts on the experience answer
       await page.keyboard.press('Enter'); await page.waitForTimeout(250);   // Next: the story card
       if (!/Clearcoat/.test(await page.evaluate(() => document.body.innerText))) fail('journey: the story card does not carry Wolf\'s line');
       await page.keyboard.press('Enter');   // Start lesson 1.1.1
       await page.waitForFunction(() => /#\/lesson\/inherited-workbook/.test(location.hash), null, { timeout: 4000 }).catch(() => fail('journey: the first run did not land on lesson 1.1.1 (' + page.url() + ')'));
       const prefsRec = await page.evaluate(() => { try { return JSON.parse(localStorage.getItem('hk2_prefs')); } catch (e) { return null; } });
       if (!prefsRec || !prefsRec.briefingDone || !prefsRec.firstRunDone) fail('journey: first-run prefs not written');
-      if (!prefsRec || prefsRec.platform !== 'mac') fail('journey: the arrow did not change the keyboard answer: ' + JSON.stringify(prefsRec && prefsRec.platform));
+      if (!prefsRec || prefsRec.experience !== 'sometimes' || prefsRec.platform !== 'win') fail('journey: the arrow did not move the experience answer: ' + JSON.stringify(prefsRec && [prefsRec.platform, prefsRec.experience]));
     }
     t('first run');
     // 1.1.1: the module's story beat in the panel (Enter starts the job), the title row reads 1.1, the card names itself once, then the lesson by keyboard

@@ -139,7 +139,7 @@ test('parseRoute: every documented route, with params and query', () => {
 
 test('navKeyFor and titleFor', () => {
   assert.equal(navKeyFor('root'), 'home'); assert.equal(navKeyFor('landing'), ''); assert.equal(navKeyFor('lesson'), 'learn'); assert.equal(navKeyFor('start'), ''); assert.equal(navKeyFor('learn'), 'learn');
-  assert.equal(navKeyFor('drill'), 'practice'); assert.equal(navKeyFor('drill', { daily: true }), 'daily'); assert.equal(navKeyFor('practice', { mode: 'rapid' }), 'rapid'); assert.equal(navKeyFor('practice', { mode: 'drills' }), 'practice'); assert.equal(navKeyFor('leaderboard'), 'leaderboard'); assert.equal(navKeyFor('reference'), 'reference');
+  assert.equal(navKeyFor('drill'), 'drills'); assert.equal(navKeyFor('practice'), 'drills'); assert.equal(navKeyFor('drill', { daily: true }), 'daily'); assert.equal(navKeyFor('practice', { mode: 'rapid' }), 'rapid'); assert.equal(navKeyFor('practice', { mode: 'drills' }), 'drills'); assert.equal(navKeyFor('leaderboard'), 'leaderboard'); assert.equal(navKeyFor('reference'), 'reference');
   assert.equal(navKeyFor('pricing'), '');
   assert.equal(titleFor('learn'), 'Learn · hotkey.gg');
   assert.equal(titleFor('lesson', 'The active cell'), 'The active cell · hotkey.gg');

@@ -79,8 +79,8 @@ export function parseRoute(hash) {
 export function navKeyFor(name, params = {}) {
   if (name === 'root' || name === 'home') return 'home';
   if (name === 'learn' || name === 'lesson' || name === 'locked') return 'learn';
-  if (name === 'practice') return params.mode && params.mode !== 'drills' ? params.mode : 'practice';
-  if (name === 'drill') return params.daily ? 'daily' : 'practice';
+  if (name === 'practice') return params.mode || 'drills';   // #/practice is Drills: its item under Practice carries the mark (3.0, The rail)
+  if (name === 'drill') return params.daily ? 'daily' : 'drills';
   if (name === 'rapid') return 'rapid';
   if (name === 'due') return 'practice';
   if (name === 'leaderboard' || name === 'reference') return name;

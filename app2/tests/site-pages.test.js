@@ -148,6 +148,10 @@ test('the set\'s line counts in words, and the challenges table reads the curric
   assert.equal(setLine(1, 60), 'One drill picked for you, about one minute.');
   assert.equal(setLine(3, 290), 'Three drills picked for you, about five minutes.');
   assert.equal(setLine(0, 0), 'Finish a lesson and its drills unlock here.');
+  // a set the open drills cannot fill to the chosen length says so, not "picked, about one minute" under 10 minutes
+  assert.equal(setLine(1, 60, 10), 'One drill open so far, about one minute. Each lesson you finish opens more.');
+  assert.equal(setLine(2, 150, 10), 'Two drills open so far, about three minutes. Each lesson you finish opens more.');
+  assert.equal(setLine(6, 600, 10), 'Six drills picked for you, about ten minutes.');
   const rows = challengeRows(DRILLS.filter(d => d.kind === 'challenge'), { 'challenge-inherited-file': { challenge: true } }, { 'challenge-inherited-file': { secs: 100, tier: 'pass' } });
   const first = rows.find(r => r.id === 'challenge-inherited-file');
   assert.equal(first.n, '1.1'); assert.equal(first.module, 'Open and set up'); assert.equal(first.passed, true); assert.equal(first.best, 100); assert.ok(first.length > 0);
