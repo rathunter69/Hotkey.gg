@@ -1328,8 +1328,10 @@ export function challengeSeed(id, rng) {
 
 /* ---------------- a live session, read back in the states' shape ---------------- */
 
+/** Names in the order a session lists them (alphabetical, case ignored), so the order a state was written in never shows as a difference. */
+const namesSorted = st => (st && st.names ? { ...st, names: Object.fromEntries(Object.entries(st.names).sort(([a], [b]) => a.toUpperCase().localeCompare(b.toUpperCase()))) } : st);
 /** What differs between two states (clearcoat-weekly's diff: cells, structure, names, settings). */
-export const diffStates = diffCells;
+export const diffStates = (a, b) => diffCells(namesSorted(a), namesSorted(b));
 /** A live session in the authored-state shape: clearcoat-weekly's extraction, with the iteration limits the model's settings carry. */
 export function sessionToState(ses) {
   const st = sessionCells(ses); const set = ses.settings;

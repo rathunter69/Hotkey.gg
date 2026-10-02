@@ -329,6 +329,20 @@ export const CONCEPTS = {
   'name-manager': 'the Name Manager (Ctrl+F3) lists every name with its value, its reference and its scope; Edit renames or re-points one and the formulas follow, Delete removes a stray',
   'paste-list': 'Paste Name (F3) › Paste List writes every name and what it refers to from the active cell down, so the reviewer can read them on a sheet',
   'name-driven-list': 'a drop-down whose Source is a name (=Cases) reads the named list wherever it sits, so the list can move and the picker keeps working',
+  // Chapter 5 · 5.3 Schedules and 5.4 Linking the statements (the operating model)
+  'corkscrew': 'a corkscrew rolls a balance: opening, plus what comes in, less what goes out, is the closing, and the closing is next year’s opening',
+  'driver-build': 'a driver-based build multiplies inputs a buyer can question (sites × washes a day × days × ticket) instead of growing last year by a typed rate',
+  'cost-behaviour': 'each cost is built the way it behaves: per wash as a share of revenue, per site as a cost per site × average sites, fixed as a base that grows plus a step',
+  'working-capital-days': 'a working-capital balance is its driver ÷ 365 × its days, and the change in it is cash: a rise in an asset uses cash, a rise in a liability brings it in',
+  'depreciation-waterfall': 'a depreciation waterfall puts each year’s capex on its own row and depreciates it across from the year after, so total depreciation is a SUM down a column',
+  'circularity-breaker': 'interest on the average balance makes a circle that iterative calculation settles; a breaker cell (Circ: 1 on the average, 0 on the opening) switches it off when it breaks',
+  'tax-losses': 'tax is MAX(EBT,0) × the rate, and a loss is carried forward as a balance that later profit uses up before tax is paid',
+  'statement-links': 'each projected statement line links to the last line of its schedule, and one formula a row carries the actuals through the projection flag',
+  'indirect-cash-flow': 'the indirect cash flow starts from net income, adds back depreciation, takes the working-capital changes with their signs, then capex and the financing lines',
+  'cash-not-a-plug': 'balance sheet cash is the cash flow’s closing cash, built from every other line, so a sheet that balances proves the links and nothing is forced',
+  'cash-sweep': 'the revolver draws MAX(minimum cash − cash before the revolver, 0) and repays MIN(MAX(surplus, 0), its balance): MIN and MAX, never an IF tower',
+  'balance-order': 'when the balance sheet is off, read the size of the difference first, then check in order: cash, working-capital signs, depreciation, capex, debt, net income to equity, openings',
+  'select-precedents': 'Ctrl+[ jumps to the cells a formula reads, on another sheet too, so a link can be followed back to its source',
 };
 
 /**

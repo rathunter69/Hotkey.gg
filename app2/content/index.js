@@ -166,6 +166,10 @@ import validation_list_by_name from './lessons/validation-list-by-name.js';
 import challenge_toggles_named from './lessons/challenge-toggles-named.js';
 import ch4_project from './lessons/ch4-project.js';
 import ch4_assessment from './lessons/ch4-assessment.js';
+// Chapter 5 · Finance and Accounting (Run R5): 5.3 Schedules, 5.4 Linking the statements
+import revenue_build from './lessons/revenue-build.js';
+import cost_build from './lessons/cost-build.js';
+import working_capital_schedule from './lessons/working-capital-schedule.js';
 
 export const CHAPTERS = [
   {
@@ -280,6 +284,26 @@ export const CHAPTERS = [
       challenge_three_case_model,
       naming_sparingly, name_manager, validation_list_by_name, challenge_toggles_named,
       ch4_project, ch4_assessment,
+    ],
+  },
+  {
+    id: 'finance-and-accounting',
+    title: 'Finance and Accounting',
+    access: 'paid',
+    blurb: 'The three statements, model setup, the schedules, the links between them, auditing, the DCF and model speed: Clearcoat’s operating model built until it balances in every case, and valued.',
+    // Chapter 5's sections in order (script-ch5.md): the seven modules and the closing project block.
+    sections: [
+      { name: 'The three statements', blurb: 'The income statement, accrual and cash, the cash flow statement, the balance sheet, how the three link, one week of one site through all three, and reading a set the way a buyer does.' },
+      { name: 'Model setup and efficiencies', blurb: 'Inputs, calculations and outputs in sheet order; the timeline row with its flags and counters; the fill patterns; the checks sheet from day one; the statements populated from the data tab; the drivers block.' },
+      { name: 'Schedules', blurb: 'The revenue build, the cost build, working capital from days to balances, PP&E with its depreciation waterfall, debt and interest with the average-balance circle and a breaker, and tax.' },
+      { name: 'Linking the statements', blurb: 'The income statement from the schedules, the cash flow statement by the indirect method, the balance sheet with cash as the plug that isn’t a plug, the cash sweep and the revolver, and the order to check when it doesn’t balance.' },
+      { name: 'Auditing a model', blurb: 'Tie-outs and cross-foots, error flags and the checks summary, the model-wide sweep for hardcodes and pattern breaks, and stress tests.' },
+      { name: 'DCF', blurb: 'What a DCF is and what the statements feed it, unlevered free cash flow, the WACC block, terminal value both ways, discounting with the mid-year convention, and sensitivity tables.' },
+      { name: 'Model speed', blurb: 'The revenue build in three minutes, a block filled and formatted in one pass, and the statements linked without the mouse.' },
+      { name: 'Project and assessment', blurb: 'The operating model with its DCF page end to end, then one schedule and the links from it against the clock.' },
+    ],
+    lessons: [
+      revenue_build, cost_build, working_capital_schedule,
     ],
   },
 ];
