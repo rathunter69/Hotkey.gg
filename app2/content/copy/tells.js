@@ -74,7 +74,7 @@ export function capsTell(s) {
   for (const w of words) {
     const letters = w.replace(/[^A-Za-z]/g, '');
     if (letters.length < 4 || letters !== letters.toUpperCase()) continue;
-    const base = w.replace(/\.[A-Z]+$/, '');   // QUARTILE.INC → QUARTILE
+    const base = w.replace(/\.[A-Z]+$/, '').replace(/^&+|&+$/g, '');   // QUARTILE.INC → QUARTILE; &YEAR in a joined formula → YEAR
     if (CAPS_OK.has(w) || CAPS_OK.has(base) || FUNCTION_NAMES.test(base)) continue;
     return `"${w}" in capitals`;
   }
