@@ -49,7 +49,7 @@ export const SITE_KEYS = [
   'setting_dailyReminder_help', 'setting_weeklySummary', 'setting_news', 'setting_handle', 'setting_certificateName', 'setting_certificateName_help',
   // the workspace chrome, the task card and the run panel (R1b: M90, M91, M93)
   'ws_back', 'ws_more', 'ws_sound_on', 'ws_sound_off', 'ws_goal_count', 'ws_task_count', 'ws_lesson_menu_hint', 'ws_close', 'ws_done', 'ws_esc_again', 'ws_sub_lesson',
-  'ws_exit', 'ws_exit_hint', 'ws_sheet_keys', 'ws_sheet_keys_or', 'ws_full_screen', 'ws_full_screen_tip', 'ws_focus_title', 'ws_focus_where', 'ws_focus_clock', 'more_exit',
+  'ws_exit', 'ws_exit_hint', 'ws_sheet_keys', 'ws_sheet_keys_tip', 'ws_full_screen', 'ws_full_screen_tip', 'ws_focus_title', 'ws_focus_where', 'ws_focus_clock', 'more_exit',
   'leave_title', 'leave_body', 'leave_run_title', 'leave_run_body', 'leave_drill_title', 'leave_action', 'leave_stay', 'card_also_works', 'card_alt_or', 'card_live_try', 'card_live_works', 'panel_exit_ends',
   'ws_sub_challenge', 'ws_sub_item', 'ws_sub_drill', 'ws_sub_daily', 'ws_sub_due', 'ws_kind_project', 'ws_kind_assessment', 'ws_kind_testout', 'more_lessons',
   'more_restart', 'more_collapse', 'more_expand', 'more_move', 'more_report', 'restart_title', 'restart_body', 'restart_action', 'dialog_cancel', 'card_help',

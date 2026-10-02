@@ -20,15 +20,12 @@ body[data-route="lesson"], body[data-route="drill"], body[data-route="due"]{over
 .wsc-bar button{font:inherit; color:inherit; background:transparent; border:0; cursor:pointer; display:inline-flex; align-items:center; gap:var(--s2); padding:0 var(--s3)}
 .wsc-exit{color:var(--xl-ink); font-size:var(--fs-label); font-weight:var(--fw-semi); white-space:nowrap; border-right:1px solid var(--xl-line)}
 .wsc-exit svg{width:var(--s4); height:var(--s4); flex:none}
-.wsc-exit .wsc-key{color:var(--xl-ink-2)}
+.wsc-bar .wsc-key{color:var(--xl-ink-2); background:transparent; border-color:var(--xl-line); border-bottom-width:1px; font-size:var(--fs-min)}
 .wsc-title{justify-self:center; max-width:46vw; min-width:0; margin:var(--s1) 0; border-radius:var(--r-btn)}
-.wsc-title-text{font-weight:var(--fw-bold); font-size:var(--fs-label); color:var(--xl-ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-.wsc-sub{font-size:var(--fs-label); color:var(--xl-ink-2); white-space:nowrap}
+.wsc-title-text{font-family:var(--xl-font); font-weight:var(--fw-semi); font-size:var(--xl-fs-tab); color:var(--xl-ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.wsc-sub{font-family:var(--xl-font); font-size:var(--xl-fs-tab); color:var(--xl-ink-2); white-space:nowrap}
 .wsc-title svg{width:var(--s3); height:var(--s3); color:var(--xl-ink-2); flex:none}
-.wsc[data-kind="lesson"] .wsc-title{background:var(--learn-tint)}
-.wsc[data-kind="lesson"] .wsc-title-text, .wsc[data-kind="lesson"] .wsc-sub, .wsc[data-kind="lesson"] .wsc-title svg{color:var(--learn-ink)}
 .wsc-bar button:hover{background:var(--xl-hover)}
-.wsc[data-kind="lesson"] .wsc-title:hover{background:var(--xl-press)}
 .wsc-bar button:focus-visible{outline:var(--cursor-w) solid var(--xl-green); outline-offset:calc(-1 * var(--cursor-w))}
 .wsc-key{font-family:var(--mono); font-weight:var(--fw-key); font-size:var(--fs-min); line-height:1; color:var(--ink); background:var(--sheet); border:1px solid var(--edge); border-bottom-width:var(--key-edge); border-radius:var(--r-btn); padding:var(--s1) var(--s2); white-space:nowrap}
 .wsc-progress{display:inline-flex; align-items:center; gap:var(--s3); padding:0 var(--s3); min-width:0}
@@ -119,7 +116,7 @@ body[data-route="lesson"] .rdrop-item, body[data-route="drill"] .rdrop-item, bod
 .wsc-sheet{flex:1 1 auto; min-height:0; display:flex; flex-direction:column}
 .wsc-sheet > .sheet-view, .wsc-sheet.sheet-view{flex:1 1 auto}
 .wsc .fbar{font-family:var(--mono); font-size:var(--fs-label); background:var(--sheet); border-bottom:1px solid var(--line)}
-.wsc .namebox{color:var(--ink); background:var(--chrome); font-family:var(--mono); font-weight:var(--fw-bold); font-size:var(--fs-namebox); min-width:calc(var(--s12) * 2); display:flex; align-items:center}
+.wsc .namebox{color:var(--xl-ink); background:var(--sheet); font-family:var(--mono); font-weight:var(--fw-semi); font-size:var(--fs-namebox); min-width:calc(var(--s12) * 2); display:flex; align-items:center; border-right:1px solid var(--xl-line)}
 .wsc .fx{color:var(--ink-2); font-family:var(--font)}
 .wsc .fcontent{color:var(--ink)}
 .wsc .fcontent.isfx{color:var(--ink)}
@@ -141,7 +138,6 @@ body[data-route="lesson"] .rdrop-item, body[data-route="drill"] .rdrop-item, bod
 .wsc-sheetkeys[hidden]{display:none}
 .wsc-sheetkeys .wsc-key{font-size:var(--fs-min); padding:1px var(--s1); border-bottom-width:var(--bw-2)}
 .wsc-sk-label{margin-right:var(--s1)}
-.wsc-sk-or{margin:0 var(--s1)}
 .wsc-sk-full{font:inherit; font-size:var(--fs-min); color:var(--xl-green-ink); background:transparent; border:1px solid var(--xl-line); border-radius:var(--r-btn); padding:1px var(--s2); margin-left:var(--s2); cursor:pointer}
 .wsc-sk-full:hover{background:var(--xl-hover)}
 .wsc-status{flex:1 1 auto; min-width:0; display:flex}

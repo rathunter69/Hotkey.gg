@@ -193,10 +193,11 @@ export function createChrome(host, opts = {}) {
   function setSheetKeys(hint, { fullscreen = false, isFull = false } = {}) {
     const box = $('.wsc-sheetkeys');
     if (!hint) { box.hidden = true; box.innerHTML = ''; return; }
-    const k = x => `<kbd class="wsc-key">${esc(keyLabel(x, platform()))}</kbd>`;
-    let h = `<span class="wsc-sk-label">${esc(siteCopy('ws_sheet_keys', 'Sheets'))}</span>${hint.keys.map(k).join('')}`;
-    if (hint.alias) h += `<span class="wsc-sk-or">${esc(siteCopy('ws_sheet_keys_or', 'in the browser'))}</span>${hint.alias.map(k).join('')}`;
-    if (fullscreen && hint.alias && !isFull) h += `<button type="button" class="wsc-sk-full" data-act="fullscreen" title="${esc(siteCopy('ws_full_screen_tip', 'Full screen hands Ctrl+PgDn and Ctrl+PgUp to the sheet'))}">${esc(siteCopy('ws_full_screen', 'Full screen'))}</button>`;
+    // the keys that work in this window: the browser's alias until Excel's own arrive, each titled with what it stands for
+    const tip = esc(siteCopy('ws_sheet_keys_tip', 'Excel’s keys are Ctrl+PgUp and Ctrl+PgDn. Your browser keeps them for its tabs, so these do the same here.'));
+    const k = x => `<kbd class="wsc-key"${hint.alias ? ` title="${tip}"` : ''}>${esc(keyLabel(x, platform()))}</kbd>`;
+    let h = `<span class="wsc-sk-label">${esc(siteCopy('ws_sheet_keys', 'Sheets'))}</span>${(hint.alias || hint.keys).map(k).join('')}`;
+    if (fullscreen && hint.alias && !isFull) h += `<button type="button" class="wsc-sk-full" data-act="fullscreen" title="${esc(siteCopy('ws_full_screen_tip', 'Full screen hands Ctrl+PgDn and Ctrl+PgUp to the sheet'))}">${esc(siteCopy('ws_full_screen', 'Full screen for Ctrl+PgDn'))}</button>`;
     if (box.innerHTML !== h) box.innerHTML = h;
     box.hidden = false;
   }
@@ -316,6 +317,10 @@ export function confirmDialog({ title, body, action, cancel, platform, focus = '
     };
     document.addEventListener('keydown', onKey, true);
     wrap.addEventListener('click', e => { const b = e.target.closest('[data-dlg]'); if (b) done(b.dataset.dlg === 'ok'); else if (e.target === wrap) done(false); });
+    // Enter presses the focused button, so its keycap moves with the focus
+    const enterCap = wrap.querySelector('[data-dlg] .wsc-key:last-child');
+    const enterKbd = [...wrap.querySelectorAll('.wsc-key')].find(k => k.textContent === keyLabel('Enter', platform)) || enterCap;
+    wrap.addEventListener('focusin', e => { const b = e.target.closest && e.target.closest('[data-dlg]'); if (b && enterKbd && enterKbd.parentNode !== b) b.appendChild(enterKbd); });
     const first = wrap.querySelector(okFirst ? '[data-dlg="ok"]' : '[data-dlg="cancel"]'); if (first) first.focus();
   });
 }
