@@ -261,6 +261,7 @@ body[data-route="lesson"] #hkToast, body[data-route="due"] #hkToast, body[data-r
 .rp-out .rp-body, .rp-out .rp-foot{opacity:0}
 .rp-foot{flex:none; display:flex; flex-direction:column; gap:var(--s2); padding:var(--s3) var(--s5) var(--s4); transition:opacity var(--d-beat)}
 .rp-foot[hidden]{display:none}
+.rp-pinned{display:flex; flex-direction:column; gap:var(--s2); padding-top:var(--s3); border-top:1px solid var(--line)}   /* lesson complete: XP and quest ticks above Next, never scrolled away */
 .rp-title{font-size:var(--fs-item); font-weight:var(--fw-heavy); line-height:1.25; color:var(--ink)}
 .rp-para{margin:0; color:var(--ink); font-size:var(--fs-body)}
 .rp-wow{font-weight:var(--fw-bold); font-size:var(--fs-body); color:var(--mode-ink)}
