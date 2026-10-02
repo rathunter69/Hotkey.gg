@@ -33,5 +33,5 @@ export default databookDrill({
   ],
   get solution() { return toScript(Object.values(KEYS).join(' ')); },
   optimalKeys: 280,
-  route: 60,
+  route: 75,
 });

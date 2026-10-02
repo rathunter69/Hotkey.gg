@@ -21,7 +21,7 @@ export default pnlDrill({
   goals: [
     { id: 'mark', text: 'Type x in column A beside the line whose format breaks the page.', keys: 'Ctrl+G "A16" ↵ "x" ↵',
       check: (s, ses) => settled(ses) && marked(pnl(ses)) },
-    { id: 'fix', text: 'Put that line back on the page’s code, so its negatives sit in parentheses like the rest.', keys: `Ctrl+G "C16:E16" ↵ Ctrl+1 N Tab End Alt+T "${PLAIN}" ↵`,
+    { id: 'fix', text: 'Give C16:E16 the page’s number format, so the negatives sit in parentheses like the rest.', keys: `Ctrl+G "C16:E16" ↵ Ctrl+1 N Tab End Alt+T "${PLAIN}" ↵`,
       check: (s, ses) => settled(ses) && marked(pnl(ses)) && fixed(pnl(ses)) },
   ],
   endState: [
