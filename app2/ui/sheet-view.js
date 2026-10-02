@@ -391,7 +391,7 @@ export class SheetView {
             cls += ' spill';
             txt = '<span class="sp" style="width:' + (Z(caw) - 2 * CELL_PAD) + 'px;max-width:' + (Z(caw) - 2 * CELL_PAD) + 'px;text-align:center;display:inline-block">' + txt + '</span>';
           }
-          else if (cell.txt && !cell.wrap && typeof cell.value === 'string') {
+          else if ((cell.txt || (cell.formula && !isErrVal(cell.value))) && !cell.wrap && typeof cell.value === 'string') {   // a formula's text result spills too, as in Excel
             // EXCEL PARITY — long text SPILLS across empty right neighbours, clipping at the first occupied cell
             const est = cellTxtPx(cell);
             if (est > W[c]) {
