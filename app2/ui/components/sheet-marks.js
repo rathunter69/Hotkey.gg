@@ -14,10 +14,13 @@
 //   paintNote(gw, cellRect, text, box)     → { el, rect }: the note, and where it sits (the card keeps off it)
 //   paintPen(gw, cellRect, chip, line)     → the pen's elements
 //   paintCheck(gw, cellRect, state)        → the check mark ('diff' | 'zero' | 'ok')
+//   pingMark(gw, cellRect)                 → the ring the cursor-ping moment grows out of the active cell
+//   beaconPlace(target, view, size)        → where the off-screen target's pill sits on the sheet's edge (pure)
+//   paintBeacon(gw, target, view, label)   → the pill ("A61 ↓"), or nothing when the target shows
 //   clearMarks(gw, kind?)                  take a kind off, or every mark
 //   notePlace(cellRect, box, size)         → where the note goes (pure; right of the cell, else left, else below)
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const KINDS = ['target', 'note', 'pen', 'check'];
+const KINDS = ['target', 'note', 'pen', 'check', 'ping', 'beacon'];
 
 function mark(gw, kind, rect, cls) {
   const d = document.createElement('div');
@@ -96,6 +99,44 @@ export function paintCheck(gw, cell, state) {
   clearMarks(gw, 'check');
   if (!gw || !cell) return null;
   return mark(gw, 'check', cell, 'sm-check-' + (['diff', 'zero', 'ok'].includes(state) ? state : 'diff'));
+}
+
+/** The ping's ring, on the active cell: the host plays the cursor-ping moment on it (effects.js). */
+export function pingMark(gw, cell) {
+  clearMarks(gw, 'ping');
+  if (!gw || !cell) return null;
+  return mark(gw, 'ping', cell, 'sm-ping');
+}
+
+const BEACON_ARROW = { '0,1': '↓', '0,-1': '↑', '1,0': '→', '-1,0': '←', '1,1': '↘', '-1,1': '↙', '1,-1': '↗', '-1,-1': '↖' };
+/**
+ * Where the pill for a target off the screen goes, in content pixels: on the edge of the visible box
+ * that faces the target, level with it where it can be, with an arrow the way to go. `target` is the
+ * target's rect, `view` { sl, st, w, h, x0, y0 } (the scroll offsets, the box's size, where the cells
+ * start under the sticky headers), `size` the pill's { w, h }. → null when any of the target shows. Pure.
+ */
+export function beaconPlace(target, view, size = { w: 72, h: 22 }, pad = 8) {
+  if (!target || !view) return null;
+  const L = view.sl + (view.x0 || 0), T = view.st + (view.y0 || 0), R = view.sl + view.w, B = view.st + view.h;
+  const dx = target.left + target.width <= L ? -1 : target.left >= R ? 1 : 0;
+  const dy = target.top + target.height <= T ? -1 : target.top >= B ? 1 : 0;
+  if (!dx && !dy) return null;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const left = dx < 0 ? L + pad : dx > 0 ? R - pad - size.w : clamp(target.left + target.width / 2 - size.w / 2, L + pad, R - pad - size.w);
+  const top = dy < 0 ? T + pad : dy > 0 ? B - pad - size.h : clamp(target.top + target.height / 2 - size.h / 2, T + pad, B - pad - size.h);
+  return { left, top, dx, dy, arrow: BEACON_ARROW[dx + ',' + dy] };
+}
+/** The pill for a target off the screen: its address and the arrow, on the edge that faces it. */
+export function paintBeacon(gw, target, view, label) {
+  clearMarks(gw, 'beacon');
+  if (!gw || !target || !view || !label) return null;
+  const d = mark(gw, 'beacon', null, 'sm-addr');
+  d.textContent = label + ' ' + (BEACON_ARROW['0,1']);
+  const at = beaconPlace(target, view, { w: d.offsetWidth || 72, h: d.offsetHeight || 22 });
+  if (!at) { d.remove(); return null; }
+  d.textContent = label + ' ' + at.arrow;
+  d.style.left = Math.round(at.left) + 'px'; d.style.top = Math.round(at.top) + 'px';
+  return d;
 }
 
 export const MARK_KINDS = KINDS;

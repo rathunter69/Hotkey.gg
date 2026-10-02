@@ -12,57 +12,87 @@ body[data-route="lesson"], body[data-route="drill"], body[data-route="due"]{over
 .wsc{display:flex; flex-direction:column; height:100vh; width:100%; background:var(--sheet); color:var(--ink); font-family:var(--font); font-size:var(--fs-body); line-height:var(--lh-body); position:relative}
 .wsc-sr{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
 
-/* ---------- the one title row, folded into the Ribbon's tab row ---------- */
-.wsc-top{position:relative; flex:none; z-index:30; --wsc-left-w:0px; --wsc-right-w:0px}
-.wsc .ribbon-slot{position:relative; flex:none; height:calc(var(--tabrow-h) + var(--ribbon-groups-h)); --rib-h:calc(var(--tabrow-h) + var(--ribbon-groups-h)); z-index:12; background:var(--chrome)}
-.wsc .ribbon-slot[data-ribbon="tabs"]{height:var(--tabrow-h)}
-.wsc .ribbon-slot > .ribbon{position:absolute; top:0; left:0; right:0}
-.wsc .ribbon.ribbon-full{height:calc(var(--tabrow-h) + var(--ribbon-groups-h)); font-family:var(--font); background:var(--chrome); border:0; border-radius:0}
-.wsc .ribbon.ribbon-full.show{background-image:none}   /* its KeyTips state never tints it (3.0) */
-.wsc .ribbon-slot.rib-collapsed .ribbon.ribbon-full{height:var(--tabrow-h)}
-.wsc .ribbon-slot[data-ribbon="tabs"] .ribbon.ribbon-full:not(.rib-collapsed-self){box-shadow:none}
-.wsc .ribbon-slot[data-ribbon="tabs"]:not(.rib-collapsed) .ribbon.ribbon-full{box-shadow:var(--shadow-float)}   /* Alt drops the groups over the sheet */
-.wsc .ribbon-slot .rf-tabs, html[data-density] .wsc .ribbon-slot .rf-tabs{height:var(--tabrow-h); box-sizing:border-box; align-items:center; padding:0 calc(var(--wsc-right-w) + var(--s3)) 0 calc(var(--wsc-left-w) + var(--s3)); gap:var(--s1); border-bottom:1px solid var(--line); background:var(--chrome)}
-.wsc .rf-tab{font-family:var(--font); font-size:var(--fs-label); font-weight:var(--fw-semi); color:var(--ink-2); border-radius:var(--r-btn); padding:var(--s1) var(--s3); margin:0; border:0}
-.wsc .rf-tab:hover{color:var(--ink); background:var(--sheet)}
-.wsc .rf-tab.on{color:var(--on-fill); background:var(--mode); margin:0; padding:var(--s1) var(--s3); font-weight:var(--fw-semi); border:0}
-.wsc .rf-tab.dead{color:var(--edge)}
-.wsc .rf-tab.rf-file, .wsc .rf-tab.rf-file.dead{color:var(--on-accent); background:var(--accent)}   /* File reads as Excel's: never dimmed with the tabs a run doesn't use */
-.wsc .rf-tab k{bottom:calc(-1 * var(--s2))}
-.wsc .rf-tools, .wsc .rf-tabs .rf-qat{display:none}   /* the toolbar has its own row; the layout toggle is a setting */
-.wsc .rf-body{background:var(--chrome)}
-.wsc .rf-gname{font-family:var(--font); text-transform:none; letter-spacing:0}
-
-.wsc-row{position:absolute; top:0; left:0; right:0; height:var(--tabrow-h); display:flex; align-items:stretch; justify-content:space-between; pointer-events:none; z-index:13}
-.wsc-left, .wsc-right{display:flex; align-items:stretch; pointer-events:auto}
-.wsc-left button, .wsc-right button{font:inherit; color:inherit; background:transparent; border:0; cursor:pointer; display:inline-flex; align-items:center; gap:var(--s2); padding:0 var(--s3)}
-.wsc-back{border-right:1px solid var(--line); color:var(--ink-2)}
-.wsc-back svg{width:var(--s4); height:var(--s4)}
-.wsc-title{border-right:1px solid var(--line); max-width:40vw}
-.wsc-title-text{font-weight:var(--fw-bold); font-size:var(--fs-name); color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-.wsc-sub{font-size:var(--fs-label); color:var(--ink-2); white-space:nowrap}
-.wsc-title svg{width:var(--s3); height:var(--s3); color:var(--ink-2); flex:none}
-.wsc[data-kind="lesson"] .wsc-left{background:var(--learn-tint); color:var(--learn-ink)}
-.wsc[data-kind="lesson"] .wsc-title-text, .wsc[data-kind="lesson"] .wsc-back, .wsc[data-kind="lesson"] .wsc-sub, .wsc[data-kind="lesson"] .wsc-title svg{color:var(--learn-ink)}
-.wsc-left button:hover, .wsc-right button:hover{background:var(--sheet)}
-.wsc[data-kind="lesson"] .wsc-left button:hover{background:var(--sheet)}
-.wsc-left button:focus-visible, .wsc-right button:focus-visible{outline:var(--cursor-w) solid var(--mode); outline-offset:calc(-1 * var(--cursor-w))}
+/* ---------- the title bar, as Excel's: Exit and the Quick Access Toolbar at the left, the title centred, the goal and More at the right ---------- */
+.wsc-top{position:relative; flex:none; z-index:30}
+.wsc-bar{position:relative; z-index:13; height:var(--titlebar-h); display:grid; grid-template-columns:minmax(0, 1fr) auto minmax(0, 1fr); align-items:stretch; background:var(--xl-bar); color:var(--xl-ink); font-family:var(--font)}
+.wsc-left, .wsc-right{display:flex; align-items:stretch; min-width:0}
+.wsc-right{justify-content:flex-end; padding-right:var(--s2)}
+.wsc-bar button{font:inherit; color:inherit; background:transparent; border:0; cursor:pointer; display:inline-flex; align-items:center; gap:var(--s2); padding:0 var(--s3)}
+.wsc-exit{color:var(--xl-ink); font-size:var(--fs-label); font-weight:var(--fw-semi); white-space:nowrap; border-right:1px solid var(--xl-line)}
+.wsc-exit svg{width:var(--s4); height:var(--s4); flex:none}
+.wsc-bar .wsc-key{color:var(--xl-ink-2); background:transparent; border-color:var(--xl-line); border-bottom-width:1px; font-size:var(--fs-min)}
+.wsc-title{justify-self:center; max-width:46vw; min-width:0; margin:var(--s1) 0; border-radius:var(--r-btn)}
+.wsc-title-text{font-family:var(--xl-font); font-weight:var(--fw-semi); font-size:var(--xl-fs-tab); color:var(--xl-ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.wsc-sub{font-family:var(--xl-font); font-size:var(--xl-fs-tab); color:var(--xl-ink-2); white-space:nowrap}
+.wsc-title svg{width:var(--s3); height:var(--s3); color:var(--xl-ink-2); flex:none}
+.wsc-bar button:hover{background:var(--xl-hover)}
+.wsc-bar button:focus-visible{outline:var(--cursor-w) solid var(--xl-green); outline-offset:calc(-1 * var(--cursor-w))}
 .wsc-key{font-family:var(--mono); font-weight:var(--fw-key); font-size:var(--fs-min); line-height:1; color:var(--ink); background:var(--sheet); border:1px solid var(--edge); border-bottom-width:var(--key-edge); border-radius:var(--r-btn); padding:var(--s1) var(--s2); white-space:nowrap}
-.wsc-right{padding-right:var(--s2)}
-.wsc-progress{display:inline-flex; align-items:center; gap:var(--s3); padding:0 var(--s3)}
+.wsc-progress{display:inline-flex; align-items:center; gap:var(--s3); padding:0 var(--s3); min-width:0}
 .wsc-segs, .tc-segs{display:inline-flex; gap:var(--s1)}
 .wsc-segs i, .tc-segs i{display:inline-block; width:var(--s6); height:var(--s1); background:var(--line); border-radius:1px}
-.wsc-segs i{width:var(--s4)}   /* the row's segments are the card's at two thirds, so eight of them leave the tabs their room */
-.wsc-tight .wsc-segs{display:none}   /* the tab row ran out of room: the count alone */
+.wsc-segs i{width:var(--s4)}
 .wsc-segs i.done, .tc-segs i.done{background:var(--mode)}
 .wsc-segs i.now, .tc-segs i.now{background:transparent; outline:1px solid var(--mode); outline-offset:-1px}
-.wsc-fact{font-weight:var(--fw-bold); font-size:var(--fs-label); color:var(--ink); white-space:nowrap}
-.wsc-icon{color:var(--ink-2)}
+.wsc-fact{font-weight:var(--fw-bold); font-size:var(--fs-label); color:var(--xl-ink); white-space:nowrap}
+.wsc-icon{color:var(--xl-ink-2)}
 .wsc-icon svg{width:var(--s5); height:var(--s5)}
-.wsc-icon[aria-expanded="true"]{background:var(--sheet)}
+.wsc-icon[aria-expanded="true"]{background:var(--xl-hover)}
+@media (max-width: 1180px){ .wsc-segs, .wsc-exit .wsc-key{display:none} }
+
+/* the Quick Access Toolbar, in the title bar where Excel keeps it */
+.wsc-qat{flex:none; display:flex; align-items:center; gap:var(--s1); padding:0 var(--s2)}
+.wsc-qat .rf-qat{display:inline-flex; border:0; padding:0; margin:0; align-self:center}
+.wsc-qat .rf-qbtn{width:var(--s6); height:var(--s6); color:var(--xl-ink); border-radius:var(--r-btn)}
+.wsc-qat .rf-qbtn:hover{background:var(--xl-hover); border-color:transparent}
+.wsc-qat .ri-key{position:absolute; top:calc(-1 * var(--s1)); right:calc(-1 * var(--s1)); font-family:var(--mono); font-size:var(--fs-min); line-height:1; color:var(--on-fill); background:var(--xl-green); border-radius:1px; padding:0 var(--s1)}
+
+/* ---------- the Ribbon, as Windows Excel draws it: the tab row from the window's left edge, File in green, a light body ---------- */
+.wsc .ribbon-slot{position:relative; flex:none; height:calc(var(--xl-tabs-h) + var(--ribbon-groups-h)); --rib-h:calc(var(--xl-tabs-h) + var(--ribbon-groups-h)); z-index:12; background:var(--xl-body); border-bottom:1px solid var(--xl-line)}
+.wsc .ribbon-slot[data-ribbon="tabs"]{height:var(--xl-tabs-h)}
+.wsc .ribbon-slot > .ribbon{position:absolute; top:0; left:0; right:0}
+.wsc .ribbon.ribbon-full{height:calc(var(--xl-tabs-h) + var(--ribbon-groups-h)); font-family:var(--xl-font); background:var(--xl-body); color:var(--xl-ink); border:0; border-radius:0}
+.wsc .ribbon.ribbon-full.show{background-image:none}   /* its KeyTips state never tints it (3.0) */
+.wsc .ribbon-slot.rib-collapsed .ribbon.ribbon-full{height:var(--xl-tabs-h)}
+.wsc .ribbon-slot[data-ribbon="tabs"] .ribbon.ribbon-full:not(.rib-collapsed-self){box-shadow:none}
+.wsc .ribbon-slot[data-ribbon="tabs"]:not(.rib-collapsed) .ribbon.ribbon-full{box-shadow:var(--shadow-float)}   /* Alt drops the groups over the sheet */
+.wsc .ribbon-slot .rf-tabs, html[data-density] .wsc .ribbon-slot .rf-tabs{height:var(--xl-tabs-h); box-sizing:border-box; align-items:stretch; padding:0 var(--s2); gap:0; border-bottom:0; background:var(--xl-bar)}
+.wsc .rf-tab, html[data-density] .wsc .rf-tab{font-family:var(--xl-font); font-size:var(--xl-fs-tab); font-weight:var(--fw-body); color:var(--xl-ink); border-radius:0; padding:0 var(--s3); margin:0; border:0; background:transparent; display:inline-flex; align-items:center; position:relative}
+.wsc .rf-tab:hover{color:var(--xl-ink); background:var(--xl-hover)}
+.wsc .rf-tab.on, html[data-density] .wsc .rf-tab.on{color:var(--xl-green-ink); background:var(--xl-body); font-weight:var(--fw-semi); margin:0; padding:0 var(--s3); border:0}
+.wsc .rf-tab.on::after{content:''; position:absolute; left:var(--s3); right:var(--s3); bottom:0; height:var(--bw-3); border-radius:var(--bw-2) var(--bw-2) 0 0; background:var(--xl-green)}
+.wsc .rf-tab.dead{color:var(--xl-ink-2)}
+html[data-density] .wsc .rf-tab.rf-file, .wsc .rf-tab.rf-file, .wsc .rf-tab.rf-file.dead, .wsc .rf-tab.rf-file.on{color:var(--on-fill); background:var(--xl-green); font-weight:var(--fw-semi); margin:var(--s1) var(--s2) var(--s1) 0; border-radius:var(--r-btn)}   /* File reads as Excel's: never dimmed with the tabs a run doesn't use */
+.wsc .rf-tab.rf-file::after{display:none}
+html[data-density] .wsc .rf-tab.rf-file:hover, .wsc .rf-tab.rf-file:hover{background:var(--xl-green-ink); color:var(--on-fill)}
+.wsc .rf-tab k{bottom:calc(-1 * var(--s2))}
+.wsc .rf-tools, .wsc .rf-tabs .rf-qat{display:none}   /* the toolbar lives in the title bar; the layout toggle is a setting */
+.wsc .rf-body{background:var(--xl-body)}
+.wsc .rf-grp{border-right-color:var(--xl-line)}
+.wsc .rf-gname, html[data-density] .wsc .rf-gname{font-family:var(--xl-font); font-size:var(--xl-fs-group); font-weight:var(--fw-body); color:var(--xl-ink-2); text-transform:none; letter-spacing:0}
+.wsc .rf-btn, .wsc .rf-box, html[data-density] .wsc .rf-btn, html[data-density] .wsc .rf-box{font-family:var(--xl-font); font-size:var(--xl-fs); color:var(--xl-ink); border-radius:var(--bw-2)}
+.wsc .rf-btn .rf-lbl, .wsc .rf-btn .rf-ico{color:var(--xl-ink)}
+/* Excel's proportions: three rows of small buttons and the group's name fit the body's height */
+.wsc .rf-body, html[data-density] .wsc .rf-body{padding:1px var(--s1) 0}
+.wsc .rf-cols, html[data-density] .wsc .rf-cols{gap:var(--bw-2)}
+.wsc .rf-col, html[data-density] .wsc .rf-col{gap:1px}
+.wsc .rf-btn:not(.big), .wsc .rf-box, html[data-density] .wsc .rf-btn:not(.big), html[data-density] .wsc .rf-box{height:var(--xl-btn-h)}
+.wsc .rf-btn.big, html[data-density] .wsc .rf-btn.big{height:var(--xl-big-h)}
+.wsc .rf-split.big .rf-face, html[data-density] .wsc .rf-split.big .rf-face{height:calc(var(--xl-big-h) - var(--s3))}
+.wsc .rf-gname, html[data-density] .wsc .rf-gname{padding-top:0; padding-bottom:var(--bw-2)}
+.wsc .rf-btn.big .rf-lbl, .wsc .rf-split.big .rf-face .rf-lbl, html[data-density] .wsc .rf-btn.big .rf-lbl, html[data-density] .wsc .rf-split.big .rf-face .rf-lbl{font-size:var(--xl-fs-small)}
+.wsc .rf-btn:hover{background:var(--xl-hover); border-color:transparent}
+.wsc .rf-btn.on{background:var(--xl-press); border-color:var(--xl-green); color:var(--xl-ink)}
+.wsc .rf-btn.open, .wsc .rf-split.open .rf-arrow{background:var(--xl-hover); border-color:var(--xl-line)}
+.wsc .rf-box{background:var(--sheet); border-color:var(--xl-line)}
+.wsc .rf-btn .rf-caret, .wsc .rf-box .rf-caret{color:var(--xl-ink-2)}
+.wsc .ribbon-full .ri-key{font-family:var(--mono); color:var(--on-fill); background:var(--xl-ink); border-color:var(--xl-ink)}
+.wsc .rf-tab k{background:var(--xl-ink); color:var(--on-fill)}
+body[data-route="lesson"] .rdrop, body[data-route="drill"] .rdrop, body[data-route="due"] .rdrop{font-family:var(--xl-font); background:var(--xl-body); border-color:var(--xl-line); color:var(--xl-ink)}
+body[data-route="lesson"] .rdrop-item, body[data-route="drill"] .rdrop-item, body[data-route="due"] .rdrop-item{font-family:var(--xl-font); font-size:var(--xl-fs); color:var(--xl-ink)}
 
 /* the lesson menu grows from the title; More from its button (the menu moment) */
-.wsc-menu{position:absolute; top:var(--tabrow-h); left:var(--s12); min-width:calc(var(--panel-w) + var(--s12) * 2); background:var(--sheet); border-radius:var(--r-card); box-shadow:var(--shadow-float); padding:var(--s2); z-index:40; transform-origin:top left; animation:wscMenu var(--d-menu) ease-out}
+.wsc-menu{position:absolute; top:var(--titlebar-h); left:var(--s12); min-width:calc(var(--panel-w) + var(--s12) * 2); background:var(--sheet); border-radius:var(--r-card); box-shadow:var(--shadow-float); padding:var(--s2); z-index:40; transform-origin:top center; animation:wscMenu var(--d-menu) ease-out}
 .wsc-menu-more{left:auto; right:var(--s2); min-width:calc(var(--side-col) - var(--s12)); transform-origin:top right}
 .wsc-menu[hidden]{display:none}
 @keyframes wscMenu{from{opacity:0; transform:scale(.96)} to{opacity:1; transform:none}}
@@ -76,41 +106,80 @@ body[data-route="lesson"], body[data-route="drill"], body[data-route="due"]{over
 .wsc-item-key{margin-left:auto; color:var(--ink-2)}
 .wsc-menu-foot{display:flex; justify-content:space-between; align-items:center; gap:var(--s3); padding:var(--s3) var(--s3) var(--s1); border-top:1px solid var(--line); margin-top:var(--s2); font-size:var(--fs-label); color:var(--ink-2)}
 .wsc-foot-k{display:inline-flex; align-items:center; gap:var(--s2)}
-
-/* the toolbar row below the Ribbon: the Quick Access Toolbar where a desk sets it */
-.wsc-qat{flex:none; height:var(--qat-h); display:flex; align-items:center; gap:var(--s1); padding:0 var(--s2); background:var(--chrome); border-bottom:1px solid var(--line)}
-.wsc-qat .rf-qat{display:inline-flex; border:0; padding:0; margin:0; align-self:center}
-.wsc-qat .rf-qbtn{width:var(--s6); height:var(--s5)}
-.wsc-qat .ri-key{position:absolute; top:calc(-1 * var(--s1)); right:calc(-1 * var(--s1)); font-family:var(--mono); font-size:var(--fs-min); line-height:1; color:var(--on-fill); background:var(--mode); border-radius:1px; padding:0 var(--s1)}
-.wsc-hint{position:absolute; top:calc(var(--tabrow-h) + var(--ribbon-groups-h) + var(--qat-h) + var(--s2)); left:50%; transform:translateX(-50%); z-index:35; background:var(--ink); color:var(--sheet); font-weight:var(--fw-semi); font-size:var(--fs-label); padding:var(--s2) var(--s4); border-radius:var(--r-btn); box-shadow:var(--shadow-float)}
+.wsc-hint{position:absolute; top:calc(var(--titlebar-h) + var(--xl-tabs-h) + var(--ribbon-groups-h) + var(--s8)); left:50%; transform:translateX(-50%); z-index:35; background:var(--ink); color:var(--sheet); font-weight:var(--fw-semi); font-size:var(--fs-label); padding:var(--s2) var(--s4); border-radius:var(--r-btn); box-shadow:var(--shadow-float)}
 .wsc-hint[hidden]{display:none}
 
-/* ---------- the quiet formula bar, the sheet, the tabs ---------- */
+/* ---------- the quiet formula bar, the sheet, and the one strip at its foot ---------- */
 .wsc-main{flex:1 1 auto; min-height:0; display:flex; align-items:stretch}
 .wsc-stage{flex:1 1 auto; min-width:0; min-height:0; display:flex; flex-direction:column; position:relative; outline:none}
 .wsc-stage:focus, .wsc-stage:focus-visible, .wsc-stage[tabindex]:focus-visible{outline:none}
 .wsc-sheet{flex:1 1 auto; min-height:0; display:flex; flex-direction:column}
 .wsc-sheet > .sheet-view, .wsc-sheet.sheet-view{flex:1 1 auto}
 .wsc .fbar{font-family:var(--mono); font-size:var(--fs-label); background:var(--sheet); border-bottom:1px solid var(--line)}
-.wsc .namebox{color:var(--ink); background:var(--chrome); font-weight:var(--fw-key); min-width:calc(var(--s12) * 2)}
+.wsc .namebox{color:var(--xl-ink); background:var(--sheet); font-family:var(--mono); font-weight:var(--fw-semi); font-size:var(--fs-namebox); min-width:calc(var(--s12) * 2); display:flex; align-items:center; border-right:1px solid var(--xl-line)}
 .wsc .fx{color:var(--ink-2); font-family:var(--font)}
 .wsc .fcontent{color:var(--ink)}
 .wsc .fcontent.isfx{color:var(--ink)}
 .wsc .fcontent.empty{color:var(--edge)}
 .wsc .gridwrap{position:relative}
-.wsc .wb-tabs{height:calc(var(--s8) + var(--s2)); background:var(--chrome); font-family:var(--font)}
-.wsc .wb-tab{font-family:var(--font); font-size:var(--fs-label); font-weight:var(--fw-semi); color:var(--ink-2); border-color:var(--line); border-top-color:var(--line)}
-.wsc .wb-tab.cur{color:var(--ink); background:var(--sheet); border-top-color:var(--mode); border-color:var(--line)}
+/* Excel's foot: the sheet tabs at the left, the status at the right, one row */
+.wsc-foot{flex:none; height:var(--foot-h); display:flex; align-items:stretch; background:var(--xl-bar); border-top:1px solid var(--xl-line); font-family:var(--xl-font); min-width:0}
+.wsc-tabs{flex:0 1 auto; min-width:0; display:flex}
+.wsc .wb-tabs{height:var(--foot-h); background:transparent; border-top:0; padding:0 var(--s2); align-items:stretch; gap:0; font-family:var(--xl-font)}
+.wsc .wb-tab, html[data-density] .wsc .wb-tabs .wb-tab{font-family:var(--xl-font); font-size:var(--xl-fs-tab); font-weight:var(--fw-body); color:var(--xl-ink); background:transparent; border:0; border-right:1px solid var(--xl-line); border-radius:0; display:inline-flex; align-items:center; padding:0 var(--s4); position:relative}
+.wsc .wb-tab:hover{background:var(--xl-hover)}
+.wsc .wb-tab.cur{color:var(--xl-green-ink); background:var(--sheet); font-weight:var(--fw-semi)}
+.wsc .wb-tab.cur::after{content:''; position:absolute; left:var(--s3); right:var(--s3); bottom:0; height:var(--bw-3); border-radius:var(--bw-2) var(--bw-2) 0 0; background:var(--xl-green)}
+.wsc .wb-tab.grp{background:var(--xl-press)}
+.wsc .wb-tab.cue-target{box-shadow:inset 0 var(--bw-3) 0 var(--learn); color:var(--learn-ink)}
+.wsc .wb-add{align-self:center; margin-left:var(--s2); color:var(--xl-ink-2); background:transparent; border-color:var(--xl-line)}
 .wsc .wb-lead{display:none}
-.wsc .sbar{font-family:var(--font); font-size:var(--fs-min); background:var(--chrome); color:var(--ink-2); min-height:var(--sbar-h)}
-/* the key echo and a status toast float over the sheet just above the status bar, never on it or the sheet tabs; the task card (z 20) covers the echo where they meet */
+.wsc-sheetkeys{flex:none; display:flex; align-items:center; gap:var(--s1); padding:0 var(--s3); font-size:var(--fs-min); color:var(--xl-ink-2); white-space:nowrap; border-left:1px solid var(--xl-line)}
+.wsc-sheetkeys[hidden]{display:none}
+.wsc-sheetkeys .wsc-key{font-size:var(--fs-min); padding:1px var(--s1); border-bottom-width:var(--bw-2)}
+.wsc-sk-label{margin-right:var(--s1)}
+.wsc-sk-full{font:inherit; font-size:var(--fs-min); color:var(--xl-green-ink); background:transparent; border:1px solid var(--xl-line); border-radius:var(--r-btn); padding:1px var(--s2); margin-left:var(--s2); cursor:pointer}
+.wsc-sk-full:hover{background:var(--xl-hover)}
+.wsc-status{flex:1 1 auto; min-width:0; display:flex}
+.wsc .sbar{flex:1 1 auto; min-width:0; border-top:0; font-family:var(--xl-font); font-size:var(--fs-min); background:transparent; color:var(--xl-ink-2); min-height:0; height:var(--foot-h); padding:0 var(--s3); position:relative}
+.wsc .sbar .sb-mode{color:var(--xl-ink); margin-left:var(--s2)}
+.wsc .sbar .sb-stats{overflow:hidden}
+/* the key echo and a status toast float over the sheet just above the strip, never on it; the task card (z 20) covers the echo where they meet */
 .wsc-stage > .keyflash.in-frame{position:absolute; right:var(--s4); bottom:calc(var(--ws-foot-h) + var(--s3)); z-index:15; max-width:60%; overflow:hidden; justify-content:flex-end; align-items:center; gap:var(--s1)}
 .wsc-stage > .keyflash.in-frame .kchip{font-size:var(--fs-key); padding:var(--s1) var(--s2); border-radius:var(--r-btn); line-height:1.3}
 body[data-route="lesson"] #hkToast, body[data-route="due"] #hkToast, body[data-route="drill"] #hkToast{bottom:calc(var(--ws-foot-h) + var(--s3))}
 .wsc-side{flex:none; width:0; overflow:hidden; transition:width var(--d-beat)}
 .wsc-side.open{width:var(--panel-w); border-left:1px solid var(--line)}
-.wsc .focus-hint{position:absolute; left:50%; bottom:var(--s12); transform:translateX(-50%); z-index:5; pointer-events:none; font-size:var(--fs-label); font-weight:var(--fw-semi); color:var(--on-fill); background:var(--ink); border-radius:var(--r-btn); padding:var(--s2) var(--s4); box-shadow:var(--shadow-float)}
 @media (prefers-reduced-motion: reduce){ .wsc-side{transition:none} .wsc-menu{animation:none} }
+
+/* ---------- where you are: Excel's cursor, thicker, and the headers of the rows and columns it holds ---------- */
+.wsc td.active{outline:var(--cursor-cell-w) solid var(--cell-cursor); outline-offset:calc(-1 * var(--bw-2))}
+.wsc td.active.spill .sphi{outline:var(--cursor-cell-w) solid var(--cell-cursor); outline-offset:calc(-1 * var(--bw-2))}
+.wsc td.sel-t{border-top:var(--sel-edge-w) solid var(--cell-cursor)}
+.wsc td.sel-b{border-bottom:var(--sel-edge-w) solid var(--cell-cursor)}
+.wsc td.sel-l{border-left:var(--sel-edge-w) solid var(--cell-cursor)}
+.wsc td.sel-r{border-right:var(--sel-edge-w) solid var(--cell-cursor)}
+.wsc td.fh::after{width:var(--s2); height:var(--s2); right:calc(-1 * var(--bw-2)); bottom:calc(-1 * var(--bw-2)); border:1px solid var(--sheet)}
+.wsc #grid th.hd-on{background:var(--xl-hdr); color:var(--xl-hdr-ink); font-weight:var(--fw-bold)}
+.wsc #grid tr:first-child th.hd-on{box-shadow:inset 0 calc(-1 * var(--bw-2)) 0 var(--cell-cursor)}
+.wsc #grid th.rowhdr.hd-on{box-shadow:inset calc(-1 * var(--bw-2)) 0 0 var(--cell-cursor)}
+/* the ping: a ring that grows out of the active cell after a goal lands and when the window comes back (the cursor-ping moment) */
+.sm-ping{border:var(--cursor-cell-w) solid var(--cell-cursor); border-radius:var(--bw-2); opacity:0; z-index:8}
+.sm-ping.m-cursor-ping{animation:smPing var(--d-ping) ease-out}
+.sm-ping.m-cursor-ping.m-fade{animation:smPingFade var(--d-ping) ease-out}
+@keyframes smPing{0%{opacity:1; transform:scale(1)} 100%{opacity:0; transform:scale(2.4)}}
+@keyframes smPingFade{0%{opacity:1} 100%{opacity:0}}
+/* the target off the screen: a pill at the edge of the sheet with its address and the way to go */
+.sm-addr{display:inline-flex; align-items:center; gap:var(--s1); width:auto; height:auto; font-family:var(--mono); font-weight:var(--fw-bold); font-size:var(--fs-min); line-height:1; color:var(--on-fill); background:var(--learn); border-radius:var(--r-btn); padding:var(--s1) var(--s2); box-shadow:var(--shadow-float); z-index:9; white-space:nowrap}
+
+/* ---------- the focus veil: the window lost the keyboard; a click or any key gives it back without touching a cell ---------- */
+.wsc-veil{position:absolute; inset:0; z-index:25; display:grid; place-items:center; background:color-mix(in srgb, var(--ink) 18%, transparent); cursor:pointer}
+.wsc-veil[hidden]{display:none}
+.wsc-veil-box{width:var(--veil-w); max-width:calc(100% - var(--s8)); background:var(--sheet); color:var(--ink); border:var(--cursor-w) solid var(--learn); border-radius:var(--r-card); box-shadow:var(--shadow-float); padding:var(--s5) var(--s6); text-align:center; font-family:var(--font)}
+.wsc-veil-title{font-size:var(--fs-panel); font-weight:var(--fw-bold); line-height:1.35}
+.wsc-veil-line{margin-top:var(--s2); font-size:var(--fs-name); color:var(--ink-2)}
+.wsc-veil-where{margin-top:var(--s2); font-size:var(--fs-name); color:var(--ink-2)}
+.wsc-veil-where .wsc-veil-addr{font-family:var(--mono); color:var(--learn-ink)}
 
 /* ---------- the task card ---------- */
 .tc{position:absolute; z-index:20; width:var(--card-w); background:var(--sheet); color:var(--ink); border:var(--cursor-w) solid var(--learn); border-radius:var(--r-card); box-shadow:var(--shadow-float); padding:var(--s4) var(--s5) var(--s3); box-sizing:border-box; display:flex; flex-direction:column; gap:var(--s3); overflow:auto; transition:left var(--d-card) ease-out, top var(--d-card) ease-out; font-family:var(--font)}
@@ -135,6 +204,13 @@ body[data-route="lesson"] #hkToast, body[data-route="due"] #hkToast, body[data-r
 .tc-live{font-size:var(--fs-name); font-weight:var(--fw-semi); color:var(--learn-ink)}
 .tc-live-wrong{color:var(--red)}
 .tc-live-stuck, .tc-live-mouse, .tc-live-demo{color:var(--ink-2); font-weight:var(--fw-body)}
+.tc-live-try{color:var(--ink); font-weight:var(--fw-semi)}   /* the gentle line after a pause off the route: never red */
+.tc-alt{display:flex; flex-wrap:wrap; align-items:center; gap:var(--s1) var(--s2); font-size:var(--fs-label); color:var(--ink-2)}
+.tc-alt-label{margin-right:var(--s1)}
+.tc-alt-route{display:inline-flex; flex-wrap:wrap; gap:var(--s1)}
+.tc-alt-or{color:var(--ink-2)}
+.tc-key.tc-key-sm{font-size:var(--fs-min); padding:var(--s1) var(--s1); min-width:var(--s5); border-bottom-width:var(--bw-2); color:var(--ink-2)}
+.tc-aside{font-size:var(--fs-label); color:var(--learn-ink); font-weight:var(--fw-semi); padding-bottom:var(--s2); border-bottom:1px solid var(--line)}
 .tc-foot{display:flex; justify-content:space-between; align-items:center; gap:var(--s3); padding-top:var(--s3); border-top:1px solid var(--line); font-size:var(--fs-label); color:var(--ink-2)}
 .tc-foot-k{display:inline-flex; align-items:center; gap:var(--s2)}
 .tc-ring-help .tc-foot-k:first-child .tc-key{outline:var(--cursor-w) solid var(--learn); outline-offset:1px; animation:tcRing var(--d-streak) ease-in-out infinite}
@@ -193,6 +269,7 @@ body[data-route="lesson"] #hkToast, body[data-route="due"] #hkToast, body[data-r
 .rp-pars{display:flex; justify-content:space-between; gap:var(--s3); margin-top:auto; padding-top:var(--s3); font-size:var(--fs-label); color:var(--ink-2); font-variant-numeric:tabular-nums}
 .rp-pars b, .rp-track-labels b{font-weight:var(--fw-bold); color:var(--ink)}
 .rp-start{background:var(--clock-tint); color:var(--clock-ink); font-weight:var(--fw-bold); font-size:var(--fs-body); padding:var(--s3) var(--s4); border-radius:var(--r-btn); border:1px solid color-mix(in srgb, var(--clock) 50%, transparent)}
+.rp-run-foot .rp-keys{white-space:nowrap}
 .rp-line{display:flex; justify-content:space-between; align-items:center; gap:var(--s3); font-size:var(--fs-label); color:var(--ink-2)}
 .rp-esc{display:inline-flex; align-items:center; gap:var(--s2); white-space:nowrap}
 .rp-key{font-family:var(--mono); font-weight:var(--fw-key); font-size:var(--fs-min); line-height:1; color:var(--ink); background:var(--sheet); border:1px solid var(--edge); border-bottom-width:var(--key-edge); border-radius:var(--r-btn); padding:var(--s1) var(--s2); white-space:nowrap}
@@ -291,4 +368,4 @@ html[data-effects="off"] .rp-animate .rp-m, html[data-effects="off"] .rp-animate
 .wsc-btn-primary .wsc-key{color:var(--on-fill); background:transparent; border-color:color-mix(in srgb, var(--on-fill) 55%, transparent)}
 .wsc-btn:focus-visible{outline:var(--cursor-w) solid var(--mode); outline-offset:1px}
 /* the achievement banner keeps to the top right, under the title row, so the goal count, sound and More stay visible */
-body[data-route="lesson"] .fx-banner, body[data-route="drill"] .fx-banner, body[data-route="due"] .fx-banner{top:calc(var(--tabrow-h) + var(--s2))}
+body[data-route="lesson"] .fx-banner, body[data-route="drill"] .fx-banner, body[data-route="due"] .fx-banner{top:calc(var(--titlebar-h) + var(--s2))}
