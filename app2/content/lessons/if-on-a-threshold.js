@@ -40,7 +40,7 @@ export default {
   conventions: ['E3'],
   teaches: ['if-function'],
   uses: ['formula-basics', 'fill-down-right', 'sum-family', 'arrow-keys', 'ctrl-arrow', 'shift-arrow', 'ctrl-shift-arrow', 'cross-sheet-ref'],
-  prerequisites: ['challenge-house-format-set'],
+  prerequisites: ['ch2-assessment'],
   brief: 'The point-of-sale export logs one row per wash, and it is the only number a buyer trusts, because a machine wrote it. A site’s target is the washes it needs in a day to cover its site costs; below it, the site loses money that day. IF asks a question and gives one answer if it is true and another if it is false: =IF(C5>=D5,"On target","Below"). Build the daily flag for every site on the Summary block. The key is `IF`.',
   goals: [
     { id: 'read-block', teach: 'Column C links each site’s Sep 15 washes from the point-of-sale day totals, and column D its daily target from Sites, so the question sits on one row.',

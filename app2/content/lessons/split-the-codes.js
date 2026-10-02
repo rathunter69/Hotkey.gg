@@ -40,8 +40,8 @@ export default {
   headline: 'LEFT',
   conventions: ['F1', 'F5'],
   teaches: ['left-right-mid-len'],
-  uses: ['go-to', 'ctrl-enter-fill', 'type-to-enter', 'cross-sheet-ref', 'check-cell'],
-  prerequisites: ['the-reconciliation'],
+  uses: ['go-to', 'ctrl-enter-fill', 'type-to-enter', 'cross-sheet-ref', 'check-cell', 'clean-text'],
+  prerequisites: ['challenge-site-package-summary'],
   brief: 'A site code is two facts in one cell: AUS-DOM is the cluster and the site. LEFT takes characters from the start, RIGHT from the end, MID from a position, and LEN counts them, so the cluster is LEFT(B5,3) and the site is RIGHT(B5,3). Split the codes into their own columns on Transactions, so the cluster can be counted on, and let LEN find the two codes that have been hiding a space since the counts. The key is `LEFT`.',
   goals: [
     { id: 'cluster', teach: 'LEFT(text, n) takes n characters from the start of a text and RIGHT(text, n) takes n from the end; MID(text, start, n) takes n from a position, so MID(F5,6,1) is the package letter in “Wash D @ …”. The cluster is the first three letters of the code.', text: 'On Transactions, select S5:S94, type =LEFT(B5,3) and press Ctrl+Enter: the cluster of every wash.', keys: 'Ctrl+G "Transactions!S5:S94" ↵ "=LEFT(B5,3)" Ctrl+↵', requires: ['left-right-mid-len', 'go-to', 'ctrl-enter-fill'],

@@ -49,7 +49,7 @@ export default {
   conventions: ['B4', 'C4'],
   teaches: ['pmt-pv-fv'],
   uses: ['formula-basics', 'formula-operators', 'sheet-tabs', 'ctrl-arrow', 'ctrl-shift-arrow', 'arrow-keys', 'type-to-enter'],
-  prerequisites: ['challenge-house-format-set'],
+  prerequisites: ['challenge-text-dump'],
   brief: 'The Cedar Park loan is $3.5m at 7% over ten years, paid monthly. PMT gives the payment from the rate, the number of periods and the principal, and the trap is periods: a monthly payment needs the monthly rate (7% over 12) and 120 periods, not 10. PV runs it backwards to the loan a payment can support, and FV runs it forwards to what a sum grows to. Build the three on Loans and read the signs. The key is `PMT`.',
   wow: 'Three inputs gave you the payment, the total interest and the sign convention.',
   goals: [

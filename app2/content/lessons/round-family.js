@@ -34,7 +34,7 @@ export default {
   conventions: ['D2', 'D4'],
   teaches: ['round-function', 'ceiling-floor', 'roundup-rounddown', 'abs-function'],
   uses: ['go-to', 'status-bar', 'ctrl-shift-arrow', 'shift-arrow', 'ctrl-enter-fill', 'formula-basics', 'type-to-enter'],
-  prerequisites: ['challenge-timeline-and-age', 'challenge-house-format-set'],
+  prerequisites: ['challenge-timeline-and-age'],
   brief: 'A number format hides decimals; ROUND removes them, and the two are not the same thing: a page that adds up its displayed figures can land a dollar off its own total. ROUND(x,2) rounds to the cent, ROUND(x,0) to the dollar and ROUND(x,-3) to the thousand; ROUNDUP and ROUNDDOWN force the direction; CEILING and FLOOR round to a step, like the nearest $0.25 on a ticket; ABS drops the sign. Use them on the ticket figures in Summary, where the arithmetic has to be exact. The key is `ROUND`.',
   goals: [
     { id: 'read-decimals', text: 'Select the tickets in Q5:Q10 and read their Sum on the status bar: it adds every decimal the cells hide.', keys: 'Ctrl+G "Q5" ↵ Ctrl+Shift+↓', requires: ['go-to', 'status-bar', 'ctrl-shift-arrow'],
