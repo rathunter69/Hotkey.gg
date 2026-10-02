@@ -87,7 +87,7 @@ export function table(rng, o = {}) {
 
 /** Build the Session for a fragment: the sheet, the selection, then any setup keys (a copy, a bold to undo). */
 export function fragSession(frag, opts = {}) {
-  const sheet = new Sheet({ rows: SHEET_ROWS, cols: SHEET_COLS, cells: frag.cells, colW: frag.colW, hiddenRows: frag.hiddenRows, hiddenCols: frag.hiddenCols, groups: frag.groups, condFmt: frag.condFmt, view: frag.view });
+  const sheet = new Sheet({ rows: SHEET_ROWS, cols: SHEET_COLS, cells: frag.cells, colW: frag.colW, rowH: frag.rowH, hiddenRows: frag.hiddenRows, hiddenCols: frag.hiddenCols, groups: frag.groups, condFmt: frag.condFmt, view: frag.view });
   // seeded labels fit their column as typed ones do, unless the fragment sets the width (autofit needs a narrow one)
   for (let c = 1; c <= FRAG_COLS; c++) if (!(frag.colW && c in frag.colW)) { const need = sheet.neededWidth(c); if (need > sheet.colW[c]) sheet.colW[c] = need; }
   const s = new Session(sheet, opts);
@@ -446,6 +446,26 @@ export const RAPID_DECK = [
     rng => { const t = table(rng); const r = int(rng, t.top, t.last); const rg = R(r, t.c0 + 1, r, t.c1); return { cells: t.cells, select: rg, target: rg }; },
     s => dialogIs(s, 'series')),
 
+  /* ---- Chapter 1: the taught keys the first deck left out (M19: a prompt for every taught key) ---- */
+  P('extend-one', 1, 'Extend the selection one cell', 'Shift+↓',
+    rng => { const t = table(rng, { rows: 4 }); const c = int(rng, t.c0 + 1, t.c1); const r = int(rng, t.top, t.last - 1); return { cells: t.cells, select: K(r, c), target: R(r, c, r + 1, c) }; },
+    (s, f) => selIs(s, f.target)),
+  P('fill-selection', 1, 'Enter into every selected cell', 'Ctrl+↵',
+    rng => {
+      const t = table(rng, { rows: 3 }); const c = t.c1 + 1; const rg = R(t.top, c, t.last, c); const n = int(rng, 2, 9) * 100;
+      return { cells: t.cells, select: rg, setup: [`"${n}"`], editing: true, target: rg, n };
+    },
+    (s, f) => !s.editing && every(s, f.target, c => Number(c.value) === f.n)),
+  P('line-break', 1, 'Line break in a cell', 'Alt+↵',
+    rng => { const t = table(rng, { kind: 'site' }); const at = K(t.r0, t.c1 + 1); return { cells: t.cells, select: at, setup: ['"Per site"'], editing: true, target: at }; },
+    s => s.editing && s.editBuf.includes('\n')),
+  P('column-width', 1, 'Column Width', 'Alt H O W', rng => { const t = onFigures(rng); return { cells: t.cells, select: t.select, target: t.target }; }, s => dialogIs(s, 'colw')),
+  P('row-height', 1, 'Row Height', 'Alt H O H', rng => { const t = onLabel(rng); return { cells: t.cells, select: t.select, target: t.target }; }, s => dialogIs(s, 'rowh')),
+  P('autofit-row', 1, 'AutoFit Row Height', 'Alt H O A',
+    rng => { const t = table(rng); const r = int(rng, t.top, t.last); return { cells: t.cells, rowH: { [r]: 60 }, select: K(r, t.c0), target: R(r, t.c0, r, t.c1), row: r }; },
+    (s, f) => s.sheet.rowH[f.row] < 60),
+  P('print-titles', 1, 'Print Titles', 'Alt P I', rng => { const t = onHeader(rng); return { cells: t.cells, select: t.select, target: t.target }; }, s => dialogIs(s, 'pagesetup') && !!s.dlg && s.dlg.tab === 'sheet'),
+
   /* ---- Chapter 2: formatting and presentation ---- */
   P('general-format', 2, 'General Format', 'Ctrl+Shift+~',
     rng => { const t = onFigures(rng, { row: true, scale: 'big', cell: { fmtStyle: 'currency', decimals: 2 } }); return { cells: t.cells, select: t.select, target: t.target }; },
@@ -570,7 +590,7 @@ export const startsAtRest = f => !f.editing;
 /** What a prompt's sheet looks like, for telling a chord that changed something from one that did nothing. */
 export function stateSig(s) {
   const sh = s.sheet;
-  return JSON.stringify([sh.cells, sh.selectionText(), [...sh.hiddenRows], [...sh.hiddenCols], sh.groups, sh.freeze, sh.colW, sh.condFmt.length, !!sh.filter, sh.view, sh.gridlines, sh.pageSetup, sh.breaks, sh.arrows || [], s.settings.showFormulas, s.settings.calcMode, !!sh.clipboard]);
+  return JSON.stringify([sh.cells, sh.selectionText(), [...sh.hiddenRows], [...sh.hiddenCols], sh.groups, sh.freeze, sh.colW, sh.condFmt.length, !!sh.filter, sh.rowH, sh.view, sh.gridlines, sh.pageSetup, sh.breaks, sh.arrows || [], s.settings.showFormulas, s.settings.calcMode, !!sh.clipboard]);
 }
 
 /** Excel's 'B2:D5' as the fragment's rows and columns: { r1, c1, r2, c2 }, clipped to the window. */

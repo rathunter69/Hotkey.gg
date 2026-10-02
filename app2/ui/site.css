@@ -110,7 +110,7 @@ kbd{font-family:var(--mono); font-size:11.5px; color:var(--text); background:var
 :where(.home) p{font-size:14px; color:var(--muted); line-height:1.6; margin:0 0 12px; max-width:70ch}
 
 /* the drill list (Timed runs under it) takes two thirds; the rail stacks the Daily, Keep sharp,
-   rapid-fire and the sandbox. Below 1000px one column, the rail first as a 2 × 2 grid. */
+   rapid-fire. Below 1000px one column, the rail first as a 2 × 2 grid. */
 
 .tcard{background:var(--sheet); border:0; border-radius:0; overflow:hidden; display:flex; flex-direction:column}
 
@@ -219,7 +219,7 @@ kbd{font-family:var(--mono); font-size:11.5px; color:var(--text); background:var
 .rf-combo{color:var(--accent); font-weight:700}
 .rapid-durs{display:flex; gap:12px; margin:18px 0}
 
-/* ---------- badge shelf, rank emblems ---------- */
+/* ---------- badge shelf ---------- */
 .badge-shelf{display:grid; grid-template-columns:repeat(auto-fill, minmax(96px, 1fr)); gap:10px; margin:10px 0}
 .badge{display:flex; flex-direction:column; align-items:center; gap:6px; padding:12px 6px 10px; border:1px solid var(--line); border-radius:10px; background:var(--surface); text-align:center; position:relative; transition:transform .12s}
 .badge.earned:hover{transform:translateY(-2px)}

@@ -19,7 +19,7 @@ const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&a
 const t = (key, fb) => siteCopy(key, fb);
 
 /** The paid line the catalog shows on a locked chapter; one source for the lock page and the lists. */
-export const PAID_LINE = () => t('paywall_line', 'Get full access for the rest of the content.');
+export const PAID_LINE = () => t('paywall_line', 'Get Full Access for the rest of the content.');
 /** The price line under it. */
 export const PRICE_LINE = () => t('paywall_price', 'Full Access is $15 a month, or $9 with a school email. Cancel any time.');
 /** Where the button goes: checkout once the flag is on, Pricing until then. */
@@ -32,8 +32,8 @@ export const goHrefFor = payments => (payments ? '#/checkout' : '#/pricing');
  */
 export function paywallHtml({ heading = '', signedIn = false, payments = paymentsOn(), goHref = goHrefFor(payments), mode = 'learn', ids = {} } = {}) {
   const body = `<p class="panel-line">${esc(PAID_LINE())}</p><p class="panel-line ink-2">${esc(PRICE_LINE())}</p>` +
-    (signedIn ? `<p class="panel-line ink-2">${esc(t('paywall_signed_in', 'This account doesn’t have full access yet. Get it here, or redeem a code on the Account page.'))}</p>` : '') +
-    `<div class="btn-row">${buttonHtml({ label: t('paywall_go', 'Get full access'), key: 'Enter', href: goHref, primary: true, id: ids.go || '', attrs: { 'data-act': 'go' } })}${buttonHtml({ label: t('paywall_not_now', 'Not now'), key: 'Esc', quiet: true, id: ids.notNow || '', attrs: { 'data-act': 'not-now' } })}</div>` +
+    (signedIn ? `<p class="panel-line ink-2">${esc(t('paywall_signed_in', 'This account doesn’t have Full Access yet. Get it here, or redeem a code on the Account page.'))}</p>` : '') +
+    `<div class="btn-row">${buttonHtml({ label: t('paywall_go', 'Get Full Access'), key: 'Enter', href: goHref, primary: true, id: ids.go || '', attrs: { 'data-act': 'go' } })}${buttonHtml({ label: t('paywall_not_now', 'Not now'), key: 'Esc', quiet: true, id: ids.notNow || '', attrs: { 'data-act': 'not-now' } })}</div>` +
     (payments ? '' : `<p class="fine">${esc(t('pricing_checkout_soon', 'Checkout opens at launch.'))}</p>`);
   return panelHtml({ heading: esc(heading), facts: `<span class="paywall-mark">${esc(t('paywall_pro', 'Full Access'))}</span>`, body, mode, cls: 'paywall',
     attrs: { 'aria-label': t('paywall_pro', 'Full Access'), 'data-cursor': true, 'data-cursor-enter': '[data-act="go"]', tabindex: '-1' } });

@@ -70,3 +70,14 @@ test('eventsFrom folds progress, attempts and the quest ledger into one ordered 
   assert.deepEqual(evs.map(e => e.kind), ['lesson', 'challenge', 'drill', 'daily', 'quest', 'rapid']);
   assert.equal(totalXP(evs), 60 + 75 + 40 + 30 + 25 + 10);
 });
+
+test('M10: one XP story. Every line that says where XP comes from names every run that pays, and only those', async () => {
+  const { siteCopy } = await import('../content/copy/apply.js');
+  const PAYS = { lessons: XP_TABLE.lesson, challenges: XP_TABLE.challenge, drills: XP_TABLE.drillFirstClean, 'the Daily': XP_TABLE.daily, 'rapid-fire': XP_TABLE.rapid, quests: XP_TABLE.questDaily };
+  for (const key of ['home_xp_why', 'orientation_home_level', 'orientation_level']) {
+    const line = siteCopy(key, '').toLowerCase();
+    assert.ok(line, key + ' is in the sheet');
+    for (const [what, xp] of Object.entries(PAYS)) { assert.ok(xp > 0, what + ' pays'); assert.ok(line.includes(what.toLowerCase()), `${key} names ${what}`); }
+    assert.ok(!/achievement/.test(line), `${key}: achievements pay nothing, so the story leaves them out`);
+  }
+});

@@ -503,8 +503,6 @@ export const store = {
       return v;
     } catch (e) { return null; }
   },
-  /** Rank needs real boards (Phase B): every guest is Unranked, honestly. */
-  rank() { return null; },
 
   /* ---- learner state: prefs stays the read path; the store writes through ---- */
   skipped() { return prefs.get().skipped; },

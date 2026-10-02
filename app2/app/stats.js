@@ -11,6 +11,7 @@ import { DRILLS_BY_ID } from '../content/drills.js';
 import { CHAPTERS } from '../content/index.js';
 import { shortcutsUsed } from './runner.js';
 import { loadLedger, questEvents, questTotals } from './quests.js';
+import { keyStates } from './key-states.js';
 
 /** The game ctx every consumer shares: achievements, cosmetics, the level chip, Stats. */
 export function gameCtx() {
@@ -26,8 +27,8 @@ export function gameCtx() {
     progress, attempts, pbs, xp,
     signedIn: (() => { try { return auth.state() === 'in'; } catch (e) { return false; } })(),
     level: lvl.lvl, levelInfo: lvl,
-    rank: store.rank(), rankIndex: 0,
     quests: questTotals(ledger), rolled: Object.values(ledger.rolls),
+    keyRecords: (() => { try { return keyStates.records(); } catch (e) { return {}; } })(),
     chapters: Object.fromEntries(CHAPTERS.map(ch => { try { return [ch.id, store.chapter(ch.id)]; } catch (e) { return [ch.id, {}]; } })),
     streakDays: practiceStreak([...new Set(days)], dayOf()),
     days: [...new Set(days)],   // every day with a run or a lesson, for the rail's week cells (M88)

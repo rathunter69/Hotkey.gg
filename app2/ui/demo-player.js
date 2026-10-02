@@ -5,7 +5,9 @@
 // once the visitor clicks it or tabs to it, their first key takes the sheet over (SITE_SPEC §3),
 // so the demo is the lesson, not a film of one.
 //
-//   const demo = mountDemo(hostEl, { loop, autoplay, focusable, onDone, onPlay, onChange, onTakeover });
+//   const demo = mountDemo(hostEl, { lesson, loop, autoplay, focusable, onDone, onPlay, onChange, onTakeover });
+//   `lesson` defaults to the landing's DEMO_LESSON; the Reference page's Show me passes a key's
+//   single-key rep (app/schedule.js microLesson), so one engine plays every demo (M57).
 //   demo.play(); demo.skip(); demo.destroy();
 //
 // The sheet opens at the zoom that fits the Report across the frame (demoZoom, held between 85%
@@ -119,6 +121,7 @@ export function demoZoom(S, width, z = DEMO_ZOOM) {
  *                      onTakeover(); cadence ms
  */
 export function mountDemo(host, o = {}) {
+  const LESSON = o.lesson || DEMO_LESSON;
   const el = document.createElement('div');
   el.className = 'dp dp-live';
   if (o.focusable) { el.tabIndex = 0; el.setAttribute('role', 'group'); el.setAttribute('aria-label', siteCopy('demo_aria', 'A lesson playing itself. While it has focus your keys go to the sheet; Tab moves on.')); }
@@ -126,21 +129,21 @@ export function mountDemo(host, o = {}) {
     <div class="ribbon-slot dp-rib" id="demoRibbonSlot"><div class="ribbon" id="demoRibbon"></div></div>
     <div class="dp-stage" id="demoStage"><div class="stage"><div class="stage-row"><div class="stage-main"><div id="demoSheet"></div></div></div></div>
       <button type="button" class="dp-play" id="demoPlay" hidden>${esc(siteCopy('demo_play', 'Play the demo'))}</button></div>
-    <div class="dp-foot"><span class="dp-sheettab" id="demoTab"></span><span class="dp-count" id="demoCount">0 / 4</span></div>`;
+    <div class="dp-foot"><span class="dp-sheettab" id="demoTab"></span><span class="dp-count" id="demoCount">0 / ${LESSON.goals.length}</span></div>`;
   host.appendChild(el);
   const $ = id => el.querySelector('#' + id);
   const stage = $('demoStage');
   const card = createTaskCard(stage, {});
 
-  const run = new LessonRun(DEMO_LESSON, { mode: 'guided' });
+  const run = new LessonRun(LESSON, { mode: 'guided' });
   let sheetView = null, ribbonView = null, unclip = null, ro = null;
   let timer = null, i = 0, playing = false, started = false, taken = false, done = false, destroyed = false;
-  const script = demoScript(DEMO_LESSON, o.cadence || 560);
+  const script = demoScript(LESSON, o.cadence || 560);
   const sheetName = () => { const sh = run.session.sheets && run.session.sheets[run.session.sheetIndex]; return sh ? sh.name : ''; };
 
   function paintCard() {
     const m = run.goals.length, cur = run.current;
-    if (!cur || run.finished) card.set({ n: m, m, goal: siteCopy('demo_done', 'That was a lesson. The sheet is graded on how it ends up, so any route that gets there counts, and the next one is yours.'), state: 'done' });
+    if (!cur || run.finished) card.set({ n: m, m, goal: o.doneLine || siteCopy('demo_done', 'That was a lesson. The sheet is graded on how it ends up, so any route that gets there counts, and the next one is yours.'), state: 'done' });
     else {
       const tokens = routeTokens(cur.keys);
       const progress = routeProgress(tokens, run.session.keyLog.slice(run.session.goalMark || 0));

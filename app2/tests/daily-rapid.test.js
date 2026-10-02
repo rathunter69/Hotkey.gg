@@ -30,4 +30,16 @@ test('the Daily: same day same pick; the pick varies over a month; seeded cells 
   assert.match(shareText('2026-09-22', 'X', 12.34, 'pro'), /12\.34s ◆◆/);
 });
 
+test('M20: the Daily draws from every keyed drill, free and Full Access, the stretch and long ones excepted', async () => {
+  const { CATALOG } = await import('../content/catalog.js');
+  const eligible = CATALOG.filter(e => e.dailyEligible).map(e => e.id);
+  assert.deepEqual([...DAILY_POOL].sort(), [...eligible].sort(), "the pool is the catalog's dailyEligible set");
+  assert.equal(DAILY_POOL.length, 73, 'the 73 keyed drills of the six chapters');
+  assert.ok(DAILY_POOL.some(id => DRILLS_BY_ID[id].access === 'paid'), 'Full Access drills are drawn');
+  assert.ok(DAILY_POOL.some(id => DRILLS_BY_ID[id].access === 'free'), 'free drills are drawn');
+  const chapters = new Set();
+  for (let i = 0; i < 400; i++) { const d = new Date(Date.UTC(2026, 9, 1) + i * 864e5).toISOString().slice(0, 10); chapters.add(DRILLS_BY_ID[dailyFor(d).drillId].chapter); }
+  assert.equal(chapters.size, 6, 'over a year, every chapter comes round');
+});
+
 // rapid-fire's deck and stage have their own tests: rapid-deck.test.js (every prompt on a seeded fragment) and rapid-stage.test.js

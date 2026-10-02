@@ -52,8 +52,7 @@ test('every drill validates', () => {
   assert.equal(ch.length, 38, 'the seven Chapter 1 module challenges, the seven Chapter 2 ones (2.1 to 2.7), the remix, the six Chapter 3 ones (3.1 to 3.6), Chapter 4\'s six (4.1 to 4.6), Chapter 5\'s 5.1 to 5.7 and Chapter 6\'s 6.1 to 6.4 are registered');
   for (const d of ch) { assert.ok(d.lesson && d.lesson.kind === 'challenge' && d.pars && d.pars.pass > d.pars.legendary, d.id); assert.equal(d.access, d.chapter === 'foundations' ? 'free' : 'paid', d.id); }
   assert.deepEqual(ch.filter(d => d.benchmark).map(d => d.id), ['challenge-to-standard-in-three-minutes', 'challenge-the-site-pnl'], 'two challenges are benchmarks');
-  assert.ok(ch.filter(d => d.access === 'free').every(d => DAILY_POOL.includes(d.id)), 'the Daily pool picks the free challenges up');
-  assert.ok(ch.filter(d => d.access === 'paid').every(d => !DAILY_POOL.includes(d.id)), 'the Daily never draws a paid challenge');
+  assert.ok(ch.every(d => !DAILY_POOL.includes(d.id)), 'the Daily draws keyed drills, not the module challenges (they run in the lesson workspace)');
 });
 
 /** Chapter 1's drills as screenplay 6.1 lists them (resized 2026-10-01; M108): id and Pass par. */
@@ -95,7 +94,7 @@ test("Chapters 2 and 3: the planned set, the puzzle and the Wave 1 sketches, on 
       assert.deepEqual(d.pars, parsFromRoute(d.route), `${d.id}: pars from parsFromRoute`);
       assert.ok(d.pars.pass >= 60 && d.pars.pass <= 180, `${d.id}: Pass par ${d.pars.pass} s sits in the 60 to 180 second class`);
       assert.ok(d.optimalKeys / d.route <= 4.5, `${d.id}: ${d.optimalKeys} keys in a ${d.route} s route is faster than a fast hand`);
-      assert.ok(!DAILY_POOL.includes(d.id), `${d.id}: the Daily draws free drills only`);
+      assert.ok(DAILY_POOL.includes(d.id), `${d.id}: the Daily draws Full Access drills too (M20)`);
     }
     assert.deepEqual(keyed.filter(d => d.benchmark).map(d => d.id), [want.benchmark], `${chapter}: one benchmark`);
     assert.equal(keyed[keyed.length - 1].id, want.puzzle, `${chapter}: the puzzle closes the set`);

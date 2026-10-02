@@ -1,5 +1,5 @@
 // app2/ui/pixel.js — 16×16 pixel glyphs rendered to crisp SVG rects: the badge wall and the
-// rank emblems (SITE_SPEC §9). A glyph is 16 rows of 16 characters: '.' transparent, letters
+// the badges (SITE_SPEC §9). A glyph is 16 rows of 16 characters: '.' transparent, letters
 // palette slots — 'a' outline, 'b' body (takes the rarity or tier colour), 'c' accent,
 // 'd' light. At most 6 colours per glyph; the palette maps slots to CSS colours at render.
 
@@ -35,18 +35,6 @@ export const GLYPHS = {
   nametag: R('................', '................', '................', '.aaaaaaaaaaaaaa.', '.abbbbbbbbbbbba.', '.abaaaabbbbbbba.', '.abaccabccccbba.', '.abaccabbbbbbba.', '.abaaaabccccbba.', '.abbbbbbbbbbbba.', '.abccccccccccba.', '.abbbbbbbbbbbba.', '.aaaaaaaaaaaaaa.', '................', '................', '................'),
   cursor: R('................', '................', '..aaaaaaaaaaa...', '..abbbbbbbbba...', '..ab.......ba...', '..ab.......ba...', '..ab..ccc..ba...', '..ab..c....ba...', '..ab..cc...ba...', '..ab..c....ba...', '..ab..ccc..ba...', '..ab.......ba...', '..abbbbbbbbbaaa.', '..aaaaaaaaaaaba.', '............aa..', '................'),
   snail: R('................', '................', '................', '.......aaaa.....', '.....aabbbbaa...', '....abbcccbbba..', '....abccbccbba..', '....abcbbbcbba..', '.a..abccccbbba..', '.aa.abbbbbbba...', '.aba.aabbbbaa...', '.abbaaaaaaaaaaa.', '..abbbbbbbbbbba.', '...aaaaaaaaaaa..', '................', '................'),
-};
-
-/** The eight rank emblems, floor to summit (rank.js TIERS order), same 16×16 mechanism. */
-export const RANK_EMBLEMS = {
-  'tier-mba': R('................', '................', '...aaaaaaaa.....', '...abbbbbbaaa...', '...abbbbbbabba..', '...abbbbbbabba..', '...abbbbbbaaa...', '...abbbbbba.....', '....abbbba......', '.....aaaa.......', '...aaaaaaaa.....', '...abbbbbba.....', '...aaaaaaaa.....', '................', '................', '................'),
-  'tier-bronze': R('................', '.....aaaaaa.....', '....abbbbbba....', '...abbbbbbbba...', '...abbaabbbba...', '...abbbabbbba...', '...abbbabbbba...', '...abbbabbbba...', '...abbaaabbba...', '...abbbbbbbba...', '....abbbbbba....', '.....aaaaaa.....', '................', '................', '................', '................'),
-  'tier-silver': R('................', '.....aaaaaa.....', '....abbbbbba....', '...abbaaabbba...', '...abbabbbbba...', '...abbaaabbba...', '...abbbbabbba...', '...abbaaabbba...', '...abbbbbbbba...', '...abbbbbbbba...', '....abbbbbba....', '.....aaaaaa.....', '................', '................', '................', '................'),
-  'tier-gold': R('................', '.......aa.......', '.....aabbaa.....', '....abbbbbba....', '...abbcbbcbba...', '...abbbbbbbba...', '..abbcbbbbcbba..', '..abbbbbbbbbba..', '...abbbbbbbba...', '...abbcbbcbba...', '....abbbbbba....', '.....aabbaa.....', '.......aa.......', '................', '................', '................'),
-  'tier-amethyst': R('................', '................', '....aaaaaaaa....', '...abbcbbcbba...', '..abbbbbbbbbba..', '..abcbbbbbbcba..', '...abbbbbbbba...', '....abbbbbba....', '.....abbbba.....', '......abba......', '.......aa.......', '................', '................', '................', '................', '................'),
-  'tier-platinum': R('................', '.......aa.......', '......abba......', '.....abbbba.....', '....abbcbbba....', '...abbcccbbba...', '..abbcccccbbba..', '..abbbcccbbbba..', '...abbbcbbbba...', '....abbbbbba....', '.....abbbba.....', '......abba......', '.......aa.......', '................', '................', '................'),
-  'tier-crimson': R('................', '..aaaaaaaaaaaa..', '..abbbbbbbbbba..', '..abcbcbcbcbba..', '..abbbbbbbbbba..', '..abcbcbcbcbba..', '..abbbbbbbbbba..', '..abcbcbcbcbba..', '..abbbbbbbbbba..', '..abbbbaabbbba..', '..abbbbaabbbba..', '..abbbbaabbbba..', '..aaaaaaaaaaaa..', '................', '................', '................'),
-  'tier-diamond': R('................', '.......aa.......', '......abba......', '.....abccba.....', '....abccccba....', '...abccddccba...', '..abccddddccba..', '..abcddddddcba..', '...abcddddcba...', '....abcddcba....', '.....abccba.....', '......abba......', '.......aa.......', '................', '................', '................'),
 };
 
 /** Parse a glyph string → 16 rows of 16 chars; throws on a malformed glyph (the tests pin this). */

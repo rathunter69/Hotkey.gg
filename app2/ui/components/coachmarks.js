@@ -17,13 +17,13 @@ const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&a
  */
 export const COACH_MARKS = [
   { key: 'home', at: '.rail-item[data-page="home"]', copy: 'orientation_home', fallback: 'Home picks up where you left off, with today’s quests on the right.' },
-  { key: 'home_level', at: '.home-level', page: true, copy: 'orientation_home_level', fallback: 'Lessons, drills, the Daily and quests all pay XP, and every level opens a piece of flair, drawn here.' },
+  { key: 'home_level', at: '.home-level', page: true, copy: 'orientation_home_level', fallback: 'Lessons, challenges, drills, the Daily, rapid-fire and quests all pay XP, and every level opens a piece of flair, drawn here.' },
   { key: 'home_today', at: '.home-today', page: true, copy: 'orientation_home_today', fallback: 'Three quests a day and three a week each pay XP, with a bonus when all three land.' },
   { key: 'learn', at: '.rail-item[data-page="learn"]', copy: 'orientation_learn', fallback: 'Learn is the course: six chapters of short modules, each ending in a timed challenge on a fresh file.' },
   { key: 'practice', at: '.rail-item[data-page="practice"]', copy: 'orientation_practice', fallback: 'Drills, the Daily, rapid-fire and the challenges all live under Practice, on the clock.' },
   { key: 'leaderboard', at: '.rail-item[data-page="leaderboard"]', copy: 'orientation_leaderboard', fallback: 'Each drill and challenge has a board, the Daily too, and only a run with no help and no mouse posts a time.' },
   { key: 'reference', at: '.rail-item[data-page="reference"]', copy: 'orientation_reference', fallback: 'Reference has every key the course teaches, and shows which ones you’ve practiced.' },
-  { key: 'level', at: '#railLevel', copy: 'orientation_level', fallback: 'Everything you finish earns XP toward your next level, and speed is what puts you on the boards.' },
+  { key: 'level', at: '#railLevel', copy: 'orientation_level', fallback: 'Lessons, challenges, drills, the Daily, rapid-fire and quests all pay XP toward your next level, and speed is what puts you on the boards.' },
   { key: 'streak', at: '#railStreak', copy: 'orientation_streak', fallback: 'Your first practice each day fills that day’s cell and adds a day to your streak.' },
   { key: 'pro', at: '#railPro', copy: 'orientation_pro', fallback: 'Chapter 1 is free in full, and Full Access opens Chapters 2 to 6 with their timed play.' },
   { key: 'account', at: '#railAcctBtn', copy: 'orientation_account', fallback: 'Progress saves in this browser until a free account keeps it on any device and puts your times on the boards.', guest: true },

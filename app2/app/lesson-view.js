@@ -24,7 +24,9 @@ import { prefs, keyLabel } from './prefs.js';
 import { inferTarget, altPath, glowRibbon, targetBoxes, targetParts, unionBox, rangesOf, rangeCorners } from '../ui/cues.js';
 import { moduleNumber, itemNumber, isFinalItem, FINAL_MODULE } from './numbering.js';
 import { beatFor, pageDelivered } from './beats.js';
-import { schedule, grade as scheduleGrade, dueToday } from './schedule.js';
+import { schedule, grade as scheduleGrade, dueToday, FAST_SECS } from './schedule.js';
+import { keyStates, keyIdsForConcept } from './key-states.js';
+import { awardSync } from './award-sync.js';
 import { shouldOfferInstall, installAvailable, promptInstall, INSTALL_PROMPT } from './install.js';
 import { siteCopy } from '../content/copy/apply.js';
 import { settings } from './settings.js';
@@ -581,8 +583,11 @@ export function mountLessonView(root, lesson, { mode = 'guided', seed: seedOpt, 
     card.el.hidden = true;
     track('lesson_complete', { lesson_id: lesson.id, mode: run.mode });
     const used = shortcutsUsed(run.session.keyLog).map(u => ({ keys: u.keys, count: u.count }));
+    keyStates.notePressed(used);   // every key pressed in a lesson is practiced (M57)
     if (isMicro) {
       lastClean = !assisted() && !run.mouseCount;
+      // Drill it: a clean single-key rep inside its par puts the key under par (M57)
+      if (lastClean && Number.isFinite(run.elapsed) && run.elapsed <= FAST_SECS) keyStates.noteUnderPar(keyIdsForConcept(lesson.concept));
       schedule.note([lesson.concept], scheduleGrade({ ok: true, secs: run.elapsed, hint: assisted() }));
       effects.finish(chrome.stage);
       const q = dueToday(schedule.state(), {}).items.filter(i => i.id !== lesson.concept); const nextDue = q[0] || null;
@@ -605,6 +610,7 @@ export function mountLessonView(root, lesson, { mode = 'guided', seed: seedOpt, 
     const wasFirst = !!run.opts.soft;
     if (isChallenge) track('challenge_result', { ref: lesson.id, tier: lastTier || 'none', secs: Math.round(run.elapsed * 10) / 10, keys: run.session.keyLog.length, first: wasFirst, timed_out: lastTimedOut });
     const saved = store.record(lesson.id, run.mode, run.elapsed, { clean: lastClean, keystrokes: run.session.keyLog.length, mouseCount: run.mouseCount, assisted: assisted(), tier: lastTier || undefined });
+    if (lastClean && !isChallenge) { try { awardSync.cleanLesson(lesson.id); } catch (e) { /* the device keeps the bonus */ } }   // the +10 on the account too (0012)
     const pbBefore = timed ? store.pb(lesson.id) : null;
     let placeNow_ = null;
     if (timed) {

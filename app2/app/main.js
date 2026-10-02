@@ -6,7 +6,7 @@
 //   #/learn            the chapter table
 //   #/lesson/<id>      a lesson in the workspace; ?mode=solo|timed
 //   #/practice         Drills; #/practice/daily, /rapid, /challenges the other three modes
-//   #/drill/<id>       a drill; #/daily the Daily; #/drill/sandbox the free sheet
+//   #/drill/<id>       a drill; #/daily the Daily (the sandbox is gone, M21: its old routes open Practice)
 //   #/leaderboard  #/reference  #/pricing  #/teams  #/account
 //   #/about  #/terms  #/privacy  #/eula  #/contact
 //   #/due/<shortcut>   a refresher rep from today's queue (app/due-page.js)
@@ -47,7 +47,7 @@ const NARROW_QUERY = '(max-width: 900px)';
  * Parse a location hash into { name, params, query }. Pure; exported for the tests.
  *   parseRoute('#/lesson/active-cell?mode=solo')
  *     → { name:'lesson', params:{ id:'active-cell' }, query:{ mode:'solo' } }
- * Unknown paths give name 'notfound'. '#/sandbox' (the old shell's route) maps to the drill.
+ * Unknown paths give name 'notfound'. The retired sandbox's routes ('#/sandbox', '#/drill/sandbox') open Practice (M21).
  */
 export function parseRoute(hash) {
   const raw = String(hash == null ? '' : hash);
@@ -67,8 +67,8 @@ export function parseRoute(hash) {
   else if (path === '/practice') name = 'practice';
   else if ((m = /^\/practice\/(daily|drills|rapid|challenges)$/.exec(path))) { name = 'practice'; params.mode = m[1]; }   // the four modes under Practice (3.0, The rail)
   else if (path === '/leaderboards') name = 'leaderboard';
+  else if (path === '/sandbox' || path === '/drill/sandbox') name = 'practice';   // the sandbox is dropped (M21)
   else if ((m = /^\/drill\/([a-z0-9-]+)$/.exec(path))) { name = 'drill'; params.id = m[1]; }
-  else if (path === '/sandbox') { name = 'drill'; params.id = 'sandbox'; }
   else if (path === '/daily') { name = 'drill'; params.daily = true; }
   else if (path === '/rapid') name = 'rapid';
   else if ((m = /^\/due\/([a-z0-9-]+)$/.exec(path))) { name = 'due'; params.id = m[1]; }
@@ -110,7 +110,7 @@ export function titleFor(name, extra) {
     lesson: (extra ? extra + ' · ' : '') + 'hotkey.gg', locked: (extra ? extra + ' · ' : '') + 'Full Access · hotkey.gg', practice: 'Practice · hotkey.gg', drill: (extra ? extra + ' · ' : '') + 'Practice · hotkey.gg', leaderboard: 'Leaderboards · hotkey.gg',
     reference: 'Reference · hotkey.gg', pricing: 'Pricing · hotkey.gg', teams: 'Teams · hotkey.gg', account: 'Account · hotkey.gg', about: 'About · hotkey.gg',
     terms: 'Terms · hotkey.gg', privacy: 'Privacy · hotkey.gg', eula: 'EULA · hotkey.gg', contact: 'Contact · hotkey.gg', notfound: 'Page not found · hotkey.gg',
-    due: 'Due today · hotkey.gg', checkout: 'Get full access · hotkey.gg' };
+    due: 'Due today · hotkey.gg', checkout: 'Get Full Access · hotkey.gg' };
   return T[name] || 'hotkey.gg';
 }
 
@@ -289,6 +289,8 @@ export function startApp({ navEl, rootEl, footEl }) {
   const snapshot = () => { try { return JSON.stringify(store.all()); } catch (e) { return ''; } };
   auth.ready().then(() => {
     syncUser();
+    // the account mirror of quest XP, the clean-lesson bonus and the key states (0012): wired once, it hydrates on every sign-in
+    import('./award-sync.js').then(m => m.startAwardSync()).catch(() => { /* the device keeps them */ });
     if (auth.state() !== 'in') return;
     const before = snapshot();
     store.hydrate().then(() => {
@@ -342,7 +344,7 @@ export function startApp({ navEl, rootEl, footEl }) {
       }
     }
     let drill = null;
-    if (name === 'drill' && !r.params.daily && r.params.id !== 'sandbox') {
+    if (name === 'drill' && !r.params.daily) {
       try { drill = (await import('../content/drills.js')).drillById(r.params.id); } catch (e) { if (myGen === gen) fetchFailed({ name, params: r.params }); return; }
       if (myGen !== gen) return;
       if (!drill) name = 'notfound';
@@ -350,7 +352,7 @@ export function startApp({ navEl, rootEl, footEl }) {
     nav.setLanding(name === 'landing');
     nav.setActive(navKeyFor(name, r.params));
     if (nav.setSection) nav.setSection(name === 'account' ? (['profile', 'settings', 'billing', 'certificate'].includes(r.query.section) ? r.query.section : 'profile') : null);
-    document.title = titleFor(name, lesson ? lesson.title : name === 'drill' ? (drill ? drill.title : 'Sandbox') : '');
+    document.title = titleFor(name, lesson ? lesson.title : name === 'drill' ? (drill ? drill.title : '') : '');
     document.body.dataset.route = name;
     document.body.dataset.mode = modeOf(name, r.params);
     refreshLevel();

@@ -6,7 +6,7 @@
 // ticked rows and one action; the trust lines sit under the action; the terms follow as rows.
 //
 // The page shows these plans whatever the `payments` flag says (Wolf, 2026-10-02). The flag decides
-// only what Get full access does: off (hotkey.gg until Wolf says go) it is disabled with "Checkout
+// only what Get Full Access does: off (hotkey.gg until Wolf says go) it is disabled with "Checkout
 // opens at launch."; on (preview hosts) it goes to #/checkout. Teams are sold by hand at launch, so
 // Talk to us is an email.
 import { siteCopy } from '../content/copy/apply.js';
@@ -27,7 +27,7 @@ export { PRICES, FREE_ROWS, FULL_ROWS, TEAMS_ROWS };
 /** Where Talk to us writes to. */
 export const TEAMS_EMAIL = 'teams@hotkey.gg';
 
-/** The trust lines under Get full access, each on its own line (3.0, rule 10). */
+/** The trust lines under Get Full Access, each on its own line (3.0, rule 10). */
 export const TRUST_LINES = () => [t('pricing_trust_cancel', 'Cancel any time from your account.'), t('pricing_trust_refund', 'Full refund on your first payment within 14 days.'), t('pricing_trust_stripe', 'Payment is handled by Stripe.')];
 
 const tick = () => '<i class="plan-tick" aria-hidden="true"></i>';
@@ -52,16 +52,16 @@ const lines = list => `<ul class="plan-trust">${list.map(r => `<li class="fine">
 
 /** The Full Access column's foot: the one primary action, then what it needs to say beside it. Pure. */
 function fullFoot({ payments, entitled }) {
-  if (entitled) return `<div class="plan-foot">${buttonHtml({ label: t('account_manage', 'Manage billing'), href: '#/account', id: 'goFull' })}<p class="fine">${esc(t('pricing_signed_in_note', 'You have full access. Manage it on the Account page.'))}</p></div>`;
+  if (entitled) return `<div class="plan-foot">${buttonHtml({ label: t('account_manage', 'Manage billing'), href: '#/account', id: 'goFull' })}<p class="fine">${esc(t('pricing_signed_in_note', 'You have Full Access. Manage it on the Account page.'))}</p></div>`;
   const go = payments
-    ? buttonHtml({ label: t('pricing_full_go', 'Get full access'), key: 'Enter', href: '#/checkout', primary: true, id: 'goFull', attrs: { 'data-cursor': true } })
-    : buttonHtml({ label: t('pricing_full_go', 'Get full access'), key: 'Enter', primary: true, id: 'goFull', attrs: { disabled: true, 'aria-disabled': 'true', 'aria-describedby': 'fullSoon' } });
+    ? buttonHtml({ label: t('pricing_full_go', 'Get Full Access'), key: 'Enter', href: '#/checkout', primary: true, id: 'goFull', attrs: { 'data-cursor': true } })
+    : buttonHtml({ label: t('pricing_full_go', 'Get Full Access'), key: 'Enter', primary: true, id: 'goFull', attrs: { disabled: true, 'aria-disabled': 'true', 'aria-describedby': 'fullSoon' } });
   return `<div class="plan-foot">${go}${payments ? '' : `<p class="fine" id="fullSoon">${esc(t('pricing_checkout_soon', 'Checkout opens at launch.'))}</p>`}${lines(TRUST_LINES())}</div>`;
 }
 
 /**
- * The page's markup. Pure. `payments`: the flag (Get full access opens checkout, or waits for
- * launch). `entitled`: the signed-in account already has full access (its column says so instead).
+ * The page's markup. Pure. `payments`: the flag (Get Full Access opens checkout, or waits for
+ * launch). `entitled`: the signed-in account already has Full Access (its column says so instead).
  */
 export function pricingHtml({ payments = false, entitled = false } = {}) {
   const mail = `mailto:${TEAMS_EMAIL}?subject=${encodeURIComponent(t('pricing_teams_subject', 'hotkey.gg for a team'))}`;
@@ -113,7 +113,7 @@ export function mountPricingPage(root) {
   // a signed-in account's entitlement may arrive after the first paint
   let alive = true;
   if (auth.state() === 'in') entitlement.refresh().then(() => { if (alive) draw(); });
-  // Enter does the primary action (3.0, rule 2): Get full access, once checkout is on; while it waits for launch the button is disabled and Enter does nothing
+  // Enter does the primary action (3.0, rule 2): Get Full Access, once checkout is on; while it waits for launch the button is disabled and Enter does nothing
   const onKey = e => {
     if (e.defaultPrevented || e.key !== 'Enter') return;
     if (e.target && e.target.closest && e.target.closest('a, button, input')) return;

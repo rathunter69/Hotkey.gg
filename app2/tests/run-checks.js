@@ -105,7 +105,7 @@ const testFiles = files.filter(f => f.endsWith('.test.js') && (FULL || !f.endsWi
  * for the whole file or hold the auth singleton. lessons and challenge stub localStorage only inside
  * a test and take it away in its finally, so they pool (each would otherwise import the content again).
  */
-const OWN_PROCESS = new Set(['auth', 'effects', 'entitlement', 'leaderboard', 'moments', 'records', 'site-pages', 'store', 'store-sync', 'telemetry']);
+const OWN_PROCESS = new Set(['auth', 'award-sync', 'effects', 'entitlement', 'key-states', 'leaderboard', 'moments', 'records', 'site-pages', 'store', 'store-sync', 'telemetry']);
 /**
  * A file's measured CPU seconds beyond the shared imports; a file not measured yet counts the
  * median. A replay shard counts an equal part of every measured lesson: lesson-replay.js deals the
