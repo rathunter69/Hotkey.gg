@@ -441,3 +441,15 @@ td.kr-state{display:table-cell}
 .fr-pop .fr-panel:not(.fr-story){width:min(100%, calc(var(--side-col) * 1.5))}
 .fr-pop .fr-opt-sub{display:none}
 .fr-pop .fr-opt{padding:var(--s2) var(--s4)}
+
+/* the achievement banner (6.7): the sprite at 3x, the name, the line, and the rarity as a colored word */
+.fx-banner.fx-ach{align-items:center; flex-wrap:nowrap; gap:var(--s3)}
+.fx-ach-art{flex:none; image-rendering:pixelated}
+.fx-ach-words{display:flex; flex-direction:column; gap:var(--s1)}
+.fx-ach-words b{color:var(--ink); font-weight:var(--fw-bold)}
+.fx-ach-rar{font-style:normal; font-size:var(--fs-min); font-weight:var(--fw-semi); color:var(--rar-common)}
+.fx-ach.r-rare .fx-ach-rar{color:var(--rar-rare)} .fx-ach.r-epic .fx-ach-rar{color:var(--rar-epic)} .fx-ach.r-legendary .fx-ach-rar{color:var(--rar-legendary)}
+
+/* a coach mark on a page panel (Home's Level and Today): the card sits to the panel's left, its pointer on the right edge */
+.coach.coach-left{transform:translate(calc(-1 * var(--card-gap)), -50%); border-left:0; border-right:var(--mode-rule) solid var(--learn)}
+.coach.coach-left::before{left:auto; right:calc(-1 * var(--s2) - var(--mode-rule))}

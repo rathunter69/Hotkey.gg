@@ -15,8 +15,7 @@ import { dayOf } from './records.js';
 import { gameCtx } from './stats.js';
 import { schedule, dueToday } from './schedule.js';
 import { rewardAt, MAX_LEVEL } from '../content/levels.js';
-import { evaluateAchievements } from '../ui/badges.js';
-import { GLYPHS, renderPixel, RARITY_COLOURS } from '../ui/pixel.js';
+import { evaluateAchievements, badgeArt } from '../ui/badges.js';
 import { weekCells, weekLetters } from '../ui/components/rail.js';
 import { siteCopy } from '../content/copy/apply.js';
 import { xpForEvent } from './xp.js';
@@ -30,6 +29,20 @@ import { saveNudgeHtml, wireSaveNudge } from '../ui/components/nudge.js';
 import { courseNow, certTeaserHtml } from '../ui/components/certificate.js';
 
 const t = (key, vars) => fill(siteCopy(key, key), vars);
+import { questBoard } from './quest-loop.js';
+import { flairTileHtml } from '../ui/components/flair.js';
+import { QUESTS_BY_ID } from '../content/quests.js';
+
+/** A quest's mode color and where Enter takes it (6.6: lessons, drills, the Daily, rapid-fire, challenges). */
+export function questRoute(row) {
+  const q = QUESTS_BY_ID[row.id] || {};
+  const kind = (q.where && q.where.kind && q.where.kind[0]) || (q.metric === 'chapter' ? 'drill' : 'key');
+  if (kind === 'lesson') return { mode: 'learn', href: '#/learn' };
+  if (kind === 'daily') return { mode: 'daily', href: '#/daily' };
+  if (kind === 'rapid') return { mode: 'rapid', href: '#/rapid' };
+  if (kind === 'challenge') return { mode: 'challenges', href: row.ref ? '#/lesson/' + row.ref : '#/practice' };
+  return { mode: 'drills', href: '#/practice' };
+}
 /** Retired lessons never come up as next. */
 export const RETIRED = new Set(['welcome-export', 'welcome-race']);
 export const liveLessons = () => LESSONS.filter(l => !RETIRED.has(l.id) && l.module !== 'welcome' && l.kind !== 'testout');
@@ -65,8 +78,11 @@ export function nextLessonModel(lessons, all, skipped, { locked = () => false } 
  * The day's quests and the week's quests are R7's (6.6) and join these rows then. Pure.
  *   → { rows: [{ id, mode, title, length, xp, done, href, line }], done, of, fresh }
  */
-export function todayModel({ queue = { items: [], secs: 0 }, daily = { played: false }, dailyTitle = '', completedLessons = 0, dailyXp = 30 } = {}) {
+export function todayModel({ queue = { items: [], secs: 0 }, daily = { played: false }, dailyTitle = '', completedLessons = 0, dailyXp = 30, quests = null, weekOpen = false } = {}) {
   const rows = [];
+  // the day's three quests lead (6.6), each with a bar that fills as runs land
+  const qrow = r => { const to = questRoute(r); return { id: 'q-' + r.id, quest: true, mode: to.mode, title: r.title, length: r.done ? '' : t('quest_count', { d: r.have, k: r.target }), xp: r.done ? 0 : r.xp, done: r.done, href: to.href, bar: r.done ? null : Math.round(100 * r.have / (r.target || 1)) }; };
+  if (quests && quests.started) for (const r of quests.daily.rows) rows.push(qrow(r));
   const refreshers = queue.items.filter(i => i.kind === 'micro');
   if (refreshers.length) rows.push({ id: 'refreshers', mode: 'drills', title: t('home_refreshers', { n: refreshers.length }), length: t('home_seconds', { n: queue.secs }), xp: 0, done: false, href: '#/due/' + refreshers[0].id });
   const keep = queue.items.find(i => i.kind === 'challenge');
@@ -74,7 +90,16 @@ export function todayModel({ queue = { items: [], secs: 0 }, daily = { played: f
   const dailyLine = daily.played && daily.clean ? (daily.place ? t('home_daily_played', { t: fmtClock(daily.secs, true), place: daily.place, n: daily.of }) : t('home_daily_played_local', { t: fmtClock(daily.secs, true) })) : daily.played ? t('home_daily_help') : '';
   rows.push({ id: 'daily', mode: 'daily', title: t('home_daily_row'), length: daily.played ? '' : t('home_daily_len'), xp: daily.played ? 0 : dailyXp, done: !!daily.played, href: '#/daily', line: dailyLine, sub: dailyTitle });
   const done = rows.filter(r => r.done).length;
-  return { rows, done, of: rows.length, fresh: completedLessons === 0 };
+  const of = rows.length;
+  if (quests && quests.started) {
+    const D = quests.daily, W = quests.weekly;
+    if (D.rows.length && D.rows.every(r => r.done)) rows.push({ id: 'bonus', bonus: true, mode: 'learn', title: t('quest_bonus_daily'), length: '', xp: 0, xpText: t('quest_bonus_xp', { xp: D.bonusXp }), done: D.bonus, href: '#/' });
+    const wd = W.rows.filter(r => r.done).length;
+    rows.push({ id: 'week', week: true, mode: 'learn', title: t('quest_this_week'), length: t('quest_count', { d: wd, k: W.rows.length }), xp: 0, done: false, href: weekOpen ? '#/' : '#/?week=1', open: weekOpen });
+    if (weekOpen) for (const r of W.rows) rows.push({ ...qrow(r), sub: true });
+    if (W.rows.length && W.rows.every(r => r.done)) rows.push({ id: 'week-bonus', bonus: true, mode: 'learn', title: t('quest_bonus_weekly'), line: W.rollLabel ? t('quest_roll', { reward: W.rollLabel }) : '', length: '', xp: 0, xpText: t('quest_bonus_xp', { xp: W.bonusXp }), done: W.bonus, href: '#/' });
+  }
+  return { rows, done, of, fresh: completedLessons === 0 };
 }
 
 /** The latest badges and the next one to earn: the one closest to done among the unearned, visible ones. Pure. */
@@ -86,13 +111,10 @@ export function achievementsModel(states, { latest = 10 } = {}) {
 }
 
 /** A badge on Home: a keycap in its rarity's color holding the sprite (01-home); a locked one is a blank key with "?". */
-const badgeTile = s => `<span class="badge-tile badge-key r-${esc(s.def.rarity)}${s.done ? ' on' : ''}" title="${esc(s.def.name)}">${renderPixel(GLYPHS[s.def.glyph] || GLYPHS.star, { b: RARITY_COLOURS[s.def.rarity] || RARITY_COLOURS.common }, { size: 28 })}</span>`;
-/** The next level's reward, drawn (3.0, Home): a theme as its swatch, a keycap skin as a brass key, anything else as the level's key. */
+const badgeTile = s => `<span class="badge-tile badge-key r-${esc(s.def.rarity)}${s.done ? ' on' : ''}" title="${esc(s.def.name)}">${badgeArt(s.def, { done: s.done, size: 32 })}</span>`;
+/** The next level's reward, drawn (3.0, Home; 6.10): the flair item itself, or the level's key when there is none. */
 function rewardTileHtml(reward, n) {
-  const kind = reward && reward.kind;
-  if (kind === 'theme' || kind === 'themes_start' || kind === 'crimson') return '<span class="level-tile level-tile-theme" aria-hidden="true"><i></i></span>';
-  if (kind === 'keycap_skin') return '<span class="level-tile level-tile-key" aria-hidden="true">Alt</span>';
-  return `<span class="level-tile level-tile-key" aria-hidden="true">${esc(n)}</span>`;
+  return (reward && flairTileHtml(reward)) || `<span class="level-tile level-tile-key" aria-hidden="true">${esc(n)}</span>`;
 }
 
 export function mountHomePage(root, ctx = {}) {
@@ -135,9 +157,11 @@ export function mountHomePage(root, ctx = {}) {
   const daily = clean[0] ? { played: true, clean: true, secs: clean[0].secs, place: null, of: null } : played.length ? { played: true, clean: false } : { played: false };
   const dailyDrill = DRILLS.find(d => d.id === dailyFor(day).drillId) || null;
   const queue = dueToday(schedule.stateOrBackfill(all, liveLessons()), moduleCtx(all));
-  const today = todayModel({ queue, daily, dailyTitle: dailyDrill ? dailyDrill.title : '', completedLessons: completedN, dailyXp: xpForEvent({ kind: 'daily', day }, []) });
+  let quests = null; try { quests = questBoard(); } catch (e) { /* no quests this visit */ }
+  const today = todayModel({ queue, daily, dailyTitle: dailyDrill ? dailyDrill.title : '', completedLessons: completedN, dailyXp: xpForEvent({ kind: 'daily', day }, []), quests, weekOpen: !!(ctx.query && ctx.query.week === '1') });
   const week = weekCells(game.days || [], day); const letters = weekLetters();
-  const todayRows = today.rows.map(r => `<tr class="row-today${r.done ? ' done' : ''}" data-cursor tabindex="-1" data-href="${esc(r.href)}"><td class="n"><span class="tick${r.done ? ' on' : ''}" aria-hidden="true"></span></td><td>${modeMarkHtml(r.mode)}<span class="row-name">${esc(r.title)}</span>${r.line ? `<span class="row-sub">${esc(r.line)}</span>` : r.sub ? `<span class="row-sub">${esc(r.sub)}</span>` : ''}</td><td class="num len">${esc(r.length)}</td><td class="num xp">${r.xp ? esc(t('home_xp_plus', { n: r.xp })) : r.done ? esc(t('status_done')) : ''}</td></tr>`).join('');
+  const rowCls = r => ['row-today', r.done ? 'done' : '', r.quest ? 'row-quest' : '', r.sub === true ? 'row-week-q' : '', r.bonus ? 'row-bonus m-quests-done' : '', r.week ? 'row-week' : ''].filter(Boolean).join(' ');
+  const todayRows = today.rows.map(r => `<tr class="${rowCls(r)}" data-cursor tabindex="-1" data-href="${esc(r.href)}"${r.week ? ` aria-expanded="${r.open ? 'true' : 'false'}"` : ''}><td class="n">${r.week ? `<span class="week-caret${r.open ? ' open' : ''}" aria-hidden="true"></span>` : `<span class="tick${r.done ? ' on' : ''}" aria-hidden="true"></span>`}</td><td>${r.bonus || r.week ? '' : modeMarkHtml(r.mode)}<span class="row-name">${esc(r.title)}</span>${r.line ? `<span class="row-sub">${esc(r.line)}</span>` : typeof r.sub === 'string' ? `<span class="row-sub">${esc(r.sub)}</span>` : ''}${r.bar != null ? barHtml(r.bar, 'bar-quest') : ''}</td><td class="num len">${esc(r.length)}</td><td class="num xp">${r.xpText ? esc(r.xpText) : r.xp ? esc(t('home_xp_plus', { n: r.xp })) : r.done ? esc(t('status_done')) : ''}</td></tr>`).join('');
   const todayPanel = panelHtml({ heading: esc(t('home_today')), facts: esc(t('home_today_done', { d: today.done, n: today.of })), body: `${today.fresh ? `<p class="panel-line">${esc(t('quests_fresh'))}</p>` : ''}<table class="tbl tbl-today"><tbody>${todayRows}</tbody></table>
       <div class="streak-row"><span class="week" aria-hidden="true">${week.cells.map((on, i) => `<i class="${on ? 'on' : ''}${i === week.today ? ' today' : ''}">${esc(letters[i] || '')}</i>`).join('')}</span><span class="panel-facts">${game.streakDays ? esc(t('home_streak_day', { n: game.streakDays })) : ''}</span></div>`, cls: 'home-today' });
 

@@ -145,7 +145,7 @@ test('first run (3.0, M92): two questions then one story card, Wolf\'s line, Ame
   assert.deepEqual(QUESTIONS.map(q => q.key), ['platform', 'experience']);
   assert.deepEqual(QUESTIONS[1].options.map(o => o.v), ['new', 'sometimes', 'daily']);
   // the coach marks: one sentence each on Home, Learn, Practice, Leaderboards, Reference, the level and the streak (3.0 defaults)
-  assert.deepEqual(COACH_MARKS.map(m => m.key), ['home', 'learn', 'practice', 'leaderboard', 'reference', 'level', 'streak', 'pro', 'account']);
+  assert.deepEqual(COACH_MARKS.map(m => m.key), ['home', 'home_level', 'home_today', 'learn', 'practice', 'leaderboard', 'reference', 'level', 'streak', 'pro', 'account']);
   for (const m of COACH_MARKS) assert.equal((m.fallback.match(/[.!?](\s|$)/g) || []).length, 1, 'one sentence: ' + m.fallback);
   assert.equal(coachMarksDue({ firstRunDone: true, coachMarksDone: false }, 1), true);
   assert.equal(coachMarksDue({ firstRunDone: true, coachMarksDone: false }, 0), false, 'not before the first lesson');

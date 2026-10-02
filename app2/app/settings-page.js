@@ -120,7 +120,7 @@ export function mountSettingsPage(root, ctx = {}) {
   render();
   // the theme locks come from the lazy stats stack; the tiles redraw once they arrive
   Promise.all([import('./stats.js'), import('./cosmetics.js'), import('../ui/badges.js')]).then(([st, c, b]) => {
-    try { const g = st.gameCtx(); const earned = b.earnedSet ? b.earnedSet(g) : new Set(); lockOf = key => c.themeLock(key, { level: g.level, earned, rankIndex: g.rankIndex || 0 }); render(); } catch (e) { /* locks stay open */ }
+    try { const g = st.gameCtx(); const earned = b.earnedSet ? b.earnedSet(g) : new Set(); lockOf = key => c.themeLock(key, { level: g.level, earned, rolled: g.rolled }); render(); } catch (e) { /* locks stay open */ }
   }).catch(() => { /* locks stay open */ });
   return { destroy() { el.removeEventListener('click', onClick); el.removeEventListener('change', onChange); el.remove(); } };
 }

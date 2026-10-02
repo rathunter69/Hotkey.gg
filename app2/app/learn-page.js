@@ -20,7 +20,7 @@ import { sheetPreviewHtml, previewOfLesson } from '../ui/components/sheet-previe
 import { routeKeys, keysRowHtml, chapterCardsHtml, moduleRowHtml, continueHtml } from '../ui/components/path.js';
 import { ACHIEVEMENTS } from '../content/achievements.js';
 import { saveNudgeHtml, wireSaveNudge } from '../ui/components/nudge.js';
-import { GLYPHS, renderPixel, RARITY_COLOURS } from '../ui/pixel.js';
+import { badgeArt } from '../ui/badges.js';
 
 const t = (key, vars) => fill(siteCopy(key, key), vars);
 
@@ -213,9 +213,9 @@ export function modulePreview(chapter, moduleId, delivered) {
   return previewOfLesson(delivered ? last : first, delivered ? 'after' : 'before');
 }
 
-/** The badge a module pays out when it is finished ("Finish Format" is House Style), or null. */
-export function moduleBadge(title) {
-  return ACHIEVEMENTS.find(a => a.desc === 'Finish ' + title) || null;
+/** The badge a module pays out when it is finished (the def names its module), or null. */
+export function moduleBadge(moduleId) {
+  return ACHIEVEMENTS.find(a => a.module === moduleId) || null;
 }
 
 /** The next lesson the learner can open, with where it sits; null when none is left. Pure over the store's shape. */
@@ -303,9 +303,9 @@ export function mountLearnPage(root, ctx = {}) {
       const pageName = (copy && copy.page_name) || open.title;
       const beat = copy && copy.story_beat ? String(copy.story_beat).split('||')[0].trim() : '';
       const modKeys = [...new Set(open.lessons.flatMap(l => { const x = LESSONS.find(y => y.id === l.id); return routeKeys(x && x.solution, 4); }))];
-      const badge = moduleBadge(open.title);
+      const badge = moduleBadge(open.id);
       const earned = open.status === 'complete';
-      const reward = badge ? `<div class="learn-reward${earned ? ' on' : ''}">${renderPixel(GLYPHS[badge.glyph] || GLYPHS.star, { b: RARITY_COLOURS[badge.rarity] || RARITY_COLOURS.common }, earned ? { size: 40 } : { size: 40, mono: 'var(--line)' })}<span><span class="row-name">${esc(badge.name)}</span><span class="row-sub">${esc(earned ? t('learn_reward_earned') : t('learn_reward', { module: open.title }))}</span></span></div>` : '';
+      const reward = badge ? `<div class="learn-reward${earned ? ' on' : ''}">${badgeArt(badge, { done: earned, size: 40 })}<span><span class="row-name">${esc(badge.name)}</span><span class="row-sub">${esc(earned ? t('learn_reward_earned') : t('learn_reward', { module: open.title }))}</span></span></div>` : '';
       side = panelHtml({ heading: esc(open.title), facts: esc(t('learn_keys_n', { n: modKeys.length })), body: `${beat ? `<p class="panel-line learn-beat">${esc(beat)}</p>` : ''}<div class="learn-keys">${keysRowHtml(modKeys, { max: 14 })}</div><p class="panel-line ink-2">${esc(delivered ? t('learn_page_built', { page: pageName }) : t('learn_page_fill'))}</p>${delivered && open.lessons.some(l => l.kind === 'challenge') ? `<a class="panel-link" href="#/lesson/${esc(open.lessons.find(l => l.kind === 'challenge').id)}?seed=new">${esc(t('learn_replay'))}</a>` : ''}${reward}`, cls: 'learn-side', stretch: true });
     } else if (locked) side = paywall;
     // before Chapter 1 ends (Wolf, 2026-10-02, point 25): past its halfway module, a guest is offered the account that keeps it

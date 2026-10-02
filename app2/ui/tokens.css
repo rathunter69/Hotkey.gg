@@ -94,6 +94,12 @@
   --d-count:900ms; --d-result-tier:1000ms; --d-result-best:1450ms; --d-result-track:1500ms; --d-result-board:1900ms;
   --d-result-xp:2300ms; --d-result-level:3200ms; --d-result-quest:3900ms;
 
+  /* ---------- flair (6.10; M60): the keycap, the ghost, the frame; html[data-keycap|cursor|frame] below switch them ---------- */
+  --key-face:var(--sheet); --key-ink:var(--ink); --key-rim:var(--edge);   /* a keycap: its face, its legend, its edge */
+  --ghost:var(--accent);   /* the PB ghost's outline */
+  --frame:var(--line); --frame-w:0px;   /* the profile's frame */
+  --d-trail:420ms;   /* the ghost trail: the ghost eases behind the route */
+
   /* ---------- the one shadow, for floating things only ---------- */
   --shadow-float:0 14px 36px -14px rgba(0,0,0,.35);
   --scrim:color-mix(in srgb, var(--rail) 55%, transparent);   /* behind a pop-out over the product (the first run) */
@@ -118,3 +124,20 @@ body[data-mode="clock"]{--mode:var(--clock); --mode-ink:var(--clock-ink); --mode
 
 /* a dark theme: the workspace's Excel chrome takes the theme's own ground and ink (Excel's dark mode does the same) */
 html[data-dark="1"]{--xl-green:var(--learn); --xl-green-ink:var(--learn-ink); --xl-bar:var(--chrome); --xl-body:var(--sheet); --xl-line:var(--line); --xl-hover:var(--paper); --xl-press:var(--learn-tint); --xl-ink:var(--ink); --xl-ink-2:var(--ink-2); --xl-hdr:var(--paper); --xl-hdr-ink:var(--learn-ink)}
+
+/* flair (6.10; M60): keycap skins, ghost colors and frames, each one set of tokens; every legend passes 4.5 to 1 on its face */
+html[data-keycap="slate"], .kc-skin-slate{--key-face:#3B4652; --key-ink:#FFFFFF; --key-rim:#1F262E}
+html[data-keycap="amber"], .kc-skin-amber{--key-face:#F6D27A; --key-ink:#3A2A00; --key-rim:#A77A12}
+html[data-keycap="ink"], .kc-skin-ink{--key-face:#17201B; --key-ink:#FFFFFF; --key-rim:#000000}
+html[data-keycap="mint"], .kc-skin-mint{--key-face:#D9F2E4; --key-ink:#0B4A2A; --key-rim:#3E9A6A}
+html[data-keycap="paper"], .kc-skin-paper{--key-face:#FBF7EC; --key-ink:#2B2418; --key-rim:#B8A98A}
+html[data-keycap="gold"], .kc-skin-gold{--key-face:#E9C46A; --key-ink:#2E2200; --key-rim:#8A6A10}
+html[data-keycap="crimson"], .kc-skin-crimson{--key-face:#8E1B2A; --key-ink:#FFFFFF; --key-rim:#4D0C15}
+html[data-cursor="blue"], .cur-blue{--ghost:#1F4FD1}
+html[data-cursor="violet"], .cur-violet{--ghost:#6B3FC4}
+html[data-cursor="amber"], .cur-amber{--ghost:#F0A81C}
+html[data-cursor="red"], .cur-red{--ghost:#C23B2A}
+html[data-cursor="green"], .cur-green{--ghost:#0F7B45}
+html[data-cursor="ink"], .cur-ink{--ghost:var(--ink)}
+html[data-frame="ledger"], .frame-ledger{--frame:var(--learn); --frame-w:3px}
+html[data-frame="top"], .frame-top{--frame:#8E1B2A; --frame-w:4px}

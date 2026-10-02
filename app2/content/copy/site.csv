@@ -118,7 +118,6 @@ level_reward_crimson,Crimson and the Top Bucket frame
 level_reward_profile_frame,The profile frame
 level_reward_ghost_trail,The ghost trail
 level_reward_keycap_skin,A keycap skin
-level_reward_sound_set,A sound set
 level_reward_board_flair,Board flair
 level_reward_cursor_color,A cursor color
 level_reward_panel_style,A panel style
@@ -690,7 +689,7 @@ learn_reward,Finish {module} to earn it
 learn_reward_earned,Earned
 practice_chapter_coming,Chapter {n} is being written. Its drills land here as its lessons do.
 learn_keys_n,{n} keys
-home_xp_why,"Lessons, drills and the Daily pay XP. Every level opens a reward."
+home_xp_why,"Lessons, drills, the Daily and quests pay XP. Every level opens a piece of flair."
 save_title,Save your progress
 save_line,Your progress lives in this browser for now. A free account keeps it on any device and puts your times on the boards.
 save_go,Make a free account
@@ -887,3 +886,203 @@ quest_bonus_xp,+{xp} XP
 quest_week_line,This week: {d} of 3
 quest_roll,{reward} is yours.
 quest_new_at,"New quests at midnight UTC, with the Daily."
+ach_first-open,Clocked In
+ach_first-open_desc,Open your first lesson
+ach_account,On the Roster
+ach_account_desc,Make a free account
+ach_first-lesson,First Steps
+ach_first-lesson_desc,Complete your first lesson
+ach_scenic-route,Scenic Route
+ach_scenic-route_desc,Finish a drill with twice the keys its route needs
+ach_mod-setup,Through the Door
+ach_mod-setup_desc,Finish Open and set up
+ach_mod-move,Navigator
+ach_mod-move_desc,Finish Move and select
+ach_mod-edit,Editor
+ach_mod-edit_desc,"Finish Enter, edit, copy and fill"
+ach_mod-structure,Structural
+ach_mod-structure_desc,Finish Structure
+ach_mod-format,By the Book
+ach_mod-format_desc,Finish Format
+ach_mod-formulas,Calculator
+ach_mod-formulas_desc,Finish Formulas
+ach_mod-present,Signed Off
+ach_mod-present_desc,Finish Present and audit
+ach_ch1-project,Report Builder
+ach_ch1-project_desc,Complete the Chapter 1 project
+ach_ch1-verified,Verified: Foundations
+ach_ch1-verified_desc,Pass the Chapter 1 assessment
+ach_ch2-verified,Verified: Formatting
+ach_ch2-verified_desc,Pass the Chapter 2 assessment
+ach_ch3-verified,Verified: Formulas
+ach_ch3-verified_desc,Pass the Chapter 3 assessment
+ach_ch4-verified,Verified: Data and Lookups
+ach_ch4-verified_desc,Pass the Chapter 4 assessment
+ach_ch5-verified,Verified: Finance and Accounting
+ach_ch5-verified_desc,Pass the Chapter 5 assessment
+ach_ch6-verified,Verified: Valuation
+ach_ch6-verified_desc,Pass the Chapter 6 assessment
+ach_ch1-testout,Tested Out
+ach_ch1-testout_desc,Pass the Chapter 1 assessment without finishing the lessons
+ach_ch1-complete,Foundations Poured
+ach_ch1-complete_desc,Complete every Chapter 1 lesson
+ach_ch2-complete,Book Ready
+ach_ch2-complete_desc,Complete Chapter 2
+ach_ch3-complete,Ties Out
+ach_ch3-complete_desc,Complete Chapter 3
+ach_ch4-complete,Data Room
+ach_ch4-complete_desc,Complete Chapter 4
+ach_ch5-complete,Three Statements
+ach_ch5-complete_desc,Complete Chapter 5
+ach_ch6-complete,The Bid
+ach_ch6-complete_desc,Complete Chapter 6
+ach_program,Certified
+ach_program_desc,All six chapters Verified
+ach_clean-1,Clean Sheet
+ach_clean-1_desc,Finish a lesson with no mouse and no help
+ach_clean-10,Hands Off
+ach_clean-10_desc,Ten clean lessons
+ach_clean-module,Untouched
+ach_clean-module_desc,"A whole module clean, challenge included"
+ach_timed-1,Against the Clock
+ach_timed-1_desc,Finish a timed run
+ach_drill-1,On the Range
+ach_drill-1_desc,Attempt a drill
+ach_drill-tour,Tourist
+ach_drill-tour_desc,Attempt every drill in a chapter
+ach_pb-1,On the Board
+ach_pb-1_desc,Set your first personal best
+ach_pb-all,Collector
+ach_pb-all_desc,A personal best on every drill in a chapter
+ach_keys-ch1,Keyring
+ach_keys-ch1_desc,Every key in Chapter 1 collected on the Reference page
+ach_keys-ch2,Keyring
+ach_keys-ch2_desc,Every key in Chapter 2 collected on the Reference page
+ach_keys-ch3,Keyring
+ach_keys-ch3_desc,Every key in Chapter 3 collected on the Reference page
+ach_keys-ch4,Keyring
+ach_keys-ch4_desc,Every key in Chapter 4 collected on the Reference page
+ach_keys-ch5,Keyring
+ach_keys-ch5_desc,Every key in Chapter 5 collected on the Reference page
+ach_keys-ch6,Keyring
+ach_keys-ch6_desc,Every key in Chapter 6 collected on the Reference page
+ach_tier-pass,Cleared
+ach_tier-pass_desc,Beat a Pass clock clean
+ach_tier-pro,Expert
+ach_tier-pro_desc,Beat an Expert clock clean
+ach_tier-legend,Legendary
+ach_tier-legend_desc,Beat a Legendary clock clean
+ach_legend-3,Heating Up
+ach_legend-3_desc,Legendary on three different drills
+ach_legend-all,Untouchable
+ach_legend-all_desc,Legendary on every drill in a chapter
+ach_daily-1,Showed Up
+ach_daily-1_desc,Finish a Daily
+ach_daily-7,Regular
+ach_daily-7_desc,Seven Dailies on seven days
+ach_daily-30,Fixture
+ach_daily-30_desc,Thirty Dailies on thirty days
+ach_streak-7,Momentum
+ach_streak-7_desc,Practice seven days in a row
+ach_no-waste,No Wasted Keys
+ach_no-waste_desc,Finish a drill clean at the optimal keystroke count
+ach_econ-10,Economist
+ach_econ-10_desc,Ten clean runs at or under optimal keys
+ach_rapid-1,Quick Draw
+ach_rapid-1_desc,Finish a rapid-fire round
+ach_rapid-500,Live Wire
+ach_rapid-500_desc,Reach Combo 20 in one rapid-fire round
+ach_combo-10,In the Zone
+ach_combo-10_desc,A ten-hit rapid-fire combo
+ach_rapid-perfect,Perfect Round
+ach_rapid-perfect_desc,A full rapid-fire round with no misses
+ach_quest-1,First Quest
+ach_quest-1_desc,Complete a quest
+ach_quest-25,Questing
+ach_quest-25_desc,Twenty-five quests
+ach_quest-week,Clean Sweep
+ach_quest-week_desc,Every quest in one week
+ach_runs-100,Volume Business
+ach_runs-100_desc,One hundred recorded runs
+ach_level-5,Warming Up
+ach_level-5_desc,Reach level 5
+ach_level-10,Committed
+ach_level-10_desc,Reach level 10
+ach_level-20,Seasoned
+ach_level-20_desc,Reach level 20
+ach_level-30,Top Bucket
+ach_level-30_desc,Reach level 30
+ach_blink,Blink
+ach_blink_desc,Finish a drill clean ten seconds or more under its Legendary par
+ach_night-shift,Goblin Hours
+ach_night-shift_desc,A clean run between midnight and 4am
+ach_early-bird,First One In
+ach_early-bird_desc,A clean run between 5 and 7am
+ach_weekend,Weekend Warrior
+ach_weekend_desc,A clean run on a Saturday or Sunday
+ach_old-habits,Old Habits
+ach_old-habits_desc,Ruin a timed run with the mouse
+flair_themes-start,"Workbook, High Contrast and Graphite"
+flair_kc-slate,The slate keycaps
+flair_theme-newsprint,The Newsprint theme
+flair_cur-blue,The blue ghost
+flair_panel-ruled,The ruled panel header
+flair_theme-terminal,The Terminal theme
+flair_board-key,The keycap board mark
+flair_kc-amber,The amber keycaps
+flair_kc-ink,The ink keycaps
+flair_frame-ledger,The ledger profile frame
+flair_cur-violet,The violet ghost
+flair_panel-tape,The adding machine header
+flair_board-bolt,The bolt board mark
+flair_kc-mint,The mint keycaps
+flair_board-flame,The flame board mark
+flair_cur-amber,The amber ghost
+flair_panel-stamp,The stamped panel header
+flair_cur-red,The red pen ghost
+flair_kc-paper,The paper keycaps
+flair_trail,The ghost trail
+flair_panel-double,The double rule header
+flair_board-gem,The gem board mark
+flair_cur-green,The green ghost
+flair_kc-gold,The gold keycaps
+flair_panel-ticker,The ticker panel header
+flair_board-crown,The crown board mark
+flair_board-clock,The stopwatch board mark
+flair_kc-crimson,The crimson keycaps
+flair_cur-ink,The ink ghost
+flair_top-bucket,"Crimson, with the Top Bucket frame"
+ach_shelf_label,Achievements: {n} of {m} earned
+ach_banner,Achievement
+orientation_home_level,"Lessons, drills, the Daily and quests all pay XP, and every level opens a piece of flair, drawn here."
+orientation_home_today,"Three quests a day and three a week each pay XP, with a bonus when all three land."
+panel_equipped,Equipped
+profile_xp_head,Where XP comes from
+profile_xp_line,"XP counts how much you practice, and the boards count how fast you are."
+col_run,Run
+col_xp,XP
+xp_row_lesson,"A lesson, the first time"
+xp_val_lesson,"{n}, and {c} more if clean"
+xp_row_challenge,A challenge passed
+xp_val_challenge,"{n}, then {e} at Expert and {l} at Legendary"
+xp_row_drill,"A drill, the first clean pass"
+xp_val_drill,"{n}, then {r} a repeat"
+xp_row_daily,The Daily
+xp_val_n,{n}
+xp_row_rapid,A rapid-fire round
+xp_row_quest_daily,A daily quest
+xp_val_quest,"{n}, and {b} for all three"
+xp_row_quest_weekly,A weekly quest
+xp_val_quest_weekly,"{n}, and {b} with a reward for all three"
+xp_row_ach,An achievement
+xp_val_ach,"Nothing, the shelf is its own reward"
+flair_head,Flair
+flair_line,"Every level opens a piece, and a weekly clear rolls one you haven't got. Nothing here is ever sold."
+flair_plain,Plain
+flair_at_level,Level {n}
+flair_slot_keycap,Keycaps
+flair_slot_cursor,Ghost
+flair_slot_trail,Ghost trail
+flair_slot_panel,Result panel
+flair_slot_board,Board mark
+flair_slot_frame,Profile frame

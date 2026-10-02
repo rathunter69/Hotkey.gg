@@ -28,6 +28,9 @@ import { settings } from './settings.js';
 import { fitZoomFor } from './zoom.js';
 import { itemNumber } from './numbering.js';
 import { titleAt, rewardAt } from '../content/levels.js';
+import { recordRun } from './quest-loop.js';
+import { equipReward } from './cosmetics.js';
+import { shortcutsUsed } from './runner.js';
 import { siteCopy } from '../content/copy/apply.js';
 import { createChrome, confirmDialog, isExitKey, EXIT_KEY, sheetKeys, noteSheetKey, sheetKeysDelivered, canFullscreen, fullscreenKeys } from '../ui/components/chrome.js';
 import { createFocusVeil } from '../ui/components/focus-veil.js';
@@ -100,7 +103,7 @@ export function mountDrillPage(root, ctx = {}) {
   let run = null, sheetView = null, ribbonView = null, tabs = null, ghostEl = null;
   let phase = 'ready';           // 'ready' | 'run' | 'done'
   let checklist = null, showKeys = false, replay = null, tickH = null, busyOn = false;
-  let pbBefore = store.pb(drill.id), ghostTrace = store.trace(drill.id), lastAttempt = null;
+  let pbBefore = store.pb(drill.id), ghostTrace = store.trace(drill.id), lastAttempt = null, lastReward = null;
 
   /* ---------------- the run ---------------- */
   function mountRun() {
@@ -225,7 +228,8 @@ export function mountDrillPage(root, ctx = {}) {
   function levelUpRow(earned) {
     if (!earned || !(earned.levelTo > earned.levelFrom)) return null;
     const lv = earned.levelTo; const reward = rewardAt(lv);
-    return { level: lv, title: titleAt(lv), reward: reward ? reward.label : '', equip: !!reward && reward.kind !== 'themes_start' };
+    lastReward = reward;
+    return { level: lv, title: titleAt(lv), reward: reward ? reward.label : '', item: reward, equip: !!reward && reward.kind !== 'themes_start' };
   }
   function finish() {
     phase = 'done';
@@ -241,6 +245,8 @@ export function mountDrillPage(root, ctx = {}) {
     effects.clockStop();
     effects.finish(chrome.stage);
     if (newPb) effects.newPB(); else if (attempt.tier !== 'none') effects.parTier(attempt.tier);
+    // the quest loop (6.10): the run ticks its quests before the XP is read, so their XP lands in this result
+    const qr = recordRun({ kind: daily ? 'daily' : 'drill', ref: drill.id, clean: attempt.clean, tier: attempt.tier, pb: newPb, ghost: newPb && !!pbBefore, noWaste: attempt.clean && drill.optimalKeys > 0 && attempt.keys <= drill.optimalKeys, noMouse: !attempt.mouse, used: shortcutsUsed(run.session.keyLog) });
     busyOn = false; if (effects.setBusy) effects.setBusy(false);
     const earned = celebrate(effects, ctxBefore);
     const ctxAfter = gameCtx();
@@ -265,6 +271,7 @@ export function mountDrillPage(root, ctx = {}) {
       xp: gained ? { gained, pct: ctxAfter.levelInfo.pct } : null,
       board: ix >= 0 ? { title: daily ? siteCopy('panel_board_today', 'Today’s board') : siteCopy('panel_board', 'Your board'), place: ix + 1, of: board.length, move: null } : null,
       levelUp: levelUpRow(earned),
+      quests: qr.quests, bonus: qr.bonus,
       buttons,
     });
     focusStage();
@@ -274,7 +281,7 @@ export function mountDrillPage(root, ctx = {}) {
     if (act === 'again') { mountRun(); return; }
     if (act === 'all') { location.hash = '#/practice'; return; }
     if (act === 'board') { location.hash = '#/leaderboard'; return; }
-    if (act === 'equip') { location.hash = '#/account'; return; }
+    if (act === 'equip') { const g = gameCtx(); if (equipReward(lastReward, { level: g.level, rolled: g.rolled })) showToast(siteCopy('panel_equipped', 'Equipped')); return; }
     if (act === 'share' && lastAttempt) {
       const text = shareText(dayOf(), drill.title, lastAttempt.secs, lastAttempt.tier);
       try { navigator.clipboard.writeText(text).then(() => showToast(siteCopy('panel_result_copied', 'Result copied')), () => showToast(siteCopy('panel_copy_blocked', 'Couldn’t copy: the clipboard is blocked'))); }

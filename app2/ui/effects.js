@@ -21,6 +21,7 @@
 
 import { prefs } from '../app/prefs.js';
 import { siteCopy } from '../content/copy/apply.js';
+import { spriteSvg } from './sprites.js';
 
 /* ---------------- pure rules (unit-tested in tests/effects.test.js) ---------------- */
 
@@ -397,7 +398,8 @@ export function mountEffects(opts = {}) {
       const def = queued.shift();
       if (!def || busy) { if (def) queued.unshift(def); draining = false; return; }
       moment('achievement');
-      banner('<b>' + String((def && def.name) || 'Achievement') + '</b><span>' + String((def && def.desc) || '') + '</span>', 'fx-ach r-' + ((def && def.rarity) || 'common'));
+      const art = def && def.art ? spriteSvg(def.art, { size: 48, cls: 'fx-ach-art' }) : '';
+      banner(art + '<span class="fx-ach-words"><b>' + String((def && def.name) || siteCopy('ach_banner', 'Achievement')) + '</b><span>' + String((def && def.desc) || '') + '</span><i class="fx-ach-rar">' + siteCopy('rarity_' + ((def && def.rarity) || 'common'), '') + '</i></span>', 'fx-ach r-' + ((def && def.rarity) || 'common'));
       later(step, 1100);
     };
     step();
