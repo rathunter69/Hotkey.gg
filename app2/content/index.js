@@ -174,6 +174,7 @@ import ppe_and_depreciation from './lessons/ppe-and-depreciation.js';
 import debt_and_interest_circle from './lessons/debt-and-interest-circle.js';
 import tax_schedule from './lessons/tax-schedule.js';
 import challenge_schedules from './lessons/challenge-schedules.js';
+import is_from_schedules from './lessons/is-from-schedules.js';
 
 export const CHAPTERS = [
   {
@@ -308,6 +309,7 @@ export const CHAPTERS = [
     ],
     lessons: [
       revenue_build, cost_build, working_capital_schedule, ppe_and_depreciation, debt_and_interest_circle, tax_schedule, challenge_schedules,
+      is_from_schedules,
     ],
   },
 ];
