@@ -216,6 +216,9 @@ import keyboard_only_linking from './lessons/keyboard-only-linking.js';
 import challenge_model_speed from './lessons/challenge-model-speed.js';
 import ch5_project from './lessons/ch5-project.js';
 import ch5_assessment from './lessons/ch5-assessment.js';
+// Chapter 6 · Valuation (Run R6): 6.2 Precedent transactions, 6.3 LBO
+import deal_multiples_premiums from './lessons/deal-multiples-premiums.js';
+import sort_and_decide from './lessons/sort-and-decide.js';
 
 export const CHAPTERS = [
   {
@@ -356,6 +359,23 @@ export const CHAPTERS = [
       what_a_dcf_is, unlevered_free_cash_flow, wacc_block, terminal_value, discounting_mid_year, dcf_sensitivity, challenge_dcf,
       revenue_build_in_three, fill_and_format_block, keyboard_only_linking, challenge_model_speed,
       ch5_project, ch5_assessment,
+    ],
+  },
+  {
+    id: 'valuation',
+    title: 'Valuation',
+    access: 'paid',
+    blurb: 'Trading comps, precedent deals, the sponsor’s LBO, the three bids priced and the waterfall to each owner, on one page for the board, with every number traceable to the model.',
+    // Chapter 6's sections in order (script-ch6.md): the four modules and the closing project block.
+    sections: [
+      { name: 'Trading comps', blurb: 'Spreading a comp; calendarization and LTM; sorting the set, screening the outliers, the median; operating multiples; applying the range.' },
+      { name: 'Precedent transactions', blurb: 'Deal multiples and premiums; sorting by date and size and deciding what is comparable; applying the precedents range.' },
+      { name: 'LBO', blurb: 'Sources and uses; debt tranches and the cash sweep; sale-leasebacks; returns, IRR and MOIC; the returns bridge; what the sponsor can pay.' },
+      { name: 'The bids and the waterfall', blurb: 'Three bids side by side; from enterprise value to the owners’ proceeds; your stake; the football field and the board page.' },
+      { name: 'Project and assessment', blurb: 'The valuation summary for the board from fresh comps, deals and bids, then again on the clock.' },
+    ],
+    lessons: [
+      deal_multiples_premiums, sort_and_decide,
     ],
   },
 ];
