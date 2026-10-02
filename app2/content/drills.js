@@ -20,6 +20,14 @@ import ch5_sweep from './drills/ch5-sweep.js';
 import ch5_checks from './drills/ch5-checks.js';
 import ch5_revenue_build from './drills/ch5-revenue-build.js';
 import puzzle_ch5 from './drills/puzzle-ch5.js';
+import ch6_spread_a_comp from './drills/ch6-spread-a-comp.js';
+import ch6_median_and_range from './drills/ch6-median-and-range.js';
+import ch6_sources_and_uses from './drills/ch6-sources-and-uses.js';
+import ch6_irr_sprint from './drills/ch6-irr-sprint.js';
+import ch6_waterfall from './drills/ch6-waterfall.js';
+import ch6_football_field from './drills/ch6-football-field.js';
+import ch6_paper_lbo from './drills/ch6-paper-lbo.js';
+import puzzle_ch6 from './drills/puzzle-ch6.js';
 import { LESSONS } from './index.js';
 
 /**
@@ -47,6 +55,15 @@ export const DRILLS = [
   ch5_checks,
   ch5_revenue_build,
   puzzle_ch5,
+  // Chapter 6 (screenplay 6.2): the planned set on the valuation pack, the benchmark and the puzzle
+  ch6_spread_a_comp,
+  ch6_median_and_range,
+  ch6_sources_and_uses,
+  ch6_irr_sprint,
+  ch6_waterfall,
+  ch6_football_field,
+  ch6_paper_lbo,
+  puzzle_ch6,
 ];
 
 /**

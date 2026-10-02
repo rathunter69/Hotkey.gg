@@ -66,7 +66,7 @@ test("Chapter 1's eleven drills: 6.1's set and order, eight to twenty goals, par
     assert.ok(d.optimalKeys / d.route <= 4, `${id}: ${d.optimalKeys} keys in a ${d.route} s route is faster than a fast hand`);
     assert.equal(d.access, 'free', `${id}: Chapter 1 is free`);
   }
-  assert.deepEqual(BENCHMARKS.filter(d => d.kind !== 'challenge').map(d => d.id), ['weekly-sales-report', 'ch5-revenue-build'], 'the weekly report and Chapter 5\'s revenue build are the benchmarks');
+  assert.deepEqual(BENCHMARKS.filter(d => d.kind !== 'challenge').map(d => d.id), ['weekly-sales-report', 'ch5-revenue-build', 'ch6-paper-lbo'], 'the weekly report, Chapter 5\'s revenue build and Chapter 6\'s paper LBO are the benchmarks');
   for (const [id] of CH1) assert.ok(DAILY_POOL.includes(id), `${id} is in the Daily's pool`);
 });
 

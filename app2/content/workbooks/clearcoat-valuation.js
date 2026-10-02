@@ -833,6 +833,8 @@ const B63C = lazy(() => {
   stripHeader(s, 'LBO', rows, 'hurdles'); delete s.sheets[0].condFmt;
   return s;
 });
+/** The paper LBO finished: what 6.3.C's route leaves (the Chapter 6 benchmark drill grades on it). */
+const B63CD = lazy(() => ({ sheets: [clone(PAPER_PAGE().sheet)], settings: { ...clone(M.stateOf('DONE').settings) } }));
 
 // module 6.4: the bids and the waterfall
 const B644 = derive(DONE, s => summaryLabels(s));
@@ -860,7 +862,7 @@ const B6AD = freshState(ALT2_PACK, () => {});
 const BUILDERS = {
   B611, B612, B613, B614, B615, B61C,
   B621, B622, B623, B62C,
-  B631, B632, B633, B634, B635, B636, B63C,
+  B631, B632, B633, B634, B635, B636, B63C, B63CD,
   B641, B642, B643, B644, B64C,
   B6P, B6PD, B6A, B6AD, DONE,
 };
@@ -872,7 +874,7 @@ export const STATE_ORDER = Object.keys(BUILDERS);
 export const STATE_LESSONS = {
   B611: '6.1.1', B612: '6.1.2', B613: '6.1.3', B614: '6.1.4', B615: '6.1.5', B61C: '6.1.C',
   B621: '6.2.1', B622: '6.2.2', B623: '6.2.3', B62C: '6.2.C',
-  B631: '6.3.1', B632: '6.3.2', B633: '6.3.3', B634: '6.3.4', B635: '6.3.5', B636: '6.3.6', B63C: '6.3.C',
+  B631: '6.3.1', B632: '6.3.2', B633: '6.3.3', B634: '6.3.4', B635: '6.3.5', B636: '6.3.6', B63C: '6.3.C', B63CD: 'after 6.3.C',
   B641: '6.4.1', B642: '6.4.2', B643: '6.4.3', B644: '6.4.4', B64C: '6.4.C',
   B6P: '6.P', B6PD: 'after 6.P', B6A: '6.A', B6AD: 'after 6.A', DONE: 'the finished pack',
 };
