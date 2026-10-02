@@ -8,8 +8,8 @@ export const COPY = {
    "module": "open-and-set-up",
    "order": "1.1.1",
    "title": "The workbook the managers sent",
-   "brief": "This is the Austin cluster’s weekly workbook exactly as ops sent it: five sites, two weeks of daily wash counts on the Raw tab, and the leftovers. First, learn to move: the arrow keys go one cell at a time, Ctrl and an arrow jumps to the edge of the data, and Shift selects on the way. Then get the file in order (rename the Sheet2 tab, delete last week’s export, and add a Report sheet at the front) because the tab names you set now are the ones every formula will carry. The key is `Ctrl+↓`.",
-   "closing": "Ctrl and an arrow jumps to the edge of the data; add Shift and it selects on the way. Those two moves are most of what \"fast in Excel\" means, and you’ll use them hundreds of times a week. || The workbook is set up: the tabs are named and in order, the stale data is gone and the Report page sits in front. Once the numbers are clean it goes to the CFO for approval and into the VDR, the virtual data room every buyer will read.",
+   "brief": "This is the Austin cluster’s weekly workbook exactly as ops sent it: five sites, two weeks of daily wash counts on the Raw tab, and the leftovers. First, learn to move: the arrow keys go one cell at a time, and Ctrl and an arrow jumps to the edge of the data. Then use those jumps to read each tab before you decide what happens to it: rename the one that holds the inputs, delete last week’s broken export, and add a Report sheet at the front. The tab names you set now are the ones every formula will carry. The key is `Ctrl+↓`.",
+   "closing": "Ctrl and an arrow jumps to the edge of the data, and where it lands tells you something: sixty rows of feed, a sheet of inputs, an export that ends in #N/A. That jump is most of what \"fast in Excel\" means, and you’ll use it hundreds of times a week. || The workbook is set up: the tabs are named and in order, the stale data is gone and the Report page sits in front. Once the numbers are clean it goes to the CFO for approval and into the VDR, the virtual data room every buyer will read.",
    "wow": "Five presses or one. Ctrl and an arrow gets you there.",
    "convention_line": "Name the tabs and put the output page first: every formula carries the names you set now.",
    "mac_note": "",
@@ -32,8 +32,8 @@ export const COPY = {
    "module": "open-and-set-up",
    "order": "1.1.3",
    "title": "The Ribbon by keyboard",
-   "brief": "The Ribbon is the open secret of Excel power users, and the reason a mouse is taboo at elite firms. Unlike a normal shortcut, a Ribbon hotkey runs in sequence: press Alt, and every tab and command shows a letter; press the letters, and the command runs. The letters stay on screen to guide you, and with repetition you’ll type the sequence without looking. Watch it once, then walk it yourself, and finish by hiding the gridlines on Report. The key is `Alt`.",
-   "closing": "Every tab and button on the Ribbon has a letter, and Esc backs out one level at a time. It’s the same on every copy of Excel, so there’s nothing to memorize except the handful of hotkeys you use every day. || Report’s gridlines are off, which is what most people do to a page someone else reads, though they keep them on while they work. It’s a matter of preference, and Alt W V G flips them either way.",
+   "brief": "The Ribbon is the open secret of Excel power users, and the reason a mouse is taboo at elite firms. Unlike a normal shortcut, a Ribbon hotkey runs in sequence: press Alt, and every tab and command shows a letter; press the letters, and the command runs. The letters stay on screen to guide you, and with repetition you’ll type the sequence without looking. Walk it once, then put it to work: hide the gridlines on Report and make two of the inputs read the way a reader expects. The key is `Alt`.",
+   "closing": "Every tab and button on the Ribbon has a letter, and Esc backs out one level at a time. It’s the same on every copy of Excel, so there’s nothing to memorize except the handful of hotkeys you use every day, and Ctrl+1 for the dialog behind most of them. || Report’s gridlines are off, which is what most people do to a page someone else reads, though they keep them on while they work. On Inputs, 9,000 washes and a 2.50% fee rate now read at a glance; the rate has one decimal more than it needs, and the next lesson trims it.",
    "wow": "Alt, then the letters. Every command in Excel is reachable without the mouse.",
    "convention_line": "Gridlines off on a page someone reads: borders carry the structure.",
    "mac_note": "On a Mac, press and release ⌥ Option to show the letters (Excel for Mac in Microsoft 365). A few commands have no letter there; the ⌘ shortcut or the mouse fills the gap. In System Settings › Keyboard, turn on \"Use F1, F2, etc. keys as standard function keys\" so F2, F4 and F9 work without holding fn.",
@@ -44,8 +44,8 @@ export const COPY = {
    "module": "open-and-set-up",
    "order": "1.1.4",
    "title": "Set Excel up like an analyst",
-   "brief": "Let’s make sure you have your settings configured like a pro. Calculation stays on Automatic, so every formula updates when a cell changes; iterative calculation goes on so a model that loops on purpose can settle; Enter is set to stay in the cell you typed in. And know F9: when a big model is switched to Manual to stay fast, nothing recalculates until you press it. Then we’ll put the commands you use most (font color, fill color, borders, decimals) on the Quick Access Toolbar, the row just under the Ribbon, so Alt and a number runs any of them. The key is `Alt F T`.",
-   "closing": "Calculation is on Automatic, iterative calculation is on, Enter stays put, and your four most-used formatting commands sit on the Quick Access Toolbar after Save, Undo and Redo: Alt+4 through Alt+7 here, and whatever numbers Alt shows on your toolbar. That’s the setup every analyst does once. || Top-bucket tip: a full desk toolbar runs to eight or nine (font color, fill color, borders, increase and decrease decimal, paste values, freeze panes, group and ungroup), and most people delete Save, Undo and Redo from it, since Ctrl+S, Ctrl+Z and Ctrl+Y already exist, so the numbers 1 to 9 are all formatting. || Best practice: two more settings on a new install, both in Excel Options (Alt, F, T). On General, switch off the Start screen so Excel opens on a blank workbook; under Accessibility, switch off \"Provide feedback with animation\" so the cursor stops gliding (older builds: Advanced, \"Disable hardware graphics acceleration\").",
+   "brief": "Let’s make sure you have your settings configured like a pro. Calculation stays on Automatic, so every formula updates when a cell changes, and F9 recalculates by hand on a big model switched to Manual; iterative calculation goes on so a model that loops on purpose can settle; Enter is set to stay in the cell you typed in. Then we’ll put the commands you use most (font color, fill color, borders, decimals) on the Quick Access Toolbar, the row just under the Ribbon, and run one on the fee rate from last lesson. The key is `Alt F T`.",
+   "closing": "Calculation is on Automatic, iterative calculation is on, Enter stays put, and your four most-used formatting commands sit on the Quick Access Toolbar after Save, Undo and Redo: Alt+4 through Alt+7 here, and whatever numbers Alt shows on your toolbar. The fee rate on Inputs reads 2.5%, trimmed in two keys. That’s the setup every analyst does once. || Top-bucket tip: a full desk toolbar runs to eight or nine (font color, fill color, borders, increase and decrease decimal, paste values, freeze panes, group and ungroup), and most people delete Save, Undo and Redo from it, since Ctrl+S, Ctrl+Z and Ctrl+Y already exist, so the numbers 1 to 9 are all formatting. || Best practice: two more settings on a new install, both in Excel Options (Alt, F, T). On General, switch off the Start screen so Excel opens on a blank workbook; under Accessibility, switch off \"Provide feedback with animation\" so the cursor stops gliding (older builds: Advanced, \"Disable hardware graphics acceleration\").",
    "wow": "Your settings are set, and formatting is Alt and a number from here on.",
    "convention_line": "Set Excel up once: calculation, iteration, Enter, and the four formatting commands on the toolbar.",
    "mac_note": "",
@@ -92,9 +92,9 @@ export const COPY = {
    "module": "move-and-select",
    "order": "1.2.2",
    "title": "Select like you mean it",
-   "brief": "Everything you format later starts with a selection: the highlighted cells are the ones a command acts on. Made with the mouse, a selection takes a drag and a scroll; made with the keyboard, it takes one or two presses. Shift and an arrow grows it a cell at a time, Ctrl+Shift and an arrow grows it to the edge of the data, Shift+Space takes a whole row, Ctrl+Space a whole column, and Ctrl+A takes the table. Practice the set on the feed. The key is `Ctrl+Shift+↓`.",
-   "closing": "Shift grows a selection; Ctrl+Shift grows it to the edge; Shift+Space and Ctrl+Space take a row or a column; Ctrl+A takes the block. Every format, fill and paste in this course starts with one of those. || Next, making room and making things fit.",
-   "wow": "A table of any size, selected in two presses.",
+   "brief": "Everything you do to a sheet starts with a selection: the highlighted cells are the ones a command acts on. Made with the mouse, a selection takes a drag and a scroll; made with the keyboard, it takes one or two presses. Shift and an arrow grows it a cell at a time, Ctrl+Shift and an arrow to the edge of the data, Shift+Space takes a row, Ctrl+Space a column, and Ctrl+A the table. Each one gets used the moment you make it, to tidy the feed’s headers and read what the feed holds. The key is `Ctrl+Shift+↓`.",
+   "closing": "Shift grows a selection; Ctrl+Shift grows it to the edge; Shift+Space and Ctrl+Space take a row or a column; Ctrl+A takes the block and Ctrl+Shift+End everything in use. Select, then act: the headers sit over their numbers, the header row has air and every site name reads in full. || Next, the columns get matching widths and the notes get room of their own.",
+   "wow": "Select, then act: every selection did a job.",
    "convention_line": "Select by keyboard: one or two presses for a block of any size.",
    "mac_note": "",
    "story_beat": ""
@@ -104,8 +104,8 @@ export const COPY = {
    "module": "move-and-select",
    "order": "1.2.3",
    "title": "Rows, columns and cells",
-   "brief": "Half of Excel is making room and making things fit. Rows and columns insert with Ctrl and plus and delete with Ctrl and minus, but select the whole row or column first with Shift+Space or Ctrl+Space. Widths and heights are under Home › Format (Alt, H, O), AutoFit sizes a column to its longest entry, and alignment sits under Alt, H, A. Ten minutes on these and you’ll never fight a sheet again. The key is `Ctrl+Shift+=`.",
-   "closing": "Insert with Ctrl and plus, delete with Ctrl and minus, select the row or column first; widths, heights and AutoFit under Alt, H, O; alignment under Alt, H, A; F4 to do it again. That’s the cell basics, and every sheet you touch from here on gets them without thinking. || Module 1.4 does the same on a page with formulas in it, where a deleted column can break a total.",
+   "brief": "Half of Excel is making room and making things fit. Rows and columns insert with Ctrl and plus and delete with Ctrl and minus, but select the whole row or column first with Shift+Space or Ctrl+Space. Widths are under Home › Format (Alt, H, O), F4 repeats the last one on whatever you select next, and Wrap Text keeps a long note inside its cell. Ten minutes on these and you’ll never fight a sheet again. The key is `Ctrl+Shift+=`.",
+   "closing": "Insert with Ctrl and plus, delete with Ctrl and minus, select the row or column first; widths under Alt, H, O; F4 to do it again; Wrap Text for a note that runs long. That’s the cell basics, and every sheet you touch from here on gets them without thinking. || Module 1.4 does the same on a page with formulas in it, where a deleted column can break a total.",
    "wow": "You made room and made everything fit, and F4 did half the work.",
    "convention_line": "Select the whole row or column first, then insert, delete or size it; F4 repeats the last action.",
    "mac_note": "",
@@ -645,31 +645,31 @@ export const COPY = {
    {
     "lesson_id": "inherited-workbook",
     "goal_index": "3",
-    "text": "Select the whole date column from A1 in one Ctrl+Shift+↓, then widen the selection to the whole table with Ctrl+Shift+→: A1:F61.",
-    "teach": "A selection is the set of cells a command will act on, the highlighted block. Hold Shift with any arrow and the selection grows a cell at a time; hold Ctrl and Shift and it grows to the edge of the data. Two presses select a table of any size.",
+    "text": "Move to Sheet2 with Ctrl+PgDn and jump down its labels with Ctrl+↓ to A15: a cost per wash, a target ticket, a fee rate.",
+    "teach": "A workbook is the file, and the tabs along the bottom are its sheets: Ctrl+PgDn walks them to the right, Ctrl+PgUp to the left. A jump down column A reads a sheet’s labels without scrolling, and the jump stops at the blank row 2 on the way.",
     "why": "",
-    "hint_stuck": "pulse the Name Box · The Name Box shows the range as it grows. It should end at A1:F61."
+    "hint_stuck": "pulse the Sheet2 tab · One Ctrl+PgDn from Raw, then Ctrl+↓ until the Name Box reads A15."
    },
    {
     "lesson_id": "inherited-workbook",
     "goal_index": "4",
-    "text": "Walk the tabs to Costs with Ctrl+PgDn and land on the Domain total in E4, where the formula bar shows =B4+C4+D4.",
-    "teach": "A workbook is the file; the tabs along the bottom are its sheets, and Ctrl+PgDn and Ctrl+PgUp walk them. The grid shows a result; the formula bar shows where it came from, and that’s the one a reviewer reads.",
-    "why": "",
-    "hint_stuck": "pulse the Costs tab · Costs is the last tab. The formula bar only shows the sum once you’re on E4."
-   },
-   {
-    "lesson_id": "inherited-workbook",
-    "goal_index": "5",
-    "text": "Rename the Sheet2 tab to Inputs.",
+    "text": "Those labels are the inputs the report runs on, so rename the Sheet2 tab to Inputs.",
     "teach": "Rename Sheet is Home › Format › Rename (Alt, H, O, R): type the new name and press Enter. Every formula that points at this sheet will carry the name you type now, so name it once and name it right.",
     "why": "",
     "hint_stuck": "pulse the Sheet2 tab · Rename works on the active sheet, so Sheet2 has to be the one selected."
    },
    {
     "lesson_id": "inherited-workbook",
+    "goal_index": "5",
+    "text": "On the next tab, Old wk37, jump down column A with Ctrl+↓: it ends at A22 on #N/A, an export that died halfway.",
+    "teach": "One jump down a column tells you how far the data runs and what it ends on. Data that ends in #N/A is an export that broke on the way out, and nobody should be reading it.",
+    "why": "",
+    "hint_stuck": "pulse the Old wk37 tab · One Ctrl+PgDn from Inputs, then Ctrl+↓ from A1."
+   },
+   {
+    "lesson_id": "inherited-workbook",
     "goal_index": "6",
-    "text": "Delete the Old wk37 tab, since it’s last week’s export and the live numbers are on Raw.",
+    "text": "Delete the Old wk37 tab: it’s last week’s export, half of it broken, and the live numbers are on Raw.",
     "teach": "Delete Sheet (Alt, H, D, S) removes the active sheet; Excel asks first because it can’t be undone. Stale data left in a file gets read as if it were current, so it comes out. Nothing warns you when other tabs read the one you delete (their formulas turn to #REF!), so on a live model you search the workbook for the tab’s name first (3.6.3).",
     "why": "",
     "hint_stuck": "pulse the Old wk37 tab · Old wk37 has to be the active tab; then answer the confirmation."
@@ -677,6 +677,14 @@ export const COPY = {
    {
     "lesson_id": "inherited-workbook",
     "goal_index": "7",
+    "text": "Costs is open now: jump to the Domain total in E4, where the formula bar shows =B4+C4+D4.",
+    "teach": "The grid shows a result; the formula bar shows where it came from, and that’s the one a reviewer reads. Three steps down to the Domain row and one jump across put you on it.",
+    "why": "",
+    "hint_stuck": "pulse cell E4 · The formula bar only shows the sum once you’re on E4."
+   },
+   {
+    "lesson_id": "inherited-workbook",
+    "goal_index": "8",
     "text": "Add a new sheet for the report, name it Report, and move it to the front of the workbook.",
     "teach": "Shift+F11 inserts a sheet, Alt, H, O, R names it, and Move or Copy Sheet (Alt, H, O, M) moves it: ↑ ↓ pick where it sits, Enter confirms. The output page goes first: tabs run the way a reader reads.",
     "why": "",
@@ -711,8 +719,8 @@ export const COPY = {
    {
     "lesson_id": "know-the-screen",
     "goal_index": "3",
-    "text": "Select the wash counts C2:C60 and read the status bar at the bottom: Sum, Average and Count.",
-    "teach": "The status bar totals whatever is selected, with no formula written: Sum, Average, Count. Select a column, glance at the bottom of the window, and you know whether a number is plausible before anyone asks. Right-click the status bar once and tick Minimum and Maximum, and the largest and smallest figure in the selection show there too, the one mouse setting worth making.",
+    "text": "Select the wash counts C2:C60 with one Ctrl+Shift+↓ from C2, then read the status bar at the bottom: Sum, Average and Count.",
+    "teach": "A selection is the block of cells a command acts on: hold Ctrl and Shift and press ↓, and it runs from the active cell to the edge of the data. The status bar totals whatever is selected, with no formula written, so you know whether a number is plausible before anyone asks. Right-click the status bar once and tick Minimum and Maximum, the one mouse setting worth making.",
     "why": "",
     "hint_stuck": "pulse the status bar · Land on C2, Ctrl+Shift+↓, then look at the bottom edge of the window."
    },
@@ -745,7 +753,7 @@ export const COPY = {
    {
     "lesson_id": "ribbon-by-keyboard",
     "goal_index": "1",
-    "text": "Walk to the View tab with Alt, W, look at what lives there, and leave with Esc.",
+    "text": "Walk to the View tab with Alt, W, find Gridlines among its letters, and back out with Esc.",
     "teach": "The tab letters never change: H Home, N Insert, P Page Layout, M Formulas, A Data, W View. They’re the same on every copy of Excel you’ll ever sit at, so learn them once.",
     "why": "",
     "hint_stuck": "pulse the View tab · Alt first, wait for the letters, then W."
@@ -753,7 +761,7 @@ export const COPY = {
    {
     "lesson_id": "ribbon-by-keyboard",
     "goal_index": "2",
-    "text": "Hide the gridlines on Report.",
+    "text": "Now run it: Alt, W, V, G hides the gridlines on Report.",
     "teach": "View › Show › Gridlines (Alt, W, V, G) hides or shows the grid on the active sheet. Most people turn gridlines off on a page someone else reads; on a working sheet they can help. It’s a matter of preference, and the hotkey flips them either way.",
     "why": "",
     "hint_stuck": "pulse the Gridlines box on the View tab · It only switches the sheet you’re on, so check the tab bar says Report."
@@ -761,40 +769,32 @@ export const COPY = {
    {
     "lesson_id": "ribbon-by-keyboard",
     "goal_index": "3",
-    "text": "Open Format Cells with Ctrl+1, glance at its tabs, and close it with Esc.",
-    "teach": "From anywhere, Ctrl+1 opens Format Cells, the dialog with six tabs across the top (Number, Alignment, Font, Border, Fill, Protection) where most formatting lives. Tab moves between its fields, Enter is OK, Esc is Cancel. Most of what you’ll do to a page in this chapter happens in here.",
+    "text": "On Inputs, the estimated washes in B6 read 9000: open Format Cells with Ctrl+1 and give them a thousands separator, no decimals.",
+    "teach": "From anywhere, Ctrl+1 opens Format Cells, the dialog where most formatting lives. Inside it, a letter picks from a list, Tab moves to the next field, and Alt with an underlined letter jumps to that field: Alt+D for Decimal places, Alt+U for the separator. Enter is OK and Esc is Cancel, and 9,000 reads at a glance where 9000 makes you count.",
     "why": "",
-    "hint_stuck": "pulse the 1 key on the top row · Use the 1 on the top row, not the number pad, and close the box again to finish."
+    "hint_stuck": "pulse the Format Cells dialog · On the Number page pick Number, set Decimal places to 0, tick the separator, then Enter."
    },
    {
     "lesson_id": "ribbon-by-keyboard",
     "goal_index": "4",
-    "text": "Open the same dialog the long way, Alt, H, O, E, and close it again.",
-    "teach": "Every dialog also has a Ribbon route: Format Cells is Home › Format › Format Cells. When a shortcut slips your mind, the route still gets you there, so know both.",
+    "text": "The card fee rate below it in B7 reads 0.025: open the same dialog the long way, Alt, H, O, E, and make it a Percentage.",
+    "teach": "Every dialog also has a Ribbon route: Format Cells is Home › Format › Format Cells. When a shortcut slips your mind, the route still gets you there, so know both. A rate reads as a percentage, and the dialog gives it two decimals unless you say otherwise.",
     "why": "",
-    "hint_stuck": "pulse Home › Format · O is Format, near the end of the Home tab; if you’re in the wrong menu, Esc backs out one level."
+    "hint_stuck": "pulse Home › Format · O is Format, near the end of the Home tab; in the Category list, P goes to Percentage."
    }
   ],
   "analyst-setup": [
    {
     "lesson_id": "analyst-setup",
     "goal_index": "0",
-    "text": "Press F9 once so your hands know where it is, even though on Automatic nothing visibly changes.",
-    "teach": "Calculation is on Automatic here, so F9 does nothing you can see. Big models get switched to Manual to stay fast, and then F9 (Calculate Now) is the only thing that updates the numbers.",
-    "why": "",
-    "hint_stuck": "pulse the F9 keycap · F9 is on the top row. Nothing visible changes on Automatic, and that’s the point."
-   },
-   {
-    "lesson_id": "analyst-setup",
-    "goal_index": "1",
     "text": "Open Excel Options and turn iterative calculation on.",
-    "teach": "Alt, F, T opens Excel Options; on the Formulas page, iterative calculation lets a model that loops on purpose (interest on debt, for one) settle instead of erroring out. Every desk turns it on, on day one.",
+    "teach": "Alt, F, T opens Excel Options; on the Formulas page, iterative calculation lets a model that loops on purpose (interest on debt, for one) settle instead of erroring out. Calculation stays on Automatic beside it, and on a big model switched to Manual to stay fast, F9 (Calculate Now) is what updates the numbers. Every desk turns iteration on, on day one.",
     "why": "",
     "hint_stuck": "pulse the Formulas page of Excel Options · It’s on the Formulas page of Options, and it only counts once the box is closed with OK."
    },
    {
     "lesson_id": "analyst-setup",
-    "goal_index": "2",
+    "goal_index": "1",
     "text": "On the Advanced page, turn off \"After pressing Enter, move selection\".",
     "teach": "With this off, Enter commits what you typed and stays on the cell, so you read it back before you move; the arrow keys do the moving. It’s the setting the desks change first, and every lesson from here on assumes it.",
     "why": "",
@@ -802,7 +802,7 @@ export const COPY = {
    },
    {
     "lesson_id": "analyst-setup",
-    "goal_index": "3",
+    "goal_index": "2",
     "text": "Add Font Color to the Quick Access Toolbar.",
     "teach": "Q opens the Quick Access Toolbar page: ↑ ↓ pick a command, A adds it, Enter is OK. You’ll press these four commands more than anything else this week, and Alt plus a number is the shortest route to them there is. The toolbar sits under the Ribbon here, which is where most desks put it.",
     "why": "",
@@ -810,7 +810,7 @@ export const COPY = {
    },
    {
     "lesson_id": "analyst-setup",
-    "goal_index": "4",
+    "goal_index": "3",
     "text": "Add Fill Color the same way.",
     "teach": "Fill Color is for the tint on the input block, later in the chapter. One Alt+number beats a trip into the Ribbon every time.",
     "why": "",
@@ -818,7 +818,7 @@ export const COPY = {
    },
    {
     "lesson_id": "analyst-setup",
-    "goal_index": "5",
+    "goal_index": "4",
     "text": "Add Borders.",
     "teach": "Borders is where a total’s top border comes from, and you’ll put one on every page you build.",
     "why": "",
@@ -826,19 +826,19 @@ export const COPY = {
    },
    {
     "lesson_id": "analyst-setup",
-    "goal_index": "6",
+    "goal_index": "5",
     "text": "Add Decrease Decimal, the last of the four.",
-    "teach": "Every figure column gets its decimals set, usually down to none. This button gets pressed more than you’d think.",
+    "teach": "Every figure column gets its decimals set, usually down to none. This button gets pressed more than you’d think, starting now.",
     "why": "",
     "hint_stuck": "pulse the command list · When it’s in, the toolbar reads seven buttons, ending with Decrease Decimal."
    },
    {
     "lesson_id": "analyst-setup",
-    "goal_index": "7",
-    "text": "Run one from the keyboard by pressing Alt, reading the number over Undo on the toolbar (2 here) and pressing it.",
-    "teach": "Alt on its own numbers the toolbar 1 to 9, left to right, and Alt then the number runs that command from anywhere. The numbers follow your own toolbar: this one starts with Save, Undo and Redo, so Undo is 2 here, and on your own copy of Excel it may sit under another number or on the Home tab. Press Alt, read the numbers, then press one: that’s how you’ll format for the rest of the course.",
+    "goal_index": "6",
+    "text": "Run one from the toolbar: on Inputs, the fee rate in B7 reads 2.50%, so press Alt, then 7, the number over Decrease Decimal.",
+    "teach": "Alt on its own numbers the toolbar 1 to 9, left to right, and Alt then the number runs that command from anywhere. The numbers follow your own toolbar: this one starts with Save, Undo and Redo, so Decrease Decimal is 7 here, and on your own copy of Excel it may sit under another number. A rate reads to one decimal, and from now on that’s two keys away.",
     "why": "",
-    "hint_stuck": "pulse the toolbar numbers · Press Alt on its own and watch the toolbar: the numbers appear over the buttons."
+    "hint_stuck": "pulse the toolbar numbers · Land on B7 first, then press Alt on its own and read the number over Decrease Decimal."
    }
   ],
   "colour-label-hardcode": [
@@ -1019,64 +1019,48 @@ export const COPY = {
    {
     "lesson_id": "select-like-you-mean-it",
     "goal_index": "0",
-    "text": "Move to Raw, where the selecting is.",
-    "teach": "Ctrl+PgDn from Report. Every selection in this lesson starts from a cell you’ve landed on by keyboard.",
+    "text": "On Raw, select the figure headers C1:F1 a cell at a time with Shift+→ and right-align them over their numbers with Alt, H, A, R.",
+    "teach": "Shift and an arrow grows a selection a cell at a time, and a command then lands on every cell in it. Numbers align right and text aligns left, so a header over a number column reads best right-aligned: Alt, H, A, then L, C or R.",
     "why": "",
-    "hint_stuck": "pulse the Raw tab · One Ctrl+PgDn from Report."
+    "hint_stuck": "pulse cells C1:F1 · From C1, Shift+→ until the Name Box reads C1:F1, then Alt, H, A, R."
    },
    {
     "lesson_id": "select-like-you-mean-it",
     "goal_index": "1",
-    "text": "Select Revenue from its header to the last figure: land on E1, then one Ctrl+Shift+↓.",
-    "teach": "Hold Ctrl and Shift together and press ↓: the selection runs from the active cell to the edge of the data. The Name Box reads E1:E60. Sixty cells in one press.",
+    "text": "Select Revenue from its header E1 to the last figure with one Ctrl+Shift+↓, then read its sum in the status bar.",
+    "teach": "Ctrl+Shift and an arrow grows the selection to the edge of the data: sixty cells in one press, and the Name Box reads E1:E60. Glance at the status bar before you use any column, because it’s how you catch a text figure or a missing day before it costs you.",
     "why": "",
-    "hint_stuck": "pulse the Name Box · Ctrl+Home, Ctrl+→, ← to reach E1; then Ctrl+Shift+↓."
+    "hint_stuck": "pulse the Name Box · From E1, one Ctrl+Shift+↓; then look at the bottom edge of the window."
    },
    {
     "lesson_id": "select-like-you-mean-it",
     "goal_index": "2",
-    "text": "With E1:E60 still selected, read the status bar at the bottom of the window (sum, average, count), then come back to A1 with Ctrl+Home.",
-    "teach": "Same status bar as 1.1.2, bigger selection: sixty cells summed with no formula written. Do this on every column you’re about to use. It’s how you catch a text figure or a missing day before it costs you.",
+    "text": "Give the header row some air: select row 1 with Shift+Space and set its height to 20 with Alt, H, O, H.",
+    "teach": "Shift+Space selects the entire row of the active cell, edge to edge, and any arrow on its own collapses a selection back to one cell. Row Height (Alt, H, O, H) is in points: type it and Enter. AutoFit Row Height (Alt, H, O, A) sizes a row back to what its text needs.",
     "why": "",
-    "hint_stuck": "pulse the status bar · Look at the bottom edge of the window while the selection is live, then Ctrl+Home."
+    "hint_stuck": "pulse row 1 · Ctrl+Home, then Shift and the space bar together, then Alt, H, O, H."
    },
    {
     "lesson_id": "select-like-you-mean-it",
     "goal_index": "3",
-    "text": "Select the whole header row with Shift+Space.",
-    "teach": "Shift+Space selects the entire row of the active cell, edge to edge. Any arrow key on its own collapses a selection back to one cell.",
+    "text": "The site names in column B are cut off: select the column with Ctrl+Space and AutoFit it with Alt, H, O, I.",
+    "teach": "Ctrl+Space selects the entire column, and AutoFit Column Width (Alt, H, O, I) sizes it to its longest entry. Row and column selections are how you insert, delete, hide and resize, all of module 1.4. On a Mac, ⌃Space may be taken by the system; ⌘⇧↑ then ⌘⇧↓ from the top of a column does the job.",
     "why": "",
-    "hint_stuck": "pulse row 1 · From A1, Shift and the space bar together."
+    "hint_stuck": "pulse column B · Ctrl+Space on any cell in column B, then Alt, H, O, I."
    },
    {
     "lesson_id": "select-like-you-mean-it",
     "goal_index": "4",
-    "text": "Now the whole of column E with Ctrl+Space.",
-    "teach": "Ctrl+Space selects the entire column. Row and column selections are how you insert, delete, hide and resize, all of module 1.4. On a Mac, ⌃Space may be taken by the system; ⌘⇧↑ then ⌘⇧↓ from the top of a column does the job.",
-    "why": "",
-    "hint_stuck": "pulse column E · Land anywhere in column E first, then Ctrl and the space bar."
-   },
-   {
-    "lesson_id": "select-like-you-mean-it",
-    "goal_index": "5",
-    "text": "Select the whole feed in one press: Ctrl+A.",
-    "teach": "Ctrl+A selects the current region: the block of data around the active cell, bounded by blank rows and columns. From inside the feed, that’s A1:F61.",
+    "text": "Select the whole feed with Ctrl+A and read Count in the status bar: 357 of its 366 cells are filled, so nine are blank.",
+    "teach": "Ctrl+A selects the current region: the block of data around the active cell, bounded by blank rows and columns, and a second Ctrl+A takes the whole sheet. Count is how many cells hold something, so a feed that comes up short is a figure somebody still owes you. You’ll fill those nine in module 1.3.",
     "why": "",
     "hint_stuck": "pulse the Name Box · Land inside the feed first; from a blank cell Ctrl+A selects the whole sheet instead."
    },
    {
     "lesson_id": "select-like-you-mean-it",
-    "goal_index": "6",
-    "text": "Press Ctrl+A a second time: the entire sheet.",
-    "teach": "Ctrl+A again widens to every cell on the sheet. Useful for a format you want everywhere, dangerous for anything else.",
-    "why": "",
-    "hint_stuck": "pulse the select-all corner · Ctrl+A twice from inside the feed."
-   },
-   {
-    "lesson_id": "select-like-you-mean-it",
-    "goal_index": "7",
-    "text": "Go home to A1 with Ctrl+Home, then take everything in use (feed, notes and the totals block) with Ctrl+Shift+End.",
-    "teach": "Ctrl+Shift+End selects from the active cell to the last used cell on the sheet, gaps included. Ctrl+A stops at the first blank row; Ctrl+Shift+End doesn’t.",
+    "goal_index": "5",
+    "text": "Go home with Ctrl+Home and take everything in use with Ctrl+Shift+End: A1:N67, the feed, its notes and the two blocks beside it.",
+    "teach": "Ctrl+Shift+End selects from the active cell to the last used cell on the sheet, gaps included, where Ctrl+A stops at the first blank row. The Name Box tells you how far a sheet really runs before you send it or print it.",
     "why": "",
     "hint_stuck": "pulse the Name Box · Ctrl+Home, then Ctrl, Shift and End together."
    }
@@ -1085,22 +1069,14 @@ export const COPY = {
    {
     "lesson_id": "around-the-workbook",
     "goal_index": "0",
-    "text": "On Raw, the site names in column B are cut off: AutoFit the column to its longest entry.",
-    "teach": "AutoFit Column Width is Home › Format › AutoFit Column Width (Alt, H, O, I): the column sizes to the longest entry in it. Select the whole column first with Ctrl+Space, so the whole column is the target.",
+    "text": "On Raw, column A is wider than a date needs: select it with Ctrl+Space and set it to width 11.",
+    "teach": "Column Width (Alt, H, O, W) sets the selected columns to a number of characters: type it and Enter. A column too narrow for a number or a date shows ######## until you widen it; that’s Excel telling you, not an error.",
     "why": "",
-    "hint_stuck": "pulse column B · Ctrl+Space on any cell in column B, then Alt, H, O, I."
+    "hint_stuck": "pulse column A · Ctrl+Space, then Alt, H, O, W, then 11, then Enter."
    },
    {
     "lesson_id": "around-the-workbook",
     "goal_index": "1",
-    "text": "Column A is wider than a date needs: set it to width 11.",
-    "teach": "Column Width (Alt, H, O, W) sets the selected columns to a number of characters: type it and Enter. A column too narrow for a number or a date shows ######## until you widen it; that’s Excel telling you, not an error.",
-    "why": "",
-    "hint_stuck": "pulse column A · Alt, H, O, W, then 11, then Enter."
-   },
-   {
-    "lesson_id": "around-the-workbook",
-    "goal_index": "2",
     "text": "The figure columns C:F should match, so select them and press F4, and the width you set a moment ago lands on all four.",
     "teach": "F4 repeats your last action on whatever is selected now: a width, a format, an insert. Set it once, F4 everywhere. It comes back in the Format module as the fastest key on the sheet.",
     "why": "",
@@ -1108,23 +1084,7 @@ export const COPY = {
    },
    {
     "lesson_id": "around-the-workbook",
-    "goal_index": "3",
-    "text": "Give the header row some air: set row 1 to height 20.",
-    "teach": "Row Height (Alt, H, O, H) is in points; AutoFit Row Height (Alt, H, O, A) sizes a row back to what its text needs. Shift+Space selects the row first if you want to be sure.",
-    "why": "",
-    "hint_stuck": "pulse row 1 · Alt, H, O, H, then 20, then Enter."
-   },
-   {
-    "lesson_id": "around-the-workbook",
-    "goal_index": "4",
-    "text": "The figure headers C1:F1 sit left over numbers that sit right: right-align them.",
-    "teach": "Numbers align right by default and text aligns left, so a header over a number column reads best right-aligned. Alignment is Alt, H, A, then L, C or R.",
-    "why": "",
-    "hint_stuck": "pulse cells C1:F1 · Select C1:F1 first, then Alt, H, A, R."
-   },
-   {
-    "lesson_id": "around-the-workbook",
-    "goal_index": "5",
+    "goal_index": "2",
     "text": "Add a line under the Notes block by inserting a row above A67, then type \"Airport Sat missing - emailed manager\".",
     "teach": "Shift+Space selects the whole row, then Ctrl+Shift+= (Ctrl and plus) inserts a row above it, and Alt, H, I, R is the Ribbon route to the same thing. Whatever was there moves down, so nothing is overwritten.",
     "why": "",
@@ -1132,7 +1092,7 @@ export const COPY = {
    },
    {
     "lesson_id": "around-the-workbook",
-    "goal_index": "6",
+    "goal_index": "3",
     "text": "On Costs, add a column for Utilities between Maintenance and Card fees: select column D and insert, then type Utilities in D3.",
     "teach": "Columns insert the same way: Ctrl+Space selects the column, Ctrl+Shift+= inserts one to its left; Alt, H, I, C is the Ribbon route. The formulas to the right move over and keep working.",
     "why": "",
@@ -1140,7 +1100,7 @@ export const COPY = {
    },
    {
     "lesson_id": "around-the-workbook",
-    "goal_index": "7",
+    "goal_index": "4",
     "text": "The CFO says utilities sit inside rent this year, so delete the Utilities column again.",
     "teach": "Ctrl+− (Ctrl and minus) deletes the selected rows or columns whole; Alt, H, D, C and Alt, H, D, R are the Ribbon routes. Ctrl+Z brings back a column you didn’t mean to delete.",
     "why": "",
@@ -1148,7 +1108,7 @@ export const COPY = {
    },
    {
     "lesson_id": "around-the-workbook",
-    "goal_index": "8",
+    "goal_index": "5",
     "text": "Back on Raw, the note in A64 runs past its column: wrap it inside the cell.",
     "teach": "Wrap Text (Alt, H, W) folds a long entry onto more lines inside its cell, and AutoFit Row Height (Alt, H, O, A) grows the row to fit. It’s how a label stays readable without widening the whole column.",
     "why": "",

@@ -260,14 +260,24 @@ const S1a = derive(S0, s => {
 });
 // 1.1.2 Know the screen: a tour; nothing on the sheets changes (S1a → S1a)
 
-// 1.1.3 The Ribbon by keyboard: gridlines off on Report (a page someone reads)
-const S1b = derive(S1a, s => { sheetOf(s, 'Report').gridlines = false; });
+// 1.1.3 The Ribbon by keyboard: gridlines off on Report (a page someone reads); each route then does a
+// job on Inputs: the estimated washes B6 get a thousands separator in Format Cells (Ctrl+1), and the
+// card fee rate B7 becomes a percentage through Alt H O E (two decimals, the dialog's default)
+export const INPUTS_SEPARATOR = { fmtStyle: 'custom', numFmt: '#,##0' };
+const S1b = derive(S1a, s => {
+  sheetOf(s, 'Report').gridlines = false;
+  const c = sheetOf(s, 'Inputs').cells;
+  each(c, ['B6'], x => { Object.assign(x, INPUTS_SEPARATOR); });
+  each(c, ['B7'], x => { x.fmtStyle = 'percent'; x.decimals = 2; });
+});
 
-// 1.1.4 Set Excel up like an analyst: iterative calc on, Enter stays put, four formatting commands on the QAT
+// 1.1.4 Set Excel up like an analyst: iterative calc on, Enter stays put, four formatting commands on the
+// QAT, and the first one run from it: Decrease Decimal (Alt 7) trims the fee rate B7 to one decimal, 2.5%
 const S1c = derive(S1b, s => {
   s.settings.iterative = true;
   s.settings.enterMoves = false;
   s.settings.qat = ['save', 'undo', 'redo', 'fontColor', 'fillColor', 'borders', 'decDecimal'];
+  each(sheetOf(s, 'Inputs').cells, ['B7'], x => { x.decimals = 1; });
 });
 
 // 1.1.5 Color-code the workbook: on Inputs, typed numbers blue, links green, formulas automatic
@@ -282,19 +292,26 @@ const S1d = derive(S1c, s => {
 });
 
 /* ---------------- module 1.2: move and select ---------------- */
-// 1.2.1 and 1.2.2 move and select only (S1d → S1d)
+// 1.2.1 moves only (S1d → S1d)
 
-// 1.2.3 Rows, columns and cells: on Raw, B AutoFit, A at 11, C:F at 11 by F4, row 1 at 20pt, the figure
-// headers right-aligned, a note row inserted above A67, the long note in A64 wrapped; on Costs a
-// Utilities column inserted and deleted again (no net change)
-export const RAW_NOTE_INSERTED = 'Airport Sat missing - emailed manager';
-const S2a = derive(S1d, s => {
+// 1.2.2 Select like you mean it: every selection is used the moment it is made (payoff pass, 2026-10-02).
+// On Raw, the figure headers C1:F1 right-aligned (Shift+→), row 1 at 20pt (Shift+Space), column B
+// AutoFit to its site names (Ctrl+Space); the rest of the set is read in the status bar and Name Box
+const S1e = derive(S1d, s => {
   viaEngine(s, 'Raw', S => {
+    S.select('C1:F1'); S.setAlign('r');
+    S.select('A1:Z1'); S.setRowHeight(20);
     S.select('B1:B100'); S.colW[2] = Math.max(S.neededWidth(2), 64); S.colSet[2] = true;   // AutoFit Column Width over the whole column
+  });
+});
+
+// 1.2.3 Rows, columns and cells: on Raw, A at 11, C:F at 11 by F4, a note row inserted above A67, the
+// long note in A64 wrapped; on Costs a Utilities column inserted and deleted again (no net change)
+export const RAW_NOTE_INSERTED = 'Airport Sat missing - emailed manager';
+const S2a = derive(S1e, s => {
+  viaEngine(s, 'Raw', S => {
     S.select('A1:A100'); S.setColWidth(11);
     S.select('C1:F100'); S.setColWidth(11);                                            // F4 repeats the width
-    S.select('A1:Z1'); S.setRowHeight(20);
-    S.select('C1:F1'); S.setAlign('r');
     S.select('A67:Z67'); S.insert('r'); S.setCell('A67', { value: RAW_NOTE_INSERTED });
     S.select('A64'); S.toggleWrap(); S.select('A64'); S.autofitRows();
   });
@@ -710,7 +727,7 @@ export function buildReport(state, { title = REPORT_TITLE_NEXT, week = WEEK_NEXT
 }
 const S8done = derive(S8raw, s => buildReport(s));
 
-export const STATES = { S0, S1a, S1b, S1c, S1d, S2a, S2b, S3a, S3b, S3c, S3d, S3e, S4a, S4b, S4c, S5a, S5b, S5c, S5d, S6a, S6b, S6c, S6d, S6e, S6f, S7a, S7b, S7c, S8raw, S8done };
+export const STATES = { S0, S1a, S1b, S1c, S1d, S1e, S2a, S2b, S3a, S3b, S3c, S3d, S3e, S4a, S4b, S4c, S5a, S5b, S5c, S5d, S6a, S6b, S6c, S6d, S6e, S6f, S7a, S7b, S7c, S8raw, S8done };
 /** The chain the lessons walk; S8raw and S8done are the project's fresh feed, not a step after S7c. */
 export const STATE_ORDER = Object.keys(STATES);
 
