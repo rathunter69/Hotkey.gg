@@ -276,3 +276,23 @@ body[data-route="landing"] > .app{padding:0 var(--content-side)}
   .lp-cells{padding-right:0}
   .lp-headline{font-size:var(--fs-time)}
 }
+
+/* the first run as pop-outs over the product: Home behind a scrim, the card centred over it */
+.fr-behind{pointer-events:none; user-select:none}
+.fr.fr-pop{position:fixed; inset:0; z-index:50; display:flex; align-items:center; justify-content:center; padding:var(--s6); background:var(--scrim); font-family:var(--font)}
+.fr-pop .fr-panel{box-shadow:var(--shadow-float); max-height:calc(100vh - var(--s12)); overflow:auto}
+.fr-facts{display:flex; flex-direction:column; border-top:1px solid var(--line)}
+.fr-fact{display:grid; grid-template-columns:var(--ls-st-w) minmax(0,1fr); gap:var(--s3); padding:var(--s2) 0; border-bottom:1px solid var(--line); font-size:var(--fs-name); line-height:1.45; color:var(--ink)}
+.fr-fact-k{font-weight:var(--fw-bold); color:var(--learn-ink)}
+.fr-fact-k.fr-fact-pro{color:var(--challenges-ink)}
+.fr-acct{font-weight:var(--fw-semi)}
+
+/* a pop-out over the page: the sign-in dialog */
+.pop{position:fixed; inset:0; z-index:70; display:flex; align-items:center; justify-content:center; padding:var(--s6); background:var(--scrim); font-family:var(--font)}
+.pop-card{width:min(100%, calc(var(--side-col) * 1.5)); box-shadow:var(--shadow-float); gap:var(--s4)}
+.pop-card .panel-head{align-items:center}
+.pop-card .input{width:100%}
+.pop-card .co-form{align-items:stretch}
+.fr-pop .fr-panel:not(.fr-story){width:min(100%, calc(var(--side-col) * 1.5))}
+.fr-pop .fr-opt-sub{display:none}
+.fr-pop .fr-opt{padding:var(--s2) var(--s4)}

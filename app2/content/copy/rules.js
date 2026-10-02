@@ -11,6 +11,12 @@ export const RIBBON_WORDS = [
 
 export const SITE_KEYS = [
   // the interface match (2026-10-02)
+  'home_tour',
+  // the interface match (2026-10-02)
+  'coach_done', 'signin_head', 'signin_line', 'signin_google', 'signin_fine',
+  // the interface match (2026-10-02)
+  'first_run_free_k', 'first_run_free', 'first_run_full', 'first_run_save', 'first_run_tour', 'orientation_pro', 'orientation_account',
+  // the interface match (2026-10-02)
   'daily_today', 'daily_not_clean', 'daily_missed', 'daily_week', 'daily_week_played', 'daily_keys', 'daily_rules', 'save_line_boards',
   // the interface match (2026-10-02)
   'boards_clean_runs_one', 'boards_day_runs_one',

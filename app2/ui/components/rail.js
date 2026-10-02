@@ -13,6 +13,7 @@
 //   rail.setLevel({ lvl, into, need } | number | null); rail.setStreak({ day, week: [bool × 7] }); rail.setPro(bool);
 //   rail.setLanding(bool); rail.openAccount(); rail.closeAccount(); rail.destroy();
 import { siteCopy } from '../../content/copy/apply.js';
+import { openSigninDialog } from './signin-dialog.js';
 
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const fill = (s, vars) => String(s).replace(/\{(\w+)\}/g, (m, k) => (vars && vars[k] != null ? vars[k] : m));
@@ -189,9 +190,10 @@ export function mountRail(el, opts = {}) {
   function wire() {
     const btn = q('#railAcctBtn'), box = q('#railAcctItems');
     if (btn) {
-      btn.addEventListener('click', () => (menuOpen ? closeAccount(false) : openAccount(null)));
+      // signed out, the account button is Sign in: it opens the sign-in pop-out, never the account menu (Wolf, 28)
+      btn.addEventListener('click', () => { if (!user) { openSigninDialog(); return; } if (menuOpen) closeAccount(false); else openAccount(null); });
       btn.addEventListener('keydown', e => {
-        if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); e.stopPropagation(); openAccount(e.key === 'ArrowUp' ? -1 : 0); }
+        if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && user) { e.preventDefault(); e.stopPropagation(); openAccount(e.key === 'ArrowUp' ? -1 : 0); }
         else if (e.key === 'Escape' && menuOpen) { e.preventDefault(); e.stopPropagation(); closeAccount(true); }
       });
     }

@@ -74,6 +74,7 @@
 
   /* ---------- the one shadow, for floating things only ---------- */
   --shadow-float:0 14px 36px -14px rgba(0,0,0,.35);
+  --scrim:color-mix(in srgb, var(--rail) 55%, transparent);   /* behind a pop-out over the product (the first run) */
 
   /* ---------- the names the older stylesheets read: they resolve to the tokens above ----------
      (app.css, shell.css, site.css, next.css and workbook.css were written against these; a theme

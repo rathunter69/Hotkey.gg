@@ -19,6 +19,8 @@ export const COACH_MARKS = [
   { key: 'reference', at: '.rail-item[data-page="reference"]', copy: 'orientation_reference', fallback: 'Reference has every key the course teaches, and shows which ones you’ve practiced.' },
   { key: 'level', at: '#railLevel', copy: 'orientation_level', fallback: 'Everything you finish earns XP toward your next level, and speed is what puts you on the boards.' },
   { key: 'streak', at: '#railStreak', copy: 'orientation_streak', fallback: 'Your first practice each day fills that day’s cell and adds a day to your streak.' },
+  { key: 'pro', at: '#railPro', copy: 'orientation_pro', fallback: 'Chapter 1 is free, all of it. Full Access opens Chapters 2 to 6 and their timed play.' },
+  { key: 'account', at: '#railAcctBtn', copy: 'orientation_account', fallback: 'Your progress saves in this browser. A free account keeps it on any device and puts your times on the boards.', guest: true },
 ];
 
 /** The marks show on the first visit to Home after a lesson, once. Pure. */
@@ -31,9 +33,9 @@ export function visibleMarks(find, marks = COACH_MARKS) {
   return marks.filter(m => { const el = find(m.at); return !!el && !el.hidden; });
 }
 
-export function mountCoachMarks({ railEl, onDone, marks = COACH_MARKS } = {}) {
+export function mountCoachMarks({ railEl, onDone, marks = COACH_MARKS, signedIn = false } = {}) {
   const find = sel => (railEl ? railEl.querySelector(sel) : null);
-  const list = visibleMarks(find, marks);
+  const list = visibleMarks(find, marks.filter(m => !(m.guest && signedIn)));
   let i = -1;
   const card = document.createElement('div');
   card.className = 'coach';
@@ -46,7 +48,8 @@ export function mountCoachMarks({ railEl, onDone, marks = COACH_MARKS } = {}) {
     if (!target) return;
     const r = target.getBoundingClientRect();
     card.style.left = Math.round(r.right) + 'px';
-    card.style.top = Math.round(r.top + r.height / 2) + 'px';
+    const half = card.offsetHeight / 2, pad = 8;   // kept inside the window: the account mark sits at the rail's foot
+    card.style.top = Math.round(Math.max(half + pad, Math.min(window.innerHeight - half - pad, r.top + r.height / 2))) + 'px';
   }
   function show(k) {
     if (target) target.classList.remove('coach-target');
@@ -54,9 +57,10 @@ export function mountCoachMarks({ railEl, onDone, marks = COACH_MARKS } = {}) {
     const m = list[i];
     if (!m) { finish(); return; }
     target = find(m.at); if (target) target.classList.add('coach-target');
-    card.innerHTML = `<p class="coach-line">${esc(siteCopy(m.copy, m.fallback))}</p><div class="coach-foot"><span class="label">${esc(siteCopy('coach_count', '{n} of {m}').replace('{n}', i + 1).replace('{m}', list.length))}</span><button type="button" class="btn btn-primary btn-small" data-act="next">${esc(siteCopy('coach_next', i + 1 < list.length ? 'Next' : 'Done'))}<kbd class="key key-on-fill">Enter</kbd></button></div>`;
+    card.innerHTML = `<p class="coach-line">${esc(siteCopy(m.copy, m.fallback))}</p><div class="coach-foot"><span class="label">${esc(siteCopy('coach_count', '{n} of {m}').replace('{n}', i + 1).replace('{m}', list.length))}</span><button type="button" class="btn btn-primary btn-small" data-act="next">${esc(i + 1 < list.length ? siteCopy('coach_next', 'Next') : siteCopy('coach_done', 'Done'))}<kbd class="key key-on-fill">Enter</kbd></button></div>`;
     card.querySelector('[data-act="next"]').onclick = next;
     place();
+    requestAnimationFrame(place);
     const b = card.querySelector('button'); if (b) b.focus({ preventScroll: true });
   }
   function next() { show(i + 1); }

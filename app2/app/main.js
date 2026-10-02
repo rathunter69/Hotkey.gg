@@ -26,6 +26,7 @@ import { settings } from './settings.js';
 import { dayOf } from './records.js';
 import { store } from './store.js';
 import { auth } from './auth.js';
+import { wireSigninLinks } from '../ui/components/signin-dialog.js';
 import { entitlement } from './entitlement.js';
 import { track, installErrorLog } from './telemetry.js';
 import { captureInstall } from './install.js';
@@ -258,7 +259,7 @@ export function startApp({ navEl, rootEl, footEl }) {
   // the rail's foot: the level with its XP, the streak with the week's cells, Go Pro for a free account (none on the landing and the first run)
   function refreshLevel() {
     const name = document.body.dataset.route;
-    if (name === 'landing' || name === 'start') { nav.setLevel(null); nav.setStreak(null); return; }
+    if (name === 'landing') { nav.setLevel(null); nav.setStreak(null); return; }
     const set = () => {
       try {
         const ctx = stats.gameCtx();
@@ -280,6 +281,7 @@ export function startApp({ navEl, rootEl, footEl }) {
     nav.setSaveState(store.saveText());
   }
   installErrorLog();
+  wireSigninLinks(document.body);   // signed out, every link to the account opens the sign-in pop-out (Wolf, 28)
   captureInstall();
   // signed in at boot: the page mounted from the device cache, so once the account's records arrive a
   // dashboard page that would read differently is drawn again (never a workspace mid-run)
@@ -379,20 +381,20 @@ export function startApp({ navEl, rootEl, footEl }) {
       if (res && typeof res.then === 'function') { res = await res; if (myGen !== gen) { if (res && typeof res.destroy === 'function') { try { res.destroy(); } catch (e) { /* ignore */ } } return; } }
       current = res && typeof res.destroy === 'function' ? res : { destroy() { rootEl.innerHTML = ''; } };
       // the first visit to Home after a lesson: one coach mark on each rail item, once (3.0, The first run; M92)
-      if (name === 'home') showCoachMarks();
+      if (name === 'home') showCoachMarks(r.query && r.query.tour === '1');
     } catch (e) {
       console.error(e);
       errorCard(rootEl, { name, params: r.params, kind: 'mount' }, route);
     }
   }
   let coach = null;
-  function showCoachMarks() {
+  function showCoachMarks(asked = false) {
     try {
       const all = store.all();
       const done = Object.values(all).filter(e => e && e.completed).length;
-      if (!coachMarksDue(prefs.get(), done)) return;
+      if (!asked && !coachMarksDue(prefs.get(), done)) return;
       if (coach) coach.destroy();
-      coach = mountCoachMarks({ railEl: navEl, onDone: () => { coach = null; prefs.set({ coachMarksDone: true }); } });
+      coach = mountCoachMarks({ railEl: navEl, signedIn: auth.state() === 'in', onDone: () => { coach = null; prefs.set({ coachMarksDone: true }); if (asked) { try { history.replaceState(null, '', '#/'); } catch (e) { /* stays */ } } } });
     } catch (e) { /* a page without records: no marks today */ }
   }
   let retrying = false;

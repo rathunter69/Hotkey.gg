@@ -4366,7 +4366,7 @@ export const COPY = {
   "first_run_then": "then",
   "first_run_next": "Next",
   "first_run_skip": "Skip",
-  "first_run_start": "Start lesson 1.1.1",
+  "first_run_start": "Open the workbook",
   "landing_start": "Start learning",
   "landing_fact_lessons": "{n} lessons.",
   "landing_fact_challenges": "{n} challenges.",
@@ -4714,7 +4714,20 @@ export const COPY = {
   "daily_week_played": "{n} of 7 days played clean",
   "daily_keys": "The keys it drills",
   "daily_rules": "One public board a day. Only a clean run posts a time: no help, no mouse.",
-  "save_line_boards": "A free account puts your Daily time on the public board next to everyone else's, and keeps your progress on any device."
+  "save_line_boards": "A free account puts your Daily time on the public board next to everyone else's, and keeps your progress on any device.",
+  "first_run_free_k": "Free",
+  "first_run_free": "Chapter 1, all of it, with its drills, the Daily and the boards.",
+  "first_run_full": "Chapters 2 to 6 and their timed play, when you want them.",
+  "first_run_save": "Progress saves in this browser. A free account keeps it on any device; make one now or after a lesson.",
+  "first_run_tour": "Show me around",
+  "orientation_pro": "Chapter 1 is free, all of it. Full Access opens Chapters 2 to 6 and their timed play.",
+  "orientation_account": "Your progress saves in this browser. A free account keeps it on any device and puts your times on the boards.",
+  "coach_done": "Done",
+  "signin_head": "Sign in or make a free account",
+  "signin_line": "Type your email and we send a 6-digit code. New here? The same code makes your account.",
+  "signin_google": "Continue with Google",
+  "signin_fine": "Your progress in this browser moves to the account. Chapter 1 stays free either way.",
+  "home_tour": "Take the tour"
  },
  "micro": {
   "enter-tab-direction": {

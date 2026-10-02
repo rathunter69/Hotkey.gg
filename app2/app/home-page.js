@@ -127,7 +127,7 @@ export function mountHomePage(root, ctx = {}) {
   // ---- right: Level, Today, Achievements
   const lv = game.levelInfo;
   const reward = lv.lvl < MAX_LEVEL ? rewardAt(lv.lvl + 1) : null;
-  const levelPanel = panelHtml({ heading: esc(t('home_level', { n: lv.lvl })), facts: esc(t('home_xp', { n: lv.into, next: lv.need })), body: `${barHtml(lv.pct, 'bar-level')}<div class="level-next">${rewardTileHtml(reward, lv.lvl < MAX_LEVEL ? lv.lvl + 1 : lv.lvl)}<span class="level-next-words">${reward ? `<span>${esc(t('home_next_reward', { n: lv.lvl + 1 }))} <b>${esc(reward.label)}</b></span><span>${esc(t('home_xp_to_go', { n: Math.max(0, lv.need - lv.into) }))}</span>` : `<span>${esc(t('home_top_level'))}</span>`}</span></div><p class="panel-line ink-2 xp-why">${esc(t('home_xp_why'))}</p>`, cls: 'home-level' });
+  const levelPanel = panelHtml({ heading: esc(t('home_level', { n: lv.lvl })), facts: esc(t('home_xp', { n: lv.into, next: lv.need })), body: `${barHtml(lv.pct, 'bar-level')}<div class="level-next">${rewardTileHtml(reward, lv.lvl < MAX_LEVEL ? lv.lvl + 1 : lv.lvl)}<span class="level-next-words">${reward ? `<span>${esc(t('home_next_reward', { n: lv.lvl + 1 }))} <b>${esc(reward.label)}</b></span><span>${esc(t('home_xp_to_go', { n: Math.max(0, lv.need - lv.into) }))}</span>` : `<span>${esc(t('home_top_level'))}</span>`}</span></div><p class="panel-line ink-2 xp-why">${esc(t('home_xp_why'))} <a href="#/?tour=1">${esc(t('home_tour'))}</a></p>`, cls: 'home-level' });
 
   const played = store.attempts({ kind: 'daily', day }).filter(a => a.secs != null);
   const clean = played.filter(a => a.clean).sort((a, b) => a.secs - b.secs);

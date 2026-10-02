@@ -6,6 +6,11 @@
 // first lesson, Home shows one coach mark on each rail item (ui/components/coachmarks.js). There
 // are no other deal cards: the case stays inside the lessons.
 //
+// Wolf, 2026-10-02 (7): the steps are pop-outs over the product, never pages of their own. Home is
+// drawn behind them with the rail, and the story card says what is free (Chapter 1, all of it),
+// what Full Access opens, and that progress saves here until a free account keeps it; it offers
+// the short tour (the coach marks on demand) beside Open the workbook.
+//
 // Keys: ↑ and ↓ move the highlight down one list of options across both questions, and the
 // highlighted option in each question is its answer; Enter goes on (Next, then Start lesson
 // 1.1.1); Esc skips (straight to the lesson with the answers as they stand). Every line is a
@@ -15,6 +20,7 @@ import { store } from './store.js';
 import { track } from './telemetry.js';
 import { LESSONS } from '../content/index.js';
 import { siteCopy, splitParas } from '../content/copy/apply.js';
+import { mountHomePage } from './home-page.js';
 
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const t = (key, fb) => siteCopy(key, fb);
@@ -67,8 +73,18 @@ export function answersAt(questions, answers, index) {
 }
 
 export function mountFirstRun(root, ctx = {}) {
+  // the product behind: Home as it will be, inert under the scrim
+  const behind = document.createElement('div');
+  behind.className = 'fr-behind';
+  behind.setAttribute('aria-hidden', 'true');
+  behind.inert = true;
+  root.appendChild(behind);
+  let home = null;
+  try { home = mountHomePage(behind, {}); } catch (e) { /* the cards stand on their own */ }
   const el = document.createElement('div');
-  el.className = 'fr';
+  el.className = 'fr fr-pop';
+  el.setAttribute('role', 'dialog');
+  el.setAttribute('aria-modal', 'true');
   root.appendChild(el);
   const q = (ctx && ctx.query) || {};
   const briefingDone = !!prefs.get().briefingDone && q.replay !== '1';
@@ -89,7 +105,6 @@ export function mountFirstRun(root, ctx = {}) {
         <h1 class="h-title">${esc(t('first_run_title', 'Two questions, then the first job.'))}</h1>
         ${QUESTIONS.map(qq => `<div class="fr-q"><div class="label" id="frq-${qq.key}">${esc(t(qq.copy, qq.fallback))}</div>
           <div class="fr-options" role="radiogroup" aria-labelledby="frq-${qq.key}" data-q="${qq.key}">${qq.options.map(o => `<button type="button" class="fr-opt" role="radio" aria-checked="false" data-q="${qq.key}" data-v="${esc(o.v)}"><span class="fr-opt-label">${esc(o.label)}</span><span class="fr-opt-sub">${esc(t(o.copy, o.sub))}</span></button>`).join('')}</div></div>`).join('')}
-        <p class="fine">${esc(t('orientation_fine', 'Use the arrows and Enter. Sound comes on quietly with your first key, and the sound button at the top of a lesson turns it off.'))}</p>
         <p class="fine">${esc(t('first_run_fine', 'Instructions and keycaps follow the keyboard choice. Both settings change any time from Settings. Progress is saved on this device.'))}</p>
         <div class="btn-row"><span class="keys-hint"><kbd class="key">↑</kbd><kbd class="key">↓</kbd> ${esc(t('first_run_then', 'then'))} <kbd class="key">Enter</kbd></span><button type="button" class="btn btn-primary" data-act="next">${esc(t('first_run_next', 'Next'))}<kbd class="key key-on-fill">Enter</kbd></button><button type="button" class="btn" data-act="skip">${esc(t('first_run_skip', 'Skip'))}<kbd class="key">Esc</kbd></button></div>
       </section>`;
@@ -99,7 +114,8 @@ export function mountFirstRun(root, ctx = {}) {
       el.innerHTML = `<section class="panel fr-panel fr-story" aria-label="${esc(card.title)}">
         <h1 class="h-title">${esc(card.title)}</h1>
         ${card.body.map((p, i) => `<p class="${i === 0 ? 'fr-story-lead' : 'body'}">${esc(p)}</p>`).join('')}
-        <div class="btn-row"><button type="button" class="btn btn-primary" data-act="start">${esc(t('first_run_start', 'Start lesson 1.1.1'))}<kbd class="key key-on-fill">Enter</kbd></button><button type="button" class="btn" data-act="skip">${esc(t('first_run_skip', 'Skip'))}<kbd class="key">Esc</kbd></button></div>
+        <div class="fr-facts"><div class="fr-fact"><span class="fr-fact-k">${esc(t('first_run_free_k', 'Free'))}</span><span>${esc(t('first_run_free', 'Chapter 1, all of it, with its drills, the Daily and the boards.'))}</span></div><div class="fr-fact"><span class="fr-fact-k fr-fact-pro">${esc(t('paywall_pro', 'Full Access'))}</span><span>${esc(t('first_run_full', 'Chapters 2 to 6 and their timed play, when you want them.'))}</span></div><div class="fr-fact"><span class="fr-fact-k">${esc(t('save_title', 'Save your progress'))}</span><span>${esc(t('first_run_save', 'Progress saves in this browser. A free account keeps it anywhere; make one now or after a lesson.'))} <a href="#/account" class="fr-acct">${esc(t('save_go', 'Make a free account'))}</a></span></div></div>
+        <div class="btn-row"><button type="button" class="btn btn-primary" data-act="start">${esc(t('first_run_start', 'Start lesson 1.1.1'))}<kbd class="key key-on-fill">Enter</kbd></button><button type="button" class="btn" data-act="tour">${esc(t('first_run_tour', 'Show me around'))}<kbd class="key">T</kbd></button><button type="button" class="btn" data-act="skip">${esc(t('first_run_skip', 'Skip'))}<kbd class="key">Esc</kbd></button></div>
       </section>`;
       const b = el.querySelector('[data-act="start"]'); if (b) b.focus({ preventScroll: true });
     }
@@ -120,16 +136,19 @@ export function mountFirstRun(root, ctx = {}) {
     if (id === 'next') next();
     else if (id === 'start') finish();
     else if (id === 'skip') { skipped = true; finish(); }
+    else if (id === 'tour') finish('#/?tour=1');
   }
   function next() { if (idx + 1 < steps.length) { idx++; render(); } else finish(); }
-  function finish() {
+  function finish(to) {
     if (!briefingDone) track('briefing_done', { skipped });
     store.setLearner(finishPatch(answers));
-    location.hash = '#/lesson/' + FIRST_LESSON;
+    location.hash = typeof to === 'string' ? to : '#/lesson/' + FIRST_LESSON;
   }
   const isTyping = tg => !!tg && (tg.tagName === 'INPUT' || tg.tagName === 'TEXTAREA' || tg.tagName === 'SELECT' || tg.isContentEditable);
   const onKey = e => {
     if (isTyping(e.target) || e.defaultPrevented) return;
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { e.preventDefault(); return; }   // the page behind keeps still
+    if ((e.key === 't' || e.key === 'T') && step() === 'story' && !e.ctrlKey && !e.metaKey && !e.altKey) { e.preventDefault(); act('tour'); return; }
     if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
       if (step() !== 'picker') return;
       e.preventDefault(); at = pickerMove(e.key, at, flat.length); Object.assign(answers, answersAt(QUESTIONS, answers, at)); paintPicker();
@@ -138,5 +157,5 @@ export function mountFirstRun(root, ctx = {}) {
   };
   document.addEventListener('keydown', onKey);
   render();
-  return { destroy() { document.removeEventListener('keydown', onKey); el.remove(); } };
+  return { destroy() { document.removeEventListener('keydown', onKey); el.remove(); if (home) home.destroy(); behind.remove(); } };
 }

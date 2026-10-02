@@ -12,9 +12,9 @@ body > .app{margin-left:var(--rail-w); max-width:none; padding:var(--content-top
 body > #footMount{margin-left:var(--rail-w)}
 #footMount .site-footer{margin-top:var(--s12)}
 /* the workspace, the first run and the landing page have no rail (3.0, The rail; the landing page has the top bar) */
-body[data-route="lesson"] #navMount, body[data-route="drill"] #navMount, body[data-route="rapid"] #navMount, body[data-route="due"] #navMount, body[data-route="start"] #navMount{display:none}
-body[data-route="lesson"] > .app, body[data-route="drill"] > .app, body[data-route="rapid"] > .app, body[data-route="due"] > .app, body[data-route="start"] > .app, body[data-route="landing"] > .app,
-body[data-route="lesson"] > #footMount, body[data-route="drill"] > #footMount, body[data-route="rapid"] > #footMount, body[data-route="due"] > #footMount, body[data-route="start"] > #footMount, body[data-route="landing"] > #footMount{margin-left:0}
+body[data-route="lesson"] #navMount, body[data-route="drill"] #navMount, body[data-route="rapid"] #navMount, body[data-route="due"] #navMount{display:none}
+body[data-route="lesson"] > .app, body[data-route="drill"] > .app, body[data-route="rapid"] > .app, body[data-route="due"] > .app, body[data-route="landing"] > .app,
+body[data-route="lesson"] > #footMount, body[data-route="drill"] > #footMount, body[data-route="rapid"] > #footMount, body[data-route="due"] > #footMount, body[data-route="landing"] > #footMount{margin-left:0}
 body[data-route="lesson"] > .app, body[data-route="drill"] > .app, body[data-route="rapid"] > .app, body[data-route="due"] > .app{padding-top:0}
 body[data-route="landing"] #navMount{position:static; width:auto; bottom:auto}
 
