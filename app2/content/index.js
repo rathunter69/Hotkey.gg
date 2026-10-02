@@ -220,6 +220,7 @@ import ch5_assessment from './lessons/ch5-assessment.js';
 import spreading_a_comp from './lessons/spreading-a-comp.js';
 import calendarization_ltm from './lessons/calendarization-ltm.js';
 import median_and_range from './lessons/median-and-range.js';
+import operating_multiples from './lessons/operating-multiples.js';
 
 export const CHAPTERS = [
   {
@@ -376,7 +377,7 @@ export const CHAPTERS = [
       { name: 'Project and assessment', blurb: 'The valuation summary for the board from a fresh set, then again against the clock.' },
     ],
     lessons: [
-      spreading_a_comp, calendarization_ltm, median_and_range,
+      spreading_a_comp, calendarization_ltm, median_and_range, operating_multiples,
     ],
   },
 ];
