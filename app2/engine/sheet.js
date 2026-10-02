@@ -370,6 +370,7 @@ export class Sheet {
     this.groups = { rows: [], cols: [] };  // the outline (C2 gap 4): [{r1,r2,collapsed}] / [{c1,c2,collapsed}], one level
     this.condFmt = [];                     // conditional formatting rules in priority order (normCondFmt)
     this._cfMap = null;                    // condFmtMap() memoised until the cells or the rules change (recalc / restore / setCell drop it)
+    this.iterCalc = null;                  // { maxIterations, maxChange } while the workbook's iterative calculation is on (the Session sets it): a circle on this sheet is iterated, not read as 0
     this.multi = null;                     // Go To Special: an explicit list of cell keys, or null
     this.names = {};                       // defined names that point at this sheet (M40): { UPPER: { name, ref: '$B$4' | '$B$4:$B$9' } }, workbook-wide through the Session
     this.zoom = ZOOM_DEFAULT;              // the sheet's zoom, % (M99): a property of the sheet, as in Excel; the view scales by it

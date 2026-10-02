@@ -79,6 +79,11 @@ table('aggregates: ranges skip text/booleans, literal arguments coerce', [
   ['=COUNT(A1:B3)', 3], ['=COUNT("3",TRUE,"x")', 2], ['=COUNTA(A1:C3)', 7], ['=COUNTA(F1:F3)', 0], ['=COUNTBLANK(A1:F3)', 5], ['=PRODUCT(A1:A3)', 6],
   ['=MEDIAN(D1:D3)', 20], ['=MEDIAN(D1:D2)', 15], ['=MEDIAN(F1:F3)', '#NUM!'], ['=LARGE(D1:D3,1)', 30], ['=SMALL(D1:D3,4)', '#NUM!'], ['=RANK(20,D1:D3)', 2], ['=RANK(20,D1:D3,1)', 2], ['=RANK(25,D1:D3)', '#N/A'],
   ['=SUMPRODUCT(A1:A3,D1:D3)', 140], ['=SUMPRODUCT(A1:A3,D1:D2)', '#VALUE!'],
+  // the inclusive percentile and quartile (Chapter 6's range on a comp set); text and blanks drop out as MEDIAN's do
+  ['=QUARTILE.INC(D1:D3,0)', 10], ['=QUARTILE.INC(D1:D3,1)', 15], ['=QUARTILE.INC(D1:D3,2)', 20], ['=QUARTILE.INC(D1:D3,3)', 25], ['=QUARTILE.INC(D1:D3,4)', 30], ['=QUARTILE.INC(D1:D3,5)', '#NUM!'],
+  ['=QUARTILE(H1:H3,2)', 20], ['=QUARTILE.INC(F1:F3,1)', '#NUM!'], ['=QUARTILE.INC(A1:B3,1)', 1.5], ['=PERCENTILE.INC(D1:D3,0.5)', 20], ['=PERCENTILE.INC(D1:D3,0.1)', 12], ['=PERCENTILE(D1:D3,1.1)', '#NUM!'], ['=PERCENTILE.INC(J1:J3,0.25)', 15],
+  // RRI: the rate that grows pv to fv over nper periods (an IRR on two flows)
+  ['=RRI(5,100,250)', Math.pow(2.5, 0.2) - 1], ['=RRI(2,100,121)', 0.1], ['=RRI(0,100,250)', '#NUM!'], ['=RRI(1,100,-50)', -1.5], ['=RRI(2,100,-50)', '#NUM!'],
 ]);
 
 // M75: array evaluation inside SUMPRODUCT (Excel evaluates each argument cell by cell; TRUE/FALSE

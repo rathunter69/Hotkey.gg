@@ -162,7 +162,8 @@ const caseTitle = what => `=${inp('company')}&": ${what}, "&Cover!$C$${R('Cover'
 const titled = (sheet, formula) => { if (!sheet) return; sheet.cells.A1 = { ...sheet.cells.A1, formula, value: undefined }; delete sheet.cells.A1.value; };
 
 /* ---- Cover ---- */
-function pageCover() {
+/** The Cover; `extraLinks` ([name, note] pairs) are the sheets a later chapter adds to the map (Chapter 6's valuation pages). */
+function pageCover(extraLinks = []) {
   const sheet = page({
     name: 'Cover', chapter: CHAPTER, title: `${COMPANY}: operating model`, units: 'USD thousands unless stated; the case switch, the checks flag and the map of the sheets',
     headers: ['Setting', 'Note'], labelHeader: 'Cover',
@@ -177,6 +178,7 @@ function pageCover() {
         ['Inputs', 'every typed number, the drivers block, the timeline'], ['IS', 'income statement'], ['CF', 'cash flow statement, indirect'], ['BS', 'balance sheet'],
         ['Schedules', 'rollout and revenue, costs, working capital, PP&E, debt, tax'], ['Checks', 'one row per check, the roll-up flag'], ['DCF', 'free cash flow, WACC, terminal value, enterprise value'],
         ['One site', 'Domain for one month, three statements by hand (5.1)'], ['One week', 'Domain for one week, six events (5.1.6)'], ['Data', 'the historical accounts as the accountants sent them'],
+        ...extraLinks,
       ].map(([name, note], i) => ({ key: 'link' + i, label: name, kind: 'text', values: [`=HYPERLINK("#'${name}'!A1","${name}")`, note] })) },
       { title: 'Cases', rows: CASES.map((c, i) => ({ key: 'c' + (i + 1), label: `Case ${i + 1}`, kind: 'text', values: [c] })) },
       { title: 'Names', rows: [
@@ -904,6 +906,17 @@ function buildAll() {
 const PAGES = buildAll();
 /** Where each keyed line of each sheet landed (lessons and tests address rows by key). */
 export const ROW = clone(ROWS);
+/**
+ * The Cover rebuilt with more sheets on its map (Chapter 6 adds its valuation pages): the same two
+ * passes, on a scratch row table, so nothing here moves. Returns { sheet, at }.
+ */
+export function coverWith(extraLinks) {
+  const saved = ROWS, savedPass = firstPass;
+  ROWS = clone(ROW); firstPass = true; pageCover(extraLinks);
+  firstPass = false; const sheet = pageCover(extraLinks); const at = ROWS.Cover;
+  ROWS = saved; firstPass = savedPass;
+  return { sheet, at };
+}
 export const NAMES = { Case: 'Cover!$C$6', LastHistorical: `Inputs!$C$${ROW.Inputs.lasthist}`, Circ: `Inputs!$C$${ROW.Inputs.circ}`, WACC: `DCF!$C$${ROW.DCF.wacc}` };
 
 const DONE = {
