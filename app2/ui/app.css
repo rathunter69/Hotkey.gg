@@ -167,7 +167,7 @@ td.editing .edin{white-space:nowrap}
 body.hide-gridlines #grid td{border-color:transparent}
 
 /* ---------- 6. cursor tokens, active, point, selection, fill-handle, marquee (463, 471–494, 501–514) ---------- */
-:root{ --cell-cursor:#1a7a45; --active-fill:rgba(26,122,69,.13); --sel-grey:rgba(58,62,72,.22); }
+:root{ --active-fill:rgba(26,122,69,.13); --sel-grey:rgba(58,62,72,.22); }
 td.active{outline:1.5px solid var(--cell-cursor); outline-offset:-1px; z-index:4}
 /* Formula pointer — the cell whose reference is currently being inserted into the formula bar.
    Dashed border reads distinct from the solid active-cell outline. */

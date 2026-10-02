@@ -45,6 +45,7 @@ export const MOMENTS = {
   'menu': { when: 'The account menu, More, Help opens', token: 'd-menu', skip: false },
   'key': { when: 'A key in a taught route', token: 'd-key', skip: false },
   'goal-done': { when: 'A goal lands', token: 'd-goal' },
+  'cursor-ping': { when: 'A goal lands, the window comes back, a sheet changes: a ring grows out of the cell cursor', token: 'd-ping', skip: false },
   'marker': { when: 'A timed run: the marker moves with the clock', token: null, skip: false },
   'beat': { when: 'The panel changes beat', token: 'd-beat', skip: false },
   'result': { when: 'A timed run ends', token: 'd-result', sequence: true },
