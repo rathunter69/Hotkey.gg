@@ -272,9 +272,10 @@ test('wildcards match with an iterative glob: many * segments stay in millisecon
   const c = {}; for (let i = 1; i <= 5; i++) c['A' + i] = 'a'.repeat(28);
   const cx = { raw: k => c[k] ?? null, rows: 20, cols: 10 };
   for (const pat of ['*a'.repeat(50) + '*b', '*'.repeat(30) + 'x', '*a?'.repeat(40) + 'b']) {
-    const t0 = Date.now();
+    const t0 = process.cpuUsage();   // CPU time, not wall: the gate runs its files side by side, often on a busy box
     assert.equal(evalFormula('=COUNTIF(A1:A5,"' + pat + '")', cx), 0); assert.equal(evalFormula('=MATCH("' + pat + '",A1:A5,0)', cx), '#N/A'); assert.equal(evalFormula('=SEARCH("' + pat + '",A1)', cx), '#VALUE!');
-    assert.ok(Date.now() - t0 < 200, pat.length + '-char pattern took ' + (Date.now() - t0) + ' ms');
+    const u = process.cpuUsage(t0); const ms = (u.user + u.system) / 1000;
+    assert.ok(ms < 200, pat.length + '-char pattern took ' + ms.toFixed(0) + ' ms of CPU');
   }
   // parity with a straightforward regex translation over random patterns (case-insensitive, ? spans any char, ~ escapes)
   const esc = ch => ch.replace(/[.*+?^$\{}()|[\]\\]/g, m => '\\' + m);

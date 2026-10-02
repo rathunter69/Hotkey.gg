@@ -1,5 +1,6 @@
-# The full node check: the gate plus the *.slow.test.js files (the liveness equivalence replay,
-# which runs the old clone-based rule beside the in-place one over every lesson and drill).
+# The full node check (npm run check:full): every lesson and drill replay (the blocking gate
+# replays a sample), plus the *.slow.test.js files (the liveness equivalence replay, which runs the
+# whole-recalculation reference beside the fast rule over every lesson and drill).
 # Non-blocking, nightly and on demand (CLAUDE.md: blocking checks stay fast). No browser, no network.
 name: full-check
 on:
@@ -14,7 +15,7 @@ concurrency:
 jobs:
   full:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 120   # the liveness equivalence replay alone runs well over half an hour with six chapters
     continue-on-error: true
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2

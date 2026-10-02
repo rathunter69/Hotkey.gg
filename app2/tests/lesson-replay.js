@@ -12,6 +12,7 @@ import { validateLesson, availableConcepts, SEEDED_KINDS } from '../content/sche
 import { WORKBOOKS, workbookState } from '../content/workbooks/index.js';
 import { LessonRun } from '../app/runner.js';
 import { hintScript } from './hint-rules.js';
+import { replayReason, sampleLine } from './replay-select.js';
 
 export const SHARDS = 8;
 /** Two runs' starting workbooks are the same: every sheet's cells exactly, its circles and names, and the calculation graph's view. */
@@ -45,12 +46,20 @@ export function partition(lessons = LESSONS, costs = lessonCosts()) {
 
 export function registerReplays(shard) {
   const mine = partition()[shard];
+  const at = new Map(LESSONS.map((l, i) => [l, i]));
+  const replayed = mine.filter(l => replayReason(l, at.get(l)));
+  sampleLine('lessons', replayed.length, mine.length);
   for (const lesson of mine) {
-    test(`${lesson.id}: validates, requires only taught concepts, solution replays`, () => {
+    const validate = () => {
       const errs = validateLesson(lesson);
       assert.deepEqual(errs, [], errs.join('; '));
       const avail = availableConcepts(lesson, LESSONS_BY_ID);
       for (const g of lesson.goals) for (const c of g.requires || []) assert.ok(avail.has(c), `${lesson.id} goal ${g.id} requires "${c}" which is not taught here or earlier`);
+    };
+    // the gate replays a sample (replay-select.js); every lesson is validated on every run
+    if (!replayed.includes(lesson)) { test(`${lesson.id}: validates, requires only taught concepts (replayed in its slice and by --full)`, validate); continue; }
+    test(`${lesson.id}: validates, requires only taught concepts, solution replays`, () => {
+      validate();
 
       let t = 0;
       const run = new LessonRun(lesson, { mode: 'guided', now: () => (t += 100), fresh: true });

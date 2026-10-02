@@ -467,8 +467,8 @@ test('F46: after Go To Special the rule applies to every selected area', () => {
 test('F47: a rule over a range far beyond the sheet costs what its cells on the sheet cost', () => {
   const huge = new Sheet({ cells: { B2: { value: 10 }, B3: { value: 20 } }, condFmt: [{ range: 'B1:B1000000', kind: 'dataBar' }, { range: 'B2:ZZZ99999', kind: 'colorScale' }] });
   const fit = new Sheet({ cells: { B2: { value: 10 }, B3: { value: 20 } }, condFmt: [{ range: 'B1:B100', kind: 'dataBar' }, { range: 'B2:Z100', kind: 'colorScale' }] });
-  const t0 = performance.now(); const m = huge.condFmtMap(); const ms = performance.now() - t0;
-  assert.deepEqual(m, fit.condFmtMap()); assert.ok(ms < 300, 'took ' + ms.toFixed(1) + ' ms');
+  const t0 = process.cpuUsage(); const m = huge.condFmtMap(); const u = process.cpuUsage(t0); const ms = (u.user + u.system) / 1000;   // CPU time, not wall: the gate runs its files side by side, often on a busy box
+  assert.deepEqual(m, fit.condFmtMap()); assert.ok(ms < 300, 'took ' + ms.toFixed(1) + ' ms of CPU');
 });
 
 test('F2: a year-less date in the Highlight Cells box (1/2, 12/31) is that day of this year, as a cell entry reads it, so a date rule compares serials', () => {

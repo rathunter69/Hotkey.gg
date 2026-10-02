@@ -83,6 +83,7 @@ After R7: the hardcoded-strings inventory (every label, tooltip and toast in the
 
 ## 3. Shipping
 - Blocking check: static + node unit tests, under 30s. Browser smoke (network blocked except localhost) as a separate non-blocking job. Full browser matrix nightly/on demand.
+- The blocking check validates every lesson but replays only the lessons and drills changed since `main` plus a daily eighth of the catalogue. Before a run merges into `main`, run `npm run check:full` (every replay, the drills, the slow liveness test). It is required when the check prints FULL RUN REQUIRED (engine, runner, schema or lesson checks touched), and it also runs nightly in `full-check`.
 - Hosting: Cloudflare Pages. Production branch is `rebuild` (renamed to `main`'s role at cutover), output directory `app2`, preview link per branch, one-click rollback, no manual ?v= bumps.
 - `supabase-deploy.yml` (old) is removed at cutover; rebuild SQL lives under app2/supabase/ and reaches the live project only with Wolf's approval: from the claude.ai project chat, or through the manual `db-deploy` workflow he approves. Nothing applies it automatically.
 

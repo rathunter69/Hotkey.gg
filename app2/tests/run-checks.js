@@ -8,9 +8,14 @@
 // equivalence replay): on demand and in the non-blocking full-check workflow, never in the gate.
 // `--measure` times every test file (and every lesson's replays) on its own and writes
 // check-costs.json, which the gate balances its processes on; rerun it when a chapter lands.
+// The gate replays a sample of the lessons and drills (replay-select.js): those whose content
+// changed since the merge-base with origin/main (CHECK_BASE overrides), plus today's eighth of the
+// catalogue; every lesson is still validated. `--full` replays everything and is the step before
+// a run merges to main. A change to the engine, the runner, the schema or the lesson checks prints
+// that a full run is required before merging.
 // CHECK_VERBOSE=1 prints each test process's time and files.
 // No dependencies, no framework, no browser.
-import { spawn } from 'node:child_process';
+import { spawn, execFileSync } from 'node:child_process';
 import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { join, dirname, resolve, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -112,7 +117,26 @@ const shardFiles = testFiles.filter(f => /^lesson-replay-\d+$/.test(base(f)));
 const lessonTotal = Object.values(COSTS.lessons || {}).reduce((a, b) => a + b, 0);
 const fileCosts = Object.values(COSTS.files || {}).sort((a, b) => a - b);
 const median = fileCosts.length ? fileCosts[fileCosts.length >> 1] : 0.3;
-const weight = f => (shardFiles.includes(f) ? lessonTotal / shardFiles.length || median : COSTS.files?.[base(f)] ?? median);
+const weight = f => (shardFiles.includes(f) ? (lessonTotal * replayShare) / shardFiles.length || median : (COSTS.files?.[base(f)] ?? median) * (base(f) === 'drills' ? replayShare : 1));
+// the gate's replay sample: the files changed since the merge-base with origin/main (the working
+// tree included), for replay-select.js in the test processes. No git (a bare copy): everything replays.
+const git = args => execFileSync('git', args, { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).split('\n').filter(Boolean);
+let changed = null;
+if (!FULL) {
+  try {
+    let since; try { since = git(['merge-base', 'HEAD', process.env.CHECK_BASE || 'origin/main'])[0]; } catch { since = null; }
+    const committed = since ? git(['diff', '--name-only', since]) : git(['diff-tree', '--no-commit-id', '--name-only', '-r', '--root', 'HEAD']).concat(git(['diff', '--name-only', 'HEAD']));
+    changed = [...new Set([...committed, ...git(['ls-files', '--others', '--exclude-standard'])])].filter(f => f.startsWith('app2/')).map(f => f.slice(5));
+    process.env.CHECK_REPLAY = JSON.stringify({ files: changed, day: Math.floor(Date.now() / 86400000) });
+  } catch { changed = null; }
+}
+/** Shared code every replay runs through: a change to it needs the full run before merging. */
+const SHARED = [/^engine\//, /^app\/runner\.js$/, /^app\/graders\.js$/, /^content\/schema\.js$/, /^content\/lessons\/lib\//, /^content\/workbooks\/(index|page|clusters)\.js$/];
+const sharedTouched = (changed || []).filter(f => SHARED.some(rx => rx.test(f)));
+// the sample's share of the replay work, for the balance only: today's slice plus the changed content files
+const contentChanged = (changed || []).filter(f => /^content\/(lessons|remixes|drills|workbooks)\/[^/]+\.js$/.test(f)).length;
+const replayShare = process.env.CHECK_REPLAY ? 0.12 + 0.88 * Math.min(1, 1 / 8 + contentChanged / 40) : 1;   // validation (about an eighth of a lesson's cost) runs for every lesson
+
 const cores = availableParallelism();
 let testJobs;
 if (FULL) testJobs = [run(['--test', '--test-concurrency=' + cores, ...testFiles])];
@@ -181,6 +205,10 @@ for (const r of failed) {
   if (!shown) console.error(r.stdout + r.stderr);
 }
 console.log(`unit tests: ${sum.tests} tests in ${testFiles.length} files, ${sum.pass} pass, ${sum.fail} fail, ${sum.skipped} skipped (${results.length} processes, the longest ${Math.max(...results.map(r => r.secs)).toFixed(1)}s)`);
+const sample = { lessons: [0, 0], drills: [0, 0] };
+for (const r of results) for (const m of r.stdout.matchAll(/^replay-sample (lessons|drills) (\d+) (\d+)$/gm)) { sample[m[1]][0] += +m[2]; sample[m[1]][1] += +m[3]; }
+if (sample.lessons[1]) console.log(`replays: ${sample.lessons[0]} of ${sample.lessons[1]} lessons and ${sample.drills[0]} of ${sample.drills[1]} drills (changed since ${process.env.CHECK_BASE || 'origin/main'}, and today's eighth); every lesson validated; npm run check:full replays all`);
+if (sharedTouched.length) console.log(`FULL RUN REQUIRED before merging: this change touches shared code every replay runs through (${sharedTouched.slice(0, 3).join(', ')}${sharedTouched.length > 3 ? ` and ${sharedTouched.length - 3} more` : ''}); run npm run check:full`);
 if (failed.length || sum.fail) fail('unit tests failed');
 
 const secs = ((Date.now() - t0) / 1000).toFixed(1);

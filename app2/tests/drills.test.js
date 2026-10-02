@@ -8,6 +8,7 @@ import { DRILLS, DRILLS_BY_ID, drillById, BENCHMARKS, DAILY_POOL } from '../cont
 import { validateDrill } from '../content/schema.js';
 import { parsFrom, parsFromRoute, tierFor, tierAtLeast } from '../app/pars.js';
 import { LessonRun } from '../app/runner.js';
+import { replayReason, sampleLine } from './replay-select.js';
 import { tells } from '../content/copy/tells.js';
 import { BRITISH, namesVisibleThing, sentenceCount } from './copy-check.js';
 
@@ -28,6 +29,11 @@ function hintScript(hint) {
   }
   return out.join(' ');
 }
+
+/** The drills whose solutions and hints this run replays: all of them, or the gate's sample (replay-select.js; `--full` replays all). */
+const PLAIN = DRILLS.filter(x => x.kind !== 'challenge');
+const REPLAYED = PLAIN.filter((d, i) => replayReason(d, i));
+sampleLine('drills', REPLAYED.length, PLAIN.length);
 
 test('the catalogue: ids unique, lookups work, benchmarks and the Daily pool are real drills', () => {
   assert.ok(DRILLS.length >= 11, 'at least the eleven Chapter 1 drills');
@@ -93,7 +99,7 @@ test('validateDrill rejects the broken shapes', () => {
 });
 
 test('every solution replays to a finish inside the optimal keystroke count; pars are hittable', () => {
-  for (const d of DRILLS.filter(x => x.kind !== 'challenge')) {
+  for (const d of REPLAYED) {
     const run = new LessonRun(d, { mode: 'timed' });
     run.run(d.solution);
     assert.ok(run.finished, `${d.id}: solution finishes the drill`);
@@ -103,7 +109,7 @@ test('every solution replays to a finish inside the optimal keystroke count; par
 });
 
 test('each checkpoint\'s keys hint replays chained from the previous end state', () => {
-  for (const d of DRILLS.filter(x => x.kind !== 'challenge')) {
+  for (const d of REPLAYED) {
     const run = new LessonRun(d, { mode: 'timed' });
     d.goals.forEach((g, i) => {
       run.run(hintScript(g.keys));
