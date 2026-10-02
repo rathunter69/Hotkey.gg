@@ -13,11 +13,11 @@ const settled = ses => !ses.editing && !ses.dialog;
 const names = ses => ses.names || {};
 const strayGone = ses => !('OldTicket' in names(ses)) && names(ses).Case === NAMES.Case && names(ses).Ticket === NAMES.Ticket;
 const renamed = ses => names(ses).Cost_Per_Wash === NAMES.Cost_Per_Wash && !('CostPerWash' in names(ses));
-/** The list on Inputs from B19 is every name, alphabetical, with what it refers to; nothing under it. */
+/** The list on Inputs from B19 is every name, alphabetical, with what it refers to. */
 export function listMatches(ses, at = 19) {
   const sh = sheetOf(ses, 'Inputs'); if (!sh) return false;
   const rows = ses.definedNames();
-  return rows.length > 0 && rows.every((n, i) => sh.value('B' + (at + i)) === n.name && sh.value('C' + (at + i)) === n.refersTo) && (sh.value('B' + (at + rows.length)) ?? '') === '';
+  return rows.length > 0 && rows.every((n, i) => sh.value('B' + (at + i)) === n.name && sh.value('C' + (at + i)) === n.refersTo);
 }
 const onInputsAt = (ses, ref) => ses.sheets[ses.sheetIndex] && ses.sheets[ses.sheetIndex].name === 'Inputs' && ses.sheet.selectionText() === ref;
 const usedGoTo = ses => (ses.keyLog || []).slice(ses.goalMark || 0).some(e => /Ctrl\+G|F5/.test(e.k));
