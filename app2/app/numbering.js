@@ -14,6 +14,7 @@ export const MODULE_NUMBERS = {
   'conditional-formatting': '2.5', 'dates-and-text-for-presentation': '2.6', 'printing-and-page-layout': '2.7', 'ch2-project-and-assessment': '2.8', remixes: '2.R',
   // Chapter 3 · Formulas and functions (script-ch3.md)
   logic: '3.1', dates: '3.2',
+  'math-and-aggregation': '3.3', text: '3.4',
 };
 /** The catalogue section the chapter's project, assessment and test-out sit in (module 1.8). */
 export const FINAL_SECTION = 'Project and assessment';

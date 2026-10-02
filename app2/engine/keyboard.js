@@ -1055,7 +1055,7 @@ export class Session {
   openGoToSpecial() {
     this.startClock();
     this.openDialog('gotospecial', this.mode === 'ribbon' ? this.path : []);
-    this.dlg = { kind: 'gotospecial', pick: 'blanks' };
+    this.dlg = { kind: 'gotospecial', pick: 'blanks', types: { numbers: true, text: true, logicals: true, errors: true } };
   }
   gotoSpecialKey(key) {
     const d = this.dlg; if (!d) return;
@@ -1065,6 +1065,9 @@ export class Session {
     if (key === 'N') { d.pick = 'notes'; return; }   // M68: Go To Special › Notes
     if (key === 'W') { d.pick = 'rowdiff'; return; }   // Row differences
     if (key === 'M') { d.pick = 'coldiff'; return; }   // Column differences
+    // Constants and Formulas narrow by type: Numbers (U), Text (X), Logicals (G), Errors (E) toggle, as Excel's four boxes
+    const BOX = { U: 'numbers', X: 'text', G: 'logicals', E: 'errors' };
+    if (BOX[key]) { if (d.pick === 'constants' || d.pick === 'formulas') { if (!d.types) d.types = { numbers: true, text: true, logicals: true, errors: true }; d.types[BOX[key]] = !d.types[BOX[key]]; } return; }
     if (key === 'ArrowUp' || key === 'ArrowDown') {
       const order = ['notes', 'blanks', 'constants', 'formulas', 'rowdiff', 'coldiff'];
       const i = order.indexOf(d.pick);
@@ -1074,7 +1077,8 @@ export class Session {
     if (key === 'Enter') {
       const pick = d.pick;
       this.exitRibbon(false);
-      if (!this.sheet.selectSpecial(pick)) { this.openGoToSpecial(); this.dlg.pick = pick; this.note = SPECIAL_NONE_NOTE; }
+      const types = d.types && Object.values(d.types).some(x => !x) ? { ...d.types } : null;
+      if (!this.sheet.selectSpecial(pick, types)) { this.openGoToSpecial(); this.dlg.pick = pick; if (types) this.dlg.types = types; this.note = SPECIAL_NONE_NOTE; }
     }
   }
 

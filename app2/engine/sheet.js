@@ -549,7 +549,9 @@ export class Sheet {
   regionAround(r, c) {
     let r1 = r, r2 = r, c1 = c, c2 = c;
     const any = (rr1, cc1, rr2, cc2) => { for (let rr = Math.max(1, rr1); rr <= Math.min(this.rows, rr2); rr++) for (let cc = Math.max(1, cc1); cc <= Math.min(this.cols, cc2); cc++) if (this.nonEmpty(rr, cc)) return true; return false; };
-    for (let guard = 0; guard < 60; guard++) {
+    // grows one row or column per side per pass until nothing touches it: a region has no size limit (Excel's
+    // current region runs the whole of a 90-row export), so the guard is the grid itself, not a fixed count
+    for (let guard = 0, most = this.rows + this.cols + 2; guard < most; guard++) {
       let grew = false;
       if (r1 > 1 && any(r1 - 1, c1 - 1, r1 - 1, c2 + 1)) { r1--; grew = true; }
       if (r2 < this.rows && any(r2 + 1, c1 - 1, r2 + 1, c2 + 1)) { r2++; grew = true; }
@@ -688,7 +690,9 @@ export class Sheet {
     // a leading apostrophe makes the rest text, whatever it looks like ('=A1, '00123), and is kept as the cell's prefix, not its value (M71)
     if (buf[0] === "'") return { kind: 'value', value: String(text).replace(/^\s*'/, '').replace(/\s+$/, ''), txt: true, apos: true };
     if (buf[0] === '=') {
-      const opens = (buf.match(/\(/g) || []).length, closes = (buf.match(/\)/g) || []).length;
+      // brackets inside a string literal ("(" in =FIND("(",F5)) are text, not grouping, so they never count
+      const bare = buf.replace(/"(?:[^"]|"")*"?/g, '');
+      const opens = (bare.match(/\(/g) || []).length, closes = (bare.match(/\)/g) || []).length;
       if (opens > closes) buf += ')'.repeat(opens - closes);   // Excel auto-closes
       const ac = autocorrectFormula(buf);
       if (ac.kind === 'fix') return { kind: 'fix', buf: ac.buf, fixed: ac.fixed };
@@ -1463,7 +1467,11 @@ export class Sheet {
    * clear operations act on), active = the first key. False when nothing qualifies — Excel says
    * "No cells were found." and the selection stays.
    */
-  selectSpecial(kind) {
+  /**
+   * `types` (Constants and Formulas only) narrows by what the cell holds, as the dialog's four boxes
+   * do: { numbers, text, logicals, errors }, each true unless unticked. Dates are numbers.
+   */
+  selectSpecial(kind, types = null) {
     let rg = this.selRange();
     if (!this.sel) rg = this.regionAround(this.active.r, this.active.c);
     const keys = [];
@@ -1488,7 +1496,12 @@ export class Sheet {
       const cell = this.get(rr, cc);
       const isFormula = !!cell.formula;
       const isBlank = !isFormula && (cell.value === null || cell.value === '');
-      const ok = kind === 'blanks' ? isBlank : kind === 'formulas' ? isFormula : kind === 'constants' ? (!isFormula && !isBlank) : kind === 'notes' ? !!cell.cmt : false;
+      let ok = kind === 'blanks' ? isBlank : kind === 'formulas' ? isFormula : kind === 'constants' ? (!isFormula && !isBlank) : kind === 'notes' ? !!cell.cmt : false;
+      if (ok && types && (kind === 'constants' || kind === 'formulas')) {
+        const v = isFormula ? this.value(refKey(rr, cc)) : cell.value;
+        const t = typeof v === 'boolean' ? 'logicals' : typeof v === 'number' ? 'numbers' : isErrVal(v) ? 'errors' : 'text';
+        ok = types[t] !== false;
+      }
       if (ok) keys.push(refKey(rr, cc));
     }
     if (!keys.length) return false;

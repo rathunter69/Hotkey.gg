@@ -95,6 +95,19 @@ import period_keys from './lessons/period-keys.js';
 import yearfrac_and_fiscal_periods from './lessons/yearfrac-and-fiscal-periods.js';
 import trading_calendar from './lessons/trading-calendar.js';
 import challenge_timeline_and_age from './lessons/challenge-timeline-and-age.js';
+// Chapter 3 · Formulas and functions (Run R3): 3.3 Math and aggregation, 3.4 Text
+import round_family from './lessons/round-family.js';
+import countif_countifs from './lessons/countif-countifs.js';
+import sumif_sumifs_averageifs from './lessons/sumif-sumifs-averageifs.js';
+import busiest_sites from './lessons/busiest-sites.js';
+import sumproduct_blended_ticket from './lessons/sumproduct-blended-ticket.js';
+import the_reconciliation from './lessons/the-reconciliation.js';
+import challenge_site_package_summary from './lessons/challenge-site-package-summary.js';
+import split_the_codes from './lessons/split-the-codes.js';
+import parse_the_memo from './lessons/parse-the-memo.js';
+import text_to_numbers from './lessons/text-to-numbers.js';
+import text_to_columns_flash_fill from './lessons/text-to-columns-flash-fill.js';
+import challenge_text_dump from './lessons/challenge-text-dump.js';
 
 export const CHAPTERS = [
   {
@@ -170,6 +183,8 @@ export const CHAPTERS = [
     lessons: [
       if_on_a_threshold, nested_if_ifs_min_max, and_or_not, iferror_and_the_override, challenge_flags_block,
       date_serials, member_tenure, period_keys, yearfrac_and_fiscal_periods, trading_calendar, challenge_timeline_and_age,
+      round_family, countif_countifs, sumif_sumifs_averageifs, busiest_sites, sumproduct_blended_ticket, the_reconciliation, challenge_site_package_summary,
+      split_the_codes, parse_the_memo, text_to_numbers, text_to_columns_flash_fill, challenge_text_dump,
     ],
   },
 ];
