@@ -1371,6 +1371,18 @@ export const COPY = {
    "mac_note": "",
    "story_beat": ""
   },
+  "name-manager": {
+   "id": "name-manager",
+   "module": "names-and-structure",
+   "order": "4.6.2",
+   "title": "The Name Manager",
+   "brief": "The Name Manager lists every name in the file, what it holds, where it points and its scope, including the ones somebody left behind. This file has one: OldTicket, still pointing at the ticket’s old cell on Scenarios, which would quietly feed a formula the wrong price. Delete it, give the cost per wash the house spelling, and paste the list where the reviewer will see it. The key is `Ctrl+F3`.",
+   "closing": "The Name Manager is the one place a name can hide, and now it holds three, each pointing where it says. The list on Inputs tells a reviewer the same without opening anything. || Open it on every file you inherit: a name pointing at #REF! after a deleted sheet, or at a cell nobody uses any more, feeds a formula silently. Delete what you cannot explain.",
+   "wow": "Every name in the file is listed, fixed and on the page.",
+   "convention_line": "Name toggles and key inputs only",
+   "mac_note": "",
+   "story_beat": ""
+  },
   "remix-format-on-the-pnl": {
    "id": "remix-format-on-the-pnl",
    "module": "remixes",
@@ -8886,6 +8898,56 @@ export const COPY = {
     "why": "",
     "hint_stuck": "pulse range G5:G8 · Case is still C11; only the way the formulas say it changed."
    }
+  ],
+  "name-manager": [
+   {
+    "lesson_id": "name-manager",
+    "goal_index": "0",
+    "text": "Open the Name Manager with Ctrl+F3 and pick the stray, OldTicket.",
+    "teach": "Ctrl+F3 opens the Name Manager: one row per name, with its value, what it refers to and its scope. ↑ and ↓ pick a row. OldTicket points at the live ticket on Scenarios, a cell the model no longer treats as the input.",
+    "why": "",
+    "hint_stuck": "pulse the Name Manager · The list is alphabetical: Case, CostPerWash, OldTicket, Ticket."
+   },
+   {
+    "lesson_id": "name-manager",
+    "goal_index": "1",
+    "text": "Delete OldTicket, confirm, and close the Name Manager.",
+    "teach": "Delete (Alt+D) asks before it removes a name, and Enter answers OK. Read the Refers To column first: a stray that still points at a real cell is the dangerous kind, because nothing on the sheet looks broken.",
+    "why": "",
+    "hint_stuck": "pulse the Name Manager · Alt+D on the picked row, Enter to confirm, Esc to close."
+   },
+   {
+    "lesson_id": "name-manager",
+    "goal_index": "2",
+    "text": "Rename CostPerWash to Cost_Per_Wash with Edit (Alt+E) in the Name Manager, then close it.",
+    "teach": "Edit (Alt+E) opens the picked name with its text selected, so typing replaces it; Enter saves, and every formula that reads the name follows it. Scope reads Workbook: a name defined this way works on every sheet, while a sheet copied with its names makes sheet-scoped duplicates, which is where strays like OldTicket come from.",
+    "why": "",
+    "hint_stuck": "pulse the Name Manager · Pick CostPerWash, Alt+E, type the new name over the old one."
+   },
+   {
+    "lesson_id": "name-manager",
+    "goal_index": "3",
+    "text": "Go To Cost_Per_Wash and land on the cost per wash on Inputs C5.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C5 · Ctrl+G takes the new name; the old one no longer exists."
+   },
+   {
+    "lesson_id": "name-manager",
+    "goal_index": "4",
+    "text": "Paste the list of names under its heading on Inputs: F3 in B19, then Paste List.",
+    "teach": "Paste Name (F3) lists the names; Paste List (Alt+L) writes each one and what it refers to from the active cell down, as text. It is a snapshot, so paste it again whenever the names change.",
+    "why": "",
+    "hint_stuck": "pulse cell B19 · F3 opens Paste Name; Alt+L is Paste List."
+   },
+   {
+    "lesson_id": "name-manager",
+    "goal_index": "5",
+    "text": "Does it tie? Watch Go To land on Ticket, a $13 ticket typed there, and EBITDA on Scenarios fall.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C24 on Scenarios · Every name in the list lands where it says."
+   }
   ]
  },
  "modules": {
@@ -9061,7 +9123,7 @@ export const COPY = {
    "id": "names-and-structure",
    "name": "Names and structure",
    "objective": "Naming the toggles and key inputs, sparingly; the Name Manager; a validation list driven by a name.",
-   "story_beat": "",
+   "story_beat": "Name the switch, not everything. || The pack is thirteen sheets now, and the case switch is read from all over it. A name turns Scenarios!$C$11 into Case, so a formula reads like English and a reviewer finds the switch by name. But a model with a hundred names is worse than one with none. Name the toggles and the key inputs, manage them, and let the picker read its list by name.",
    "page_name": ""
   }
  },

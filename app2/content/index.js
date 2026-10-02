@@ -123,6 +123,7 @@ import text_to_columns_flash_fill from './lessons/text-to-columns-flash-fill.js'
 import challenge_text_dump from './lessons/challenge-text-dump.js';
 // Chapter 4 · Data and Lookups (Run R4): 4.6 Names and structure, 4.7 Project and assessment
 import naming_sparingly from './lessons/naming-sparingly.js';
+import name_manager from './lessons/name-manager.js';
 
 export const CHAPTERS = [
   {
@@ -221,7 +222,7 @@ export const CHAPTERS = [
       { name: 'Project and assessment', blurb: 'The diligence pack from a fresh export, then another cluster’s on the clock; the assessment is the test-out.' },
     ],
     lessons: [
-      naming_sparingly,
+      naming_sparingly, name_manager,
     ],
   },
 ];
