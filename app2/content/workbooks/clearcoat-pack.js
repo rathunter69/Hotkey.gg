@@ -447,9 +447,9 @@ export function tablesOn(sheet, C, on, live = caseOf(1)) {
   sheet.dataTables = Object.values(recs).map(t => ({ ...t }));
   return sheet;
 }
-/** Take every Data Table and its result cells off a Scenarios sheet record (a start state before the lesson builds them). */
+/** Take every Data Table off a Scenarios sheet record: the result cells keep their formats and lose their figures (a start state before the lesson builds them). */
 export function tablesOff(sheet) {
-  for (const t of sheet.dataTables || []) for (let r = t.r1 + 1; r <= t.r2; r++) for (let c = t.c1 + 1; c <= t.c2; c++) delete sheet.cells[refKey(r, c)];
+  for (const t of sheet.dataTables || []) for (let r = t.r1 + 1; r <= t.r2; r++) for (let c = t.c1 + 1; c <= t.c2; c++) { const k = refKey(r, c); const f = formatOnly(sheet.cells[k]); if (f) sheet.cells[k] = f; else delete sheet.cells[k]; }
   delete sheet.dataTables;
   return sheet;
 }
@@ -993,7 +993,7 @@ export const LATE = { row: exportRow(PLANT.missing.day, PLANT.missing.site), ret
 /**
  * A module challenge's seed patch: content only, never workload. 4.4.C lays a fresh fortnight's
  * washes and revenue over Export (every row, the late one's figures parked beside it); 4.5.C draws
- * fresh case inputs (washes, member share and sites for the three cases, in order).
+ * fresh case inputs (washes, member share and sites for the three cases, in order; Base's share holds).
  */
 export function challengeSeed(id, rng) {
   if (!CHALLENGES[id]) throw new Error('clearcoat-pack: no challenge ' + id);
@@ -1018,7 +1018,8 @@ export function challengeSeed(id, rng) {
   if (id === 'challenge-a-three-case-model-with-a-sensitivity-table') {
     const sc = sheetOf(STATES[CHALLENGES[id].before], 'Scenarios').cells;
     const step = (lo, hi, by) => lo + Math.floor(rng() * (Math.round((hi - lo) / by) + 1)) * by;
-    const base = { washes: step(230, 270, 5), share: Math.round(step(0.45, 0.55, 0.01) * 100) / 100, sites: step(40, 48, 1) };
+    // the live case's member share stays at 50%, so Domain's break-even (and the Goal Seek note) is the module's 121 on every seed
+    const base = { washes: step(230, 270, 5), share: 0.5, sites: step(40, 48, 1) };
     const cases = [
       { washes: base.washes + step(15, 35, 5), share: Math.round((base.share + 0.05) * 100) / 100, sites: base.sites + 2 },
       base,

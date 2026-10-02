@@ -133,6 +133,7 @@ import two_way_data_table_ticket_member_share from './lessons/two-way-data-table
 import goal_seek_break_even_washes_per_site from './lessons/goal-seek-break-even-washes-per-site.js';
 import when_data_tables_fail_the_pass_through_driver from './lessons/when-data-tables-fail-the-pass-through-driver.js';
 import case_outputs_side_by_side_a_data_table_on_the_switch_and_the_sticky_if from './lessons/case-outputs-side-by-side-a-data-table-on-the-switch-and-the-sticky-if.js';
+import challenge_a_three_case_model_with_a_sensitivity_table from './lessons/challenge-a-three-case-model-with-a-sensitivity-table.js';
 
 export const CHAPTERS = [
   {
@@ -241,6 +242,7 @@ export const CHAPTERS = [
       goal_seek_break_even_washes_per_site,
       when_data_tables_fail_the_pass_through_driver,
       case_outputs_side_by_side_a_data_table_on_the_switch_and_the_sticky_if,
+      challenge_a_three_case_model_with_a_sensitivity_table,
     ],
   },
 ];

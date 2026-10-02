@@ -193,7 +193,7 @@ test('each state carries what its lesson reads', () => {
   assert.equal(sc('S452')['G' + C.oneWay.ebitda].table, '{=TABLE(G6,)}'); assert.equal(sc('S452')['C' + C.twoWay.vals], undefined);
   assert.equal(sc('S453')['C' + C.twoWay.rows[0]].value, 0.4); assert.equal(sc('S453')['E' + C.twoWay.rows[1]].table, '{=TABLE(G6,G7)}'); assert.equal(stateOf('S453').sheets.find(s => s.name === 'Scenarios').condFmt.length, 2);
   assert.equal(sc('S455')['E' + C.twoWay.rows[1]].table, '{=TABLE(C13,G7)}'); assert.equal(sc('S456')['D' + C.cases.ebitda].table, '{=TABLE(C11,)}');
-  assert.equal(sc('S45C')['D' + C.cases.ebitda], undefined); assert.equal(sc('S45C')['C' + C.switch].value, undefined); assert.equal(stateOf('S45C').sheets.find(s => s.name === 'Scenarios').dataTables, undefined);
+  assert.equal(sc('S45C')['D' + C.cases.ebitda].table, undefined); assert.equal(sc('S45C')['D' + C.cases.ebitda].value, undefined); assert.equal(sc('S45C')['C' + C.switch].value, undefined); assert.equal(stateOf('S45C').sheets.find(s => s.name === 'Scenarios').dataTables, undefined);
   // 4.4: the pivot on Cuts, rearranged three ways; the correction and the GETPIVOTDATA reader
   const cuts = id => stateOf(id).sheets.find(s => s.name === wb.CUTS);
   assert.equal(cuts('S44'), undefined); assert.deepEqual(cuts('S441').pivots[0].spec, { ...wb.PIVOTS.S441 });
