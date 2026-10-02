@@ -18700,7 +18700,8 @@ export const COPY = {
   "conv_G2_name": "A page reads like an MD reads",
   "conv_G2_short": "Title, units, timeline, then the answer",
   "conv_G3_name": "Consistent labels and footnotes",
-  "conv_G3_short": "Attention to detail is judged first"
+  "conv_G3_short": "Attention to detail is judged first",
+  "auth_bad_credentials": "That email and password didn’t work. Check them, or use a magic link."
  },
  "micro": {
   "enter-tab-direction": {

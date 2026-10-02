@@ -215,7 +215,7 @@ test('dev-only files are not served: everything under supabase/ and tests/ redir
     }
   };
   for (const f of all) if (!isDev(f) && /\.(js|html)$/.test(f)) follow(f);
-  assert.deepEqual([...needed].map(url), ['/supabase/functions/_shared/student-domains.js'], 'the site imports only the school-domain list from the dev folders');
+  assert.deepEqual([...needed].map(url).sort(), ['/supabase/functions/_shared/ops.js', '/supabase/functions/_shared/student-domains.js'], 'the site imports only the school-domain list and the digest renderer (the ops page) from the dev folders');
   for (const f of all) {
     const r = redirectFor(url(f));
     if (needed.has(f)) assert.equal(r, null, `${url(f)} is loaded by the site and must stay served`);

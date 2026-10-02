@@ -153,7 +153,7 @@ export const SITE_KEYS = [
   'err_mount', 'err_cap', 'err_head', 'err_retry', 'narrow_head', 'err_fetch', 'narrow_line', 'narrow_back',
   'page_label_home', 'page_label_landing', 'page_label_root', 'page_label_start', 'page_label_learn', 'page_label_lesson', 'page_label_practice', 'page_label_drill', 'page_label_daily',
   'page_label_rapid', 'page_label_due', 'page_label_leaderboard', 'page_label_reference', 'page_label_pricing', 'page_label_teams', 'page_label_account', 'page_label_checkout',
-  'page_label_desk', 'page_label_other', 'save_state_pending', 'save_state_account', 'save_state_retry', 'save_state_failed', 'save_line_device', 'save_line_pending', 'save_line_account',
+  'page_label_desk', 'page_label_other', 'auth_bad_credentials', 'save_state_pending', 'save_state_account', 'save_state_retry', 'save_state_failed', 'save_line_device', 'save_line_pending', 'save_line_account',
   'save_line_retry', 'save_line_failed', 'first_run_keyboard_mac_label', 'learn_plan_1', 'learn_plan_2', 'learn_plan_3', 'learn_plan_4', 'learn_plan_5',
   'learn_plan_6', 'fx_sound_on_title', 'fx_sound_on', 'acct_signout_unsaved_one', 'acct_tab_signup', 'acct_tab_magic', 'acct_delete_head', 'acct_data_line_out',
   'acct_delete', 'acct_stored_times', 'acct_stored_none', 'acct_delete_fine', 'acct_paid_on', 'demo_poster_link', 'demo_title', 'demo_brief',

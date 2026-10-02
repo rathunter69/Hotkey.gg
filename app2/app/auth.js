@@ -35,7 +35,7 @@ let lost = null;          // the uid whose session expired under it (this page l
  * off). Pure: the raw platform message in, { confirm: true } (answer as if the email went out) or
  * { error } (a message safe to show) out.
  */
-export const CREDENTIALS_TEXT = 'That email and password didn’t work. Check them, or use a magic link.';
+export const CREDENTIALS_TEXT = siteCopy('auth_bad_credentials', 'That email and password didn’t work. Check them, or use a magic link.');
 export function enumerationSafe(raw, kind) {
   const m = String(raw || '');
   const telling = /already (been )?registered|already exists|user not found|email not confirmed|signups? (is )?(not allowed|disabled)/i.test(m);
