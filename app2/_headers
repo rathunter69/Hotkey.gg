@@ -1,9 +1,15 @@
+# Security headers (liability checklist, Security; pinned by app2/tests/security.test.js).
+# Scripts: this origin plus the exact inline scripts the pages carry, by hash; no 'unsafe-inline', no
+# eval, no inline handlers. After editing an inline script run: node app2/tests/headers-file.js --write
+# Styles keep 'unsafe-inline' (the app sets style attributes in its templates); fonts come from Google
+# Fonts; the only API is the Supabase project (REST, Auth, functions over https, Realtime over wss).
 /*
+  Strict-Transport-Security: max-age=63072000; includeSubDomains
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=(), usb=()
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://wepejasrnskvftgnnecr.supabase.co wss://wepejasrnskvftgnnecr.supabase.co; frame-src 'none'; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-85IImuyKShQ5F+hLjZk398RjyDHLk8R3zmwnlxECWj4=' 'sha256-KF/irCFOtYOUTRyKWY7RhWY2XrqPZLhrsvOTo/ZlMy8=' 'sha256-RY50ZcxOUXfnHxX60N9QKTdHcquuc5BQQeJ3iESh/98=' 'sha256-iWwtDUwlOQlUSAolLAg3r0zXLifWTgxp0J8IBuHOsPI=' 'sha256-jvnX99rT7Plb9MdXKyGWbFh3VO0//Z6QOtoXn3ofjjk='; script-src-attr 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://wepejasrnskvftgnnecr.supabase.co wss://wepejasrnskvftgnnecr.supabase.co; worker-src 'none'; frame-src 'none'; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'
 /*.html
   Cache-Control: no-cache
 /
@@ -25,11 +31,11 @@ https://:project.pages.dev/*
   X-Robots-Tag: noindex
   ! Content-Security-Policy
   ! Permissions-Policy
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://*.stripe.com https://*.link.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://*.stripe.com https://*.link.com; connect-src 'self' https://wepejasrnskvftgnnecr.supabase.co wss://wepejasrnskvftgnnecr.supabase.co https://*.stripe.com https://*.link.com; frame-src https://*.stripe.com https://*.link.com; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-85IImuyKShQ5F+hLjZk398RjyDHLk8R3zmwnlxECWj4=' 'sha256-KF/irCFOtYOUTRyKWY7RhWY2XrqPZLhrsvOTo/ZlMy8=' 'sha256-RY50ZcxOUXfnHxX60N9QKTdHcquuc5BQQeJ3iESh/98=' 'sha256-iWwtDUwlOQlUSAolLAg3r0zXLifWTgxp0J8IBuHOsPI=' 'sha256-jvnX99rT7Plb9MdXKyGWbFh3VO0//Z6QOtoXn3ofjjk=' https://*.stripe.com https://*.link.com; script-src-attr 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://*.stripe.com https://*.link.com; connect-src 'self' https://wepejasrnskvftgnnecr.supabase.co wss://wepejasrnskvftgnnecr.supabase.co https://*.stripe.com https://*.link.com; frame-src https://*.stripe.com https://*.link.com; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'
   Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=(self "https://js.stripe.com" "https://*.stripe.com" "https://*.link.com"), usb=()
 https://:version.:project.pages.dev/*
   X-Robots-Tag: noindex
   ! Content-Security-Policy
   ! Permissions-Policy
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://*.stripe.com https://*.link.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://*.stripe.com https://*.link.com; connect-src 'self' https://wepejasrnskvftgnnecr.supabase.co wss://wepejasrnskvftgnnecr.supabase.co https://*.stripe.com https://*.link.com; frame-src https://*.stripe.com https://*.link.com; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-85IImuyKShQ5F+hLjZk398RjyDHLk8R3zmwnlxECWj4=' 'sha256-KF/irCFOtYOUTRyKWY7RhWY2XrqPZLhrsvOTo/ZlMy8=' 'sha256-RY50ZcxOUXfnHxX60N9QKTdHcquuc5BQQeJ3iESh/98=' 'sha256-iWwtDUwlOQlUSAolLAg3r0zXLifWTgxp0J8IBuHOsPI=' 'sha256-jvnX99rT7Plb9MdXKyGWbFh3VO0//Z6QOtoXn3ofjjk=' https://*.stripe.com https://*.link.com; script-src-attr 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://*.stripe.com https://*.link.com; connect-src 'self' https://wepejasrnskvftgnnecr.supabase.co wss://wepejasrnskvftgnnecr.supabase.co https://*.stripe.com https://*.link.com; frame-src https://*.stripe.com https://*.link.com; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'
   Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=(self "https://js.stripe.com" "https://*.stripe.com" "https://*.link.com"), usb=()
