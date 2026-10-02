@@ -32,6 +32,8 @@ const BEATS_DEFAULT = {
     body: 'A buyer flips to the financials and reads margins, multiples and thousands without a legend, so the number format has to carry the unit. A format code can write k or m after a figure, show a zero as a dash, color a negative and turn a plain date into FY26E, with the value underneath untouched. This module is the format code, one section at a time.' },
   'printing-and-page-layout': { eyebrow: 'Module 2.7 · printing and page layout', title: 'The book goes to print.',
     body: 'The financials section is three pages, and the book is a PDF that gets printed, so each page has to land on one sheet, carry its title rows, and say which file and which page it is. The one-page summary reads from the detail behind it. Set the pack up to print and it’s ready for the data room.' },
+  'ch2-project-and-assessment': { eyebrow: 'Module 2.8 · project and assessment', title: 'The financials section, start to finish.',
+    body: 'A fresh export has landed: the same accounting system, the same faults, a different three years. Everything the chapter taught goes onto one workbook, until three pages are ready for the data room. Build it, then build it again on the clock, because the assessment is the test-out.' },
   'project-and-assessment': { eyebrow: 'Module 1.8 · project, assessment, test-out', title: 'Management’s next feed is in.',
     body: 'A fresh week, a blank Report, and everything the chapter taught. Build the page start to finish, then prove it against the clock on Monday morning; or test out of the chapter in five minutes.' },
 };

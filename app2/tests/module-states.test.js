@@ -161,7 +161,7 @@ test('every module lesson chains: before is the previous lesson\'s after', () =>
   let prevAfter = null, prevWb = null;
   for (const l of moduleLessons) {
     if (l.workbook !== prevWb) { prevAfter = null; prevWb = l.workbook; }   // each chapter's workbook starts its own chain
-    if (l.module === 'project-and-assessment') continue;   // 1.8 opens management's next feed (S8raw), not the chain's end
+    if (/project-and-assessment$/.test(l.module)) continue;   // 1.8 and 2.8 open the next export (S8raw), not the chain's end
     if (prevAfter != null && l.kind !== 'challenge') assert.equal(l.state.before, prevAfter, `${l.id}: starts where the last lesson ended`);
     if (l.kind !== 'challenge') prevAfter = l.state.after || l.state.before;
   }

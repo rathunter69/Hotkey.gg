@@ -29,7 +29,7 @@ const divided = sh => [4, ...LINE_ROWS].every(r => sh.cellAt('D' + r).br === tru
 const laidOut = sh => [1, 2, 3, 4, 5].every(c => sh.colSet[c] && sh.colW[c] === DONE.colW[c]) && sh.gridlines === false && !!sh.freeze && sh.freeze.r === 4 && sh.freeze.c === 2;
 
 const LINK = (down, extra = '') => `"=" Ctrl+PgUp ×3 → ×2 Ctrl+↓ ×${down}${extra} Ctrl+↵`;
-const KEYS = {
+export const KEYS = {
   labels: 'Ctrl+PgDn ×3 → Ctrl+↓ ↓ ' + PRINT_LINES.map(([, label]) => `"${label}" ↵`).join(' '),
   revenue: `Ctrl+↑ ×2 ↓ → Shift+→ ×2 ${LINK(4)}`,
   rows: [LINK(7), LINK(8), LINK(10), LINK(11), LINK(11, ' ↓')].map(k => `↓ Shift+→ ×2 ${k}`).join(' '),
