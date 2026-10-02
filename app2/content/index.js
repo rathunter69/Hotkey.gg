@@ -57,6 +57,7 @@ import pv_fv_pmt from './lessons/pv-fv-pmt.js';
 import npv_xnpv from './lessons/npv-xnpv.js';
 import irr_xirr from './lessons/irr-xirr.js';
 import payment_schedule from './lessons/payment-schedule.js';
+import challenge_new_site_case from './lessons/challenge-new-site-case.js';
 import remix_format_on_the_pnl from './remixes/formatting-on-the-pnl.js';   // Chapter 1's format challenge, re-clothed (content/remix.js)
 
 export const CHAPTERS = [
@@ -118,7 +119,7 @@ export const CHAPTERS = [
       { name: 'Project and assessment', blurb: 'Build the San Antonio databook end to end, then prove it against the clock.' },
     ],
     lessons: [
-      pv_fv_pmt, npv_xnpv, irr_xirr, payment_schedule,
+      pv_fv_pmt, npv_xnpv, irr_xirr, payment_schedule, challenge_new_site_case,
     ],
   },
 ];
