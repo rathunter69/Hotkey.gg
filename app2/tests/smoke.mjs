@@ -8,6 +8,7 @@ import { createRequire } from 'node:module';
 import { spawn } from 'node:child_process';
 import { LESSONS } from '../content/index.js';
 import { parseKeyScript, parseKeySpec } from '../engine/keyboard.js';
+import { textProblems, readableText } from './text-guard.js';
 
 const require = createRequire(import.meta.url);
 let chromium;
@@ -75,14 +76,20 @@ async function play(script) {
   await page.waitForTimeout(150); await skipDemos();
 }
 const t = label => console.log(`  ${label} at ${((Date.now() - T0) / 1000).toFixed(1)}s`);
+/** The rendered-text guard (text-guard.js): no unfilled placeholder, missing value, spliced title, doubled word or raw key on the page. */
+async function guardText(label) {
+  const txt = await page.evaluate(readableText);
+  for (const p of textProblems(txt)) fail(`${label}: text: ${p.rule}: ${p.line.slice(0, 140)}`);
+}
 
 try {
   // every route renders
-  for (const route of ['#/', '#/learn', '#/practice', '#/practice/daily', '#/practice/rapid', '#/practice/challenges', '#/leaderboard', '#/reference', '#/pricing', '#/teams', '#/account', '#/account?section=settings', '#/about', '#/terms', '#/privacy', '#/contact', '#/checkout', '#/checkout/done', '#/nope']) {
+  for (const route of ['#/', '#/learn', '#/practice', '#/practice/daily', '#/practice/rapid', '#/practice/challenges', '#/leaderboard', '#/leaderboard?board=drills', '#/leaderboard?board=challenges', '#/reference', '#/pricing', '#/teams', '#/account', '#/account?section=settings', '#/about', '#/terms', '#/privacy', '#/contact', '#/checkout', '#/checkout/done', '#/nope']) {
     await page.goto(base + route);
     await page.waitForTimeout(250);
     const text = await page.evaluate(() => document.body.innerText.trim().length);
     if (!text) fail(`${route}: empty page`);
+    await guardText(route);
   }
   // checkout (Phase E): the local server is a preview host, so the flag is on: Pricing's Get full
   // access goes to #/checkout, and a guest there gets the inline code sign-in, never Stripe's form
@@ -140,6 +147,7 @@ try {
     if (!(await page.$('.tc .tc-intro'))) fail('journey: the task card does not name itself in 1.1.1');
     await play(LESSONS.find(l => l.id === 'inherited-workbook').solution);
     if (!(await page.waitForSelector('.rp[data-beat="complete"] .rp-btn[data-act="next"]', { timeout: 4000 }).catch(() => null))) fail('journey: 1.1.1 did not complete');
+    await guardText('1.1.1 complete');
     t('1.1.1');
     // 1.1.C: the module challenge passes with a tier, and the page is delivered
     await page.goto(base + '#/lesson/challenge-inherited-file');
@@ -148,6 +156,7 @@ try {
     await play(LESSONS.find(l => l.id === 'challenge-inherited-file').solution);
     if (!(await page.waitForSelector('.rp[data-beat="result"] .rp-marks i.on', { state: 'attached', timeout: 5000 }).catch(() => null))) fail('journey: 1.1.C passed with no tier');
     if (!/Page 1\.1/.test(await page.evaluate(() => (document.querySelector('.rp[data-beat="result"]') || {}).textContent || ''))) fail('journey: 1.1.C passed without delivering its page');
+    await guardText('1.1.C result');
     t('1.1.C');
     // Home (3.0): the next-lesson block names the next lesson, the chapter table, Level, Today and Achievements are there, none empty;
     // the first visit after a lesson shows the coach marks, dismissed with Enter
@@ -161,6 +170,7 @@ try {
     if (!/Know the screen/.test(home.next)) fail('journey: Home\'s next lesson reads "' + home.next + '", not the next lesson');
     if (home.empty.length) fail('journey: Home has empty panels: ' + home.empty.join(', '));
     if (home.panels.length) fail('journey: Home is missing ' + home.panels.join(', '));
+    await guardText('Home after 1.1');
     if (!home.coach) fail('journey: no coach marks on the first Home after a lesson');
     else { for (let i = 0; i < 8 && (await page.$('.coach')); i++) { await page.keyboard.press('Enter'); await page.waitForTimeout(60); } if (await page.$('.coach')) fail('journey: Enter did not dismiss the coach marks'); }
     // Learn (3.0): the chapter table with module 1.1 open and current, and its page built beside it
@@ -170,6 +180,7 @@ try {
     // Practice renders its catalog, with the first drills unlocked by 1.1
     await page.goto(base + '#/practice'); await page.waitForTimeout(300);
     if ((await page.$$('tr.row-drill[data-href]')).length < 3) fail('journey: Practice shows fewer than three drills');
+    await guardText('Practice after 1.1');
     if (await page.evaluate(() => { const h = document.querySelector('.hdr'); if (!h) return false; const cs = getComputedStyle(h); return (document.activeElement === h) || (cs.outlineStyle !== 'none' && cs.outlineColor !== 'rgba(0, 0, 0, 0)' && parseFloat(cs.outlineWidth) > 0); })) fail('journey: Practice\'s header block draws a stray outline');
     t('home, learn, practice');
     // the Daily: the Ready panel, the drill by keyboard, the result panel
@@ -245,6 +256,7 @@ try {
     }
     const res = await page.waitForSelector('.rp[data-beat="result"] .rp-marks i.on', { state: 'attached', timeout: 4000 }).catch(() => null);
     if (!res) fail('get-around: no tier on the result panel');
+    else await guardText('get-around result');
     const rec = await page.evaluate(() => { try { return JSON.parse(localStorage.getItem('hk2_records_v1')); } catch (e) { return null; } });
     const att = rec && rec.attempts && rec.attempts.find(a => a.ref === 'get-around');
     if (!att) fail('get-around: no attempt recorded');
@@ -254,6 +266,9 @@ try {
     await page.waitForSelector('.rp[data-beat="ready"]', { timeout: 5000 }).catch(() => fail('get-around: reload lost the drill'));
     const best = await page.evaluate(() => /Best /.test((document.querySelector('.rp-facts') || {}).textContent || '') && !!document.querySelector('.ghost-cursor'));
     if (best !== true) fail('get-around: Ready does not show the best with its ghost after a PB');
+    // the board with a run on it: the side panel's heading and the slowest-goal line read as sentences
+    await page.goto(base + '#/leaderboard?board=drills&ref=get-around'); await page.waitForTimeout(300);
+    await guardText('the get-around board');
   }
 
   // failure paths, in their own context so the module map starts clean: a page file that

@@ -395,7 +395,7 @@ export class Session {
     const prev = this.editCell(), was = S.tabHome;
     if (this.commitEdit(0, shift ? -1 : 1, { kind: 'tab', shift: !!shift })) this.tabArm(prev, shift, was);
   }
-  refuse() { this.logKey('⚠'); this.toast('There’s a problem with this formula — fix it or press Esc to discard'); if (this.opts.onRefuse) this.opts.onRefuse(); }
+  refuse() { this.logKey('⚠'); this.toast('There’s a problem with this formula. Fix it, or press Esc to discard it.'); if (this.opts.onRefuse) this.opts.onRefuse(); }
 
   /* ---------------- point mode ---------------- */
   /** Where a pointer step lands: one cell (clamped), or with Ctrl the block edge Sheet.ctrlJump finds. */
@@ -627,7 +627,7 @@ export class Session {
     const done = (act = true) => this.exitRibbon(act);
     switch (np) {
       case '=': this.exitRibbon(false); this.doAutoSum(); return;
-      case 'WVG': case 'WG': S.gridlines = !S.gridlines; this.toast(S.gridlines ? 'gridlines shown' : 'gridlines hidden — Alt W V G to show'); return done();
+      case 'WVG': case 'WG': S.gridlines = !S.gridlines; this.toast(S.gridlines ? 'Gridlines shown.' : 'Gridlines hidden. Alt W V G shows them.'); return done();
       case 'AGG': this.exitRibbon(false); this.groupChord(true, true); return;     // Data › Group › Group… (= Alt+Shift+→)
       case 'AUU': this.exitRibbon(false); this.groupChord(false, true); return;    // Data › Ungroup › Ungroup… (= Alt+Shift+←)
       case 'AUC': this.exitRibbon(false); this.startClock(); if (!S.clearOutline()) this.toast(NO_GROUP_NOTE); return;   // Data › Ungroup › Clear Outline

@@ -968,11 +968,11 @@ export class RibbonView {
     const badgeHtml = badge ? '<span class="ri-key">' + badge + '</span>' : '';
     if (it.box) {
       const u = UNIMPLEMENTED_BY_ID[it.dead] || { label: it.dead };
-      return `<span class="rf-box dis" aria-disabled="true" title="${esc(u.label)} — not available yet" style="min-width:${it.w | 0}px">${badgeHtml}<span class="rf-box-v">${esc(it.box)}</span><span class="rf-caret">▾</span></span>`;
+      return `<span class="rf-box dis" aria-disabled="true" title="${esc(u.label)}: not available yet" style="min-width:${it.w | 0}px">${badgeHtml}<span class="rf-box-v">${esc(it.box)}</span><span class="rf-caret">▾</span></span>`;
     }
     if (it.dead) {
       const u = UNIMPLEMENTED_BY_ID[it.dead] || { label: it.dead, icon: '' };
-      return this.btnHtml({ cls: 'dis', label: u.label, icon: u.icon || '', big: it.big, iconOnly: it.iconOnly, caret: it.caret, title: u.label + ' — not available yet', disabled: true });
+      return this.btnHtml({ cls: 'dis', label: u.label, icon: u.icon || '', big: it.big, iconOnly: it.iconOnly, caret: it.caret, title: u.label + ': not available yet', disabled: true });
     }
     if (it.menu) {
       const meta = MENU_META[it.menu] || { label: it.menu, icon: '' };

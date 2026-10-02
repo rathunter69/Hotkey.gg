@@ -202,7 +202,7 @@ const sortRun = dir => s => {
   S.sort(dir);
 };
 const autoSum = s => { leaveRibbon(s); s.startClock(); s.doAutoSum(); };
-const gridlines = direct((S, s) => { S.gridlines = !S.gridlines; s.toast(S.gridlines ? 'gridlines shown' : 'gridlines hidden — Alt W V G to show'); S.commit('ribbon'); });
+const gridlines = direct((S, s) => { S.gridlines = !S.gridlines; s.toast(S.gridlines ? 'Gridlines shown.' : 'Gridlines hidden. Alt W V G shows them.'); S.commit('ribbon'); });
 const fmtCells = s => { leaveRibbon(s); s.openFormatCells(); };
 const pasteSpecial = dialog('paste', s => { s.pasteKind = 'all'; s.pasteOp = 'none'; });
 

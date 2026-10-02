@@ -145,7 +145,7 @@ test('LessonRun builds a module lesson from its before state (settings included)
 
 test('the clothing pool: 12 cities, 5+ sites each, deterministic picks', () => {
   assert.equal(CLUSTERS.length, 12);
-  for (const cl of CLUSTERS) { assert.ok(cl.sites.length >= 5, cl.city); assert.match(cl.week, /^w\/c /); }
+  for (const cl of CLUSTERS) { assert.ok(cl.sites.length >= 5, cl.city); assert.match(cl.week, /^Week of [A-Z][a-z]{2} \d{1,2}, \d{4}$/); }
   const rng = mulberry32(7);
   const pick = pickCluster(rng);
   assert.deepEqual(pickCluster(mulberry32(7)), pick, 'same seed, same cluster');

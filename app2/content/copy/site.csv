@@ -51,7 +51,7 @@ lesson_done_project,Project complete
 lesson_done_verified,Chapter Verified
 lesson_clean,"Clean sheet: you did every goal yourself, with no mouse."
 lesson_assisted,Assisted: Help played or did a goal for you.
-page_delivered,"Page {n}, {page}, is done."
+page_delivered,Page {n} is done: {page}.
 lesson_first_saved,"Your first lesson is saved on this device, and a free account takes it to any computer."
 install_prompt,"Install hotkey.gg as an app. It opens in its own window, the browser stops grabbing your shortcuts, and Ctrl+PgDn works the way it does in Excel."
 times_up,Time’s Up. Keep Drilling.
@@ -69,7 +69,7 @@ drill_mouse_used,"The mouse touched the sheet, so there’s no best and no poste
 drill_daily_attempt,"That was attempt {n} today, and the board stays open until midnight UTC."
 rapid_intro,"We name a command and you press its keys, which stay hidden until you stall."
 rapid_fine,A round counts as practice and pays a little XP; it never sets a drill best.
-boards_closed,Desk and school boards open in a later phase.
+boards_closed,Desk and school boards aren’t open yet.
 boards_desk_prompt,Start a desk to compete with your own group.
 account_guest,"You’re a guest, so everything here is saved on this device only."
 account_title,Account
@@ -77,7 +77,7 @@ account_level,Level {n}
 account_data,Your data
 paywall_line,Get full access for the rest of the content.
 paywall_signed_in,"This account doesn’t have full access yet. Get it here, or redeem a code on the Account page."
-teams_desk_signin,"Desks need an account, and desk creation comes in a later phase."
+teams_desk_signin,"Desks need an account, and desk creation isn’t open yet."
 page_failed,{page} didn’t load.
 rail_home,Home
 rail_learn,Learn
@@ -126,6 +126,8 @@ level_reward_cursor_color,A cursor color
 level_reward_panel_style,A panel style
 level_up_title,Level {n}
 level_up_reward,{reward} is yours.
+fx_level,Level {n}
+fx_new_pb,New personal best
 level_next,Next: level {n} at {xp} XP
 settings_group_keyboard,Keyboard
 settings_group_lessons,Lessons
@@ -215,7 +217,7 @@ home_start_assessment,Start the assessment
 home_lesson_of,Lesson {n} of {m}
 home_goal_of,Goal {n} of {m}
 home_minutes_left,About {n} minutes left
-home_all_done,Chapter {n} is Verified. The next chapter is Pro.
+home_all_done,Chapter {n} is Verified. The next chapter comes with Full Access.
 chapter_heading,"Chapter {n}, {name}"
 chapter_modules_done,{d} of {m} modules done
 col_module,Module
@@ -273,7 +275,7 @@ col_length,Length
 col_best,Your best
 practice_not_played,Not played
 practice_after,After {n}
-practice_pro,Pro
+practice_pro,Full Access
 practice_set_heading,The set
 reason_due,Due a refresher
 reason_slowest,Slowest against its par
@@ -283,7 +285,7 @@ reason_fill,Fills the set
 daily_title,The Daily
 daily_line,Today it’s {drill}: ninety seconds on the same sheet as everyone else.
 daily_play,Play today’s Daily
-daily_pro_note,"Today’s drill is from Chapter {n}, which is Pro. Everyone plays the same sheet, so play it anyway."
+daily_pro_note,"Today’s drill is from Chapter {n}, which comes with Full Access. Everyone plays the same sheet, so play it anyway."
 daily_clean_runs,{n} clean runs so far
 daily_not_played,You haven’t played today.
 rapid_title,Rapid-fire
@@ -314,11 +316,15 @@ boards_keys_route,Keys ({n} on the route)
 boards_up,up {k}
 boards_down,down {k}
 boards_clean_runs,{n} clean runs
-boards_day_runs,"{day}, {n} clean runs"
+boards_clean_run,1 clean run
+boards_day_runs,"{day}, {runs}"
 boards_empty,No one is on this board yet. A clean run puts you first.
-boards_yours,Your {board}
+boards_yours,Your runs
+boards_yours_daily,Your Daily
 boards_last_five,Your last five runs
-boards_where,"Most of your time goes on {task}, about {s} seconds a run."
+boards_where,"Your slowest goal, about {secs} a run:"
+boards_second,{n} second
+boards_seconds,{n} seconds
 boards_none_yet,No clean run on this board yet.
 boards_signed_out,Your own clean runs. The field opens when you sign in.
 boards_desks_signed_out,Sign in to see your desk’s board.
@@ -519,6 +525,10 @@ card_type,type
 card_live_start,Press {key}.
 card_live_one,One key in. Press {key}.
 card_live_keys,{n} keys in. Press {key}.
+card_live_start_type,Type {text}.
+card_live_typing,Keep typing {text}.
+card_live_one_type,One key in. Type {text}.
+card_live_keys_type,{n} keys in. Type {text}.
 card_live_done,Every key is in.
 card_live_wrong,That was {key}. Start again with {key1}.
 card_live_mouse,Try it with the keyboard.
@@ -657,3 +667,51 @@ account_get,Get full access
 account_cancel_note,Cancelling keeps your access to the end of the month you paid for.
 account_billing_err,Billing didn’t open. Try again in a minute.
 account_billing_none,There is no subscription on this account yet.
+teams_title,Teams and schools
+teams_sub,"For banks, training providers, finance clubs, classes and friend groups. There are two things a group can do here."
+teams_desk_cap,Start a desk
+teams_desk_tag,Free to create
+teams_desk_heading,A private group with its own board
+teams_desk_body,"A desk is a private group: its own leaderboard, assignments set by a captain, and progress the captain can see (your times on assignments, nothing else)."
+teams_desk_who,"For a study group, a finance club, an analyst class or a team at work."
+teams_desk_create,Create a desk
+teams_code_head,Have a code?
+teams_code_line,Join a desk by invite code or link.
+teams_code_join,Join
+teams_code_kept,Code {code} is kept on this device until desks open.
+teams_code_empty,Enter a code or paste an invite link.
+teams_code_failed,Couldn’t save the code on this device.
+teams_group_cap,Group access
+teams_group_tag,Full Access for organizations
+teams_group_heading,"One code, a number of seats, one end date"
+teams_group_body,"Group access opens Full Access for everyone on the code or link, with a progress view for the organizer and invoice-friendly billing. Groups don’t check out on the site yet: send a request and we reply by email."
+teams_field_name,Name
+teams_field_org,Organization
+teams_field_email,Email
+teams_field_seats,Seats
+teams_field_start,Start date
+teams_request,Request group access
+teams_req_local,"For now a request is saved on this device and isn’t sent to us, so write to us as well:"
+teams_req_link,Contact
+teams_req_count,{n} saved on this device.
+teams_req_saved,"Saved on this device. It isn’t sent anywhere yet, so write to us from the contact page as well."
+teams_req_failed,Couldn’t save on this device. Write to us from the contact page.
+teams_err_name,Your name is needed.
+teams_err_org,The organization is needed.
+teams_err_email,A valid email is needed.
+teams_err_seats,"Seats must be a whole number, 1 or more."
+teams_err_start,A start date is needed.
+account_public_note,"Shows your handle, level and best times on the boards and on your profile page. Turned off, nothing is public."
+account_time_saved,Estimated time saved against the mouse-and-menus route: about {d}. It’s an estimate: your key counts against a slow route at half a second an action.
+about_title,About
+about_sub,"hotkey.gg teaches Excel on a real spreadsheet in your browser, the way analysts at top firms use it."
+about_loop_title,How it works
+about_loop,"Every lesson explains a key, walks you through it, then has you do it on your own. Drills and the clock come after, once the keys are in your hands. Nobody gets dropped in the deep end."
+about_who_title,Who it’s for
+about_who,"Anyone who never got taught Excel properly, through to finance analysts and MBA students. Teams and classes use it to get people ready before their first day."
+about_grade_title,How it grades
+about_grade,"We check how the sheet ends up, so any route that gets there counts. Where a figure has to be a live formula, we change an input and check that the figure moves."
+about_paid_title,Free and Full Access
+about_paid,Chapter 1 is free in full. Full Access opens Chapters 2 to 6.
+about_paid_link,See pricing
+about_independence_title,Independence

@@ -715,7 +715,7 @@ The copy checker and a CSS check enforce what a machine can check (M94); the res
 | *lesson-view.js*    Clean mark | Clean sheet: you did every goal yourself, with no mouse.    *was: ✓ Clean sheet — no mouse, no help* | **DRAFT** |
 | *lesson-view.js*    Assisted mark | Assisted: Help played or did a goal for you.    *was: Assisted — steps were shown on request.* | **DRAFT** |
 | *lesson-view.js*    Race table (1.1.1) | Slow way · Your way · {n}× faster with shortcuts.    *note: goes with the sixty-press round (M30)* | **RETIRED** |
-| *page_delivered*    When a module's page is done | Page {n}, {page}, is done.    *was: Page {n} — {page} — delivered to the data room.* | **DRAFT** |
+| *page_delivered*    When a module's page is done | Page {n} is done: {page}.    *was: Page {n}, {page}, is done (a capital The mid-sentence, 2026-10-02); before that: Page {n} — {page} — delivered to the data room.* | **DRAFT** |
 | *lesson-view.js*    Next job | Retired: the panel ends on Next lesson, with no preview of the next brief (3.0, Lesson complete).    *was: Next: {first sentence of the next brief}* | **RETIRED** |
 | *lesson-view.js*    The panel's button (new, 3.0) | Next lesson (Enter) | **DRAFT** |
 | *lesson-view.js*    After the very first lesson | Your first lesson is saved on this device, and a free account takes it to any computer.    *was: Your first lesson is done. Progress is saved on this device. Create a free account to keep it across devices — everything you have done carries over.* | **DRAFT** |
@@ -795,7 +795,7 @@ The copy checker and a CSS check enforce what a machine can check (M94); the res
 | *leaderboard-page.js*    Daily tab | One drill a day, the same sheet and board for everyone, reset at midnight UTC. | LIVE |
 | *leaderboard-page.js*    Board columns (new) | Place, Handle, Time against the field, Time, Gap, Keys ({n} on the route). The handle has the level beside it: Level {n}. | **DRAFT** |
 | *leaderboard-page.js*    Your row, pinned under the top ten (new, 3.0) | Your row as it sits on the board, with its move after it: up {k} | **DRAFT** |
-| *leaderboard-page.js*    The side panel, beside the board (new, 3.0) | Your {board}, as in Your Daily \|\| Your last five runs, each with its date, time and keys \|\| Most of your time goes on {task}, about {s} seconds a run. | **DRAFT** |
+| *leaderboard-page.js*    The side panel, beside the board (new, 3.0) | Your Daily, or Your runs on a drill or challenge board \|\| Your last five runs, each with its date, time and keys \|\| Your slowest goal, about {secs} a run: then the goal itself, as the learner read it.    *was: Your {board} and "Most of your time goes on {task}", which glued titles and goals into a sentence ("Your The desk's format in three minutes"; Wolf, 2026-10-02)* | **DRAFT** |
 | *leaderboard-page.js*    Empty board | No one is on this board yet. A clean run puts you first. | LIVE |
 | *leaderboard-page.js*    Desks tab, signed out | Sign in to see your desk's board.    *was: Boards open with accounts.*    *note: M9* | **DRAFT** |
 | *leaderboard-page.js*    Desk prompt | Start a desk to compete with your own group. \|\| Link: Teams and desks    *was: Compete with your own group: start a desk. Teams and desks →* | **DRAFT** |

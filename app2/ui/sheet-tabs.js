@@ -29,7 +29,7 @@ export function mountSheetTabs(el, session) {
     let html = '<span class="wb-lead">SHEETS</span>';
     sheets.forEach((sh, i) => {
       const label = i === ren ? (session.dlg.name || '…') : sh.name;
-      html += `<span class="wb-tab${i === cur ? ' cur' : ''}${i === ren ? ' ren' : ''}${session.group && session.group.size > 1 && session.group.has(i) ? ' grp' : ''}" role="tab" aria-selected="${i === cur}" data-i="${i}" title="${esc(sh.name)}${i === cur ? ' — double-click to rename' : ' — click, or Ctrl+PgDn / Ctrl+PgUp; double-click to rename'}">${esc(label)}</span>`;
+      html += `<span class="wb-tab${i === cur ? ' cur' : ''}${i === ren ? ' ren' : ''}${session.group && session.group.size > 1 && session.group.has(i) ? ' grp' : ''}" role="tab" aria-selected="${i === cur}" data-i="${i}" title="${esc(sh.name)}${i === cur ? '. Double-click to rename.' : '. Click, or Ctrl+PgDn and Ctrl+PgUp; double-click to rename.'}">${esc(label)}</span>`;
     });
     html += '<button type="button" class="wb-add" data-add="1" tabindex="-1" title="New sheet (Shift+F11)" aria-label="New sheet">⊕</button>';
     el.innerHTML = html;

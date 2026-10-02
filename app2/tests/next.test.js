@@ -118,7 +118,7 @@ test('beats: once per module, on its first lesson, never on a challenge; every b
   const ch = LESSONS.find(l => l.id === 'challenge-inherited-file');
   assert.equal(beatFor(ch, moduleOf(ch), []), null);
   for (const l of LESSONS) { const m = moduleOf(l); if (m && m.n === 1 && l.kind !== 'challenge') assert.ok(MODULE_BEATS[l.module], 'a beat for ' + l.module); }
-  assert.match(pageDelivered(at), /^Page 1\.1, The workbook, set up to standard, is done\.$/);
+  assert.match(pageDelivered(at), /^Page 1\.1 is done: The workbook, set up to standard\.$/);
   for (const k in MODULE_BEATS) for (const s of [MODULE_BEATS[k].title, MODULE_BEATS[k].body]) assert.doesNotMatch(s, /colour|practis|organis|centre|grey\b/i, 'American spelling in ' + k);
 });
 

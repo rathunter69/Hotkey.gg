@@ -86,7 +86,7 @@ test('cosmetics: free themes open, level ladder covers the rest, flair clamps', 
   for (const s of locked) assert.equal(typeof s.lock, 'string');
   // every level-locked theme opens by its level
   for (const s of states) { const lv = levelFor(s.key); if (lv != null) assert.equal(themeLock(s.key, { level: lv }), null, s.key + ' opens at ' + lv); }
-  assert.match(themeLock('bloomberg', {}), /Foundations/);
+  assert.match(themeLock('bloomberg', {}), /Chapter 1/);
   assert.equal(themeLock('bloomberg', { earned: ['ch1-complete'] }), null);
   assert.match(themeLock('crimson', { rankIndex: 2 }), /MD/);
   assert.equal(themeLock('crimson', { rankIndex: 6 }), null);
