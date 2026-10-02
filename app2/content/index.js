@@ -216,6 +216,33 @@ import keyboard_only_linking from './lessons/keyboard-only-linking.js';
 import challenge_model_speed from './lessons/challenge-model-speed.js';
 import ch5_project from './lessons/ch5-project.js';
 import ch5_assessment from './lessons/ch5-assessment.js';
+// Chapter 6 · Valuation (Run R6): 6.1 Trading comps
+import spreading_a_comp from './lessons/spreading-a-comp.js';
+import calendarization_ltm from './lessons/calendarization-ltm.js';
+import median_and_range from './lessons/median-and-range.js';
+import operating_multiples from './lessons/operating-multiples.js';
+import applying_the_range from './lessons/applying-the-range.js';
+import challenge_comps from './lessons/challenge-comps.js';
+// Chapter 6 · 6.2 Precedent transactions, 6.3 LBO
+import deal_multiples_premiums from './lessons/deal-multiples-premiums.js';
+import sort_and_decide from './lessons/sort-and-decide.js';
+import applying_precedents from './lessons/applying-precedents.js';
+import challenge_precedents from './lessons/challenge-precedents.js';
+import sources_and_uses from './lessons/sources-and-uses.js';
+import tranches_and_sweep from './lessons/tranches-and-sweep.js';
+import sale_leasebacks from './lessons/sale-leasebacks.js';
+import irr_moic from './lessons/irr-moic.js';
+import returns_bridge from './lessons/returns-bridge.js';
+import what_the_sponsor_can_pay from './lessons/what-the-sponsor-can-pay.js';
+import challenge_paper_lbo from './lessons/challenge-paper-lbo.js';
+// Chapter 6 · 6.4 The bids and the waterfall, 6.5 Project and assessment
+import bids_side_by_side from './lessons/bids-side-by-side.js';
+import the_waterfall from './lessons/the-waterfall.js';
+import your_stake from './lessons/your-stake.js';
+import football_field_board_page from './lessons/football-field-board-page.js';
+import challenge_board_page from './lessons/challenge-board-page.js';
+import ch6_project from './lessons/ch6-project.js';
+import ch6_assessment from './lessons/ch6-assessment.js';
 
 export const CHAPTERS = [
   {
@@ -356,6 +383,29 @@ export const CHAPTERS = [
       what_a_dcf_is, unlevered_free_cash_flow, wacc_block, terminal_value, discounting_mid_year, dcf_sensitivity, challenge_dcf,
       revenue_build_in_three, fill_and_format_block, keyboard_only_linking, challenge_model_speed,
       ch5_project, ch5_assessment,
+    ],
+  },
+  {
+    id: 'valuation',
+    title: 'Valuation',
+    access: 'paid',
+    blurb: 'What Clearcoat is worth by every method and what each bid leaves the owners: trading comps, precedent deals, the sponsor’s LBO, the bids and the waterfall, on one page for the board.',
+    // Chapter 6's sections in order (script-ch6.md): the four modules and the closing project block.
+    sections: [
+      { name: 'Trading comps', blurb: 'Spreading a comp, the enterprise value build; calendarization and LTM; sorting the set, filtering the outliers, taking the median; EV per site and per wash; the range applied to Clearcoat.' },
+      { name: 'Precedent transactions', blurb: 'Deal multiples and premiums; sorting by date and size and deciding what is comparable; the precedents range applied.' },
+      { name: 'LBO', blurb: 'Sources and uses; the debt and the cash sweep; sale-leasebacks; IRR and MOIC; the returns bridge; what the sponsor can pay.' },
+      { name: 'The bids and the waterfall', blurb: 'Three bids side by side; from enterprise value to the owners’ proceeds; your stake under each bid; the football field and the page for the board.' },
+      { name: 'Project and assessment', blurb: 'The valuation summary for the board from a fresh set, then again against the clock.' },
+    ],
+    lessons: [
+      spreading_a_comp, calendarization_ltm, median_and_range, operating_multiples, applying_the_range, challenge_comps,
+      deal_multiples_premiums, sort_and_decide, applying_precedents, challenge_precedents,
+      sources_and_uses, tranches_and_sweep, sale_leasebacks, irr_moic, returns_bridge, what_the_sponsor_can_pay,
+      challenge_paper_lbo,
+      bids_side_by_side, the_waterfall, your_stake, football_field_board_page,
+      challenge_board_page,
+      ch6_project, ch6_assessment,
     ],
   },
 ];

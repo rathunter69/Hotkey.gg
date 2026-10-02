@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 220: Your stake: what your options are worth under each bid — Valuation · hotkey.gg</title>
+<meta name="description" content="You hold options over 0.2% of the company, fully diluted, with a strike set when the equity was worth $40m. An option is worth the equity value less the strike, times your share, or nothing if the strike is above the price, and MAX handles that. Three bids, three numbers, and one of them is yours. Build the line under the waterfall. The key is MAX.">
+<meta name="generator" content="app2/tests/public-pages.js — generated from lesson data; do not edit by hand">
+<script>try{var v=JSON.parse(localStorage.getItem('hk2_theme_vars'));if(v&&v.vars){var r=document.documentElement;for(var k in v.vars)r.style.setProperty('--'+k,v.vars[k]);r.setAttribute('data-dark',v.dark?'1':'0');}}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../ui/public.css">
+</head>
+<body>
+<nav class="top"><a class="brand" href="../index.html#/">hotkey<b>.gg</b></a><a href="../index.html#/learn">Learn</a><a href="../index.html#/practice">Practice</a><a href="../index.html#/leaderboard">Leaderboard</a><a href="../index.html#/reference">Reference</a></nav>
+<main>
+<div class="crumb"><a href="../index.html#/learn">Learn</a> › <a href="index.html">Valuation</a> › The bids and the waterfall</div>
+<h1>Lesson 220: Your stake: what your options are worth under each bid</h1>
+<div class="meta">Valuation · The bids and the waterfall · medium · <span class="">Paid</span></div>
+<div class="card">
+<p style="margin:0">You hold options over 0.2% of the company, fully diluted, with a strike set when the equity was worth $40m. An option is worth the equity value less the strike, times your share, or nothing if the strike is above the price, and MAX handles that. Three bids, three numbers, and one of them is yours. Build the line under the waterfall. The key is <kbd>MAX</kbd>.</p>
+</div>
+<h2>What you will do</h2>
+<ol class="goals"><li><span class="muted">The plan’s three inputs are typed once and sourced to the option plan: the strike valuation, your share, fully diluted, and how much vests at a sale. Every bid’s line reads them.</span> Select the option plan’s inputs on Bids, C51:C53: the strike valuation, your 0.2% share and vesting at a sale.</li><li><span class="muted">An option pays the equity value times your share less the strike times your share, and never less than nothing: MAX(…, 0) floors it. Vesting at 100% means all of it is yours at a sale.</span> Value your options under bid A in C42: =MAX(C32*$C$52-$C$51*$C$52,0)*$C$53.</li><li>Select C42:E42 and fill bid A’s value across to bids B and C with Ctrl+R.</li><li><span class="muted">Bid B pays part of its price later, so part of your value waits with it: the earnout’s share of the priced value is the share of yours that is deferred.</span> Show the earnout’s share of yours, deferred, in C43:E43: =C42*IFERROR(C16/C18,0).</li><li>Format C42:E42 with the code $#,##0_);($#,##0);&quot;-&quot;_), the first line of the block carrying the $.</li><li>Format C43:E43 with the desk code #,##0_);(#,##0);&quot;-&quot;_), no $ on the line under it.</li><li>Does it tie? Watch your share in C52 go from 0.2% to 0.4%: your line doubles and the owners’ lines hold, since the pool already funds you.</li></ol>
+<div class="cta"><a class="btn" href="../index.html#/lesson/your-stake">Start this lesson</a><span class="path">Read → Guided → Try solo → Timed</span></div>
+
+<div class="prevnext"><span>← <a href="the-waterfall.html">Lesson 219: From enterprise value to the owners’ proceeds: the waterfall</a></span><span><a href="football-field-board-page.html">Lesson 221: The football-field table and the one-page summary for the board</a> →</span></div>
+</main>
+<footer><a href="../index.html#/pricing">Pricing</a><a href="../index.html#/teams">Teams</a><a href="../index.html#/about">About</a><a href="../index.html#/terms">Terms</a><a href="../index.html#/privacy">Privacy</a><a href="../index.html#/contact">Contact</a><span>© hotkey.gg</span></footer>
+</body>
+</html>

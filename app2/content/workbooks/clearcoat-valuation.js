@@ -49,9 +49,9 @@ export const DEALS = [
   { date: [2023, 1, 17], target: 'Bluewater Wash', acquirer: 'Keystone Capital Partners', type: 'Sponsor', ev: 310000, ebitda: 23000, sites: 55, listed: 0, include: 0, reason: 'Out: four years old, priced when rates were two points lower' },
   { date: [2024, 6, 4], target: 'Nationwide Shine', acquirer: 'Atlas Infrastructure Partners', type: 'Sponsor', ev: 1450000, ebitda: 108000, sites: 200, listed: 1, pre: 21, offer: 27.3, include: 0, reason: "Out: a 200-site national chain, five times Clearcoat's scale" },
   { date: [2024, 11, 12], target: 'Crestline Car Wash', acquirer: 'Pinnacle Wash Holdings', type: 'Strategic', ev: 184000, ebitda: 14500, sites: 38, listed: 0, include: 1, reason: 'In, noted: a strategic buyer, so the price may carry synergies' },
-  { date: [2025, 3, 20], target: 'Lakeside Express', acquirer: 'Harborview Equity', type: 'Sponsor', ev: 262000, ebitda: 21000, sites: 52, listed: 1, pre: 12.4, offer: 15.5, include: 1, reason: 'In' },
-  { date: [2025, 9, 9], target: 'Goldline Auto Spa', acquirer: 'Cedar Ridge Capital', type: 'Sponsor', ev: 141000, ebitda: 12000, sites: 30, listed: 0, include: 1, reason: 'In' },
-  { date: [2026, 2, 26], target: 'Sunbelt Wash Co', acquirer: 'Northstar Partners', type: 'Sponsor', ev: 228000, ebitda: 19000, sites: 45, listed: 0, include: 1, reason: 'In' },
+  { date: [2025, 3, 20], target: 'Lakeside Express', acquirer: 'Harborview Equity', type: 'Sponsor', ev: 262000, ebitda: 21000, sites: 52, listed: 1, pre: 12.4, offer: 15.5, include: 1, reason: 'In: a sponsor buying a chain of Clearcoat’s size' },
+  { date: [2025, 9, 9], target: 'Goldline Auto Spa', acquirer: 'Cedar Ridge Capital', type: 'Sponsor', ev: 141000, ebitda: 12000, sites: 30, listed: 0, include: 1, reason: 'In: a sponsor buying a chain of Clearcoat’s size' },
+  { date: [2026, 2, 26], target: 'Sunbelt Wash Co', acquirer: 'Northstar Partners', type: 'Sponsor', ev: 228000, ebitda: 19000, sites: 45, listed: 0, include: 1, reason: 'In: a sponsor buying a chain of Clearcoat’s size' },
 ];
 /** The lead sponsor's term sheet (6.3): the bid is the input and the multiple a formula (195,000 over 16,600 is 11.75x; see source-checklist H). */
 export const TERMS = { entryEV: 195000, fee: 0.02, senLev: 4.5, senRate: 0.08, senAmort: 0.05, mezLev: 1, mezRate: 0.12, roll: 0.2, exitMult: 11, hold: 5, hurdle: 0.2,
@@ -136,6 +136,7 @@ const firstCol = fn => only(['C'], fn);
 function page(spec) {
   if (firstPass) { ROWS[spec.name] = dryRows(spec); return null; }
   const { sheet, at } = buildPage(spec);
+  if (spec.rows) sheet.rows = spec.rows;   // a page taller than the default canvas (the LBO runs to row 148)
   const cells = sheet.cells;
   ROWS[spec.name] = at;
   const colsOf = r => Object.keys(cells).filter(k => /^[A-Z]+\d+$/.test(k) && +k.replace(/^[A-Z]+/, '') === r).map(k => k.replace(/\d+$/, '')).filter(col => col !== 'A' && col !== 'B');
@@ -163,6 +164,12 @@ function page(spec) {
   }
   if (spec.condFmt) sheet.condFmt = clone(spec.condFmt);
   if (spec.colWExtra) Object.assign(sheet.colW, spec.colWExtra);
+  // a page longer or wider than the default grid (100 rows, 26 columns) carries its size, so Go To reaches its last line
+  // and the last columns (Comps runs to AB) sit on the sheet; a page may also ask for more rows itself (spec.rows)
+  const used = Object.keys(cells).map(k => /^([A-Z]+)(\d+)$/.exec(k)).filter(Boolean);
+  const maxR = Math.max(...used.map(m => +m[2])), maxC = Math.max(...used.map(m => colNum(m[1])));
+  if (maxR > 90) sheet.rows = Math.max(sheet.rows || 0, Math.ceil((maxR + 20) / 10) * 10);
+  if (maxC > 24) sheet.cols = maxC + 4;
   return sheet;
 }
 function dryRows(spec) {
@@ -249,7 +256,7 @@ function pageComps(comps) {
       { title: 'Quarterly EBITDA by period end, the fiscal years and LTM', headerDates: Array.from({ length: 8 }, (_, i) => FIRST_QUARTER_END + i * 91),
         header: [...Array(8).fill(null), 'Fiscal year ended in 2025', 'Fiscal year ended in 2026', 'Fiscal year end', 'Weight on the 2025 year', 'Calendar 2025', 'LTM EBITDA', 'LTM a year earlier', 'LTM from the filings', 'Difference'],
         kinds: [...Array(8).fill('money'), 'money', 'money', 'count', 'unit', 'money', 'money', 'money', 'money', 'count'],
-        colFmt: { [Q_COLS.fye]: DATE_FMT },
+        colFmt: { [Q_COLS.fye]: DATE_FMT, [Q_COLS.w]: { fmtStyle: 'percent', decimals: 0, it: true } },
         rows: comps.map((cp, i) => {
           const q = quartersFor(cp);
           return { key: qk(i), label: cp.name, fill: (col, r) => {
@@ -337,7 +344,7 @@ function pagePrecedents(deals) {
         { key: 'dcfRead', label: 'Where the exit multiple sits', kind: 'text', fill: firstCol(() => `=IF(AND(C${R(me, 'dcfExit')}>=MIN(C${R(me, 'tradMed')},C${R(me, 'precMed')}),C${R(me, 'dcfExit')}<=MAX(C${R(me, 'tradMed')},C${R(me, 'precMed')})),"Between the two medians","Outside the two medians: the DCF page says why")`) },
       ] },
       { title: 'The set sorted by date, then by enterprise value (a values copy)', header: ['Announced', 'Enterprise value', 'EV / EBITDA (x)'], kinds: ['count', 'money', 'mult'], colFmt: { C: DATE_FMT },
-        rows: sorted.map((d, i) => ({ key: 'sort' + i, label: d.target, values: [serial(...d.date), d.ev, Math.round(d.ev / d.ebitda * 100) / 100] })) },
+        rows: sorted.map((d, i) => ({ key: 'sort' + i, label: d.target, values: [serial(...d.date), d.ev, d.ev / d.ebitda] })) },   // the multiple unrounded: 6.2.2 pastes its values
       { title: `Applying the range to ${COMPANY} (USD millions)`, header: ['Low (25th percentile)', 'Median', 'High (75th percentile)'], rows: [
         rangeRow('rgMult', 'EV / EBITDA (x)', (col, r, st) => `=${DC.helper}${R(me, st)}`, { kind: 'mult' }),
         rangeRow('rgEV', 'Enterprise value on EBITDA', col => `=${col}${R(me, 'rgMult')}*Comps!$${CC.ebitda}$${R('Comps', 'cc')}`, { fmt: MILLIONS, green: true }),
@@ -372,7 +379,7 @@ function pageLBO(T, given = null) {
   const first = col => `COLUMNS($D$4:${col}$4)`;
   const offs = [-1, -0.5, 0, 0.5, 1];
   const sheet = page({
-    name: me, chapter: CHAPTER, read: false, title: `${COMPANY}: the sponsor's LBO`, units: 'USD thousands unless stated; closing at the FY26 year end; EBITDA and free cash flow from the operating model',
+    name: me, chapter: CHAPTER, read: false, rows: 160, title: `${COMPANY}: the sponsor's LBO`, units: 'USD thousands unless stated; closing at the FY26 year end; EBITDA and free cash flow from the operating model',
     headers: LCOLS.map(() => null),
     blocks: [
       { title: 'The term sheet', rows: [
@@ -739,8 +746,8 @@ const COMP_STAT_COLS = [CC.include, CC.helper, CC.growth, CC.lev];
 const COMP_OP_COLS = [CC.sites, CC.washes, CC.owns, CC.rent, CC.ebitdar, CC.evSite, CC.evWash, CC.siteHelper, CC.washHelper];
 const Q_INPUT_COLS = ['C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', Q_COLS.fy25, Q_COLS.fy26, Q_COLS.fye];
 const DEAL_INPUT_COLS = [DC.date, DC.target, DC.acquirer, DC.ev, DC.ebitda, DC.sites, DC.listed, DC.pre, DC.offer];
-const DEAL_621_COLS = [DC.type, DC.mult, DC.evSite, DC.premium];
-const DEAL_622_COLS = [DC.age, DC.include, DC.reason, DC.helper, DC.siteHelper];
+const DEAL_621_COLS = [DC.type, DC.mult, DC.evSite, DC.premium, DC.age];   // 6.2.1 ages the deals against the as-of date (its best practice)
+const DEAL_622_COLS = [DC.include, DC.reason, DC.helper, DC.siteHelper];
 const compKeys = (rows, n) => Array.from({ length: n }, (_, i) => 'c' + i);
 const qKeys = (rows, n) => Array.from({ length: n }, (_, i) => 'q' + i);
 const dealKeys = n => Array.from({ length: n }, (_, i) => 'd' + i);
@@ -792,10 +799,10 @@ const Rw = ROW;
 function lboRaw(s, rows) { strip(s, 'LBO', rows, allKeys(rows, 'LBO')); stripHeader(s, 'LBO', rows, 'hurdles'); delete sheetOf(s, 'LBO').condFmt; }
 function bidsRaw(s, rows) { const b = BB(rows); strip(s, 'Bids', rows, [...b.bids, ...b.priced, ...b.rank, ...b.wf, ...b.stake, ...b.inputs641]); }
 function after62(s, rows) { lboRaw(s, rows); bidsRaw(s, rows); summaryLabels(s); pendSu(s); }
-function after61(s, rows, deals) { dealsRaw(s, rows, deals); after62(s, rows); }
 
 // module 6.1: trading comps (Comps grows column group by column group; every later page waits)
-const B615 = derive(DONE, s => { strip(s, 'Comps', Rw, span(Rw, 'Comps', 'rgMult', 'rgEqWash')); after61(s, Rw, DEALS); });
+// 6.1.5 ends where 6.2.1 starts: B615 is B621 with the Comps range not yet applied (so the chain is exact)
+const B615 = derive(() => B621(), s => { strip(s, 'Comps', Rw, span(Rw, 'Comps', 'rgMult', 'rgEqWash')); });
 const B614 = derive(B615, s => { keepCols(s, 'Comps', Rw, [...compKeys(Rw, 6), 'cc'], [...COMP_INPUT_COLS, ...COMP_EV_COLS, ...COMP_STAT_COLS]); strip(s, 'Comps', Rw, STATS, COMP_OP_COLS); });
 const B613 = derive(B614, s => { keepCols(s, 'Comps', Rw, compKeys(Rw, 6), [...COMP_INPUT_COLS, ...COMP_EV_COLS]); strip(s, 'Comps', Rw, [...STATS, 'cc', 'sort0', 'sort1', 'sort2', 'sort3', 'sort4', 'sort5']); stripHeader(s, 'Comps', Rw, 'sort0'); delete cellsOf(s, 'Comps')[CC.note + Rw.Comps.c4]; });
 const B612 = derive(B613, s => {
@@ -803,7 +810,8 @@ const B612 = derive(B613, s => {
   keepCols(s, 'Comps', Rw, qKeys(Rw, 6), Q_INPUT_COLS); stripHeader(s, 'Comps', Rw, 'q0', ['C']);
   strip(s, 'Comps', Rw, ['ltmDate', 'ltmStart', 'priorStart']);
 });
-const B611 = derive(B615, s => compsRaw(s, Rw, COMPS));
+// 6.1.1 ends on B612: B611 is B612 without the EV build (market cap, EV, the two multiples, the margin)
+const B611 = derive(B612, s => { strip(s, 'Comps', Rw, compKeys(Rw, 6), COMP_EV_COLS); });
 const ALT_PACK = lazy(() => buildPack(ALT));
 const ALT2_PACK = lazy(() => buildPack(ALT2));
 /** A state on a fresh set: the model sheets, the pack's pages, everything raw. `fn` shapes it. */
@@ -812,8 +820,8 @@ const B61C = freshState(ALT_PACK, (s, rows) => { compsRaw(s, rows, ALT.comps, { 
 
 // module 6.2: precedents
 const B623 = derive(DONE, s => { strip(s, 'Precedents', Rw, span(Rw, 'Precedents', 'rgMult', 'rgEqSite')); after62(s, Rw); });
-const B622 = derive(B623, s => { keepCols(s, 'Precedents', Rw, dealKeys(6), [...DEAL_INPUT_COLS, ...DEAL_621_COLS]); strip(s, 'Precedents', Rw, [...STATS, ...span(Rw, 'Precedents', 'asOf', 'dcfRead'), ...span(Rw, 'Precedents', 'sort0', 'sort5')]); stripHeader(s, 'Precedents', Rw, 'sort0'); });
-const B621 = derive(B622, s => { keepCols(s, 'Precedents', Rw, dealKeys(6), DEAL_INPUT_COLS); });
+const B622 = derive(B623, s => { keepCols(s, 'Precedents', Rw, dealKeys(6), [...DEAL_INPUT_COLS, ...DEAL_621_COLS]); strip(s, 'Precedents', Rw, [...STATS, ...span(Rw, 'Precedents', 'tradMed', 'dcfRead'), ...span(Rw, 'Precedents', 'sort0', 'sort5')]); stripHeader(s, 'Precedents', Rw, 'sort0'); });
+const B621 = derive(B622, s => { keepCols(s, 'Precedents', Rw, dealKeys(6), DEAL_INPUT_COLS); strip(s, 'Precedents', Rw, ['asOf']); });
 const B62C = freshState(ALT_PACK, (s, rows) => { dealsRaw(s, rows, ALT.deals); withoutPages(s, ['LBO', 'Bids', 'Summary']); pendSu(s); });
 
 // module 6.3: the LBO
@@ -832,6 +840,8 @@ const B63C = lazy(() => {
   stripHeader(s, 'LBO', rows, 'hurdles'); delete s.sheets[0].condFmt;
   return s;
 });
+/** The paper LBO finished: what 6.3.C's route leaves (the Chapter 6 benchmark drill grades on it). */
+const B63CD = lazy(() => ({ sheets: [clone(PAPER_PAGE().sheet)], settings: { ...clone(M.stateOf('DONE').settings) } }));
 
 // module 6.4: the bids and the waterfall
 const B644 = derive(DONE, s => summaryLabels(s));
@@ -851,13 +861,17 @@ function projectShape(s, rows, data) {
 }
 const B6P = freshState(ALT_PACK, (s, rows) => projectShape(s, rows, ALT));
 const B6A = freshState(ALT2_PACK, (s, rows) => projectShape(s, rows, ALT2));
+/** The project's end: the finished pack on the fresh set (ALT), what 6.P's solution leaves. */
+const B6PD = freshState(ALT_PACK, () => {});
+/** The assessment's end: the finished pack on the second fresh set (ALT2), before the seed's odds. */
+const B6AD = freshState(ALT2_PACK, () => {});
 
 const BUILDERS = {
   B611, B612, B613, B614, B615, B61C,
   B621, B622, B623, B62C,
-  B631, B632, B633, B634, B635, B636, B63C,
+  B631, B632, B633, B634, B635, B636, B63C, B63CD,
   B641, B642, B643, B644, B64C,
-  B6P, B6A, DONE,
+  B6P, B6PD, B6A, B6AD, DONE,
 };
 /** The named states, each built on first read. */
 export const STATES = {};
@@ -867,9 +881,9 @@ export const STATE_ORDER = Object.keys(BUILDERS);
 export const STATE_LESSONS = {
   B611: '6.1.1', B612: '6.1.2', B613: '6.1.3', B614: '6.1.4', B615: '6.1.5', B61C: '6.1.C',
   B621: '6.2.1', B622: '6.2.2', B623: '6.2.3', B62C: '6.2.C',
-  B631: '6.3.1', B632: '6.3.2', B633: '6.3.3', B634: '6.3.4', B635: '6.3.5', B636: '6.3.6', B63C: '6.3.C',
+  B631: '6.3.1', B632: '6.3.2', B633: '6.3.3', B634: '6.3.4', B635: '6.3.5', B636: '6.3.6', B63C: '6.3.C', B63CD: 'after 6.3.C',
   B641: '6.4.1', B642: '6.4.2', B643: '6.4.3', B644: '6.4.4', B64C: '6.4.C',
-  B6P: '6.P', B6A: '6.A', DONE: 'the finished pack',
+  B6P: '6.P', B6PD: 'after 6.P', B6A: '6.A', B6AD: 'after 6.A', DONE: 'the finished pack',
 };
 /** The rows of the fresh sets' pages (tests and lessons on the challenges, the project and the assessment). */
 export const ALT_ROWS = () => ALT_PACK().rows;
@@ -887,4 +901,50 @@ export function stateOf(id) {
   const s = STATES[id];
   if (!s) throw new Error('unknown workbook state ' + id);
   return clone(s);
+}
+
+/** The paper LBO solved (6.3.C's answer key): the whole page on its given inputs, as a one-sheet state. */
+export function paperState() {
+  const { sheet } = PAPER_PAGE();
+  return { sheets: [clone(sheet)], settings: { ...clone(M.stateOf('DONE').settings) } };
+}
+
+/* ---------------- the replay's state shape: the Chapter 5 model's pair, since the pack is that workbook grown ---------------- */
+export { diffStates, sessionToState } from './clearcoat-model.js';
+
+/* ---------------- the module challenges and their seeds (one table, one dispatcher) ---------------- */
+
+/** The module challenges and the states they start from (the seed dresses them; the workload never moves). */
+export const CHALLENGES = {
+  'challenge-comps': { before: 'B61C' },
+  'challenge-precedents': { before: 'B62C' },
+  'challenge-paper-lbo': { before: 'B63C' },
+};
+/** A draw on a grid: lo to hi in steps of `by`, rounded clear of float dust. */
+const drawStep = (rng, lo, hi, by) => Math.round((lo + Math.floor(rng() * (Math.round((hi - lo) / by) + 1)) * by) * 1e6) / 1e6;
+/** A typed cell of a state re-typed at a fresh figure, in its own look. */
+const retyped = (st, name, ref, value) => ({ ...clone(cellsOf(st, name)[ref]), value });
+const SEEDS = {
+  // 6.1.C: the three fresh comps' share prices, each within a tenth of its own, so every EV and multiple is new
+  'challenge-comps': rng => {
+    const st = STATES.B61C, rows = ALT_ROWS().Comps, p = {};
+    ALT.comps.forEach((cp, i) => { const ref = CC.price + rows['c' + i]; p['Comps!' + ref] = retyped(st, 'Comps', ref, drawStep(rng, Math.round(cp.price * 90) / 100, Math.round(cp.price * 110) / 100, 0.05)); });
+    return p;
+  },
+  // 6.2.C: each fresh deal's enterprise value moved by up to 5%, to the nearest $500k
+  'challenge-precedents': rng => {
+    const st = STATES.B62C, rows = ALT_ROWS().Precedents, p = {};
+    ALT.deals.forEach((d, i) => { const ref = DC.ev + rows['d' + i]; p['Precedents!' + ref] = retyped(st, 'Precedents', ref, Math.round(d.ev * drawStep(rng, 95, 105, 1) / 100 / 500) * 500); });
+    return p;
+  },
+  // 6.3.C: a fresh bid and exit multiple on the paper LBO
+  'challenge-paper-lbo': rng => {
+    const st = STATES.B63C, rows = PAPER_ROWS().LBO;
+    return { ['LBO!C' + rows.entryEV]: retyped(st, 'LBO', 'C' + rows.entryEV, drawStep(rng, 160000, 170000, 2500)), ['LBO!C' + rows.exitMult]: retyped(st, 'LBO', 'C' + rows.exitMult, drawStep(rng, 10, 11, 0.25)) };
+  },
+};
+/** A module challenge's seed patch: content only, never workload. */
+export function challengeSeed(id, rng) {
+  if (!CHALLENGES[id] || !SEEDS[id]) throw new Error('clearcoat-valuation: no challenge ' + id);
+  return SEEDS[id](rng);
 }

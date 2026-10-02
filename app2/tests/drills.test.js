@@ -43,7 +43,7 @@ test('every drill validates', () => {
   for (const d of DRILLS.filter(x => x.kind !== 'challenge')) assert.deepEqual(validateDrill(d), [], d.id);
   // the module challenges ride the catalogue as thin records over their (validated) lessons
   const ch = DRILLS.filter(x => x.kind === 'challenge');
-  assert.equal(ch.length, 34, 'the seven Chapter 1 module challenges, the seven Chapter 2 ones (2.1 to 2.7), the remix, the six Chapter 3 ones (3.1 to 3.6), Chapter 4\'s six (4.1 to 4.6) and Chapter 5\'s 5.1 to 5.7 are registered');
+  assert.equal(ch.length, 38, 'the seven Chapter 1 module challenges, the seven Chapter 2 ones (2.1 to 2.7), the remix, the six Chapter 3 ones (3.1 to 3.6), Chapter 4\'s six (4.1 to 4.6), Chapter 5\'s 5.1 to 5.7 and Chapter 6\'s 6.1 to 6.4 are registered');
   for (const d of ch) { assert.ok(d.lesson && d.lesson.kind === 'challenge' && d.pars && d.pars.pass > d.pars.legendary, d.id); assert.equal(d.access, d.chapter === 'foundations' ? 'free' : 'paid', d.id); }
   assert.deepEqual(ch.filter(d => d.benchmark).map(d => d.id), ['challenge-to-standard-in-three-minutes', 'challenge-the-site-pnl'], 'two challenges are benchmarks');
   assert.ok(ch.filter(d => d.access === 'free').every(d => DAILY_POOL.includes(d.id)), 'the Daily pool picks the free challenges up');
@@ -66,7 +66,7 @@ test("Chapter 1's eleven drills: 6.1's set and order, eight to twenty goals, par
     assert.ok(d.optimalKeys / d.route <= 4, `${id}: ${d.optimalKeys} keys in a ${d.route} s route is faster than a fast hand`);
     assert.equal(d.access, 'free', `${id}: Chapter 1 is free`);
   }
-  assert.deepEqual(BENCHMARKS.filter(d => d.kind !== 'challenge').map(d => d.id), ['weekly-sales-report', 'ch5-revenue-build'], 'the weekly report and Chapter 5\'s revenue build are the benchmarks');
+  assert.deepEqual(BENCHMARKS.filter(d => d.kind !== 'challenge').map(d => d.id), ['weekly-sales-report', 'ch5-revenue-build', 'ch6-paper-lbo'], 'the weekly report, Chapter 5\'s revenue build and Chapter 6\'s paper LBO are the benchmarks');
   for (const [id] of CH1) assert.ok(DAILY_POOL.includes(id), `${id} is in the Daily's pool`);
 });
 

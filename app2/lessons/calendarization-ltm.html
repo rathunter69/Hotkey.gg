@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 202: Calendarization and LTM — Valuation · hotkey.gg</title>
+<meta name="description" content="Two of the six report to March, and a multiple on a year that ended six months apart isn’t comparable. LTM (the last twelve months) fixes it: the last four quarters, whatever the fiscal year, so every company is measured to the same date. Calendarization restates a fiscal year onto a calendar year by weighting two fiscal years by the months each contributes. Build LTM EBITDA from the quarters and calendarize the two March companies. The key is SUM.">
+<meta name="generator" content="app2/tests/public-pages.js — generated from lesson data; do not edit by hand">
+<script>try{var v=JSON.parse(localStorage.getItem('hk2_theme_vars'));if(v&&v.vars){var r=document.documentElement;for(var k in v.vars)r.style.setProperty('--'+k,v.vars[k]);r.setAttribute('data-dark',v.dark?'1':'0');}}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../ui/public.css">
+</head>
+<body>
+<nav class="top"><a class="brand" href="../index.html#/">hotkey<b>.gg</b></a><a href="../index.html#/learn">Learn</a><a href="../index.html#/practice">Practice</a><a href="../index.html#/leaderboard">Leaderboard</a><a href="../index.html#/reference">Reference</a></nav>
+<main>
+<div class="crumb"><a href="../index.html#/learn">Learn</a> › <a href="index.html">Valuation</a> › Trading comps</div>
+<h1>Lesson 202: Calendarization and LTM</h1>
+<div class="meta">Valuation · Trading comps · hard · <span class="">Paid</span></div>
+<div class="card">
+<p style="margin:0">Two of the six report to March, and a multiple on a year that ended six months apart isn’t comparable. LTM (the last twelve months) fixes it: the last four quarters, whatever the fiscal year, so every company is measured to the same date. Calendarization restates a fiscal year onto a calendar year by weighting two fiscal years by the months each contributes. Build LTM EBITDA from the quarters and calendarize the two March companies. The key is <kbd>SUM</kbd>.</p>
+</div>
+<h2>What you will do</h2>
+<ol class="goals"><li><span class="muted">Below the spread, each comp’s last eight quarters of EBITDA sit by period end, with only the first end typed. The rest are formulas, each quarter end three months after the last.</span> Date the quarters: D20:J20 =EOMONTH(C20,3), written once with Ctrl+Enter.</li><li><span class="muted">LTM runs to one date, and that date is one input cell: every LTM formula reads it, so the set rolls forward in one edit. The window opens twelve months before it, and the year before opens twenty-four months before.</span> Type the LTM date 6/30/2026 in C29, then C30 =EDATE($C$29,-12) and C31 =EDATE($C$29,-24).</li><li><span class="muted">LTM EBITDA is the sum of the quarters that end after the window opens and on or before the LTM date. A SUMIFS on the date row picks them, so the same formula works for a December year and a March one.</span> LTM EBITDA in P21:P26: a SUMIFS of each row’s quarters dated after C30 and up to C29.</li><li>The year before in Q21:Q26: the same SUMIFS on the window from C31 to C30.</li><li><span class="muted">A March company’s fiscal 2026 holds nine months of calendar 2025, so calendar 2025 is three twelfths of fiscal 2025 plus nine twelfths of fiscal 2026. The weight comes from the year end cell, never typed into the formula, so a December year gets twelve twelfths and the two weights always total 100%.</span> Calendarize: N21:N26 =MONTH(M21)/12, and calendar 2025 in O21:O26 =K21*N21+L21*(1-N21).</li><li><span class="muted">The spread now reads the built LTM instead of the typed one. A formula is black, so the blue goes: Paste Special, Formats from column H carries the page’s look without touching the formulas.</span> Replace the given LTM: J5:J10 =P21, then copy H5:H10 and paste its formats over J5 with Ctrl+Alt+V, T.</li><li><span class="muted">Filings give LTM another way: the last full fiscal year, plus this year’s quarters so far, less the same quarters a year earlier. For Pinnacle that is fiscal 2025 plus the March and June quarters of 2026, less the same two of 2025, and a live difference against the SUMIFS reads zero.</span> The filings route for Pinnacle: R21 =K21+(I21+J21)-(E21+F21), and S21 =ROUND(R21-P21,2) reads 0.</li><li>Does it tie? Watch the LTM date in C29 move back a quarter to 3/31/2026: every LTM figure, and every multiple above, shifts.</li></ol>
+<div class="cta"><a class="btn" href="../index.html#/lesson/calendarization-ltm">Start this lesson</a><span class="path">Read → Guided → Try solo → Timed</span></div>
+
+<div class="prevnext"><span>← <a href="spreading-a-comp.html">Lesson 201: Spreading a comp: the EV build</a></span><span><a href="median-and-range.html">Lesson 203: Sort the set, filter the outliers, take the median</a> →</span></div>
+</main>
+<footer><a href="../index.html#/pricing">Pricing</a><a href="../index.html#/teams">Teams</a><a href="../index.html#/about">About</a><a href="../index.html#/terms">Terms</a><a href="../index.html#/privacy">Privacy</a><a href="../index.html#/contact">Contact</a><span>© hotkey.gg</span></footer>
+</body>
+</html>

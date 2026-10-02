@@ -380,6 +380,30 @@ export const CONCEPTS = {
   'speed-build': 'a build on the clock: each row’s formula written once in its first column and filled right, anchors set with F4 as the formula is typed, the check read at the end',
   'one-pass-format': 'a block filled with one Ctrl+R and formatted by whole-block actions, F4 repeating each one on the next range, so no cell is touched twice',
   'keyboard-linking': 'statement links made without the mouse: the reference typed, or pointed with Ctrl+PgDn and the arrows, then Ctrl+Enter across the row and F4 repeating the green',
+  // Chapter 6 · 6.1 Trading comps (the valuation pack)
+  'enterprise-value': 'enterprise value is what the operating business is worth however it is funded: market cap (price times shares) plus debt, less cash',
+  'trading-multiple': 'a trading multiple is enterprise value over a year of revenue or EBITDA, with NM where EBITDA is zero or negative: the market’s price for a dollar of profit',
+  'ltm': 'LTM is the last twelve months: the last four quarters to one date, a SUMIFS on the period-end dates, so every company is measured to the same day',
+  'calendarization': 'calendarization restates a fiscal year onto a calendar year by weighting two fiscal years by the months each contributes, the weight from MONTH(year end)/12',
+  'flagged-set-stats': 'statistics on a flagged set run through a helper column, =IF(include=1, multiple, ""), so an excluded comp drops out instead of counting as zero',
+  'quartile-range': 'QUARTILE.INC(helper,1) and (helper,3) give the low and high of a range around the median, which an outlier cannot pull',
+  'operating-multiples': 'operating multiples price a unit anyone can count: enterprise value per site and per wash, beside EV / EBITDA',
+  'applied-range': 'a range applied: the low, median and high multiples times the target’s own figure, giving a range of enterprise values and, less net debt, of equity values',
+  // Chapter 6 · 6.2 Precedent transactions and 6.3 the LBO (the valuation pack)
+  'deal-multiples': 'a precedent is a deal that closed: the enterprise value paid over the target’s LTM EBITDA, and where the target was listed, the premium is the offer over the price before the announcement, less one',
+  'comparable-screen': 'deciding what is comparable: an include flag of 1 or 0 with its reason beside it, and a helper column =IF(include=1,multiple,"") that MEDIAN and QUARTILE.INC read, so a screened deal drops out of every statistic',
+  'precedents-range': 'a range applied: the low, median and high multiples times the company’s own EBITDA or sites give enterprise value, and net debt off gives equity value',
+  'sources-uses': 'sources and uses: what a buyout pays (the price and the fees) against where the money comes from (debt sized on EBITDA, the stake the owners keep, and the sponsor’s equity as the plug)',
+  'lbo-sweep': 'a cash sweep: each year’s spare cash, after interest net of tax and the mandatory amortization, repays the senior loan with MAX(MIN(cash available, balance), 0), while a short year draws the revolver',
+  'sale-leaseback': 'a sale-leaseback sells the land under a site to a landlord and rents it back: cash today, rent a year at the cap rate on the price, and an EBITDA that falls by the rent',
+  'lbo-returns': 'a sponsor’s return: equity at the exit (the exit multiple on EBITDA, less net debt) over equity at entry is the MOIC, and IRR on the cash flows (in at closing, out at the exit) is the annual rate',
+  'returns-bridge': 'a returns bridge splits the equity gain into EBITDA growth at the entry multiple, the change in multiple on the exit EBITDA, debt paid down and the fees, and the four sum to the gain',
+  'lbo-ceiling': 'what a sponsor can pay: the most equity that still earns the hurdle is the PV of the exit equity at that rate, and adding the debt and taking off the fees turns it into the top price',
+  // Chapter 6 · 6.4 the bids and the waterfall
+  'bid-pricing': 'a bid priced for its structure: cash at close, an earnout at its odds, a rollover at the new company’s return, and the odds the deal closes',
+  'proceeds-waterfall': 'the waterfall from enterprise value to the owners: each claim paid in order as a MIN of the claim and what is left, the rest split by ownership',
+  'option-value': 'an option’s value at a sale: the equity value less the strike, times the share, floored at zero with MAX',
+  'football-field': 'the football field as a table: every method’s low, mid and high on one line each, linked from the page that built it',
 };
 
 /**
