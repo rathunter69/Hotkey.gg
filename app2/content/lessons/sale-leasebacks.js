@@ -38,7 +38,7 @@ const goals = [
     hintStuck: `pulse range ${CALC[0]}:${CALC[1]} · The switch times sites times value; the rent is the proceeds times the cap rate.`,
     check: (s, ses) => settled(ses) && lines(ses, CALC) && liveVia(ses, L, CALC[1], [ON]) },
   { id: 'lines', text: `The rent as a cost in ${span('rent')}, the proceeds in FY27 in ${span('slbIn')}, and the cash they bring in ${span('cSlb')}.`,
-    teach: 'The rent comes off EBITDA from the first year, which is why adjusted EBITDA sits on its own labeled line. The proceeds land once, in FY27, through the COLUMNS counter, and the cash block reads them.',
+    teach: 'The rent comes off EBITDA from FY27 on, which is why adjusted EBITDA sits on its own labeled line. The proceeds land once, in FY27, through the COLUMNS counter, and the cash block reads them.',
     keys: LINES.map(k => fill(AFTER, L, span(k))).join(' '), requires: ['sale-leaseback', 'columns-counter', 'if-function', 'f4-anchor', 'ctrl-enter-fill', 'go-to'], convention: 'C3',
     hintStuck: `pulse range ${span('rent')} · The rent is −$C$${R(L, 'slbRent')} every year; the proceeds only where the counter reads 1.`,
     check: (s, ses) => settled(ses) && lines(ses, LINES.flatMap(yr)) && liveVia(ses, L, 'D' + R(L, 'cSlb'), [ON]) },

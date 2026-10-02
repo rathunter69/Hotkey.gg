@@ -80,7 +80,7 @@ const goals = [
     hintStuck: `pulse range ${DCF[0]}:${DCF[1]} · The exit multiple is on Inputs; it should sit between the two medians, or have a reason not to.`,
     check: (s, ses) => settled(ses) && built(ses, P, DCF, AFTER) },
   { id: 'tie', closer: true, demo: { script: `Ctrl+G "${P}!Q${NATIONWIDE}" Enter "1" Enter Ctrl+G "${P}!S${R(P, 'stHigh')}" Enter`, cadence: 320 },
-    text: 'Does it tie? Watch Nationwide come back in: the median moves and the range between the quartiles widens.', requires: [],
+    text: `Does it tie? Watch Nationwide’s flag in Q${NATIONWIDE} go to 1: the median in S${R(P, 'stMed')} and the quartiles in S${R(P, 'stLow')}:S${R(P, 'stHigh')} move.`, requires: [],
     hintStuck: `pulse range ${P}!S${R(P, 'stLow')}:S${R(P, 'stHigh')} · Every statistic reads the helper column, and the helper reads the flag.`,
     check: (s, ses) => ses.demoDone.has('tie') },
 ];

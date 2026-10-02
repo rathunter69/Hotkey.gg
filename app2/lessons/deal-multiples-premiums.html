@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 201: Deal multiples and premiums — Valuation · hotkey.gg</title>
+<meta name="description" content="A precedent is a deal that closed: the enterprise value paid over the target’s LTM EBITDA at the time. Where the target was listed, the premium is the price paid over the share price before the deal was announced, the reason precedents run above trading comps. The six deals are typed on Precedents. Spread them the way you spread the comps, with the premium where it exists and every deal aged against one date. The key is =.">
+<meta name="generator" content="app2/tests/public-pages.js — generated from lesson data; do not edit by hand">
+<script>try{var v=JSON.parse(localStorage.getItem('hk2_theme_vars'));if(v&&v.vars){var r=document.documentElement;for(var k in v.vars)r.style.setProperty('--'+k,v.vars[k]);r.setAttribute('data-dark',v.dark?'1':'0');}}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../ui/public.css">
+</head>
+<body>
+<nav class="top"><a class="brand" href="../index.html#/">hotkey<b>.gg</b></a><a href="../index.html#/learn">Learn</a><a href="../index.html#/practice">Practice</a><a href="../index.html#/leaderboard">Leaderboard</a><a href="../index.html#/reference">Reference</a></nav>
+<main>
+<div class="crumb"><a href="../index.html#/learn">Learn</a> › <a href="index.html">Valuation</a> › Precedent transactions</div>
+<h1>Lesson 201: Deal multiples and premiums</h1>
+<div class="meta">Valuation · Precedent transactions · medium · <span class="">Paid</span></div>
+<div class="card">
+<p style="margin:0">A precedent is a deal that closed: the enterprise value paid over the target’s LTM EBITDA at the time. Where the target was listed, the premium is the price paid over the share price before the deal was announced, the reason precedents run above trading comps. The six deals are typed on Precedents. Spread them the way you spread the comps, with the premium where it exists and every deal aged against one date. The key is <kbd>=</kbd>.</p>
+</div>
+<h2>What you will do</h2>
+<ol class="goals"><li><span class="muted">A sponsor is a private equity fund buying with debt; a strategic is an operator buying a competitor. A strategic can often pay more, because it counts on savings from running two chains as one, so the type sits beside every deal.</span> Record each acquirer’s type in F5:F10: Sponsor or Strategic, read from the acquirer in column E.</li><li><span class="muted">A precedent is a deal that closed: the enterprise value paid over the target’s LTM EBITDA at the time. The IF keeps a loss-making target from showing a negative multiple.</span> The deal multiple in J5:J10: =IF(H5&gt;0,G5/H5,&quot;NM&quot;), filled down the six deals.</li><li>EV per site in K5:K10, in $m: =G5/I5/1000.</li><li><span class="muted">Where the target was listed, the premium is the offer over the share price before the deal was announced, less one: the price of control. It’s the reason precedents run above trading comps.</span> The premium in O5:O10: =IF(L5=1,N5/M5-1,&quot;-&quot;), so an unlisted target shows a dash.</li><li>The as-of date in C19, linked to the valuation date on Inputs: =Inputs!$C$87.</li><li><span class="muted">The deal date is an input and the age is a formula against the as-of date, so how old is too old is read off the page, not worked out in your head. Move the valuation date and every age moves with it.</span> Each deal’s age in years in P5:P10: =YEARFRAC(C5,$C$19).</li><li>Does it tie? Watch Lakeside’s enterprise value go to $300,000k: its multiple and EV per site answer at once.</li></ol>
+<div class="cta"><a class="btn" href="../index.html#/lesson/deal-multiples-premiums">Start this lesson</a><span class="path">Read → Guided → Try solo → Timed</span></div>
+
+<div class="prevnext"><span>← <a href="ch5-assessment.html">Lesson 200: Assessment: one schedule and the links from it, fifteen minutes</a></span><span><a href="sort-and-decide.html">Lesson 202: Sort by date and size, and decide what’s comparable</a> →</span></div>
+</main>
+<footer><a href="../index.html#/pricing">Pricing</a><a href="../index.html#/teams">Teams</a><a href="../index.html#/about">About</a><a href="../index.html#/terms">Terms</a><a href="../index.html#/privacy">Privacy</a><a href="../index.html#/contact">Contact</a><span>© hotkey.gg</span></footer>
+</body>
+</html>

@@ -69,7 +69,7 @@ export default {
   conventions: ['B4', 'C3'],
   teaches: ['deal-multiples'],
   uses: ['if-function', 'yearfrac', 'cross-sheet-ref', 'f4-anchor', 'ctrl-enter-fill', 'go-to', 'type-to-enter', 'link-colour-convention', 'formula-basics'],
-  prerequisites: ['ch5-assessment'],   // DEV: challenge-comps
+  prerequisites: ['challenge-comps'],
   brief: 'A precedent is a deal that closed: the enterprise value paid over the target’s LTM EBITDA at the time. Where the target was listed, the premium is the price paid over the share price before the deal was announced, the reason precedents run above trading comps. The six deals are typed on Precedents. Spread them the way you spread the comps, with the premium where it exists and every deal aged against one date. The key is `=`.',
   goals,
   endState: [

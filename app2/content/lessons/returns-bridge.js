@@ -45,7 +45,7 @@ const goals = [
     hintStuck: `pulse range ${SHARES[0]}:${SHARES[3]} · Each effect over the gain in ${C('gain')}; the four add to 100%.`,
     check: (s, ses) => settled(ses) && lines(ses, SHARES) },
   { id: 'tie', closer: true, demo: { script: `Ctrl+G "${L}!${C('exitMult')}" Enter "=$C$${R(L, 'entryMult')}" Enter Ctrl+G "${L}!${C('multEff')}" Enter`, cadence: 320 },
-    text: 'Does it tie? Watch the exit multiple set equal to the entry multiple: the multiple effect reads zero and the check still holds.', requires: [],
+    text: `Does it tie? Watch the exit multiple in ${C('exitMult')} set to the entry multiple: ${C('multEff')} reads zero and the check still holds.`, requires: [],
     hintStuck: `pulse cell ${L}!${C('multEff')} · Sell at what you paid and the multiple adds nothing.`,
     check: (s, ses) => ses.demoDone.has('tie') },
 ];

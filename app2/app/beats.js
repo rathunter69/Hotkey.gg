@@ -107,6 +107,11 @@ const BEATS_DEFAULT = {
     body: 'Everything in this chapter you can now do; the question a desk asks is how fast. Three benchmarks, each a piece of the model against the clock: the revenue build in three minutes, a block filled and formatted in one pass, the cash flow statement linked without touching the mouse. They live in Practice as this chapter’s benchmarks, and here you run each once with the keys shown.' },
   'ch5-project-and-assessment': { eyebrow: 'Module 5.8 · project and assessment', title: 'The operating model, end to end.',
     body: 'An empty shell with the inputs and the history in it. Build the schedules, link the statements, get the flag to OK and value the business. Build it, then build one schedule and its links again on the clock. The assessment is the test-out.' },
+  // Chapter 6 · Valuation (script-ch6.md story cards)
+  'precedent-transactions': { eyebrow: 'Module 6.2 · precedent transactions', title: 'What buyers have actually paid.',
+    body: 'Trading multiples are what the market pays for a slice; precedents are what a buyer paid for the whole thing, control included, in real deals over the last three years. They’re fewer, older and harder to compare, so the questions are which deals count, how old is too old, and what a control premium looks like when the target was listed.' },
+  lbo: { eyebrow: 'Module 6.3 · LBO', title: 'How a sponsor can pay what they’re offering.',
+    body: 'The lead sponsor is offering $195m, and the way they can afford it is debt: borrow nearly half the price against Clearcoat’s own cash flow, use every spare dollar to pay it down, sell in five years at the same multiple, and keep what’s left. Rebuild their model to see what return that gives them and, once you can, what the most is they could pay and still hit it.' },
   'project-and-assessment': { eyebrow: 'Module 1.8 · project, assessment, test-out', title: 'Management’s next feed is in.',
     body: 'A fresh week, a blank Report, and everything the chapter taught. Build the page start to finish, then prove it against the clock on Monday morning; or test out of the chapter in five minutes.' },
 };
