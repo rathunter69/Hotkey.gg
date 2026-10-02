@@ -12,6 +12,7 @@
 // revolver's interest on its average balance is the model's one circle, with Circ as its breaker.
 import { buildPage, FMT } from './page.js';
 import { Sheet } from '../../engine/sheet.js';
+import { diffStates as diffCells, sessionToState as sessionCells } from './clearcoat-weekly.js';
 
 export const CHAPTER = 5;
 export const COLS = ['C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
@@ -918,11 +919,14 @@ export function coverWith(extraLinks) {
   return { sheet, at };
 }
 export const NAMES = { Case: 'Cover!$C$6', LastHistorical: `Inputs!$C$${ROW.Inputs.lasthist}`, Circ: `Inputs!$C$${ROW.Inputs.circ}`, WACC: `DCF!$C$${ROW.DCF.wacc}` };
+/** The Watch Window's two rows (5.5.2 adds them): the Cover's flag and its sum of differences, in view on every sheet. */
+export const WATCHES = [{ sheet: 'Cover', key: 'C' + ROW.Cover.flag }, { sheet: 'Cover', key: 'C' + ROW.Cover.diff }];
 
 const DONE = {
   sheets: [...SHEET_ORDER.slice(0, 10).map(n => PAGES[n]), pageData()],
   settings: { calcMode: 'automatic', iterative: true, maxIterations: 100, maxChange: 0.001, qat: ['save', 'undo', 'redo', 'fontColor', 'fillColor', 'borders', 'decDecimal'], enterMoves: false },
   names: { ...NAMES },
+  watches: WATCHES.map(w => ({ ...w })),
 };
 
 /* ---------------- state helpers ---------------- */
@@ -965,8 +969,8 @@ function pend(state, keys) {
   for (const key of keys) { for (const col of COLS) delete cells[col + rowOf('Checks', key)]; cells['K' + rowOf('Checks', key)] = { value: 'pending', it: true }; }
 }
 const unpend = (state, keys) => { const cells = cellsOf(state, 'Checks'); for (const key of keys) delete cells['K' + rowOf('Checks', key)]; };
-/** A planted cell on a sheet. */
-const plant = (state, name, ref, cell) => { const cells = cellsOf(state, name); cells[ref] = cell === null ? undefined : { ...(cells[ref] || {}), ...cell }; if (cell === null) delete cells[ref]; };
+/** A planted cell on a sheet: merged into the cell it replaces; a typed value takes a formula's place (and a formula a value's). */
+const plant = (state, name, ref, cell) => { const cells = cellsOf(state, name); if (cell === null) { delete cells[ref]; return; } const c = { ...(cells[ref] || {}), ...cell }; if ('value' in cell && !('formula' in cell)) delete c.formula; if ('formula' in cell) delete c.value; cells[ref] = c; };
 const setFormula = (state, name, ref, formula) => { const cells = cellsOf(state, name); cells[ref] = { ...(cells[ref] || {}), formula }; delete cells[ref].value; };
 
 /** The historical values of the CF and BS lines (what the shell carries typed before the statements are linked). */
@@ -985,7 +989,7 @@ function typeStatementHist(state, name, table) {
 
 const SITE_BLOCKS = { is: ['rev', 'ni'], accrual: ['cashIn1', 'cfoHand'], cf: ['cfNi', 'close'], bs: ['bsCash', 'check'], ratios: ['rMargin', 'rReturn'] };
 const stripSite = (state, name, blocks) => { for (const b of blocks) strip(state, name, span(name, ...SITE_BLOCKS[b])); };
-const onlyPages = (state, names) => { state.sheets = state.sheets.filter(s => names.includes(s.name)); delete state.names; };
+const onlyPages = (state, names) => { state.sheets = state.sheets.filter(s => names.includes(s.name)); delete state.names; delete state.watches; };
 
 // B517: before 5.1.7, One site has everything but the ratios; One week is done
 const B517 = derive(DONE, s => { onlyPages(s, ['One site', 'One week']); stripSite(s, 'One site', ['ratios']); });
@@ -1029,6 +1033,7 @@ function isHistOnly(state) {
 
 // B531 (= after 5.2.6): the shell complete, every schedule and statement still to build
 const B531 = derive(DONE, s => {
+  delete s.watches;   // the Watch Window's rows arrive with 5.5.2
   isHistOnly(s);
   typeStatementHist(s, 'CF', CF_HIST); typeStatementHist(s, 'BS', BS_HIST);
   stripFigures(s, 'Schedules');
@@ -1115,6 +1120,7 @@ const B53C = derive(B531, s => { stripFigures(s, 'Schedules'); });
 
 // B545 (= after 5.4.4): the model complete and balanced; Checks still waits on 5.5
 const B545 = derive(DONE, s => {
+  delete s.watches;
   pend(s, ['xfoot', 'eq', 'ebitda']);
   strip(s, 'Checks', ['debtNeg', 'ppeNeg', 'roundTrip', 'npv', 'errIS', 'errCF', 'errBS', 'errSch', 'errDCF', 'errInp', 'hcIS', 'hcCF', 'hcBS', 'hcSch']);
   setFormula(s, 'Checks', 'C' + rowOf('Checks', 'rollup'), `=SUMPRODUCT(ABS(C${rowOf('Checks', 'bs')}:J${rowOf('Checks', 'npv')}))`);
@@ -1144,32 +1150,38 @@ const B545broken = derive(B545, s => plantAll(s, BREAKS));
 const B54C = derive(B544, s => { for (const name of ['IS', 'CF', 'BS']) stripFigures(s, name); });
 
 /* ---------------- module 5.5: auditing ---------------- */
+// Each state is what the lesson before it leaves, clean. What a lesson plants for the learner to
+// find (the #REF!, the sweep's typed figures and pattern break, the bare margins) rides on the
+// lesson as its planting (plantPatch), so a lesson's solution leaves exactly the next one's start.
 
 // B551: before 5.5.1 (= after 5.4.5, the breaks fixed)
 const B551 = derive(B545, () => {});
-// B552: before 5.5.2, the errors block is empty and a #REF! sits in a memo cell on Schedules
-export const PLANT_REF = ['Schedules', 'H' + rowOf('Schedules', 'capexToDep'), { formula: `=H${rowOf('Schedules', 'capexTotal')}/#REF!` }];
+const ERR_KEYS = ['errIS', 'errCF', 'errBS', 'errSch', 'errDCF', 'errInp'], HC_KEYS = ['hcIS', 'hcCF', 'hcBS', 'hcSch'];
+/** Put a keyed row's finished cells back from DONE (over `cols`). */
+const fromDone = (s, name, keys, cols = COLS) => { const done = cellsOf(DONE, name), cells = cellsOf(s, name); for (const key of keys) for (const col of cols) { const k = col + rowOf(name, key); if (done[k]) cells[k] = clone(done[k]); } };
+/** The roll-up once 5.5.2 folds the error counts in (5.5.3 adds the hardcode counts: DONE's formula). */
+export const ROLLUP_ERRORS = `=SUMPRODUCT(ABS(C${rowOf('Checks', 'bs')}:J${rowOf('Checks', 'npv')}))+SUM(C${rowOf('Checks', 'errIS')}:C${rowOf('Checks', 'errInp')})`;
+// B552: before 5.5.2 (= after 5.5.1): every tie and both limit checks live; no error or hardcode counts yet; the DCF page is labels
 const B552 = derive(DONE, s => {
-  strip(s, 'Checks', ['errIS', 'errCF', 'errBS', 'errSch', 'errDCF', 'errInp', 'hcIS', 'hcCF', 'hcBS', 'hcSch', 'roundTrip', 'npv']);
+  strip(s, 'Checks', [...ERR_KEYS, ...HC_KEYS, 'roundTrip', 'npv']);
   setFormula(s, 'Checks', 'C' + rowOf('Checks', 'rollup'), `=SUMPRODUCT(ABS(C${rowOf('Checks', 'bs')}:J${rowOf('Checks', 'npv')}))`);
   stripFigures(s, 'DCF');
-  delete s.names.WACC;
-  plant(s, ...PLANT_REF);
+  delete s.names.WACC; delete s.watches;
 });
+/** What 5.5.2 plants: one #REF! in a memo cell on Schedules (the ties still read zero; the count reads 1). */
+export const PLANT_REF = ['Schedules', 'H' + rowOf('Schedules', 'capexToDep'), { formula: `=H${rowOf('Schedules', 'capexTotal')}/#REF!` }];
+// B553: before 5.5.3: the errors block, folded into the roll-up, and the Watch Window's two rows
+const B553 = derive(B552, s => { fromDone(s, 'Checks', ERR_KEYS, ['C']); setFormula(s, 'Checks', 'C' + rowOf('Checks', 'rollup'), ROLLUP_ERRORS); s.watches = WATCHES.map(w => ({ ...w })); });
 /** What 5.5.3 plants: two typed numbers in the IS projection and a labor formula that lost its anchor in FY29. */
 export const PLANT_SWEEP = [
   ['IS', 'G' + rowOf('IS', 'util'), { value: -3100, fontColor: 'blue' }],
   ['IS', 'I' + rowOf('IS', 'mkt'), { value: -1400, fontColor: 'blue' }],
   ['Schedules', 'H' + rowOf('Schedules', 'labor'), { formula: `=IF(Inputs!H$${ROW.Inputs.flag}=0,${dat(rowOf('Schedules', 'labor'), 'H')},Inputs!H$${ROW.Inputs.labor}*(1+Inputs!$C$${ROW.Inputs.infl})^Inputs!H$${ROW.Inputs.pcnt}*H${rowOf('Schedules', 'avgSites')})` }],
 ];
-const B553 = derive(B552, s => { plant(s, PLANT_REF[0], PLANT_REF[1], null); cellsOf(s, 'Schedules')[PLANT_REF[1]] = clone(cellsOf(DONE, 'Schedules')[PLANT_REF[1]]); for (const key of ['errIS', 'errCF', 'errBS', 'errSch', 'errDCF', 'errInp']) cellsOf(s, 'Checks')['C' + rowOf('Checks', key)] = clone(cellsOf(DONE, 'Checks')['C' + rowOf('Checks', key)]); });
-const B553planted = derive(B553, s => plantAll(s, PLANT_SWEEP));
-// B554: before 5.5.4, the IS margins divide bare (the ticket at zero makes them #DIV/0!)
-const B554 = derive(B553, s => {
-  for (const key of ['hcIS', 'hcCF', 'hcBS', 'hcSch']) cellsOf(s, 'Checks')['C' + rowOf('Checks', key)] = clone(cellsOf(DONE, 'Checks')['C' + rowOf('Checks', key)]);
-  const cells = cellsOf(s, 'IS');
-  for (const [key, num] of [['gm', 'gp'], ['cm', 'contrib'], ['em', 'ebitda'], ['nm', 'ni']]) for (const col of COLS) cells[col + rowOf('IS', key)].formula = `=${col}${rowOf('IS', num)}/${col}${rowOf('IS', 'rev')}`;
-});
+// B554: before 5.5.4: the hardcode counts and the full roll-up
+const B554 = derive(B553, s => { fromDone(s, 'Checks', [...HC_KEYS, 'rollup'], ['C']); });
+/** What 5.5.4 plants: the IS margins dividing bare, so a zero revenue shows #DIV/0!. */
+export const PLANT_MARGINS = [['gm', 'gp'], ['cm', 'contrib'], ['em', 'ebitda'], ['nm', 'ni']].flatMap(([key, num]) => COLS.map(col => ['IS', col + rowOf('IS', key), { formula: `=${col}${rowOf('IS', num)}/${col}${rowOf('IS', 'rev')}` }]));
 // B55C: the eight faults on the linked model
 export const FAULTS = [
   PLANT_SWEEP[0], PLANT_SWEEP[1], PLANT_SWEEP[2],
@@ -1180,6 +1192,22 @@ export const FAULTS = [
   ['BS', 'J' + rowOf('BS', 'cash'), { formula: `=J${rowOf('BS', 'tle')}-J${rowOf('BS', 'rec')}-J${rowOf('BS', 'land')}-J${rowOf('BS', 'ppe')}` }],
 ];
 const B55C = derive(B554, s => { plantAll(s, FAULTS); });
+/**
+ * A planting as a lesson's state patch ({ 'Sheet!A1': cell | null }), laid over the named state:
+ * each planted record merges into the cell it replaces, and a typed value takes the formula's place.
+ */
+export function plantPatch(stateId, list) {
+  const st = STATES[stateId]; const out = {};
+  for (const [name, ref, cell] of list) {
+    if (cell === null) { out[name + '!' + ref] = null; continue; }
+    const base = clone((cellsOf(st, name) || {})[ref] || {});
+    const merged = { ...base, ...cell };
+    if ('value' in cell && !('formula' in cell)) delete merged.formula;
+    if ('formula' in cell) delete merged.value;
+    out[name + '!' + ref] = merged;
+  }
+  return out;
+}
 
 /* ---------------- module 5.6: DCF ---------------- */
 
@@ -1187,27 +1215,53 @@ const DCFB = {
   fcf: span('DCF', 'ebitda', 'fcfShare'), disc: span('DCF', 't', 'pvEnd'), tv: span('DCF', 'tvPerp', 'tv'), ev: span('DCF', 'dfPerp', 'evMult'),
   wacc: span('DCF', 'rf', 'wacc'), sens: span('DCF', 'ptW', 'sm4'),
 };
-// B566: before 5.6.6, the sensitivity tables are labels
+// B566: before 5.6.6, the pass-through drivers and the sensitivity tables are labels
 const B566 = derive(DONE, s => { strip(s, 'DCF', DCFB.sens); });
 // B565: before 5.6.5, the discounting and enterprise value blocks too; the NPV cross-check waits
 const B565 = derive(B566, s => { strip(s, 'DCF', [...DCFB.disc, ...DCFB.ev]); strip(s, 'Checks', ['npv']); });
-// B564: before 5.6.4, the terminal value block too; the round trip waits
-const B564 = derive(B565, s => { strip(s, 'DCF', DCFB.tv); strip(s, 'Checks', ['roundTrip']); });
+// B564: before 5.6.4, the terminal value block and the normalized FY31 column too; the round trip waits
+const B564 = derive(B565, s => { strip(s, 'DCF', DCFB.tv); strip(s, 'DCF', DCFB.fcf, ['K']); strip(s, 'Checks', ['roundTrip']); });
 // B563: before 5.6.3, the WACC block too, and no WACC name
 const B563 = derive(B564, s => { strip(s, 'DCF', DCFB.wacc); delete s.names.WACC; });
-// B562: before 5.6.2, the free-cash-flow block holds the three links 5.6.1 made
+// B562: before 5.6.2, the free-cash-flow block holds the valuation date and the three links 5.6.1 made
 const B562 = derive(B563, s => { strip(s, 'DCF', DCFB.fcf.filter(k => !['ebitda', 'capex', 'nwc'].includes(k))); });
-// B561: before 5.6.1, the DCF page is a title and a units line
-const B561 = derive(B562, s => { stripFigures(s, 'DCF', { keepTimeline: false }); const cells = cellsOf(s, 'DCF'); for (const k of Object.keys(cells)) if (k !== 'A1' && k !== 'A2') delete cells[k]; });
+// B561: before 5.6.1 (= after 5.5.4): the DCF page is its title, the timeline and the labels
+const B561 = derive(B562, s => { stripFigures(s, 'DCF'); });
 // B56C: a DCF from a given free-cash-flow line (typed), the rest to build
 export const FCF_GIVEN = [-900, 2100, 4500, 7000, 9400];
 const B56C = derive(B561, s => {
   const done = sheetOf(DONE, 'DCF'); const sh = sheetOf(s, 'DCF');
-  sh.cells = clone(done.cells);
-  stripFigures(s, 'DCF');
   PROJ_COLS.forEach((col, i) => { sh.cells[col + rowOf('DCF', 'fcf')] = { ...clone(done.cells[col + rowOf('DCF', 'fcf')]), value: FCF_GIVEN[i], fontColor: 'blue' }; delete sh.cells[col + rowOf('DCF', 'fcf')].formula; });
   sh.cells['K' + rowOf('DCF', 'fcf')] = { ...clone(done.cells['K' + rowOf('DCF', 'fcf')]), value: FCF_GIVEN[4], fontColor: 'blue' }; delete sh.cells['K' + rowOf('DCF', 'fcf')].formula;
 });
+
+/* ---------------- the challenges' seeds ---------------- */
+
+/** Each module challenge, the state it opens on. */
+export const CHALLENGES = {
+  'challenge-eight-faults': { before: 'B55C' },
+  'challenge-dcf': { before: 'B56C' },
+};
+const step = (rng, lo, hi, by) => lo + Math.floor(rng() * (Math.round((hi - lo) / by) + 1)) * by;
+/**
+ * A module challenge's seed patch: content only, never workload. 5.5.C retypes the two planted
+ * hardcodes at fresh figures; 5.6.C scales the given free-cash-flow line (the normalized year
+ * follows FY31).
+ */
+export function challengeSeed(id, rng) {
+  if (!CHALLENGES[id]) throw new Error('clearcoat-model: no challenge ' + id);
+  const st = STATES[CHALLENGES[id].before]; const p = {};
+  if (id === 'challenge-eight-faults') {
+    for (const [name, ref, lo, hi] of [['IS', PLANT_SWEEP[0][1], 2600, 3600], ['IS', PLANT_SWEEP[1][1], 1100, 1700]]) p[name + '!' + ref] = { ...clone(cellsOf(st, name)[ref]), value: -step(rng, lo, hi, 50) };
+  }
+  if (id === 'challenge-dcf') {
+    const k = step(rng, 85, 115, 5) / 100; const cells = cellsOf(st, 'DCF'); const r = rowOf('DCF', 'fcf');
+    const flows = FCF_GIVEN.map(v => Math.round(v * k / 100) * 100);
+    PROJ_COLS.forEach((col, i) => { p['DCF!' + col + r] = { ...clone(cells[col + r]), value: flows[i] }; });
+    p['DCF!K' + r] = { ...clone(cells['K' + r]), value: flows[4] };
+  }
+  return p;
+}
 
 /* ---------------- module 5.7: model speed (each starts from the finished model) ---------------- */
 
@@ -1224,6 +1278,7 @@ const B573 = derive(DONE, s => { strip(s, 'CF', allKeys('CF')); });
 
 // B5P: the project's shell: inputs, Data, the timeline, every other page empty labels
 const B5P = derive(DONE, s => {
+  delete s.watches;
   for (const name of ['IS', 'CF', 'BS', 'Schedules', 'Checks', 'DCF']) stripFigures(s, name);
   for (const name of ['IS', 'CF', 'BS', 'DCF']) setFormula(s, name, 'A1', `=Inputs!$C$${ROW.Inputs.company}&": ${{ IS: 'income statement', CF: 'cash flow statement', BS: 'balance sheet', DCF: 'DCF' }[name]}"`);
   // the Cover keeps its title, the case switch and the case names (the live drivers block reads Case); the flag and the map are the project's to build
@@ -1245,7 +1300,7 @@ const BUILDERS = {
   B521, B522, B523, B524, B525, B526, B52C,
   B531, B532, B533, B534, B535, B536, B53C,
   B541, B542, B543, B544, B545: B545broken, B54C,
-  B551, B552, B553: B553planted, B554, B55C,
+  B551, B552, B553, B554, B55C,
   B561, B562, B563, B564, B565, B566, B56C,
   B571, B572, B573, B5P, B5A, DONE: () => DONE,
 };
@@ -1278,4 +1333,20 @@ export function stateOf(id) {
   const s = STATES[id];
   if (!s) throw new Error('unknown workbook state ' + id);
   return clone(s);
+}
+
+/* ---------------- a session read back as a state (the replay's diff) ---------------- */
+
+/** The settings with the iteration limits the model carries, in the states' key order. */
+const settingsOf = st => { const { calcMode, iterative, maxIterations, maxChange, qat, enterMoves, ...rest } = st || {}; return { calcMode, iterative, maxIterations: maxIterations == null ? 100 : maxIterations, maxChange: maxChange == null ? 0.001 : maxChange, qat, ...(enterMoves === false ? { enterMoves } : {}), ...rest }; };
+/** What differs between two states: clearcoat-weekly's diff, with the iteration limits compared as settings and the names in any order. */
+export function diffStates(a, b) {
+  const names = st => (st.names ? { names: Object.fromEntries(Object.entries(st.names).sort(([x], [y]) => x.toUpperCase().localeCompare(y.toUpperCase()))) } : {});   // a session keeps its names sorted, as the Name Manager lists them
+  return diffCells({ ...a, settings: settingsOf(a.settings), ...names(a) }, { ...b, settings: settingsOf(b.settings), ...names(b) });
+}
+/** A live session in the authored-state shape: clearcoat-weekly's extraction plus the iteration limits. */
+export function sessionToState(ses) {
+  const st = sessionCells(ses);
+  st.settings = settingsOf({ ...st.settings, maxIterations: ses.settings.maxIterations, maxChange: ses.settings.maxChange });
+  return st;
 }
