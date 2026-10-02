@@ -8,6 +8,7 @@ import { spawnSync } from 'node:child_process';
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, dirname, resolve, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { availableParallelism } from 'node:os';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const app2 = resolve(here, '..');
@@ -25,11 +26,11 @@ function walk(dir, out = []) {
 }
 const files = walk(app2);
 
-// 1. syntax
-for (const f of files) {
-  const r = spawnSync(process.execPath, ['--check', f], { encoding: 'utf8' });
-  if (r.status !== 0) fail(`syntax error in ${relative(root, f)}\n${r.stderr}`);
-}
+// 1. syntax: every file parses as an ES module, in one child process (a node --check per file cost ~7 s of the budget)
+const PARSE = `import vm from 'node:vm'; import { readFileSync } from 'node:fs';
+for (const f of process.argv.slice(1)) { try { new vm.SourceTextModule(readFileSync(f, 'utf8'), { identifier: f }); } catch (e) { console.error(f + '\\n' + e.message); process.exit(1); } }`;
+const syn = spawnSync(process.execPath, ['--experimental-vm-modules', '--no-warnings', '--input-type=module', '-e', PARSE, ...files], { encoding: 'utf8' });
+if (syn.status !== 0) fail(`syntax error in ${relative(root, (syn.stderr.split('\n')[0] || ''))}\n${syn.stderr.split('\n').slice(1).join('\n')}`);
 console.log(`syntax ok: ${files.length} modules`);
 
 // 2. isolation — static import specifiers must stay inside app2/
@@ -71,7 +72,7 @@ for (const script of ['copy-build.js', 'copy-check.js', 'css-check.js']) {
 
 // 3. unit tests
 const testFiles = files.filter(f => f.endsWith('.test.js')).sort();
-const t = spawnSync(process.execPath, ['--test', ...testFiles], { stdio: 'inherit' });
+const t = spawnSync(process.execPath, ['--test', '--test-concurrency=' + availableParallelism(), ...testFiles], { stdio: 'inherit' });
 if (t.status !== 0) fail('unit tests failed');
 
 const secs = ((Date.now() - t0) / 1000).toFixed(1);
