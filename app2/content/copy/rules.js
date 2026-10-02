@@ -118,7 +118,7 @@ export const SITE_KEYS = [
   'landing_path_title', 'landing_hours', 'landing_free', 'landing_pro', 'landing_path_1_title', 'landing_path_1', 'landing_path_2_title', 'landing_path_2', 'landing_path_3_title', 'landing_path_3', 'landing_path_4_title', 'landing_path_4', 'landing_path_5_title', 'landing_path_5', 'landing_path_6_title', 'landing_path_6',
   'landing_pricing', 'landing_see_pricing', 'landing_return', 'landing_return_tail',
   'landing_demo_idle', 'landing_demo_still', 'landing_demo_focus', 'landing_demo_taken', 'landing_demo_failed',
-  'landing_plate_drills_title', 'landing_plate_boards_title', 'landing_plate_boards_facts', 'landing_plate_lesson_goal',
+  'landing_plate_drills_title', 'landing_plate_boards_title', 'landing_plate_boards_facts', 'landing_plate_boards_example', 'landing_plate_lesson_goal',
   'landing_show_label', 'landing_show_lesson_title', 'landing_show_lesson', 'landing_show_drills_title', 'landing_show_drills', 'landing_show_daily_title', 'landing_show_daily',
   'landing_strip_label', 'landing_ch_modules', 'landing_ch_lessons', 'landing_legend_lesson', 'landing_legend_challenge',
   'footer_pricing', 'footer_teams', 'footer_about', 'footer_contact', 'footer_privacy', 'footer_terms', 'footer_eula', 'footer_trademarks',

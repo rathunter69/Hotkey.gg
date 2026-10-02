@@ -93,7 +93,7 @@ function drillPlate() {
 function dailyPlate() {
   const columns = [{ key: 'n', label: '', cls: 'n' }, { key: 'name', label: '' }, { key: 'time', label: '', align: 'right', cls: 'time' }, { key: 'gap', label: '', align: 'right', cls: 'gap' }];
   const rows = DAILY_BOARD.map((r, i) => ({ cells: { n: esc(r[0]), name: esc(r[1]), time: esc(r[2]), gap: esc(r[3]) }, cls: i === DAILY_BOARD.length - 1 ? 'mine pinned' : '', cursor: false }));
-  return `<div class="lp-pcard lp-daily" data-anim="daily">${panelHtml({ heading: esc(t('landing_plate_boards_title', 'The Daily, Thursday')), facts: `<span>${esc(t('landing_plate_boards_facts', '184 clean runs'))}</span>`, body: tableHtml({ columns, rows, head: false, cls: 'tbl-board' }), cls: 'lp-board' })}</div>`;
+  return `<div class="lp-pcard lp-daily" data-anim="daily">${panelHtml({ heading: esc(t('landing_plate_boards_title', 'The Daily, Thursday')), facts: `<span class="lp-example">${esc(t('landing_plate_boards_example', 'Example board'))}</span><span>${esc(t('landing_plate_boards_facts', '184 clean runs'))}</span>`, body: tableHtml({ columns, rows, head: false, cls: 'tbl-board' }), cls: 'lp-board' })}</div>`;
 }
 
 /** The three proofs: mode (the tint and the badge's color), glyph (the pixel badge), copy (heading and line), plate. */

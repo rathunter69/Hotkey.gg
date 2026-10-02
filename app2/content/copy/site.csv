@@ -376,6 +376,7 @@ landing_demo_failed,The live demo didn’t load; the still shows the finished sh
 landing_plate_drills_title,Format the weekly page
 landing_plate_boards_title,"The Daily, Thursday"
 landing_plate_boards_facts,184 clean runs
+landing_plate_boards_example,Example board
 landing_show_label,How it works
 landing_show_lesson_title,Lessons
 landing_show_lesson,One job at a time on a real sheet. The card points at the cells and shows the keys.
