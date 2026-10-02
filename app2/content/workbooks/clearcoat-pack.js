@@ -642,7 +642,7 @@ export function cutStart({ state: solved, rows, weeks, ex, sites, S, C }) {
     for (const ref in sc.cells) if (!keepSc.has(ref)) delete sc.cells[ref];
     sc.cells.A1 = { value: `Clearcoat Express forecast, ${ex.year}`, bold: true, fsz: sc.cells.A1.fsz };
     COLS('CDE').forEach((c, i) => { sc.cells[c + C.inputs.ticket] = { value: CASE_INPUTS.ticket[i], fontColor: 'blue', fmtStyle: 'custom', numFmt: FMT.unitDollar }; });
-    delete sc.condFmt;
+    delete sc.condFmt; delete sc.dataTables;   // the sensitivities are 4.5's to build
     // Dashboard: the skeleton only
     const db = sheetOf(s, 'Dashboard');
     for (const ref in db.cells) if (!['A1', 'A2', 'B4', 'C4', 'D4', 'E4', 'F4', 'G4'].includes(ref)) delete db.cells[ref];

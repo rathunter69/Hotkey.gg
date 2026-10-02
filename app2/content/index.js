@@ -127,6 +127,7 @@ import build_and_rearrange from './lessons/build-and-rearrange.js';
 import group_dates_and_value_settings from './lessons/group-dates-and-value-settings.js';
 import refresh_and_getpivotdata from './lessons/refresh-and-getpivotdata.js';
 import challenge_an_export_summarized_three_ways from './lessons/challenge-an-export-summarized-three-ways.js';
+import a_case_toggle_with_choose_and_index from './lessons/a-case-toggle-with-choose-and-index.js';
 
 export const CHAPTERS = [
   {
@@ -229,6 +230,7 @@ export const CHAPTERS = [
       group_dates_and_value_settings,
       refresh_and_getpivotdata,
       challenge_an_export_summarized_three_ways,
+      a_case_toggle_with_choose_and_index,
     ],
   },
 ];
