@@ -202,7 +202,7 @@ const methods = {
       case 'MAD': this.exitRibbon(false); this.removeArrows('dependent'); return true;
       case 'MV': this.openEvaluate(); return true;
       case 'MK': this.openErrorCheck(); return true;
-      case 'MXA': this.settings.calcMode = 'automatic'; this.emit('settings'); this.exitRibbon(false); return true;
+      case 'MXA': this.settings.calcMode = 'automatic'; this.emit('settings'); this.computeTables(); this.exitRibbon(false); return true;   // back to Automatic recalculates, the Data Tables too
       case 'MXE': this.settings.calcMode = 'autoExceptTables'; this.emit('settings'); this.exitRibbon(false); return true;
       case 'MXM': this.settings.calcMode = 'manual'; this.emit('settings'); this.exitRibbon(false); return true;
       case 'AE': this.openTextToColumns(); return true;

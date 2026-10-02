@@ -117,6 +117,15 @@ test('4.5.4 and 4.5.5: Goal Seek finds the Domain break-even; a Data Table on th
   assert.equal(Sc.value('C' + C.driver), null, 'the driver is left blank');
 });
 
+test('Automatic except for Data Tables holds the grids until F9, and Alt M X A brings them up to date', () => {
+  const ses = live('S453'); const Sc = open(ses, 'Scenarios'); const r = C.twoWay.rows[0];
+  const before = Sc.value('D' + r);
+  ses.run('Alt M X E'); Sc.commitInput('230', C.inputs.washes, 4); ses.computeTables();
+  assert.equal(Sc.value('D' + r), before, 'the grid holds');
+  ses.run('Alt M X A'); assert.notEqual(Sc.value('D' + r), before, 'back to Automatic, the grid catches up');
+  assert.equal(ses.settings.calcMode, 'automatic');
+});
+
 test('4.6: the names resolve on the sheet and in a formula', () => {
   const ses = live('S463'); const Sc = open(ses, 'Scenarios');
   assert.deepEqual(Object.keys(ses.names).sort(), Object.keys(wb.NAMES).sort());

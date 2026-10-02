@@ -951,7 +951,7 @@ const S452 = derive(S451, s => { take(s, SOLVED, 'Scenarios', ['B' + ONE.title, 
 const S453 = derive(S452, s => {
   take(s, SOLVED, 'Scenarios', ['B' + TWO.title, 'B' + TWO.vals, 'C' + TWO.vals, ...rowRefs(TWO.vals, COLS('DEFGH')), ...TWO.rows.map(r => 'C' + r)]);
   tables(s, 'S453');
-  sheetOf(s, 'Scenarios').condFmt.push(clone(sheetOf(SOLVED, 'Scenarios').condFmt[1]));
+  sheetOf(s, 'Scenarios').condFmt.unshift(clone(sheetOf(SOLVED, 'Scenarios').condFmt[1]));   // a new rule goes to the top of the list, as Excel adds it
 });
 // 4.5.4 Goal Seek: Domain's break-even by hand and per Goal Seek, noted
 const BE = C.breakEven;

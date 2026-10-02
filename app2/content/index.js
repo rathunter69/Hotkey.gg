@@ -129,6 +129,7 @@ import refresh_and_getpivotdata from './lessons/refresh-and-getpivotdata.js';
 import challenge_an_export_summarized_three_ways from './lessons/challenge-an-export-summarized-three-ways.js';
 import a_case_toggle_with_choose_and_index from './lessons/a-case-toggle-with-choose-and-index.js';
 import one_way_data_table_the_ticket from './lessons/one-way-data-table-the-ticket.js';
+import two_way_data_table_ticket_member_share from './lessons/two-way-data-table-ticket-member-share.js';
 
 export const CHAPTERS = [
   {
@@ -233,6 +234,7 @@ export const CHAPTERS = [
       challenge_an_export_summarized_three_ways,
       a_case_toggle_with_choose_and_index,
       one_way_data_table_the_ticket,
+      two_way_data_table_ticket_member_share,
     ],
   },
 ];
