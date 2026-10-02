@@ -102,7 +102,7 @@ export function mountHomePage(root, ctx = {}) {
   else {
     const l = next.lesson;
     if (next.kind === 'assessment') { heading = t('home_next_assessment', { n: 1 }); button = buttonHtml({ label: t('home_start_assessment'), key: 'Enter', href: '#/lesson/' + l.id, primary: true, id: 'homeResume' }); }
-    else if (next.kind === 'pro') { heading = t('home_next_lesson', { title: l.title }); line = siteCopy('paywall_line', 'Go Pro for the rest of the content.'); button = buttonHtml({ label: t('paywall_go_pro'), key: 'Enter', href: '#/pricing', primary: true, id: 'homeResume' }); }
+    else if (next.kind === 'pro') { heading = t('home_next_lesson', { title: l.title }); line = siteCopy('paywall_line', 'Get full access for the rest of the content.'); button = buttonHtml({ label: t('paywall_go_pro'), key: 'Enter', href: '#/pricing', primary: true, id: 'homeResume' }); }
     else { heading = t('home_next_lesson', { title: l.title }); button = buttonHtml({ label: next.started ? t('home_resume') : t('home_start'), key: 'Enter', href: '#/lesson/' + l.id, primary: true, id: 'homeResume' }); }
     facts = `<span>${esc(next.module)}</span>${next.of ? `<span>${esc(t('home_lesson_of', { n: next.n, m: next.of }))}</span>` : ''}${next.goals ? `<span class="fact-segs">${segmentsHtml(0, next.goals, true)}<span>${esc(t('home_goal_of', { n: 1, m: next.goals }))}</span></span>` : ''}${next.minutes ? `<span>${esc(t('home_minutes_left', { n: next.minutes }))}</span>` : ''}`;
     sheet = previewOfLesson(l, 'before');

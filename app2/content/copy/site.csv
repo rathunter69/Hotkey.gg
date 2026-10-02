@@ -215,7 +215,7 @@ home_start_assessment,Start the assessment
 home_lesson_of,Lesson {n} of {m}
 home_goal_of,Goal {n} of {m}
 home_minutes_left,About {n} minutes left
-home_all_done,Chapter {n} is Verified. The next chapter is Pro.
+home_all_done,Chapter {n} is Verified. The next chapter is in Full Access.
 chapter_heading,"Chapter {n}, {name}"
 chapter_modules_done,{d} of {m} modules done
 col_module,Module
@@ -273,7 +273,7 @@ col_length,Length
 col_best,Your best
 practice_not_played,Not played
 practice_after,After {n}
-practice_pro,Pro
+practice_pro,Full Access
 practice_set_heading,The set
 reason_due,Due a refresher
 reason_slowest,Slowest against its par
@@ -283,7 +283,7 @@ reason_fill,Fills the set
 daily_title,The Daily
 daily_line,Today it’s {drill}: ninety seconds on the same sheet as everyone else.
 daily_play,Play today’s Daily
-daily_pro_note,"Today’s drill is from Chapter {n}, which is Pro. Everyone plays the same sheet, so play it anyway."
+daily_pro_note,"Today’s drill is from Chapter {n}, which is in Full Access. Everyone plays the same sheet, so play it anyway."
 daily_clean_runs,{n} clean runs so far
 daily_not_played,You haven’t played today.
 rapid_title,Rapid-fire
