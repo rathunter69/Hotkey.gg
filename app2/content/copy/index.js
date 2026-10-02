@@ -1887,6 +1887,18 @@ export const COPY = {
    "mac_note": "",
    "story_beat": ""
   },
+  "ch5-project": {
+   "id": "ch5-project",
+   "module": "ch5-project-and-assessment",
+   "order": "5.8.P",
+   "title": "Project: the operating model with its DCF page",
+   "brief": "Fresh inputs, an empty shell, three historical years typed and sourced on Data. Build the schedules, link the three statements, value it on the DCF page and get the flag on the Cover to OK. No clock, and nothing here is new. The key is `Ctrl+Enter`.",
+   "closing": "An empty shell in, a model out: seven schedules, three statements linked, a DCF with both terminal values and two grids, and the flag on the Cover at OK. || This is the model a buyer’s team rebuilds before they sign. Now one schedule and its links again, on the clock.",
+   "wow": "An empty shell in, a three statement model with its DCF out, the flag at OK, and that is Chapter 5.",
+   "convention_line": "Write once, fill right; Links green; external links avoided; Name toggles and key inputs only; Know the four anchor states; The check is a live difference → 0",
+   "mac_note": "",
+   "story_beat": ""
+  },
   "remix-format-on-the-pnl": {
    "id": "remix-format-on-the-pnl",
    "module": "remixes",
@@ -11928,6 +11940,136 @@ export const COPY = {
     "why": "",
     "hint_stuck": ""
    }
+  ],
+  "ch5-project": [
+   {
+    "lesson_id": "ch5-project",
+    "goal_index": "0",
+    "text": "Build the rollout and revenue on Schedules, rows 6 to 27, each row one formula entered across C:J with Ctrl+Enter.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-project",
+    "goal_index": "1",
+    "text": "Build the cost build down to EBITDA and its margin on Schedules, rows 30 to 43.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-project",
+    "goal_index": "2",
+    "text": "Build working capital on Schedules, rows 46 to 57: the balances by days, the changes in cash and the cycle.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-project",
+    "goal_index": "3",
+    "text": "Build PP&E and the depreciation waterfall on Schedules, rows 60 to 76, each vintage depreciating from the year after it is spent.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-project",
+    "goal_index": "4",
+    "text": "Build the term loan and the delayed draw on Schedules, rows 79 to 95, interest on the average balance behind the breaker.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-project",
+    "goal_index": "5",
+    "text": "Build the revolver and the debt totals on Schedules, rows 98 to 111, drawing to the minimum cash and repaying from any surplus.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-project",
+    "goal_index": "6",
+    "text": "Build tax on Schedules, rows 114 to 121, with the loss carried forward and used against later profit.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-project",
+    "goal_index": "7",
+    "text": "Build the IS from revenue to net income, history from Data and projections from Schedules.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-project",
+    "goal_index": "8",
+    "text": "Build the cash flow statement: the links from the IS and Schedules, the distribution, the section totals and cash.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-project",
+    "goal_index": "9",
+    "text": "Build the BS: cash from the cash flow, the balances from Schedules, equity rolled forward, and the balance check.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-project",
+    "goal_index": "10",
+    "text": "Name DCF C60 WACC with Alt M M D, then build the WACC block in DCF rows 50 to 65.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-project",
+    "goal_index": "11",
+    "text": "Build the DCF in rows 5 to 47: free cash flow, the discount factors, terminal value both ways and the equity bridge.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-project",
+    "goal_index": "12",
+    "text": "Build both sensitivity grids on DCF, rows 68 to 81, each axis stepping from the base case and each cell a live value.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-project",
+    "goal_index": "13",
+    "text": "Build the checks on Checks, rows 6 to 27, each a rounded difference that reads 0 when the model ties.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-project",
+    "goal_index": "14",
+    "text": "Count the errors and hardcodes on Checks, roll everything up to the flag in C45, and link the flag to the Cover.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch5-project",
+    "goal_index": "15",
+    "text": "Does it tie? Watch FY31 washes a day in Inputs J22 go from 250 to 300: every statement moves and the flag on the Cover holds at OK.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
   ]
  },
  "modules": {
@@ -12154,6 +12296,13 @@ export const COPY = {
    "objective": "The chapter’s three benchmarks with the keys shown once: the revenue build in three minutes, a block filled and formatted in one pass, the cash flow statement linked by keyboard alone.",
    "story_beat": "Now do it fast. || Everything in this chapter you can now do; the question a desk asks is how fast. Three benchmarks, each a piece of the model against the clock: the revenue build in three minutes, a block filled and formatted in one pass, the cash flow statement linked without touching the mouse. They live in Practice as this chapter’s benchmarks, and here you run each once with the keys shown.",
    "page_name": "The benchmarks"
+  },
+  "ch5-project-and-assessment": {
+   "id": "ch5-project-and-assessment",
+   "name": "Project and assessment",
+   "objective": "The operating model with its DCF page; the assessment is one schedule and the links from it, timed.",
+   "story_beat": "The operating model, end to end. || An empty shell with the inputs and the history in it. Build the schedules, link the statements, get the flag to OK and value the business. Build it, then build one schedule and its links again on the clock. The assessment is the test-out.",
+   "page_name": "The operating model"
   }
  },
  "site": {

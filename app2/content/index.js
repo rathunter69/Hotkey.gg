@@ -171,6 +171,7 @@ import revenue_build_in_three from './lessons/revenue-build-in-three.js';
 import fill_and_format_block from './lessons/fill-and-format-block.js';
 import keyboard_only_linking from './lessons/keyboard-only-linking.js';
 import challenge_model_speed from './lessons/challenge-model-speed.js';
+import ch5_project from './lessons/ch5-project.js';
 
 export const CHAPTERS = [
   {
@@ -308,6 +309,7 @@ export const CHAPTERS = [
       fill_and_format_block,
       keyboard_only_linking,
       challenge_model_speed,
+      ch5_project,
     ],
   },
 ];
