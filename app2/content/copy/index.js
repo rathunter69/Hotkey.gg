@@ -4687,7 +4687,8 @@ export const COPY = {
   "learn_being_written": "Being written",
   "learn_up_next": "Up next",
   "learn_reward": "Finish {module} to earn it",
-  "learn_reward_earned": "Earned"
+  "learn_reward_earned": "Earned",
+  "practice_chapter_coming": "Chapter {n} is being written. Its drills land here as its lessons do."
  },
  "micro": {
   "enter-tab-direction": {

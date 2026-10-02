@@ -282,7 +282,38 @@ a.pn:focus-visible{outline:var(--cursor-w) solid var(--mode); outline-offset:var
 /* the badge a module pays out, under its page */
 .learn-reward{display:flex; align-items:center; gap:var(--s3); padding-top:var(--s3); border-top:1px solid var(--line)}
 .learn-reward .px{flex:none}
-@media (max-width:900px){ .ch-cards{grid-template-columns:repeat(2, minmax(0,1fr))} .learn-continue{flex-wrap:wrap} }
+@media (max-width:900px){ .ch-cards, .dt-grid{grid-template-columns:repeat(2, minmax(0,1fr))} .learn-continue{flex-wrap:wrap} }
+
+/* a drill as a tile (the catalog, the Challenges page): the keys it drills lead, your best and tier at its foot */
+.dt-grid{display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:var(--s3)}
+.dt{position:relative; display:flex; flex-direction:column; gap:var(--s3); min-height:var(--dt-min-h); padding:var(--s3) var(--s4); background:var(--sheet); border:1px solid var(--line); border-top:var(--mode-rule) solid var(--mode); color:var(--ink); text-decoration:none; cursor:pointer}
+.dt:hover{background:var(--chrome)}
+.dt.next{background:var(--mode-tint)}
+.dt.later, .dt.pro{border-top-color:var(--line); cursor:default}
+.dt.pro{cursor:pointer}
+.dt.later .dt-title, .dt.pro .dt-title{color:var(--ink-2)}
+.dt.later:hover{background:var(--sheet)}
+.dt-head{display:flex; justify-content:space-between; align-items:baseline; gap:var(--s2)}
+.dt-title{font-size:var(--fs-name); font-weight:var(--fw-bold); line-height:1.25}
+.dt-len{flex:none; font-size:var(--fs-min); color:var(--ink-2); font-variant-numeric:tabular-nums}
+.dt-sub{font-size:var(--fs-label); color:var(--ink-2)}
+.dt .keys-row .key{font-size:var(--fs-key)}
+.dt.later .keys-row, .dt.pro .keys-row{opacity:.75}
+.dt-foot{display:flex; justify-content:space-between; align-items:center; gap:var(--s2); margin-top:auto; padding-top:var(--s2); border-top:1px solid var(--line)}
+.dt-time{font-family:var(--mono); font-weight:var(--fw-bold); font-size:var(--fs-key); font-variant-numeric:tabular-nums}
+.dt-new{font-size:var(--fs-label); font-weight:var(--fw-semi); color:var(--ink-2)}
+.dt.next .dt-new{color:var(--ink)}
+.dt-lock{display:inline-flex; align-items:center; gap:var(--s2); font-size:var(--fs-label); font-weight:var(--fw-bold); color:var(--challenges-ink)}
+.dt-lock::before{content:''; width:var(--s2); height:var(--s2); border:var(--bw-2) solid currentColor; border-bottom:0; border-radius:var(--s1) var(--s1) 0 0; box-shadow:0 var(--s2) 0 calc(-1 * var(--bw-2)) currentColor; margin-bottom:var(--s1)}
+.dt-lock.dt-after{color:var(--ink-2); font-weight:var(--fw-semi)}
+
+/* the set, inline at the side of the catalog */
+.set-list{display:flex; flex-direction:column; border-top:var(--bw-2) solid var(--ink)}
+.set-row{display:grid; grid-template-columns:auto minmax(0,1fr) var(--set-len-w); align-items:center; gap:var(--s3); padding:var(--s2) 0; border-bottom:1px solid var(--line); color:var(--ink); text-decoration:none}
+.set-row:hover{background:var(--chrome)}
+.set-n{min-width:var(--s6); text-align:center}
+.set-main{display:flex; flex-direction:column; min-width:0}
+.set-len{font-size:var(--fs-min); color:var(--ink-2); text-align:right; font-variant-numeric:tabular-nums}
 
 /* below 900px the columns stack */
 @media (max-width:900px){

@@ -169,7 +169,7 @@ try {
     if (!/built/.test(await page.evaluate(() => (document.querySelector('.learn-side') || {}).textContent || ''))) fail('journey: Learn does not show page 1.1 as built');
     // Practice renders its catalog, with the first drills unlocked by 1.1
     await page.goto(base + '#/practice'); await page.waitForTimeout(300);
-    if ((await page.$$('tr.row-drill[data-href]')).length < 3) fail('journey: Practice shows fewer than three drills');
+    if ((await page.$$('.row-drill[data-href]')).length < 3) fail('journey: Practice shows fewer than three drills');
     if (await page.evaluate(() => { const h = document.querySelector('.hdr'); if (!h) return false; const cs = getComputedStyle(h); return (document.activeElement === h) || (cs.outlineStyle !== 'none' && cs.outlineColor !== 'rgba(0, 0, 0, 0)' && parseFloat(cs.outlineWidth) > 0); })) fail('journey: Practice\'s header block draws a stray outline');
     t('home, learn, practice');
     // the Daily: the Ready panel, the drill by keyboard, the result panel

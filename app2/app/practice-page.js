@@ -16,13 +16,14 @@ import { entitlement } from './entitlement.js';
 import { dailyFor } from './daily.js';
 import { dayOf } from './records.js';
 import { tierAtLeast } from './pars.js';
-import { statusOf } from './learn-page.js';
+import { statusOf, chapterTabs } from './learn-page.js';
 import { moduleNumber, itemNumber } from './numbering.js';
 import { schedule, dueToday } from './schedule.js';
 import { COURSE } from './progress-model.js';
 import { siteCopy } from '../content/copy/apply.js';
 import { esc, fill, fmtClock, fmtLength, numberWord, prettyDay } from '../ui/components/format.js';
-import { panelHtml, tableHtml, buttonHtml, headerBlockHtml, wireRows } from '../ui/components/table.js';
+import { panelHtml, tableHtml, buttonHtml, headerBlockHtml, wireRows, wireTabs } from '../ui/components/table.js';
+import { routeKeys, keysRowHtml, chapterCardsHtml, drillTileHtml } from '../ui/components/path.js';
 import { tierMarksHtml } from '../ui/components/marks.js';
 import { paywallHtml } from '../ui/components/paywall.js';
 import { auth } from './auth.js';
@@ -152,39 +153,57 @@ function drillsPage(el, ctx) {
   const unlocked = CATALOG.filter(e => drillUnlocked(e, all, skipped).open).map(e => e.id);
   const queue = dueToday(schedule.stateOrBackfill(all, liveLessons()), moduleCtx(all));
   const due = dueDrills(CATALOG, queue.items.filter(i => i.kind === 'micro').map(i => i.id));
+  const q = (ctx && ctx.query) || {};
   let minutes = Number(settings.get().setLength) || 10;
-  let showSet = false, paywall = null;
+  let chapterKey = (chapterTabs().find(c => c.key === q.ch) || chapterTabs()[0]).key;
+  let paywall = null;
   let unwire = null;
-  function render() {
+  const keysOf = id => { const e = CATALOG.find(x => x.id === id); return routeKeys(e && e.route && e.route.solution, 6); };
+  function render(focusTab) {
     const set = pickSet({ catalog: CATALOG, minutes, pro, due, unlocked, bests });
     const first = set.ids[0] || null;
     const href = first ? `#/drill/${first}?set=${set.ids.join(',')}&len=${minutes}` : '';
     const control = `<label class="picker"><select id="setLen">${SET_LENGTHS.map(n => `<option value="${n}"${n === minutes ? ' selected' : ''}>${esc(t('setting_setLength_' + n))}</option>`).join('')}</select></label>`;
-    const header = headerBlockHtml({ title: t('practice_drills'), line: `${esc(setLine(set.ids.length, set.secs, minutes))} ${set.ids.length ? `<button type="button" class="link-btn" id="seeSet">${esc(showSet ? t('practice_hide_set') : t('practice_see_set'))}</button>` : ''}`, control, button: first ? buttonHtml({ label: t('practice_start'), key: 'Enter', href, primary: true, id: 'startDrilling' }) : '', cls: 'hdr-drills' });
-    const setPanel = showSet && set.ids.length ? panelHtml({ heading: esc(t('practice_set_heading')), facts: esc(fmtLength(set.secs)), body: tableHtml({ columns: [{ key: 'n', label: '', cls: 'n' }, { key: 'title', label: t('col_drill') }, { key: 'why', label: '' }, { key: 'length', label: t('col_length'), align: 'right', cls: 'min' }], rows: set.ids.map((id, i) => { const e = CATALOG.find(x => x.id === id); return { cells: { n: String(i + 1), title: esc(e.title), why: esc(t('reason_' + String(set.reasons[id]).replace('-', '_'))), length: fmtLength(e.length) }, href: '#/drill/' + id }; }), cls: 'tbl-set' }), cls: 'set-panel' }) : '';
-    const paywallPanel = paywall ? paywallHtml({ heading: paywall.title, signedIn: auth.state() === 'in', mode: 'drills', ids: { go: 'practiceGoPro', notNow: 'practiceNotNow' } }) : '';   // the one paywall panel (M105)
-    const columns = [{ key: 'title', label: t('col_drill') }, { key: 'length', label: t('col_length'), align: 'right', cls: 'min' }, { key: 'best', label: t('col_best'), align: 'right', cls: 'best' }, { key: 'tier', label: '', align: 'right', cls: 'tier' }];
-    const panels = groups.map(g => panelHtml({ heading: esc(t('chapter_heading', { n: g.n, name: g.title })), facts: esc(g.rows.every(r => r.pro) ? t('practice_pro') : t('practice_chapter_fact', { done: g.passed, of: g.of })), body: tableHtml({ columns, rows: g.rows.map(r => ({ cells: { title: esc(r.title), length: fmtLength(r.length), best: r.pro ? esc(t('practice_pro')) : r.best != null ? fmtClock(r.best) : r.open ? esc(t('practice_not_played')) : esc(t('practice_after', { n: r.after })), tier: r.pro ? '' : tierMarksHtml(r.tier) }, cls: `row-drill${r.pro ? ' pro' : ''}${r.open ? '' : ' later'}`, href: r.pro ? '' : '#/drill/' + r.id, attrs: r.pro ? { 'data-pro': r.id } : null })), cls: 'tbl-catalog', label: g.title }), cls: 'catalog' }));
-    el.innerHTML = `${header}${setPanel}${paywallPanel}<div class="pg-cols">${panels.map(p => `<div class="pg-col">${p}</div>`).join('')}</div>`;
+    const header = headerBlockHtml({ title: t('practice_drills'), line: esc(setLine(set.ids.length, set.secs, minutes)), control, button: first ? buttonHtml({ label: t('practice_start'), key: 'Enter', href, primary: true, id: 'startDrilling' }) : '', cls: 'hdr-drills' });
+    // the chapters as the same cards Learn uses: the number on a key, the bar, the count or the lock; all six, so what Full Access opens is in view
+    const cards = chapterTabs().map(c => {
+      const gr = groups.find(x => x.id === c.key);
+      const locked = c.access === 'paid' && !pro;
+      return { key: c.key, n: c.n, title: c.title, on: c.key === chapterKey, locked, pct: gr && gr.of ? 100 * gr.passed / gr.of : 0,
+        note: c.access === 'free' ? t('learn_free') : locked ? t('paywall_pro') : '', count: gr ? t('practice_chapter_fact', { done: gr.passed, of: gr.of }) : t('learn_being_written') };
+    });
+    const tab = chapterTabs().find(c => c.key === chapterKey) || chapterTabs()[0];
+    const g = groups.find(x => x.id === chapterKey) || { id: tab.key, n: tab.n, title: tab.title, rows: [], passed: 0, of: 0 };
+    const chLocked = tab.access === 'paid' && !pro;
+    const nextId = (g.rows.find(r => r.open && !r.pro && r.best == null) || {}).id;
+    const tiles = g.rows.map(r => drillTileHtml({ id: r.id, title: r.title, keys: keysOf(r.id), length: fmtLength(r.length), best: r.best != null ? fmtClock(r.best) : '', tier: r.tier, open: r.open, pro: r.pro, href: '#/drill/' + r.id, next: r.id === nextId },
+      { notPlayed: t('practice_not_played'), after: t('practice_after', { n: r.after }), full: t('paywall_pro') })).join('');
+    const main = panelHtml({ heading: esc(t('chapter_heading', { n: g.n, name: g.title })), facts: g.of ? esc(t('practice_chapter_fact', { done: g.passed, of: g.of })) : '', body: g.rows.length ? `<div class="dt-grid" data-cursor-cols="3">${tiles}</div>` : `<p class="panel-line">${esc(t('practice_chapter_coming', { n: g.n }))}</p>`, cls: 'catalog', stretch: true });
+    // the set, inline: what Start drilling plays, in order, and why each is in it
+    const setRows = set.ids.map((id, i) => { const e = CATALOG.find(x => x.id === id); return `<a class="set-row" href="#/drill/${esc(id)}"><kbd class="key set-n">${i + 1}</kbd><span class="set-main"><span class="row-name">${esc(e.title)}</span><span class="row-sub">${esc(t('reason_' + String(set.reasons[id]).replace('-', '_')))}</span></span><span class="set-len">${esc(fmtLength(e.length))}</span></a>`; }).join('');
+    const setPanel = panelHtml({ heading: esc(t('practice_set_heading')), facts: set.ids.length ? esc(fmtLength(set.secs)) : '', body: set.ids.length ? `<div class="set-list">${setRows}</div>` : `<p class="panel-line">${esc(t('practice_set_none'))}</p>`, cls: 'set-panel', stretch: true });
+    const paywallPanel = paywall || chLocked ? paywallHtml({ heading: paywall ? paywall.title : t('paywall_chapter', { n: tab.n, name: tab.title }), signedIn: auth.state() === 'in', mode: 'drills', ids: { go: 'practiceGoPro', notNow: 'practiceNotNow' } }) : '';   // the one paywall panel (M105)
+    el.innerHTML = `${header}${chapterCardsHtml(cards, t('rail_practice'))}<div class="pg-two"><div class="pg-main">${main}</div><div class="pg-side">${paywallPanel || setPanel}</div></div>`;
     const len = el.querySelector('#setLen'); if (len) len.onchange = () => { minutes = Number(len.value); settings.set({ setLength: String(minutes) }); render(); };
-    const see = el.querySelector('#seeSet'); if (see) see.onclick = () => { showSet = !showSet; render(); };
-    const nn = el.querySelector('#practiceNotNow'); if (nn) nn.onclick = () => { paywall = null; render(); };
+    const nn = el.querySelector('#practiceNotNow'); if (nn) nn.onclick = () => { if (!paywall) chapterKey = chapterTabs()[0].key; paywall = null; render(); };
     el.querySelectorAll('[data-pro]').forEach(r => r.addEventListener('click', () => { const e = CATALOG.find(x => x.id === r.dataset.pro); paywall = { title: e ? e.title : '' }; render(); }));
+    wireTabs(el, (key, viaKeys) => { chapterKey = key; paywall = null; render(viaKeys); });
     if (unwire) unwire();
     unwire = wireRows(el);
-    if (ctx.keytips) ctx.keytips.register([{ id: 'start', label: t('practice_start'), el: el.querySelector('#startDrilling') }, { id: 'set', label: t('practice_see_set'), el: el.querySelector('#seeSet') }].filter(i => i.el));
+    if (focusTab) { const on = el.querySelector('.tab.on'); if (on) on.focus(); }
+    if (ctx.keytips) ctx.keytips.register([{ id: 'start', label: t('practice_start'), el: el.querySelector('#startDrilling') }, ...chapterTabs().map(x => ({ id: x.key, label: t('learn_tab', { n: x.n }), el: el.querySelector(`.tab[data-tab="${x.key}"]`) }))].filter(i => i.el));
     if (ctx.cursor) ctx.cursor.refresh();
   }
   render();
-  // the selected row: the newest unlocked unplayed drill, else the first open one; Enter on the header starts the set
+  // the selected item: the header (Enter starts the set), else the next unplayed drill
   setTimeout(() => {
     if (!ctx.cursor) return;
-    const pick = el.querySelector('.row-drill:not(.later):not(.pro)');
+    const pick = el.querySelector('.row-drill.next') || el.querySelector('.row-drill:not(.later):not(.pro)');
     const start = el.querySelector('#startDrilling');
     if (start) ctx.cursor.select(el.querySelector('.hdr'), { focus: false });
     else if (pick) ctx.cursor.select(pick, { focus: false });
   }, 0);
-  const onKey = e => { if (e.key === 'Escape' && paywall) { e.preventDefault(); paywall = null; render(); } };
+  const onKey = e => { if (e.key === 'Escape' && !e.defaultPrevented) { const nn = el.querySelector('#practiceNotNow'); if (nn) { e.preventDefault(); nn.click(); } } };
   document.addEventListener('keydown', onKey);
   return () => { document.removeEventListener('keydown', onKey); if (unwire) unwire(); };
 }

@@ -39,7 +39,7 @@ export function routeKeys(solution, max = Infinity) {
   }
   // what a route does comes first, how it moves (arrows with Ctrl or Shift, the sheet keys) after:
   // a lesson's row leads with Ctrl+1 and Alt H A R, a navigation drill still shows its jumps
-  const NAV = /^(Ctrl\+|Shift\+|Ctrl\+Shift\+)?(→|←|↑|↓|Home|End|PgUp|PgDn|Space)$/;
+  const NAV = /^((Ctrl\+|Shift\+|Ctrl\+Shift\+)?(→|←|↑|↓|Home|End|PgUp|PgDn|Space)|Ctrl\+G)$/;   // Go To is how a drill reaches its cells, not what it drills
   const act = out.filter(k => !NAV.test(k)), nav = out.filter(k => NAV.test(k));
   return [...act, ...nav].slice(0, max);
 }
@@ -85,4 +85,25 @@ export function moduleRowHtml(row, { open = false, locked = false, status = '', 
     <span class="mod-main"><span class="mod-head"><span class="mod-title">${esc(row.title)}</span>${minutes ? `<span class="mod-min">${esc(minutes)}</span>` : ''}</span>${pathNodesHtml(row.nodes)}</span>
     <span class="mod-end">${status ? `<span class="mod-status">${esc(status)}</span>` : ''}${tierMarksHtml(row.tier || 'none')}</span>
   </div>`;
+}
+
+/**
+ * A drill as a tile (the catalog, the Challenges page): its name, the keys it drills as keycaps
+ * (the lead fact), its length, and at the foot your best with its tier, or why it is closed: the
+ * module to finish first, or Full Access with a lock. d: { id, title, keys, length, best, tier, open,
+ * after, pro, href, mode, sub, next }; words: { notPlayed, after, full }.
+ */
+export function drillTileHtml(d, words = {}) {
+  const closed = d.pro || !d.open;
+  const foot = d.pro ? `<span class="dt-lock">${esc(words.full || '')}</span>`
+    : !d.open ? `<span class="dt-lock dt-after">${esc(words.after || '')}</span>`
+    : d.best ? `<span class="dt-time">${esc(d.best)}</span>${tierMarksHtml(d.tier || 'none')}` : `<span class="dt-new">${esc(words.notPlayed || '')}</span>${tierMarksHtml('none')}`;
+  const attrs = d.pro ? ` data-pro="${esc(d.id)}" data-cursor tabindex="-1"` : closed ? '' : ' data-cursor tabindex="-1"';
+  const tag = d.href && !closed ? 'a' : 'div';
+  return `<${tag} class="dt row-drill${d.pro ? ' pro' : ''}${!d.open && !d.pro ? ' later' : ''}${d.best ? ' played' : ''}${d.next ? ' next' : ''}"${tag === 'a' ? ` href="${esc(d.href)}" data-href="${esc(d.href)}"` : ''}${attrs}${d.mode ? ` style="--mode:var(--${esc(d.mode)})"` : ''}>
+    <span class="dt-head"><span class="dt-title">${esc(d.title)}</span>${d.length ? `<span class="dt-len">${esc(d.length)}</span>` : ''}</span>
+    ${d.sub ? `<span class="dt-sub">${esc(d.sub)}</span>` : ''}
+    ${keysRowHtml(d.keys || [], { max: 4 })}
+    <span class="dt-foot">${foot}</span>
+  </${tag}>`;
 }
