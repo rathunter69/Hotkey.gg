@@ -4729,7 +4729,8 @@ export const COPY = {
   "ref_no_key": "Nothing in the course uses {k} yet.",
   "ref_board": "The keyboard",
   "ref_leg_open": "Not yet",
-  "ref_leg_got": "Yours"
+  "ref_leg_got": "Yours",
+  "save_line_ch1": "Chapter 1 is nearly done. A free account keeps your progress on any device and puts your name on the certificate."
  },
  "micro": {
   "enter-tab-direction": {

@@ -19,6 +19,7 @@ import { auth } from './auth.js';
 import { sheetPreviewHtml, previewOfLesson } from '../ui/components/sheet-preview.js';
 import { routeKeys, keysRowHtml, chapterCardsHtml, moduleRowHtml, continueHtml } from '../ui/components/path.js';
 import { ACHIEVEMENTS } from '../content/achievements.js';
+import { saveNudgeHtml, wireSaveNudge } from '../ui/components/nudge.js';
 import { GLYPHS, renderPixel, RARITY_COLOURS } from '../ui/pixel.js';
 
 const t = (key, vars) => fill(siteCopy(key, key), vars);
@@ -307,8 +308,11 @@ export function mountLearnPage(root, ctx = {}) {
       const reward = badge ? `<div class="learn-reward${earned ? ' on' : ''}">${renderPixel(GLYPHS[badge.glyph] || GLYPHS.star, { b: RARITY_COLOURS[badge.rarity] || RARITY_COLOURS.common }, earned ? { size: 40 } : { size: 40, mono: 'var(--line)' })}<span><span class="row-name">${esc(badge.name)}</span><span class="row-sub">${esc(earned ? t('learn_reward_earned') : t('learn_reward', { module: open.title }))}</span></span></div>` : '';
       side = panelHtml({ heading: esc(open.title), facts: esc(t('learn_keys_n', { n: modKeys.length })), body: `${beat ? `<p class="panel-line learn-beat">${esc(beat)}</p>` : ''}<div class="learn-keys">${keysRowHtml(modKeys, { max: 14 })}</div><p class="panel-line ink-2">${esc(delivered ? t('learn_page_built', { page: pageName }) : t('learn_page_fill'))}</p>${delivered && open.lessons.some(l => l.kind === 'challenge') ? `<a class="panel-link" href="#/lesson/${esc(open.lessons.find(l => l.kind === 'challenge').id)}?seed=new">${esc(t('learn_replay'))}</a>` : ''}${reward}`, cls: 'learn-side', stretch: true });
     } else if (locked) side = paywall;
+    // before Chapter 1 ends (Wolf, 2026-10-02, point 25): past its halfway module, a guest is offered the account that keeps it
+    if (tab.n === 1 && !locked && rows.length && doneN >= Math.ceil(rows.length / 2)) side = saveNudgeHtml({ line: t('save_line_ch1') }) + side;
     el.innerHTML = `${nextStepHtml()}${chapterCardsHtml(cards(all, skipped), t('rail_learn'))}
       <div class="pg-two"><div class="pg-main">${panelHtml({ heading: esc(heading), facts, body, cls: 'learn-table', stretch: true })}</div><div class="pg-side">${side}</div></div>`;
+    wireSaveNudge(el);
     wireTabs(el, (key, viaKeys) => { chapterKey = key; openModule = null; render(viaKeys); });
     if (unwire) unwire();
     unwire = wireRows(el);
