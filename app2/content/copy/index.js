@@ -4149,18 +4149,18 @@ export const COPY = {
    {
     "lesson_id": "conditional-codes-and-hidden-zeros",
     "goal_index": "3",
-    "text": "Set C5:E5 back to General, the top of Ctrl+1’s list, and the flags show again.",
-    "teach": "General is the format with no format: General at the top of Ctrl+1’s list returns a cell to showing its value as typed.",
+    "text": "On Inputs, the switch in B12 holds a 1: give it On;;Off, with the negative section left empty, so it reads On and still multiplies.",
+    "teach": "",
     "why": "",
-    "hint_stuck": "pulse range C5:E5 · The A and E never left the cells."
+    "hint_stuck": "pulse cell B12 · Positive; negative; zero: a 0 would read Off."
    },
    {
     "lesson_id": "conditional-codes-and-hidden-zeros",
     "goal_index": "4",
-    "text": "On Inputs, the switch in B12 holds a 1: give it the code On;;Off so it reads On and still multiplies as a number.",
-    "teach": "",
+    "text": "Back on the P&L, set the flags C5:E5 to General, the top of Ctrl+1’s list, and they show again.",
+    "teach": "General is the format with no format: General at the top of Ctrl+1’s list returns a cell to showing its value as typed.",
     "why": "",
-    "hint_stuck": "pulse cell B12 · Positive; negative; zero: a 0 would read Off."
+    "hint_stuck": "pulse range C5:E5 · The A and E never left the cells."
    },
    {
     "lesson_id": "conditional-codes-and-hidden-zeros",
@@ -4289,14 +4289,22 @@ export const COPY = {
    {
     "lesson_id": "title-units-timeline-answer",
     "goal_index": "7",
-    "text": "Select the account codes and their header in A4:A23 and clear them with Alt, H, E, A.",
+    "text": "Monthly takes the same rule: select its months C7:N23 and color only the typed figures blue with Go To Special Constants again.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range Monthly!C7:N23 · The subtotals and the full year are formulas and stay black."
+   },
+   {
+    "lesson_id": "title-units-timeline-answer",
+    "goal_index": "8",
+    "text": "Back on the P&L, select the account codes and their header in A4:A23 and clear them with Alt, H, E, A.",
     "teach": "The account codes belong to the ledger, not to the page. Clear All (Alt, H, E, A) takes the contents and the formats, so nothing of them is left behind.",
     "why": "",
     "hint_stuck": "pulse range A4:A23 · The codes stop at head office in row 23."
    },
    {
     "lesson_id": "title-units-timeline-answer",
-    "goal_index": "8",
+    "goal_index": "9",
     "text": "Does it tie? Watch C7 change to 18500, and EBITDA in C24 answer under the title.",
     "teach": "",
     "why": "",
@@ -4489,18 +4497,18 @@ export const COPY = {
    {
     "lesson_id": "widths-and-the-label-column",
     "goal_index": "1",
-    "text": "Make row 1 a little taller for the title: Alt, H, O, H, height 24.",
-    "teach": "",
-    "why": "",
-    "hint_stuck": "pulse row 1 · The title is a size up, so its row gets a little more room."
-   },
-   {
-    "lesson_id": "widths-and-the-label-column",
-    "goal_index": "2",
     "text": "Select columns C:E and give the three years one width, 12.",
     "teach": "Period columns are set by hand to one width, so FY24A, FY25A and FY26E read as equals. AutoFit would give each year its own width.",
     "why": "",
     "hint_stuck": "pulse range C:E · Ctrl+Space selects the whole column."
+   },
+   {
+    "lesson_id": "widths-and-the-label-column",
+    "goal_index": "2",
+    "text": "Back at A1 with Ctrl+Home, make row 1 a little taller for the title: Alt, H, O, H, height 24.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse row 1 · The title is a size up, so its row gets a little more room."
    },
    {
     "lesson_id": "widths-and-the-label-column",
@@ -5101,14 +5109,22 @@ export const COPY = {
    {
     "lesson_id": "data-bars-and-scales",
     "goal_index": "1",
-    "text": "Put a color scale on chemicals and water, C13:N13, and read which months cost most.",
+    "text": "On Monthly detail, the working sheet nobody prints, put data bars on the company revenue line C66:N66.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C66:N66 · Total revenue in the company block at the foot of the clusters."
+   },
+   {
+    "lesson_id": "data-bars-and-scales",
+    "goal_index": "2",
+    "text": "Back on Monthly, put a color scale on chemicals and water, C13:N13, and read which months cost most.",
     "teach": "Alt, H, L, S opens Color Scales: green to red by default, each cell shaded by where it sits in the range.",
     "why": "",
     "hint_stuck": "pulse range C13:N13 · The first line under Site costs."
    },
    {
     "lesson_id": "data-bars-and-scales",
-    "goal_index": "2",
+    "goal_index": "3",
     "text": "With C13:N13 still selected, take the scale off with Clear Rules from Selected Cells.",
     "teach": "Alt, H, L, C, S is Clear Rules from Selected Cells: every rule that meets the selection goes. Monthly is a page in the book, so the decoration comes off.",
     "why": "",
@@ -5116,19 +5132,11 @@ export const COPY = {
    },
    {
     "lesson_id": "data-bars-and-scales",
-    "goal_index": "3",
+    "goal_index": "4",
     "text": "Open Manage Rules, delete the data bars at the top of the list, and keep the slow-month rule on C10:N10.",
     "teach": "Clearing C10:N10 would take the slow-month rule as well, since it sits on the same cells. Manage Rules deletes one rule and leaves the rest.",
     "why": "",
     "hint_stuck": "pulse range C10:N10 · Delete removes the selected rule, the first in the list."
-   },
-   {
-    "lesson_id": "data-bars-and-scales",
-    "goal_index": "4",
-    "text": "On Monthly detail, the working sheet nobody prints, put data bars on the company revenue line C66:N66.",
-    "teach": "",
-    "why": "",
-    "hint_stuck": "pulse range C66:N66 · Total revenue in the company block at the foot of the clusters."
    },
    {
     "lesson_id": "data-bars-and-scales",

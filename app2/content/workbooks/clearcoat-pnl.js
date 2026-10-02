@@ -797,7 +797,7 @@ const print = s => cellsOf(s, 'Print');
 const detail = s => cellsOf(s, 'Monthly detail');
 const PNL_COLS = ['B', ...YEAR_COLS];
 
-/** 2.3.1 Title, units, timeline, sections, answer: the anatomy in place, the typed figures blue, the system's codes gone. */
+/** 2.3.1 Title, units, timeline, sections, answer: the anatomy in place, the typed figures blue on the P&L and Monthly, the system's codes gone. */
 function anatomy(s) {
   const c = pnl(s);
   c.A1 = { value: TITLE, bold: true, fsz: TITLE_FSZ, ca: 5 };
@@ -808,6 +808,8 @@ function anatomy(s) {
   for (const r of [ROW.checkRevenue, ROW.checkMonthly]) put(c, 'B' + r, { indent: 1 });
   for (const r of [...LINE_ROWS, 33, 34]) for (const col of YEAR_COLS) put(c, col + r, { fontColor: 'blue' });
   for (let r = 4; r <= 35; r++) delete c['A' + r];
+  const m = monthly(s);                                                                  // Go To Special's payoff: Monthly's typed months blue the same way
+  for (const r of LINE_ROWS) for (const col of MONTH_COLS) put(m, col + r, { fontColor: 'blue' });
 }
 /** 2.3.2 The A/E divider: a right border down the last actual column, the estimate header shaded, Monthly's header row shaded. */
 function divider(s) {

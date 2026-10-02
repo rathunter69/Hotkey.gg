@@ -1,9 +1,9 @@
 // Chapter 2 · 2.5.3 Data bars and scales, and when not to (clearcoat-pnl, S5b → S5c)
 // Data bars and color scales draw a chart inside the cells. Monthly's revenue line C10:N10 takes
-// bars and its chemicals line C13:N13 a scale, and both come off again: Clear Rules from Selected
+// bars, then the same bars go on the working sheet, Monthly detail's company revenue C66:N66, where
+// they stay; the chemicals line C13:N13 takes a scale, and both come off Monthly again: Clear Rules from Selected
 // Cells for the scale, Manage Rules for the bars (clearing C10:N10 would take the slow-month rule
-// with them). One set of bars stays on the working sheet, Monthly detail's company revenue
-// C66:N66. The closer raises one cluster's month and the bar answers.
+// with them). The closer raises one cluster's month and the bar answers.
 import { DETAIL, slowMonthThreshold, EXPORT } from '../workbooks/clearcoat-pnl.js';
 
 const sheetOf = (ses, name) => { const e = ses.sheets.find(x => x.name === name); return e ? e.sheet : null; };
@@ -42,7 +42,10 @@ export default {
     { id: 'bars', teach: 'Alt, H, L, D opens the Data Bars gallery: Enter takes the first, a blue bar in each cell sized to its value. Read the shape: winter low, summer high.', text: 'On Monthly, put data bars on the revenue line C10:N10 and read the seasonal shape.', keys: 'Ctrl+G "Monthly!C10" ↵ Ctrl+Shift+→ Shift+← Alt H L D ↵', requires: ['data-bars', 'go-to', 'sheet-reference', 'ctrl-shift-arrow', 'shift-arrow'],
       hintStuck: 'pulse range C10:N10 · January to December; the full year in O would flatten every bar.',
       check: (s, ses) => ruled(monthly(ses), 'C10:N10', bar) && settled(ses) },
-    { id: 'scale', teach: 'Alt, H, L, S opens Color Scales: green to red by default, each cell shaded by where it sits in the range.', text: 'Put a color scale on chemicals and water, C13:N13, and read which months cost most.', keys: '↓ ×3 Ctrl+Shift+→ Shift+← Alt H L S ↵', requires: ['data-bars', 'arrow-keys', 'ctrl-shift-arrow', 'shift-arrow'],
+    { id: 'keep-bars', text: `On Monthly detail, the working sheet nobody prints, put data bars on the company revenue line ${DETAIL_REV}.`, keys: `Ctrl+G "'Monthly detail'!C${DETAIL.rev}" ↵ Ctrl+Shift+→ Shift+← Alt H L D ↵`, requires: ['data-bars', 'go-to', 'sheet-reference', 'ctrl-shift-arrow', 'shift-arrow'],
+      hintStuck: `pulse range ${DETAIL_REV} · Total revenue in the company block at the foot of the clusters.`,
+      check: (s, ses) => ruled(detail(ses), DETAIL_REV, bar) && settled(ses) },
+    { id: 'scale', teach: 'Alt, H, L, S opens Color Scales: green to red by default, each cell shaded by where it sits in the range.', text: 'Back on Monthly, put a color scale on chemicals and water, C13:N13, and read which months cost most.', keys: 'Ctrl+G "Monthly!C13" ↵ Ctrl+Shift+→ Shift+← Alt H L S ↵', requires: ['data-bars', 'go-to', 'sheet-reference', 'ctrl-shift-arrow', 'shift-arrow'],
       hintStuck: 'pulse range C13:N13 · The first line under Site costs.',
       check: (s, ses) => ruled(monthly(ses), 'C13:N13', scale) && settled(ses) },
     { id: 'clear-scale', teach: 'Alt, H, L, C, S is Clear Rules from Selected Cells: every rule that meets the selection goes. Monthly is a page in the book, so the decoration comes off.', text: 'With C13:N13 still selected, take the scale off with Clear Rules from Selected Cells.', keys: 'Alt H L C S', requires: ['data-bars'], convention: 'D8',
@@ -51,10 +54,7 @@ export default {
     { id: 'delete-bars', teach: 'Clearing C10:N10 would take the slow-month rule as well, since it sits on the same cells. Manage Rules deletes one rule and leaves the rest.', text: 'Open Manage Rules, delete the data bars at the top of the list, and keep the slow-month rule on C10:N10.', keys: 'Alt H L R Delete ↵', requires: ['manage-rules'], convention: 'G2',
       hintStuck: 'pulse range C10:N10 · Delete removes the selected rule, the first in the list.',
       check: (s, ses) => monthlyClean(monthly(ses)) && settled(ses) },
-    { id: 'keep-bars', text: `On Monthly detail, the working sheet nobody prints, put data bars on the company revenue line ${DETAIL_REV}.`, keys: `Ctrl+G "'Monthly detail'!C${DETAIL.rev}" ↵ Ctrl+Shift+→ Shift+← Alt H L D ↵`, requires: ['data-bars', 'go-to', 'sheet-reference', 'ctrl-shift-arrow', 'shift-arrow'],
-      hintStuck: `pulse range ${DETAIL_REV} · Total revenue in the company block at the foot of the clusters.`,
-      check: (s, ses) => ruled(detail(ses), DETAIL_REV, bar) && settled(ses) },
-    { id: 'tie', closer: true, demo: { script: `Ctrl+G "C${DETAIL.clusters[0].head + 1}" Enter "2000" Enter Escape`, cadence: 320 }, text: `Does it tie? Watch Austin’s January retail revenue in C${DETAIL.clusters[0].head + 1} go up to 2,000 and January’s bar on row ${DETAIL.rev} grow.`, requires: [],
+    { id: 'tie', closer: true, demo: { script: `Ctrl+G "'Monthly detail'!C${DETAIL.clusters[0].head + 1}" Enter "2000" Enter Escape`, cadence: 320 }, text: `Does it tie? Watch Austin’s January retail revenue in C${DETAIL.clusters[0].head + 1} go up to 2,000 and January’s bar on row ${DETAIL.rev} grow.`, requires: [],
       hintStuck: `pulse cell C${DETAIL.rev} · The company line adds the four clusters.`,
       check: (s, ses) => ses.demoDone.has('tie') },
   ],
@@ -66,5 +66,5 @@ export default {
     'Bars stay on the working sheet; the page gets figures.',
     'A bar shows a shape faster than a column of numbers, which is why it belongs where you work, and a scale shades a line by rank, which is why a reader asks what the colors mean. The book’s pages carry the figures and the two quiet rules that flag a problem.',
   ],
-  solution: `Ctrl+G "Monthly!C10" Enter Ctrl+Shift+Right Shift+Left Alt H L D Enter Down Down Down Ctrl+Shift+Right Shift+Left Alt H L S Enter Alt H L C S Alt H L R Delete Enter Ctrl+G "'Monthly detail'!C${DETAIL.rev}" Enter Ctrl+Shift+Right Shift+Left Alt H L D Enter`,
+  solution: `Ctrl+G "Monthly!C10" Enter Ctrl+Shift+Right Shift+Left Alt H L D Enter Ctrl+G "'Monthly detail'!C${DETAIL.rev}" Enter Ctrl+Shift+Right Shift+Left Alt H L D Enter Ctrl+G "Monthly!C13" Enter Ctrl+Shift+Right Shift+Left Alt H L S Enter Alt H L C S Alt H L R Delete Enter`,
 };

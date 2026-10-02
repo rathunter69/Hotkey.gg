@@ -1,8 +1,8 @@
 // Chapter 2 · 2.2.4 Conditional codes and hidden zeros (clearcoat-pnl, S2c → S2d)
 // A format section can carry a color and a condition, and an empty section hides a value. The
 // checks C39:C40 paint a negative red (F1), washes pick their code by size, the A/E flags hide
-// with ;;; and come back with General, and the 1/0 switch on Inputs reads On or Off while it stays
-// a number a formula can multiply by. The closer types a wrong total and the check turns red.
+// with ;;;, the 1/0 switch on Inputs reads On or Off through another empty section while it stays
+// a number a formula can multiply by, and the flags come back with General. The closer types a wrong total and the check turns red.
 import { YEAR_COLS, CODES, TYPED } from '../workbooks/clearcoat-pnl.js';
 
 const sheetOf = (ses, name) => { const e = ses.sheets.find(x => x.name === name); return e ? e.sheet : null; };
@@ -44,12 +44,12 @@ export default {
     { id: 'hide-flags', teach: 'An empty section shows nothing, so ;;; hides every kind of value while the cell still holds it for any formula that reads it.', text: 'Hide the flags C5:E5 with the code ;;; so the cells keep their A and E but the page stops showing them.', keys: `Ctrl+G "C5" ↵ Shift+→ ×2 Ctrl+1 N Tab End Alt+T "${TYPED.hide}" ↵`, requires: ['hide-zeros', 'custom-number-format', 'go-to', 'shift-arrow'], convention: 'D3',
       hintStuck: 'pulse range C5:E5 · Three semicolons and nothing in any section.',
       check: (s, ses) => { const sh = pnl(ses); return !!sh && codeIs(sh, FLAG_CELLS, CODES.hide) && settled(ses); } },
-    { id: 'flags-back', teach: 'General is the format with no format: General at the top of Ctrl+1’s list returns a cell to showing its value as typed.', text: 'Set C5:E5 back to General, the top of Ctrl+1’s list, and the flags show again.', keys: 'Ctrl+1 N Tab Home ↵', requires: ['general-format', 'format-cells-tabs'],
-      hintStuck: 'pulse range C5:E5 · The A and E never left the cells.',
-      check: (s, ses) => { const sh = pnl(ses); return !!sh && flagsShown(sh) && settled(ses); } },
-    { id: 'on-off', text: 'On Inputs, the switch in B12 holds a 1: give it the code On;;Off so it reads On and still multiplies as a number.', keys: `Ctrl+G "Inputs!B12" ↵ Ctrl+1 N Tab End Alt+T "${TYPED.onOff}" ↵`, requires: ['custom-number-format', 'go-to', 'sheet-reference'], convention: 'D9',
+    { id: 'on-off', text: 'On Inputs, the switch in B12 holds a 1: give it On;;Off, with the negative section left empty, so it reads On and still multiplies.', keys: `Ctrl+G "Inputs!B12" ↵ Ctrl+1 N Tab End Alt+T "${TYPED.onOff}" ↵`, requires: ['hide-zeros', 'custom-number-format', 'go-to', 'sheet-reference'], convention: 'D9',
       hintStuck: 'pulse cell B12 · Positive; negative; zero: a 0 would read Off.',
       check: (s, ses) => { const sh = inputs(ses); return !!sh && codeIs(sh, ['B12'], CODES.onOff) && settled(ses); } },
+    { id: 'flags-back', teach: 'General is the format with no format: General at the top of Ctrl+1’s list returns a cell to showing its value as typed.', text: 'Back on the P&L, set the flags C5:E5 to General, the top of Ctrl+1’s list, and they show again.', keys: 'Ctrl+G "\'P&L\'!C5:E5" ↵ Ctrl+1 N Tab Home ↵', requires: ['general-format', 'format-cells-tabs', 'go-to', 'sheet-reference'],
+      hintStuck: 'pulse range C5:E5 · The A and E never left the cells.',
+      check: (s, ses) => { const sh = pnl(ses); return !!sh && flagsShown(sh) && settled(ses); } },
     { id: 'tie', closer: true, demo: { script: `Ctrl+G "'P&L'!C10" Enter "32000" Enter Ctrl+G "C39" Enter Escape Escape Escape`, cadence: 320 }, text: 'Does it catch it? Watch total revenue in C10 typed over as 32000, and the check in C39 leave zero and turn red.', requires: [],
       hintStuck: 'pulse cell C39 · A typed total no longer matches its lines.',
       check: (s, ses) => ses.demoDone.has('tie') },
@@ -63,5 +63,5 @@ export default {
     'A format can color, scale and hide, and the value never moves.',
     'The checks stay quiet at zero and go red the moment two figures disagree; the switch reads On and still multiplies like the 1 it is. The same On and Off code comes back on the switches of the model in Chapters 5 and 6.',
   ],
-  solution: `Ctrl+G "C39" Enter Shift+Down Ctrl+1 N Tab End Alt+T "${TYPED.check}" Enter Ctrl+Up Up Shift+Right Shift+Right Ctrl+1 N Tab End Alt+T "${TYPED.washes}" Enter Ctrl+G "C5" Enter Shift+Right Shift+Right Ctrl+1 N Tab End Alt+T "${TYPED.hide}" Enter Ctrl+1 N Tab Home Enter Ctrl+G "Inputs!B12" Enter Ctrl+1 N Tab End Alt+T "${TYPED.onOff}" Enter`,
+  solution: `Ctrl+G "C39" Enter Shift+Down Ctrl+1 N Tab End Alt+T "${TYPED.check}" Enter Ctrl+Up Up Shift+Right Shift+Right Ctrl+1 N Tab End Alt+T "${TYPED.washes}" Enter Ctrl+G "C5" Enter Shift+Right Shift+Right Ctrl+1 N Tab End Alt+T "${TYPED.hide}" Enter Ctrl+G "Inputs!B12" Enter Ctrl+1 N Tab End Alt+T "${TYPED.onOff}" Enter Ctrl+G "\'P&L\'!C5:E5" Enter Ctrl+1 N Tab Home Enter`,
 };

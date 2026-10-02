@@ -53,7 +53,7 @@ export default {
     { id: 'dup-rule', teach: 'A label that repeats is the easiest error to miss and the first one a buyer finds. Highlight Cells Rules › Duplicate Values (Alt, H, L, H, D) lights every label that appears more than once.', text: 'Back on the P&L, select the labels B7:B35 and add Duplicate Values with Alt, H, L, H, D, Enter.', keys: `Ctrl+G "'P&L'!B7:B35" ↵ Alt H L H D ↵`, requires: ['duplicate-values', 'go-to', 'sheet-reference'], convention: 'F4',
       hintStuck: 'pulse range B7:B35 · Every label from retail wash revenue to the memo.',
       check: (s, ses) => dupRuled(pnl(ses)) && settled(ses) },
-    { id: 'duplicate', text: 'B18 and B19 light up because B18 repeats Marketing: type Card fees over it.', keys: `Ctrl+G "'P&L'!B18" ↵ "Card fees" ↵`, requires: ['go-to', 'replace-by-typing'], convention: 'F4',
+    { id: 'duplicate', text: 'B18 and B19 light up because B18 repeats Marketing: type Card fees over it.', keys: `Ctrl+G "'P&L'!B18" ↵ "Card fees" ↵`, requires: ['duplicate-values', 'go-to', 'replace-by-typing'], convention: 'F4',
       hintStuck: 'pulse cell B18 · The line between maintenance and marketing.',
       check: (s, ses) => { const sh = pnl(ses); return !!sh && dupRuled(sh) && sh.value('B18') === LABELS[18] && settled(ses); } },
     { id: 'read-rules', teach: 'Alt, H, L, R opens Manage Rules: every rule on the sheet, its format and the range it applies to, in the order they run.', text: 'Open Manage Rules with Alt, H, L, R and read the two rules on the P&L, the newest on top, and the ranges they apply to.', keys: 'Alt H L R', requires: ['manage-rules'],

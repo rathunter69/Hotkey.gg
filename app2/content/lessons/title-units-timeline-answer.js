@@ -1,9 +1,9 @@
 // Chapter 2 · 2.3.1 Title, units, timeline, sections, answer (clearcoat-pnl, S2d → S3a)
 // The page gets its anatomy: the title in A1, bold and one size up, centered across A1:E1; the
 // section headers typed and bold; the four answer lines bold; the sub-lines indented; the checks
-// block given the same shape; the typed figures blue; the system's account codes cleared out of
+// block given the same shape; the typed figures blue, on the P&L and then on Monthly; the system's account codes cleared out of
 // column A. The closer moves retail revenue and EBITDA answers under the title.
-import { YEAR_COLS, TITLE, SECTION_HEADS, TOTAL_ROWS, INDENT_ROWS, LINE_ROWS } from '../workbooks/clearcoat-pnl.js';
+import { YEAR_COLS, MONTH_COLS, TITLE, SECTION_HEADS, TOTAL_ROWS, INDENT_ROWS, LINE_ROWS } from '../workbooks/clearcoat-pnl.js';
 import { TITLE_FSZ } from '../workbooks/page.js';
 
 const sheetOf = (ses, name) => { const e = ses.sheets.find(x => x.name === name); return e ? e.sheet : null; };
@@ -18,6 +18,8 @@ const indented = sh => INDENT_ROWS.every(r => (cell(sh, 'B' + r).indent | 0) ===
 const checksShaped = sh => cell(sh, 'B38').bold && [39, 40].every(r => (cell(sh, 'B' + r).indent | 0) === 1);
 const TYPED = [...LINE_ROWS, 33, 34].flatMap(r => YEAR_COLS.map(col => col + r));
 const blueTyped = sh => TYPED.every(ref => cell(sh, ref).fontColor === 'blue') && YEAR_COLS.every(col => cell(sh, col + '10').fontColor !== 'blue' && cell(sh, col + '35').fontColor !== 'blue');
+const MONTHLY_TYPED = LINE_ROWS.flatMap(r => MONTH_COLS.map(col => col + r));
+const blueMonthly = sh => MONTHLY_TYPED.every(ref => cell(sh, ref).fontColor === 'blue') && ['C10', 'C20', 'C24', 'O7'].every(ref => cell(sh, ref).fontColor !== 'blue');
 const codesGone = sh => { for (let r = 4; r <= 35; r++) { const c = sh.cells['A' + r]; if (c && (c.value != null || c.formula || c.bold)) return false; } return true; };
 
 export default {
@@ -60,7 +62,10 @@ export default {
     { id: 'blue', teach: 'Typed figures are blue and formulas black, on the page as in the model, so a reader knows which numbers came in from the ledger. Go To Special Constants picks the typed cells out of a block and leaves the formulas.', text: 'Select C7:E34, keep only the typed figures with Go To Special Constants (Alt, H, F, D, N), and color them blue.', keys: 'Ctrl+G "C7:E34" ↵ Alt H F D N Alt H F C → ×4 ↵', requires: ['go-to-special', 'font-color', 'input-colour-convention', 'go-to'], convention: 'B1',
       hintStuck: 'pulse range C7:E34 · Constants leaves the totals and the margins behind.',
       check: (s, ses) => { const sh = pnl(ses); return !!sh && blueTyped(sh) && settled(ses); } },
-    { id: 'codes', teach: 'The account codes belong to the ledger, not to the page. Clear All (Alt, H, E, A) takes the contents and the formats, so nothing of them is left behind.', text: 'Select the account codes and their header in A4:A23 and clear them with Alt, H, E, A.', keys: 'Ctrl+Home Ctrl+↓ ×2 Ctrl+Shift+↓ ×5 Alt H E A', requires: ['clear-all', 'ctrl-arrow', 'ctrl-shift-arrow'], convention: 'G2',
+    { id: 'monthly-blue', text: 'Monthly takes the same rule: select its months C7:N23 and color only the typed figures blue with Go To Special Constants again.', keys: 'Ctrl+G "Monthly!C7:N23" ↵ Alt H F D N Alt H F C → ×4 ↵', requires: ['go-to-special', 'font-color', 'input-colour-convention', 'go-to', 'sheet-reference'], convention: 'B1',
+      hintStuck: 'pulse range Monthly!C7:N23 · The subtotals and the full year are formulas and stay black.',
+      check: (s, ses) => { const sh = sheetOf(ses, 'Monthly'); return !!sh && blueMonthly(sh) && settled(ses); } },
+    { id: 'codes', teach: 'The account codes belong to the ledger, not to the page. Clear All (Alt, H, E, A) takes the contents and the formats, so nothing of them is left behind.', text: 'Back on the P&L, select the account codes and their header in A4:A23 and clear them with Alt, H, E, A.', keys: 'Ctrl+G "\'P&L\'!A4:A23" ↵ Alt H E A', requires: ['clear-all', 'go-to', 'sheet-reference'], convention: 'G2',
       hintStuck: 'pulse range A4:A23 · The codes stop at head office in row 23.',
       check: (s, ses) => { const sh = pnl(ses); return !!sh && codesGone(sh) && settled(ses); } },
     { id: 'tie', closer: true, demo: { script: 'Ctrl+G "C7" Enter "18500" Enter Ctrl+G "C24" Enter Escape Escape Escape', cadence: 320 }, text: 'Does it tie? Watch C7 change to 18500, and EBITDA in C24 answer under the title.', requires: [],
@@ -70,11 +75,11 @@ export default {
   endState: [
     { text: 'The title is bold, a size up and centered across the page', check: (s, ses) => { const sh = pnl(ses); return !!sh && titled(sh) && (cell(sh, 'A1').ca | 0) === 5; } },
     { text: 'The sections and the answer lines are bold, the sub-lines indented', check: (s, ses) => { const sh = pnl(ses); return !!sh && heads(sh) && answers(sh) && indented(sh); } },
-    { text: 'The typed figures are blue and the account codes are gone', check: (s, ses) => { const sh = pnl(ses); return !!sh && blueTyped(sh) && codesGone(sh); } },
+    { text: 'The typed figures are blue on both pages and the account codes are gone', check: (s, ses) => { const sh = pnl(ses), m = sheetOf(ses, 'Monthly'); return !!sh && !!m && blueTyped(sh) && blueMonthly(m) && codesGone(sh); } },
   ],
   closing: [
     'The page reads in the order a buyer reads it, and it lands on EBITDA.',
     'A title a size up, a units line, a timeline, four sections and four bold answers: that is the anatomy of every financial page in the book. The codes went back to the ledger, and the blue figures say which numbers were typed.',
   ],
-  solution: '"Clearcoat Express - Historical Financials" Ctrl+Enter Ctrl+B Alt H F G Shift+Right Shift+Right Shift+Right Shift+Right Ctrl+1 A Alt+H Down Down Down Down Enter Ctrl+Down Ctrl+Down Right Down Down "Revenue" Ctrl+Enter Ctrl+B Ctrl+Down Ctrl+Down Up "Site costs" Ctrl+Enter Ctrl+B Ctrl+Down Ctrl+Down Ctrl+Down Ctrl+Down Ctrl+B Ctrl+Down Ctrl+Down Up "Memo" Ctrl+Enter Ctrl+B Ctrl+Up Ctrl+Up Ctrl+Up Shift+Right Shift+Right Shift+Right Ctrl+B Ctrl+Up Shift+Right Shift+Right Shift+Right F4 Ctrl+Up Shift+Right Shift+Right Shift+Right F4 Ctrl+Up Ctrl+Up Shift+Right Shift+Right Shift+Right F4 Up Shift+Up Shift+Up Alt H 6 Ctrl+Down Ctrl+Down Down Shift+Down Shift+Down Shift+Down Shift+Down Shift+Down Shift+Down F4 Ctrl+G "B38" Enter Ctrl+B Down Shift+Down Alt H 6 Ctrl+G "C7:E34" Enter Alt H F D N Alt H F C Right Right Right Right Enter Ctrl+Home Ctrl+Down Ctrl+Down Ctrl+Shift+Down Ctrl+Shift+Down Ctrl+Shift+Down Ctrl+Shift+Down Ctrl+Shift+Down Alt H E A',
+  solution: '"Clearcoat Express - Historical Financials" Ctrl+Enter Ctrl+B Alt H F G Shift+Right Shift+Right Shift+Right Shift+Right Ctrl+1 A Alt+H Down Down Down Down Enter Ctrl+Down Ctrl+Down Right Down Down "Revenue" Ctrl+Enter Ctrl+B Ctrl+Down Ctrl+Down Up "Site costs" Ctrl+Enter Ctrl+B Ctrl+Down Ctrl+Down Ctrl+Down Ctrl+Down Ctrl+B Ctrl+Down Ctrl+Down Up "Memo" Ctrl+Enter Ctrl+B Ctrl+Up Ctrl+Up Ctrl+Up Shift+Right Shift+Right Shift+Right Ctrl+B Ctrl+Up Shift+Right Shift+Right Shift+Right F4 Ctrl+Up Shift+Right Shift+Right Shift+Right F4 Ctrl+Up Ctrl+Up Shift+Right Shift+Right Shift+Right F4 Up Shift+Up Shift+Up Alt H 6 Ctrl+Down Ctrl+Down Down Shift+Down Shift+Down Shift+Down Shift+Down Shift+Down Shift+Down F4 Ctrl+G "B38" Enter Ctrl+B Down Shift+Down Alt H 6 Ctrl+G "C7:E34" Enter Alt H F D N Alt H F C Right Right Right Right Enter Ctrl+G "Monthly!C7:N23" Enter Alt H F D N Alt H F C Right Right Right Right Enter Ctrl+G "\'P&L\'!A4:A23" Enter Alt H E A',
 };

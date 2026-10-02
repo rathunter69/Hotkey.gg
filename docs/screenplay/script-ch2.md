@@ -827,3 +827,7 @@ From screenplay 10.3, rows 2.1–2.7: Ctrl+1 and its Number, Alignment, Border a
 - 2.7.C: five goals, not six, and two and a half minutes: the pack set-up of 2.7.1 on S7C (landscape, fit, titles, footer, centered); no print areas, no orientation by sheet and no break above site costs.
 - 2.8.P: sixteen goals on the export a year on (FY25A, FY26A, FY27E), built to the chapter's standard except that the detail groups on one level (13:19, 26:30, 33:35), the navigation column is text with Monthly's three names, and the print set-up is the one pack Page Setup.
 - 2.8.A: the project's sixteen goals on a seeded sister operator over the same export, ten minutes, graded against the same builder's end; the slow-month threshold follows the sister's figures.
+- 2.2.4 (payoff rule): On;;Off comes straight after ;;; as a second empty-section code, and the flags go back to General last.
+- 2.3.1 (payoff rule): Go To Special Constants is used a second time on Monthly's months C7:N23 before Clear All, so Monthly's typed figures are blue from here; nine goals. Increase Font Size stays a single use, since the title is the one line a size up.
+- 2.3.5 (payoff rule): the three years' width follows the margin's straight away, so Column Width is used twice before Row Height.
+- 2.5.3 (payoff rule): the bars go on Monthly detail's company revenue straight after Monthly's revenue line, before the color scale.
