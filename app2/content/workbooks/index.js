@@ -2,10 +2,14 @@
 // The runner and the schema resolve `lesson.module` + `lesson.state.before` through this.
 import * as clearcoatWeekly from './clearcoat-weekly.js';
 import * as clearcoatPnl from './clearcoat-pnl.js';
+import * as clearcoatModel from './clearcoat-model.js';
+import * as clearcoatValuation from './clearcoat-valuation.js';
 
 export const WORKBOOKS = {
   'clearcoat-weekly': clearcoatWeekly,
   'clearcoat-pnl': clearcoatPnl,
+  'clearcoat-model': clearcoatModel,
+  'clearcoat-valuation': clearcoatValuation,
 };
 
 /** The named state of a workbook, deep-cloned; throws on an unknown workbook or state. */

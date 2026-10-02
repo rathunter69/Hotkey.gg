@@ -11,7 +11,7 @@ const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', '
 const loc = (n, dec, group = true) => n.toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec, useGrouping: group });
 /** What a date or time format shows for a value it cannot show (a negative or past 31 Dec 9999): Excel fills the cell with #. */
 export const HASHES = '########';
-const ERRORS = new Set(['#NULL!', '#DIV/0!', '#VALUE!', '#REF!', '#NAME?', '#NUM!', '#N/A']);   // formula.js's ERROR_CODES (no import: formula.js imports this module)
+const ERRORS = new Set(['#NULL!', '#DIV/0!', '#VALUE!', '#REF!', '#NAME?', '#NUM!', '#N/A', '#SPILL!', '#CALC!']);   // formula.js's ERROR_CODES (no import: formula.js imports this module)
 const isErr = v => typeof v === 'string' && ERRORS.has(v);
 
 /** Excel serial (days since 1899-12-30) → UTC Date. */

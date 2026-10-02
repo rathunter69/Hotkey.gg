@@ -17,12 +17,18 @@
 // (see normCondFmt); condFmtMap() evaluates it for the painter and the graders.
 
 import { colLetter, colIndex, refKey, parseRef, parseRange, rectRefs, rangeText } from './refs.js';
+import { CalcGraph } from './calc.js';
+import { pivotLocate } from './pivot.js';
 import { evalFormula, parseFormula, translateFormula, transposeFormula, normalizeFormula, autocorrectFormula, adjustFormulaStructure, isErrVal, formulaRefs, parses, dateTextValue, compareValues } from './formula.js';
 import { fmtNum, dispText, dispMarked, fitGeneral, serialToDate, HASHES, PAD_MARK } from './format.js';
 import { isValidFormat, normalizeCode, stepDecimals, codeDecimals } from './numfmt.js';
 
 export const COLW_DEFAULT = 64;   // px: Excel's default column width at 100% (8.43 characters); autofit widens beyond this
-export const ROWH_DEFAULT = 20;   // px: Excel's default row height at 100% (15pt)
+export const ROWH_DEFAULT = 20;
+/** A sheet's Page Setup as Excel starts it (Page Setup belongs to the sheet; the Session's settings.pageSetup reads the active one). */
+export const PAGE_SETUP_DEFAULT = { orientation: 'portrait', scaling: 'adjust', adjustTo: 100, fitWide: 1, fitTall: 1, titlesRows: '', footer: { left: '', centre: '', right: '' }, printGridlines: false };
+/** Letter paper, inches, and the screen's 96 px to the inch: what an automatic page break counts against. */
+const PAPER = { w: 8.5, h: 11 }, PX_IN = 96;   // px: Excel's default row height at 100% (15pt)
 export const CHARPX = 8.6;        // mono digit width the #### test assumes
 export const TXTPX = 6.9;         // proportional label glyph
 export const PAD_NUM = 12, PAD_TXT = 20, FIT_SLACK = 4, COLW_MAX = 220;
@@ -62,6 +68,12 @@ export const FILL_SWATCHES = [
   { k: 'blue', hex: '#9cc3e8', name: 'Blue' }, { k: 'gray', hex: '#d4d4d4', name: 'Gray (header)' },
   { k: 'yellow', hex: '#ffe699', name: 'Yellow (flag)' }, { k: 'green', hex: '#c6e0b4', name: 'Green' },
   { k: 'red', hex: '#f2b8b8', name: 'Red' }, { k: null, hex: 'transparent', name: 'No fill' },
+];
+/** Format › Tab Color (Alt H O T): the palette's standard colours, then No Color. */
+export const TAB_COLORS = [
+  { k: 'darkred', hex: '#c00000', name: 'Dark Red' }, { k: 'red', hex: '#ff0000', name: 'Red' }, { k: 'orange', hex: '#ffc000', name: 'Orange' }, { k: 'yellow', hex: '#ffff00', name: 'Yellow' },
+  { k: 'lightgreen', hex: '#92d050', name: 'Light Green' }, { k: 'green', hex: '#00b050', name: 'Green' }, { k: 'lightblue', hex: '#00b0f0', name: 'Light Blue' }, { k: 'blue', hex: '#0070c0', name: 'Blue' },
+  { k: 'darkblue', hex: '#002060', name: 'Dark Blue' }, { k: 'purple', hex: '#7030a0', name: 'Purple' }, { k: null, hex: 'transparent', name: 'No Color' },
 ];
 export const CELL_STYLES = [
   { k: 'normal', name: 'Normal', apply: c => { const v = c.value, f = c.formula, t = c.txt; for (const k in c) delete c[k]; Object.assign(c, blankCell()); c.value = v; c.formula = f; c.txt = t; } },
@@ -302,6 +314,7 @@ export function normCondFmt(list, today) {
       rule.style = CF_STYLES[x.style] ? x.style : 'lightred';
     }
     else if (x.kind === 'formula') { if (typeof x.formula !== 'string' || !x.formula.trim()) continue; const f = x.formula.trim(); rule.formula = normalizeFormula(f.startsWith('=') ? f : '=' + f); rule.style = CF_STYLES[x.style] ? x.style : 'lightred'; }
+    else if (x.kind === 'duplicate') { rule.unique = x.unique === true; rule.style = CF_STYLES[x.style] ? x.style : 'lightred'; }   // Highlight Cells › Duplicate Values (or Unique)
     else if (x.kind === 'dataBar') { rule.color = CF_BAR_COLORS.some(b => b.k === x.color) ? x.color : 'blue'; rule.stopIfTrue = false; }
     else if (x.kind === 'colorScale') { rule.scale = CF_SCALES.some(s => s.k === x.scale) ? x.scale : 'green-yellow-red'; rule.stopIfTrue = false; }
     else continue;
@@ -344,15 +357,27 @@ export class Sheet {
     this.gridlines = true;
     this.rowH = new Array(this.rows + 1).fill(ROWH_DEFAULT);   // px per row (Excel default 20)
     this.hiddenRows = new Set(); this.hiddenCols = new Set();
+    this.filter = null;                    // the AutoFilter (Ctrl+Shift+L): { r1, c1, r2, c2, crit: { [col]: criterion } }; the header row is r1
+    this.filterRows = new Set();           // the rows the AutoFilter hides (apart from hiddenRows: Unhide does not show them, SUBTOTAL 101+ skips them)
+    this.dataTables = null;                // What-If data tables (Alt A W T): [{ r1, c1, r2, c2, row, col }]
+    this.pageSetup = clone(PAGE_SETUP_DEFAULT);   // Page Setup (Alt P S P), the print area (Alt P R S, pageSetup.printArea), the custom header and footer
+    this.breaks = { rows: [], cols: [] };  // manual page breaks (Alt P B I): a break above each listed row / left of each listed column
+    this.pivots = null;                    // PivotTables on this sheet (Alt N V T): [{ id, source: { sheet, range }, spec: { row, col, value, fn }, at, r1, c1, r2, c2, rowItems, colItems, valueHead }]
+    this.tabColor = null;                  // Format › Tab Color (Alt H O T): a TAB_COLORS key, or null
+    this.view = 'normal';                  // the sheet's view: 'normal' (Alt W L), 'pagebreak' (Page Break Preview, Alt W I), 'layout' (Page Layout, Alt W P)
+    this.validation = null;                // Data Validation rules by cell key: { allow, data, min, max, source, inCell, ignoreBlank, errTitle, errMsg, errStyle, inTitle, inMsg }
     this.freeze = { r: 0, c: 0 };          // rows/cols frozen above/left of the seam (0 = none)
     this.groups = { rows: [], cols: [] };  // the outline (C2 gap 4): [{r1,r2,collapsed}] / [{c1,c2,collapsed}], one level
     this.condFmt = [];                     // conditional formatting rules in priority order (normCondFmt)
     this._cfMap = null;                    // condFmtMap() memoised until the cells or the rules change (recalc / restore / setCell drop it)
+    this.iterCalc = null;                  // { maxIterations, maxChange } while the workbook's iterative calculation is on (the Session sets it): a circle on this sheet is iterated, not read as 0
     this.multi = null;                     // Go To Special: an explicit list of cell keys, or null
     this.names = {};                       // defined names that point at this sheet (M40): { UPPER: { name, ref: '$B$4' | '$B$4:$B$9' } }, workbook-wide through the Session
     this.zoom = ZOOM_DEFAULT;              // the sheet's zoom, % (M99): a property of the sheet, as in Excel; the view scales by it
     this.resolver = null;                  // name → Sheet, set by the Session that owns the workbook
     this.today = opts.today || null;
+    this.calc = null;                      // the workbook's calculation settings (iterative, maxIterations, maxChange, tables), set by the Session; null = Excel's defaults
+    this.circular = [];                    // the formula cells in a circular reference after the last recalc, in sheet order (M78)
     this.listeners = new Set();
     this.lastFlash = null;   // {r1,c1,r2,c2} pasted footprint for the UI's one-shot flash
     if (opts.cells) for (const k in opts.cells) this.setCell(k, opts.cells[k]);
@@ -366,6 +391,13 @@ export class Sheet {
     if (opts.gridlines === false) this.gridlines = false;
     if (opts.names) for (const k in opts.names) { const n = opts.names[k]; if (n && n.ref) this.names[String(n.name || k).toUpperCase()] = { name: String(n.name || k), ref: String(n.ref) }; }
     if (opts.zoom) this.zoom = clampZoom(opts.zoom);
+    if (opts.validation && typeof opts.validation === 'object') this.validation = clone(opts.validation);
+    if (opts.pageSetup && typeof opts.pageSetup === 'object') this.pageSetup = { ...clone(PAGE_SETUP_DEFAULT), ...clone(opts.pageSetup) };
+    if (opts.breaks) this.breaks = { rows: [...new Set((opts.breaks.rows || []).map(n => n | 0).filter(n => n > 1))].sort((a, b) => a - b), cols: [...new Set((opts.breaks.cols || []).map(n => n | 0).filter(n => n > 1))].sort((a, b) => a - b) };
+    if (opts.view === 'pagebreak' || opts.view === 'layout') this.view = opts.view;
+    if (Array.isArray(opts.pivots)) this.pivots = clone(opts.pivots);
+    if (opts.tabColor && TAB_COLORS.some(t => t.k === opts.tabColor)) this.tabColor = opts.tabColor;
+    if (Array.isArray(opts.dataTables)) this.dataTables = clone(opts.dataTables);   // What-If data tables: [{ r1, c1, r2, c2, row, col }] (the input cells' keys)
     if (opts.active) this.active = this.clamp(opts.active.r, opts.active.c);
     this.recalc();
   }
@@ -390,6 +422,7 @@ export class Sheet {
     if (!p) throw new Error('bad ref ' + ref);
     this._cfMap = null;
     const cell = this.ensure(p.r, p.c);
+    if (spec.formula || spec.value !== undefined) { delete cell.spill; delete cell.spillVal; }
     if (spec.formula) { cell.formula = spec.formula; cell.txt = false; }
     else if (spec.value !== undefined) { cell.formula = null; cell.value = spec.value; cell.txt = typeof spec.value === 'string' && !isErrVal(spec.value); }
     for (const k in spec) if (k !== 'value' && k !== 'formula') cell[k] = spec[k];
@@ -409,9 +442,23 @@ export class Sheet {
   evalCtx(extra) {
     return { raw: k => this.raw(k), rows: this.rows, cols: this.cols, today: this.today || undefined,
       // NAME!B3: another sheet of the workbook (the Session wires `resolver`); no workbook = #REF!
-      sheetRaw: (name, key) => { const sh = this.resolver ? this.resolver(name) : null; return sh ? sh.raw(key) : '#REF!'; },
+      sheetRaw: (name, key) => { const sh = this.resolver ? this.resolver(name) : null; return sh ? sh.raw(key) : this.externalRaw ? this.externalRaw(name, key) : '#REF!'; },
+      // GETPIVOTDATA: the cell of the pivot that holds a figure (null: no pivot there, or no such field / item)
+      pivotCell: (k, field, pairs) => { const sh = this.sheetOfKey(k); if (!sh) return null; const p = parseRef(sh.key); const pv = (sh.sheet.pivots || []).find(x => p.r >= x.r1 && p.r <= x.r2 && p.c >= x.c1 && p.c <= x.c2); if (!pv) return null; const loc = pivotLocate(pv, field, pairs); if (!loc) return null; const b = k.indexOf('!'); return b < 0 ? loc : k.slice(0, b + 1) + loc; },
+      // a 3D reference's run of sheets, first to last in tab order (either end missing: null, #REF!)
+      sheetSpan: (a, b) => { const names = this.workbook().map(e => e.name); const i = names.findIndex(n => n.toLowerCase() === String(a).toLowerCase()), j = names.findIndex(n => n.toLowerCase() === String(b).toLowerCase()); if (i < 0 || j < 0) return null; return names.slice(Math.min(i, j), Math.max(i, j) + 1); },
+      // ISFORMULA: whether a cell holds a formula, here or on another sheet (null = no such sheet)
       name: nm => this.resolveName(nm),
+      rowHidden: r => this.hiddenRows.has(r) || this.filterRows.has(r) || this.isFolded('r', r),   // SUBTOTAL 101 to 111 skip hidden rows
+      rowFiltered: r => this.filterRows.has(r),                                                       // SUBTOTAL 1 to 11 skip only the AutoFilter's
+      isFormula: k => { const sh = this.sheetOfKey(k); if (!sh) return null; const c = sh.sheet.cells[sh.key]; return !!(c && c.formula); },   // ISFORMULA (null: no such sheet)
+      spillRange: k => { const sh = this.sheetOfKey(k); const c = sh && sh.sheet.cells[sh.key]; return c && c.spillTo ? { ...c.spillTo } : null; },   // A1#
       ...extra };
+  }
+  /** A key, possibly NAME!B3, as { sheet, key }; null when the sheet is unknown. */
+  sheetOfKey(k) {
+    const b = k.indexOf('!'); if (b < 0) return { sheet: this, key: k };
+    const sh = this.resolver ? this.resolver(k.slice(0, b)) : null; return sh ? { sheet: sh, key: k.slice(b + 1) } : null;
   }
 
   /* ---------------- defined names (Define Name, the Name Box list, Go To by name: M40) ---------------- */
@@ -536,7 +583,7 @@ export class Sheet {
     this.emit('select');
   }
   /** Row / column `n` is on screen: neither hidden (Ctrl+9 / Ctrl+0) nor inside a collapsed group. */
-  isVisible(axis, n) { return !(axis === 'r' ? this.hiddenRows : this.hiddenCols).has(n) && !this.isFolded(axis, n); }
+  isVisible(axis, n) { return !(axis === 'r' ? this.hiddenRows : this.hiddenCols).has(n) && !(axis === 'r' && this.filterRows.has(n)) && !this.isFolded(axis, n); }
   /** `d` visible steps from `from` on an axis, as the arrow keys walk (Excel skips hidden and folded rows / columns); stops at the edge. */
   stepVisible(axis, from, d) {
     if (!d) return from;
@@ -590,12 +637,15 @@ export class Sheet {
 
   /* ---------------- undo ---------------- */
   snapshot() { return { cells: clone(this.cells), colW: this.colW.slice(), colSet: this.colSet.slice(), rows: this.rows, active: { ...this.active }, sel: this.sel && { ...this.sel },
-    rowH: this.rowH.slice(), hiddenRows: [...this.hiddenRows], hiddenCols: [...this.hiddenCols], freeze: { ...this.freeze }, groups: clone(this.groups), condFmt: clone(this.condFmt), names: clone(this.names) }; }
+    rowH: this.rowH.slice(), hiddenRows: [...this.hiddenRows], hiddenCols: [...this.hiddenCols], freeze: { ...this.freeze }, groups: clone(this.groups), condFmt: clone(this.condFmt), names: clone(this.names),
+    filter: clone(this.filter), filterRows: [...this.filterRows], validation: clone(this.validation || null), dataTables: clone(this.dataTables || null), breaks: clone(this.breaks), pivots: clone(this.pivots || null), printArea: this.pageSetup.printArea || null }; }
   /** Rewind cells AND the whole selection to one moment, so undo/redo re-select the range the operation touched (Excel). */
   restore(s) {
     this.cells = clone(s.cells); this.colW = s.colW.slice(); this.colSet = s.colSet.slice(); this.rows = s.rows;
     if (s.rowH) this.rowH = s.rowH.slice();
     this.hiddenRows = new Set(s.hiddenRows || []); this.hiddenCols = new Set(s.hiddenCols || []);
+    this.filter = s.filter ? clone(s.filter) : null; this.filterRows = new Set(s.filterRows || []); this.validation = s.validation ? clone(s.validation) : null; this.dataTables = s.dataTables ? clone(s.dataTables) : null;
+    if (s.breaks) this.breaks = clone(s.breaks); if (s.pivots !== undefined) this.pivots = s.pivots ? clone(s.pivots) : null; if (s.printArea !== undefined) { if (s.printArea) this.pageSetup.printArea = s.printArea; else delete this.pageSetup.printArea; }
     this.freeze = s.freeze ? { ...s.freeze } : { r: 0, c: 0 };
     this.groups = s.groups ? normGroups(s.groups) : { rows: [], cols: [] };
     this.condFmt = s.condFmt ? normCondFmt(s.condFmt, this.today) : [];
@@ -614,74 +664,15 @@ export class Sheet {
 
   /* ---------------- recalc ---------------- */
   /**
-   * Recalculate every formula cell. Cells are evaluated in dependency order (precedents first,
-   * found from the formula's references — token based); a genuine circular reference reads 0,
-   * as Excel shows it with iterative calculation off. A fixed-point pass then settles anything the
-   * static references cannot see (OFFSET/INDEX-built ranges).
+   * Recompute what the last changes reach, through the workbook's calculation graph (calc.js):
+   * the changed cells' readers across every sheet, in dependency order; a genuine circular
+   * reference reads 0 (iterative calculation off) or iterates to Maximum Change (on). Sets
+   * `circular` and applies dynamic-array spills.
    */
   recalc() {
     this._cfMap = null;   // every mutation ends in a recalc (commit): the conditional-formatting map is re-evaluated on the next read
-    const keys = []; for (const k in this.cells) if (this.cells[k] && this.cells[k].formula) keys.push(k);
-    if (!keys.length) return;
-    const fset = new Set(keys);
-    // Every formula-cell key a formula actually dereferences while evaluating is recorded, so a
-    // dependency that only exists through OFFSET/INDEX/INDIRECT-built ranges still joins the graph.
-    const reads = {}; let cur = null;
-    const ctx = this.evalCtx({ raw: kk => { if (cur && fset.has(kk)) reads[cur].add(kk); return this.raw(kk); } });
-    const evalOne = k => {
-      const c = this.cells[k];
-      const p = parseRef(k);
-      cur = k; reads[k] = new Set();
-      try { return evalFormula(c.formula, { ...ctx, cell: p ? { r: p.r, c: p.c } : undefined }); }
-      catch (e) { return '#NAME?'; }   // a stored formula that no longer parses reads as an error
-      finally { cur = null; }
-    };
-    // static precedents (formula cells only), ranges clipped to the grid
-    const deps = {};
-    for (const k of keys) {
-      const d = new Set();
-      for (const ref of formulaRefs(this.cells[k].formula, { rows: this.rows, cols: this.cols })) {
-        if (ref.sheet) continue;   // another sheet's cell: the Session's cross-sheet recalc covers it
-        if (ref.key) { if (fset.has(ref.key)) d.add(ref.key); }
-        else { const rg = ref.range; for (let r = Math.max(1, rg.r1); r <= Math.min(rg.r2, this.rows); r++) for (let c = Math.max(1, rg.c1); c <= Math.min(rg.c2, this.cols); c++) { const kk = refKey(r, c); if (fset.has(kk)) d.add(kk); } }
-      }
-      deps[k] = d;
-    }
-    // cycle detection via iterative DFS colouring: a back edge to n marks the frames from the top
-    // of the stack down to n (exactly the loop's members) — never the ancestors below it
-    const detect = () => {
-      const state = {}; const cyclic = new Set(); const order = [];
-      const visit = start => {
-        const stack = [[start, [...deps[start]]]]; state[start] = 1;
-        while (stack.length) {
-          const top = stack[stack.length - 1]; const [k, rest] = top;
-          if (!rest.length) { state[k] = 2; order.push(k); stack.pop(); continue; }
-          const n = rest.pop();
-          if (state[n] === 1) { for (let i = stack.length - 1; i >= 0; i--) { cyclic.add(stack[i][0]); if (stack[i][0] === n) break; } continue; }
-          if (!state[n]) { state[n] = 1; stack.push([n, [...deps[n]]]); }
-        }
-      };
-      for (const k of keys) if (!state[k]) visit(k);
-      return { cyclic, order };
-    };
-    // fold the reads of the last evaluation into deps; true when the graph gained an edge
-    const merge = () => { let added = false; for (const k of keys) { if (!reads[k]) continue; for (const d of reads[k]) if (!deps[k].has(d)) { deps[k].add(d); added = true; } } return added; };
-    let { cyclic, order } = detect();
-    // a cell that depends on a cyclic cell inherits nothing special — it just reads the 0
-    const evalAll = () => { for (const k of order) { const c = this.cells[k]; c.value = cyclic.has(k) ? 0 : evalOne(k); } };
-    evalAll();
-    if (merge()) { ({ cyclic, order } = detect()); evalAll(); }
-    // settle dynamic references (OFFSET etc.) with a short fixed-point pass; a loop that only
-    // forms once values move is caught by the read log, and anything still moving at the cap is
-    // treated as circular rather than left at an arbitrary iterate
-    const CAP = Math.min(50, keys.length + 2);
-    for (let pass = 0; pass < CAP; pass++) {
-      const moved = [];
-      for (const k of order) { if (cyclic.has(k)) continue; const c = this.cells[k]; const v = evalOne(k); if (v !== c.value) { c.value = v; moved.push(k); } }
-      if (!moved.length) break;
-      if (merge()) { ({ cyclic, order } = detect()); for (const k of cyclic) this.cells[k].value = 0; continue; }
-      if (pass === CAP - 1) for (const k of moved) { cyclic.add(k); this.cells[k].value = 0; }
-    }
+    if (!this.book) this.book = new CalcGraph(() => this.workbook());   // a sheet on its own keeps its own graph; the Session wires one for the workbook
+    this.book.recalc(this);
   }
 
   /* ---------------- commit parsing (what a typed entry becomes) ---------------- */
@@ -745,6 +736,7 @@ export class Sheet {
   }
   applyInput(target, cls, r, c) {
     if (cls.kind === 'empty') return;
+    delete target.spill; delete target.spillVal;   // an entry over a spilled cell is the cell's own (and blocks the spill)
     if (cls.kind === 'formula') {
       target.formula = cls.formula; target.txt = false; target.apos = false;
       let v; try { v = evalFormula(cls.formula, this.evalCtx({ cell: { r, c } })); } catch (e) { v = '#NAME?'; }
@@ -923,13 +915,18 @@ export class Sheet {
       } else if (rule.kind === 'formula') {
         const ast = astOf(rule.formula);
         holds = (r, c) => { const x = evalAt(ast, r, c, a); return x === true || (typeof x === 'number' && x !== 0); };
+      } else if (rule.kind === 'duplicate') {
+        // a value that appears more than once across the whole Applies-to (text case aside, a number by its value); blanks and errors never format
+        const keyOf = v => v === null || v === '' || isErrVal(v) ? null : (typeof v) + ':' + (typeof v === 'string' ? v.toLowerCase() : String(v));
+        const count = new Map(); for (const rg of rects) for (let r = rg.r1; r <= rg.r2; r++) for (let c = rg.c1; c <= rg.c2; c++) { const k = keyOf(this.raw(refKey(r, c))); if (k !== null) count.set(k, (count.get(k) || 0) + 1); }
+        holds = (r, c) => { const k = keyOf(this.raw(refKey(r, c))); if (k === null) return false; const n = count.get(k) || 0; return rule.unique ? n === 1 : n > 1; };
       } else holds = (r, c) => numAt(r, c) !== null;   // bars and scales apply to every number in the range
       for (const rg of rects) for (let r = rg.r1; r <= rg.r2; r++) for (let c = rg.c1; c <= rg.c2; c++) {
         const key = refKey(r, c);
         if (out[key] && out[key].stop) continue;
         if (!holds(r, c)) continue;
         const o = out[key] || (out[key] = {});
-        if (rule.kind === 'cellValue' || rule.kind === 'formula') {
+        if (rule.kind === 'cellValue' || rule.kind === 'formula' || rule.kind === 'duplicate') {
           const st = CF_STYLES[rule.style];
           if (st.fill && !o.fill) o.fill = st.fill;
           if (st.fontColor && !o.fontColor) o.fontColor = st.fontColor;
@@ -1125,11 +1122,11 @@ export class Sheet {
   /* ---------------- clipboard ---------------- */
   copy(cut = false) {
     const r = this.selRange(); const data = [];
-    for (let rr = r.r1; rr <= r.r2; rr++) { const row = []; for (let cc = r.c1; cc <= r.c2; cc++) row.push(clone(this.get(rr, cc))); data.push(row); }
+    for (let rr = r.r1; rr <= r.r2; rr++) { if (this.filterRows.has(rr)) continue; const row = []; for (let cc = r.c1; cc <= r.c2; cc++) row.push(clone(this.get(rr, cc))); data.push(row); }   // a filtered list copies its visible rows only (Excel)
     const cols = []; for (let cc = r.c1; cc <= r.c2; cc++) cols.push(this.colW[cc]);
     // `src` is the sheet the block came from: a workbook shares one clipboard (Session.wireSheet), so a
     // cut pasted on another sheet clears its source there, and the marquee shows only on that sheet
-    this.clipboard = { data, cols, h: r.r2 - r.r1 + 1, w: r.c2 - r.c1 + 1, rect: { ...r }, cut: !!cut, src: this };
+    this.clipboard = { data, cols, h: data.length, w: r.c2 - r.c1 + 1, rect: { ...r }, cut: !!cut, src: this };
     this.emit('clipboard');
   }
   clearClipboard() { if (this.clipboard) { this.clipboard = null; this.emit('clipboard'); } }
@@ -1163,7 +1160,7 @@ export class Sheet {
     if (cb.cut) {
       const from = cb.src && cb.src !== this ? cb.src : null;   // a cut from another sheet: its cells go there (own undo entry)
       if (from) from.pushUndo();
-      for (let rr = cb.rect.r1; rr <= cb.rect.r2; rr++) for (let cc = cb.rect.c1; cc <= cb.rect.c2; cc++) delete (from || this).cells[refKey(rr, cc)];
+      for (let rr = cb.rect.r1; rr <= cb.rect.r2; rr++) { if ((from || this).filterRows.has(rr)) continue; for (let cc = cb.rect.c1; cc <= cb.rect.c2; cc++) delete (from || this).cells[refKey(rr, cc)]; }
       for (let i = 0; i < cb.h; i++) for (let j = 0; j < cb.w; j++) { const cell = this.ensure(r0 + i, c0 + j); const s = cb.data[i][j]; Object.assign(cell, clone(s)); }
       this.cfMoveRules(cb, r0, c0, from);   // the conditional formats travel with the moved cells
       if (!from && (r0 !== cb.rect.r1 || c0 !== cb.rect.c1)) {   // M68: every formula that read the moved cells (and the moved formulas' references into their own block) follows them
@@ -1313,16 +1310,28 @@ export class Sheet {
 
   /* ---------------- sort ---------------- */
   /** Sort the selected rows by the column of the active cell (or keyCol). Blanks stay last. */
-  sort(dir, keyCol) {
-    const r = this.selRange(); const sortCol = keyCol || this.dispActive().c;
+  sort(dir, keyCol, rect) {
+    const r = rect || this.selRange(); const sortCol = keyCol || this.dispActive().c;
     if (sortCol < r.c1 || sortCol > r.c2 || r.r1 === r.r2) return false;
+    return this.sortBy([{ col: sortCol, dir }], r);
+  }
+  /** The Sort dialog's sort: `levels` [{ col, dir: 'asc' | 'desc' }] in order, over `rect` (the list body). Numbers before text before booleans, text case-insensitive, blanks last whatever the order (Excel), ties kept in place. */
+  sortBy(levels, rect) {
+    const r = rect || this.selRange(); if (r.r1 === r.r2 || !levels.length) return false;
     const rows = []; for (let rr = r.r1; rr <= r.r2; rr++) { const row = []; for (let cc = r.c1; cc <= r.c2; cc++) row.push(clone(this.get(rr, cc))); row.r0 = rr; rows.push(row); }
-    const off = sortCol - r.c1;
     const rank = v => typeof v === 'number' ? 0 : typeof v === 'string' ? 1 : 2;
-    const cmp = (a, b) => { const va = a[off].value, vb = b[off].value; if (rank(va) !== rank(vb)) return rank(va) - rank(vb); if (typeof va === 'number') return va - vb; if (typeof va === 'string') return va.localeCompare(vb, 'en', { sensitivity: 'base' }); return (va ? 1 : 0) - (vb ? 1 : 0); };
-    const blanks = rows.filter(rw => rw[off].value == null || rw[off].value === ''), filled = rows.filter(rw => !(rw[off].value == null || rw[off].value === ''));
-    filled.sort(cmp); if (dir === 'desc') filled.reverse();
-    const all = [...filled, ...blanks];
+    const blank = v => v == null || v === '';
+    const cmp1 = (va, vb) => { if (rank(va) !== rank(vb)) return rank(va) - rank(vb); if (typeof va === 'number') return va - vb; if (typeof va === 'string') return va.localeCompare(vb, 'en', { sensitivity: 'base' }); return (va ? 1 : 0) - (vb ? 1 : 0); };
+    const cmp = (a, b) => {
+      for (const { col, dir } of levels) {
+        const off = col - r.c1; if (off < 0 || off >= a.length) continue;
+        const va = a[off].value, vb = b[off].value; const ba = blank(va), bb = blank(vb);
+        if (ba || bb) { if (ba && bb) continue; return ba ? 1 : -1; }
+        const c = cmp1(va, vb); if (c) return dir === 'desc' ? -c : c;
+      }
+      return a.r0 - b.r0;
+    };
+    const all = rows.slice().sort(cmp);
     this.pushUndo();
     // a row that moves takes its formulas with it as a moved cell would: relative refs shift by the row delta, $-anchored parts stay (Excel)
     let i = 0; for (let rr = r.r1; rr <= r.r2; rr++) { const dr = rr - all[i].r0; let j = 0; for (let cc = r.c1; cc <= r.c2; cc++) { const cell = all[i][j]; if (cell.formula && dr) cell.formula = translateFormula(cell.formula, dr, 0); this.cells[refKey(rr, cc)] = cell; j++; } i++; }
@@ -1402,6 +1411,8 @@ export class Sheet {
       const inh = r.r1 > 1 ? this.rowH[r.r1 - 1] : ROWH_DEFAULT;
       this.rowH.splice(r.r1, 0, ...new Array(count).fill(inh)); this.rowH.length = this.rows + 1;
       this.hiddenRows = new Set([...this.hiddenRows].map(n => n >= r.r1 ? n + count : n).filter(n => n <= this.rows));
+      this.filterRows = new Set([...this.filterRows].map(n => n >= r.r1 ? n + count : n).filter(n => n <= this.rows));
+      if (this.filter) { if (this.filter.r1 >= r.r1) this.filter.r1 += count; if (this.filter.r2 >= r.r1) this.filter.r2 += count; }
       if (this.freeze.r >= r.r1) this.freeze.r = Math.min(this.rows - 1, this.freeze.r + count);
       this.groups.rows = this.shiftGroups('r', r.r1, count);
       this.condFmt = this.shiftCondFmt('r', r.r1, count); this.shiftNames('r', r.r1, count);
@@ -1419,6 +1430,8 @@ export class Sheet {
     if (axis === 'r') { const count = r.r2 - r.r1 + 1; this.shiftCells('r', r.r1, -count);
       this.rowH.splice(r.r1, count); while (this.rowH.length < this.rows + 1) this.rowH.push(ROWH_DEFAULT);
       this.hiddenRows = new Set([...this.hiddenRows].filter(n => n < r.r1 || n > r.r2).map(n => n > r.r2 ? n - count : n));
+      this.filterRows = new Set([...this.filterRows].filter(n => n < r.r1 || n > r.r2).map(n => n > r.r2 ? n - count : n));
+      if (this.filter) { const f = this.filter; if (f.r1 >= r.r1 && f.r1 <= r.r2) { this.filter = null; this.filterRows = new Set(); } else { if (f.r1 > r.r2) f.r1 -= count; f.r2 = f.r2 > r.r2 ? f.r2 - count : Math.min(f.r2, r.r1 - 1); } }
       this.groups.rows = this.shiftGroups('r', r.r1, -count);
       this.condFmt = this.shiftCondFmt('r', r.r1, -count); this.shiftNames('r', r.r1, -count);
       if (this.freeze.r > r.r2) this.freeze.r -= count; else if (this.freeze.r >= r.r1) this.freeze.r = Math.max(0, r.r1 - 1);
@@ -1452,6 +1465,23 @@ export class Sheet {
     let rg = this.selRange();
     if (!this.sel) rg = this.regionAround(this.active.r, this.active.c);
     const keys = [];
+    if (kind === 'rowdiff' || kind === 'coldiff') {
+      // Row differences: each row against the cell in the active cell's column; Column differences:
+      // each column against the cell in the active cell's row. A formula is the same when its
+      // relative shape is (=B2*2 beside =C2*2); a constant differs from a formula; values compare as values.
+      const a = this.dispActive();
+      const differs = (cell, base, dr, dc) => {
+        if (cell.formula || base.formula) { if (!cell.formula || !base.formula) return true; return translateFormula(base.formula, dr, dc) !== cell.formula; }
+        const v = cell.value === undefined ? null : cell.value, b = base.value === undefined ? null : base.value; return v !== b;
+      };
+      for (let rr = rg.r1; rr <= rg.r2; rr++) for (let cc = rg.c1; cc <= rg.c2; cc++) {
+        const br = kind === 'rowdiff' ? rr : a.r, bc = kind === 'rowdiff' ? a.c : cc;
+        if (br === rr && bc === cc) continue;
+        if (differs(this.get(rr, cc), this.get(br, bc), rr - br, cc - bc)) keys.push(refKey(rr, cc));
+      }
+      if (!keys.length) return false;
+      const first = parseRef(keys[0]); this.sel = null; this.selA = null; this.tabHome = null; this.active = { r: first.r, c: first.c }; this.multi = keys; this.emit('select'); return true;
+    }
     for (let rr = rg.r1; rr <= rg.r2; rr++) for (let cc = rg.c1; cc <= rg.c2; cc++) {
       const cell = this.get(rr, cc);
       const isFormula = !!cell.formula;
@@ -1581,23 +1611,37 @@ export class Sheet {
     if (!full) return false;
     return this.groupSpan(axis, axis === 'r' ? r.r1 : r.c1, axis === 'r' ? r.r2 : r.c2);
   }
-  /** Group rows / columns a..b on an axis (the Group dialog's Rows / Columns answer over a cell range takes this route). */
-  groupSpan(axis, a, b) {
+  /**
+   * The outline as Excel keeps it: every row / column has a level (0 = not grouped, up to 7); a
+   * group of level k is a run of neighbours whose level is k or more. `groups` lists those runs
+   * ({r1, r2, collapsed}, with `level` when it is 2 or more), outer before inner.
+   */
+  outlineLevels(axis) { const key = axis === 'r' ? 'rows' : 'cols', k1 = axis === 'r' ? 'r1' : 'c1', k2 = axis === 'r' ? 'r2' : 'c2'; const lv = new Map(); for (const g of this.groups[key]) for (let n = g[k1]; n <= g[k2]; n++) lv.set(n, Math.max(lv.get(n) || 0, g.level || 1)); return lv; }
+  /** Rebuild an axis's bands from levels, keeping each surviving band's collapsed state (a band that grew keeps the state of the one it grew from). */
+  setOutline(axis, lv) {
     const key = axis === 'r' ? 'rows' : 'cols', k1 = axis === 'r' ? 'r1' : 'c1', k2 = axis === 'r' ? 'r2' : 'c2';
-    if (this.groups[key].some(g => g[k1] <= a && g[k2] >= b)) return false;   // already inside a group: one level, nothing to add
-    this.pushUndo();
-    let lo = a, hi = b, keep = this.groups[key].slice();
-    for (let merged = true; merged;) {   // every band touching the new one joins it, however the joins chain
-      merged = false; const rest = [];
-      for (const g of keep) { if (g[k2] < lo - 1 || g[k1] > hi + 1) rest.push(g); else { lo = Math.min(lo, g[k1]); hi = Math.max(hi, g[k2]); merged = true; } }
-      keep = rest;
+    const old = this.groups[key]; const out = []; const ns = [...lv.keys()].filter(n => lv.get(n) > 0).sort((x, y) => x - y);
+    const max = ns.reduce((m, n) => Math.max(m, lv.get(n)), 0);
+    for (let L = 1; L <= max; L++) {
+      let a = null, prev = null;
+      const close = () => { if (a === null) return; const was = old.find(g => (g.level || 1) === L && g[k1] <= prev && g[k2] >= a); const band = { [k1]: a, [k2]: prev, collapsed: !!(was && was.collapsed) }; if (L > 1) band.level = L; out.push(band); a = null; };
+      for (const n of ns) { if (lv.get(n) >= L) { if (a !== null && n !== prev + 1) close(); if (a === null) a = n; prev = n; } else close(); }
+      close();
     }
-    keep.push({ [k1]: lo, [k2]: hi, collapsed: false });
-    keep.sort((x, y) => x[k1] - y[k1]);
-    this.groups[key] = keep;
+    out.sort((x, y) => (x[k1] - y[k1]) || ((x.level || 1) - (y.level || 1)));
+    this.groups[key] = out;
+  }
+  /** Group rows / columns a..b on an axis (the Group dialog's Rows / Columns answer over a cell range takes this route): each one goes a level deeper, up to Excel's seven. */
+  groupSpan(axis, a, b) {
+    const lv = this.outlineLevels(axis);
+    let any = false; for (let n = a; n <= b; n++) if ((lv.get(n) || 0) < 7) any = true;
+    if (!any) return false;
+    this.pushUndo();
+    for (let n = a; n <= b; n++) lv.set(n, Math.min(7, (lv.get(n) || 0) + 1));
+    this.setOutline(axis, lv);
     this.commit('layout'); return true;
   }
-  /** Ungroup (Alt+Shift+←, Data › Ungroup): the selection's whole rows / columns leave whatever group they are in; a group cut in two survives as two. False when nothing changed. */
+  /** Ungroup (Alt+Shift+←, Data › Ungroup): the selection's whole rows / columns come up one level; a group cut in two survives as two. False when nothing changed. */
   ungroup(axis) {
     const r = this.selRange();
     const full = axis === 'r' ? (r.c1 === 1 && r.c2 === this.cols) : (r.r1 === 1 && r.r2 === this.rows);
@@ -1606,18 +1650,22 @@ export class Sheet {
   }
   /** Ungroup rows / columns a..b on an axis (the Ungroup dialog's answer over a cell range). */
   ungroupSpan(axis, a, b) {
-    const key = axis === 'r' ? 'rows' : 'cols', k1 = axis === 'r' ? 'r1' : 'c1', k2 = axis === 'r' ? 'r2' : 'c2';
-    const out = []; let changed = false;
-    for (const g of this.groups[key]) {
-      if (g[k2] < a || g[k1] > b) { out.push(g); continue; }
-      changed = true;
-      if (g[k1] < a) out.push({ ...g, [k2]: a - 1 });
-      if (g[k2] > b) out.push({ ...g, [k1]: b + 1 });
-    }
-    if (!changed) return false;
+    const lv = this.outlineLevels(axis);
+    let any = false; for (let n = a; n <= b; n++) if (lv.get(n) > 0) any = true;
+    if (!any) return false;
     this.pushUndo();
-    this.groups[key] = out;
+    for (let n = a; n <= b; n++) if (lv.get(n) > 0) lv.set(n, lv.get(n) - 1);
+    this.setOutline(axis, lv);
     this.commit('layout'); return true;
+  }
+  /** The outline's depth on an axis (0 = none): the level buttons are 1 to depth + 1. */
+  outlineDepth(axis) { return this.groups[axis === 'r' ? 'rows' : 'cols'].reduce((m, g) => Math.max(m, g.level || 1), 0); }
+  /** A level button (1, 2, 3… at the outline's corner): level n shows the detail of levels below n and folds every group of level n or deeper. False when nothing changed. */
+  showOutlineLevel(axis, n) {
+    const list = this.groups[axis === 'r' ? 'rows' : 'cols']; if (!list.length) return false;
+    const want = list.map(g => (g.level || 1) >= n);
+    if (list.every((g, i) => !!g.collapsed === want[i])) return false;
+    this.pushUndo(); list.forEach((g, i) => { g.collapsed = want[i]; }); this.commit('layout'); return true;
   }
   /** Data › Ungroup › Clear Outline: every group on the sheet goes. False when there was none. */
   clearOutline() {
@@ -1627,7 +1675,7 @@ export class Sheet {
   /** The group (with its index) holding row / column `n` on an axis, or null. */
   groupAt(axis, n) {
     const key = axis === 'r' ? 'rows' : 'cols', k1 = axis === 'r' ? 'r1' : 'c1', k2 = axis === 'r' ? 'r2' : 'c2';
-    const i = this.groups[key].findIndex(g => n >= g[k1] && n <= g[k2]);
+    let i = -1; this.groups[key].forEach((g, j) => { if (n >= g[k1] && n <= g[k2] && (i < 0 || (g.level || 1) > (this.groups[key][i].level || 1))) i = j; });   // the innermost group holding it
     return i < 0 ? null : { i, g: this.groups[key][i] };
   }
   /** Fold (collapsed = true) or unfold one group by index; false when there is no such group or nothing changes. */
@@ -1649,7 +1697,7 @@ export class Sheet {
     return this.setGroupFold(hit[0], hit[1], collapsed);
   }
   /** Is row / column `n` inside a collapsed group (folded away in the view, never `hidden`)? */
-  isFolded(axis, n) { const h = this.groupAt(axis, n); return !!(h && h.g.collapsed); }
+  isFolded(axis, n) { const key = axis === 'r' ? 'rows' : 'cols', k1 = axis === 'r' ? 'r1' : 'c1', k2 = axis === 'r' ? 'r2' : 'c2'; return this.groups[key].some(g => g.collapsed && n >= g[k1] && n <= g[k2]); }
   /** Shift an axis's groups for an insert (delta > 0 at `at`) or a delete (delta < 0: the band at..at−delta−1 goes). */
   shiftGroups(axis, at, delta) {
     const list = this.groups[axis === 'r' ? 'rows' : 'cols'], k1 = axis === 'r' ? 'r1' : 'c1', k2 = axis === 'r' ? 'r2' : 'c2', max = axis === 'r' ? this.rows : this.cols;
@@ -1670,6 +1718,71 @@ export class Sheet {
     return out;
   }
 
+  /* ---------------- printing: the print area, page breaks, the pages (Page Break Preview) ---------------- */
+  /** Page Layout › Print Area › Set Print Area (Alt P R S): the selection, absolute ('$A$1:$H$40'). */
+  setPrintArea() { const r = this.selRange(); this.pushUndo(); this.pageSetup.printArea = '$' + colLetter(r.c1) + '$' + r.r1 + ':$' + colLetter(r.c2) + '$' + r.r2; this.commit('layout'); return this.pageSetup.printArea; }
+  /** Print Area › Clear Print Area (Alt P R C). */
+  clearPrintArea() { if (!this.pageSetup.printArea) return false; this.pushUndo(); delete this.pageSetup.printArea; this.commit('layout'); return true; }
+  /** What prints: the print area, else A1 to the last used cell. */
+  printRange() {
+    const pa = this.pageSetup.printArea && parseRange(String(this.pageSetup.printArea).replace(/\$/g, ''));
+    if (pa) return pa;
+    const u = this.usedRange(); return { r1: 1, c1: 1, r2: Math.max(1, u.r), c2: Math.max(1, u.c) };
+  }
+  /**
+   * Breaks › Insert Page Break (Alt P B I): a break above the active cell's row and left of its
+   * column (in row 1, only the column break; in column A, only the row break; at A1, none).
+   */
+  insertPageBreak() {
+    const a = this.dispActive(); if (a.r === 1 && a.c === 1) return false;
+    this.pushUndo();
+    if (a.r > 1 && !this.breaks.rows.includes(a.r)) { this.breaks.rows.push(a.r); this.breaks.rows.sort((x, y) => x - y); }
+    if (a.c > 1 && !this.breaks.cols.includes(a.c)) { this.breaks.cols.push(a.c); this.breaks.cols.sort((x, y) => x - y); }
+    this.commit('layout'); return true;
+  }
+  /** Breaks › Remove Page Break (Alt P B R): the manual breaks at the active cell's row and column. */
+  removePageBreak() {
+    const a = this.dispActive(); const had = this.breaks.rows.includes(a.r) || this.breaks.cols.includes(a.c); if (!had) return false;
+    this.pushUndo(); this.breaks.rows = this.breaks.rows.filter(n => n !== a.r); this.breaks.cols = this.breaks.cols.filter(n => n !== a.c); this.commit('layout'); return true;
+  }
+  /** Breaks › Reset All Page Breaks (Alt P B A). */
+  resetPageBreaks() { if (!this.breaks.rows.length && !this.breaks.cols.length) return false; this.pushUndo(); this.breaks = { rows: [], cols: [] }; this.commit('layout'); return true; }
+  /**
+   * The printed pages, down then over, as Page Break Preview numbers them: the print range cut at
+   * the manual breaks and, between them, wherever the next row or column no longer fits on the
+   * paper (letter, the orientation and margins, Adjust to %). Fit to n by m pages cuts the range
+   * into that many even pages and ignores the manual breaks, as Excel does.
+   * Returns [{ r1, c1, r2, c2, page, manual: {top, left} }]; `auto` lists the automatic breaks.
+   */
+  pages() {
+    const p = this.pageSetup; const rg = this.printRange();
+    const m = p.margins || { top: 0.75, bottom: 0.75, left: 0.7, right: 0.7 };
+    const land = p.orientation === 'landscape';
+    const scale = p.scaling === 'fit' ? 1 : Math.max(10, Math.min(400, p.adjustTo || 100)) / 100;
+    const W = ((land ? PAPER.h : PAPER.w) - m.left - m.right) * PX_IN / scale, H = ((land ? PAPER.w : PAPER.h) - m.top - m.bottom) * PX_IN / scale;
+    const size = (axis, n) => axis === 'r' ? (this.hiddenRows.has(n) ? 0 : (this.rowH[n] || ROWH_DEFAULT)) : (this.hiddenCols.has(n) ? 0 : (this.colW[n] || COLW_DEFAULT));
+    const cuts = (axis, a, b, limit, manual, even) => {   // the first row / column of each page
+      const out = [a];
+      if (even) { const n = Math.max(1, Math.min(even, b - a + 1)); for (let i = 1; i < n; i++) out.push(a + Math.round(i * (b - a + 1) / n)); return out; }
+      let used = 0;
+      for (let k = a; k <= b; k++) {
+        const z = size(axis, k);
+        if (k > a && (manual.includes(k) || used + z > limit)) { out.push(k); used = 0; }
+        used += z;
+      }
+      return out;
+    };
+    const fit = p.scaling === 'fit';
+    const rs = cuts('r', rg.r1, rg.r2, H, this.breaks.rows, fit ? (p.fitTall || 1) : 0), cs = cuts('c', rg.c1, rg.c2, W, this.breaks.cols, fit ? (p.fitWide || 1) : 0);
+    const out = []; let page = 0;
+    for (let j = 0; j < cs.length; j++) for (let i = 0; i < rs.length; i++) {
+      out.push({ r1: rs[i], r2: i + 1 < rs.length ? rs[i + 1] - 1 : rg.r2, c1: cs[j], c2: j + 1 < cs.length ? cs[j + 1] - 1 : rg.c2, page: ++page,
+        manual: { top: !fit && this.breaks.rows.includes(rs[i]), left: !fit && this.breaks.cols.includes(cs[j]) } });
+    }
+    out.auto = { rows: fit ? [] : rs.slice(1).filter(n => !this.breaks.rows.includes(n)), cols: fit ? [] : cs.slice(1).filter(n => !this.breaks.cols.includes(n)) };
+    return out;
+  }
+
   /* ---------------- serialisation ---------------- */
   toJSON() {
     const cells = {}; for (const k in this.cells) { const c = this.cells[k]; const b = blankCell(); const o = {}; for (const f in c) if (c[f] !== b[f] && !(f === 'value' && c.formula)) o[f] = c[f]; if (Object.keys(o).length) cells[k] = o; }
@@ -1683,6 +1796,13 @@ export class Sheet {
     if (this.condFmt.length) out.condFmt = clone(this.condFmt);
     if (Object.keys(this.names).length) out.names = clone(this.names);
     if (this.zoom !== ZOOM_DEFAULT) out.zoom = this.zoom;
+    if (this.validation && Object.keys(this.validation).length) out.validation = clone(this.validation);
+    if (this.dataTables && this.dataTables.length) out.dataTables = clone(this.dataTables);
+    if (JSON.stringify(this.pageSetup) !== JSON.stringify(PAGE_SETUP_DEFAULT)) out.pageSetup = clone(this.pageSetup);
+    if (this.breaks.rows.length || this.breaks.cols.length) out.breaks = clone(this.breaks);
+    if (this.view !== 'normal') out.view = this.view;
+    if (this.tabColor) out.tabColor = this.tabColor;
+    if (this.pivots && this.pivots.length) out.pivots = clone(this.pivots);
     return out;
   }
 }
@@ -1707,8 +1827,8 @@ export function zoomToFit(sheet, { width, height, floor = ZOOM_DEFAULT, max = 15
 
 /** A groups record with sane shapes: rows [{r1,r2,collapsed}], cols [{c1,c2,collapsed}], sorted, each band r1 ≤ r2. */
 export function normGroups(g) {
-  const band = (x, k1, k2) => { if (!x || typeof x !== 'object') return null; const a = x[k1] | 0, b = x[k2] | 0; if (a < 1 || b < a) return null; return { [k1]: a, [k2]: b, collapsed: x.collapsed === true }; };
-  const rows = (Array.isArray(g && g.rows) ? g.rows : []).map(x => band(x, 'r1', 'r2')).filter(Boolean).sort((x, y) => x.r1 - y.r1);
-  const cols = (Array.isArray(g && g.cols) ? g.cols : []).map(x => band(x, 'c1', 'c2')).filter(Boolean).sort((x, y) => x.c1 - y.c1);
+  const band = (x, k1, k2) => { if (!x || typeof x !== 'object') return null; const a = x[k1] | 0, b = x[k2] | 0; if (a < 1 || b < a) return null; const o = { [k1]: a, [k2]: b, collapsed: x.collapsed === true }; const L = x.level | 0; if (L >= 2 && L <= 7) o.level = L; return o; };
+  const rows = (Array.isArray(g && g.rows) ? g.rows : []).map(x => band(x, 'r1', 'r2')).filter(Boolean).sort((x, y) => (x.r1 - y.r1) || ((x.level || 1) - (y.level || 1)));
+  const cols = (Array.isArray(g && g.cols) ? g.cols : []).map(x => band(x, 'c1', 'c2')).filter(Boolean).sort((x, y) => (x.c1 - y.c1) || ((x.level || 1) - (y.level || 1)));
   return { rows, cols };
 }

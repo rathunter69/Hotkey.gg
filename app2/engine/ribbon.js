@@ -5,7 +5,7 @@
 export const TABS = [
   { k: 'F', name: 'File', live: true, backstage: true },   // the backstage: a menu, not a tab of groups
   { k: 'H', name: 'Home', live: true },
-  { k: 'N', name: 'Insert', live: false },
+  { k: 'N', name: 'Insert', live: true },
   { k: 'P', name: 'Page Layout', live: true },
   { k: 'M', name: 'Formulas', live: true },
   { k: 'A', name: 'Data', live: true },
@@ -21,38 +21,47 @@ export const MENUS = {
   'HE': [['A', 'Clear all'], ['F', 'Clear formats'], ['C', 'Clear contents'], ['M', 'Clear comments and notes']],
   'HI': [['R', 'Insert rows'], ['C', 'Insert columns'], ['S', 'Insert sheet']],
   'HD': [['R', 'Delete rows'], ['C', 'Delete columns'], ['S', 'Delete sheet']],
-  'HO': [['H', 'Row height…'], ['A', 'Autofit height'], ['W', 'Column width…'], ['I', 'Autofit width'], ['U', 'Hide & Unhide'], ['R', 'Rename sheet'], ['M', 'Move or copy sheet…'], ['E', 'Format cells…']],   // Excel's Format menu: sizes, visibility, the sheet items, E last
+  'HO': [['H', 'Row height…'], ['A', 'Autofit height'], ['W', 'Column width…'], ['I', 'Autofit width'], ['U', 'Hide & Unhide'], ['R', 'Rename sheet'], ['M', 'Move or copy sheet…'], ['T', 'Tab Color'], ['E', 'Format cells…']],   // Excel's Format menu: sizes, visibility, the sheet items, E last
   'HOU': [['R', 'Hide Rows'], ['C', 'Hide Columns'], ['O', 'Unhide Rows'], ['L', 'Unhide Columns']],
   'HB': [['O', 'Bottom'], ['P', 'Top'], ['L', 'Left'], ['R', 'Right'], ['N', 'No border'], ['A', 'All'], ['S', 'Outside'], ['T', 'Thick box'], ['B', 'Double bottom'], ['D', 'Top & bottom']],
   'HU': [['S', 'Sum']],
   // Conditional Formatting (Chapter 2), Excel's KeyTips: H L H highlight presets, D data bars, S colour scales, N a formula rule, C clear, R manage
   'HL': [['H', 'Highlight Cells Rules'], ['D', 'Data Bars'], ['S', 'Color Scales'], ['N', 'New Rule…'], ['C', 'Clear Rules'], ['R', 'Manage Rules…']],
-  'HLH': [['G', 'Greater Than…'], ['L', 'Less Than…'], ['B', 'Between…'], ['E', 'Equal To…']],
+  'HLH': [['G', 'Greater Than…'], ['L', 'Less Than…'], ['B', 'Between…'], ['E', 'Equal To…'], ['D', 'Duplicate Values…']],
   'HLC': [['S', 'Clear Rules from Selected Cells'], ['E', 'Clear Rules from Entire Sheet']],
   'HA': [['L', 'Left'], ['C', 'Center'], ['R', 'Right'], ['N', '$ Accounting']],
   'HF': [['C', 'Font color'], ['G', 'Grow font'], ['K', 'Shrink font'], ['I', 'Fill'], ['D', 'Find & Select']],   // Excel shares the H F prefix between Font and Fill / Find & Select
   'HFI': [['S', 'Series…'], ['D', 'Down'], ['R', 'Right']],
   'HFD': [['F', 'Find…'], ['R', 'Replace…'], ['G', 'Go To…'], ['S', 'Go To Special…'], ['U', 'Formulas'], ['N', 'Constants'], ['V', 'Data Validation'], ['O', 'Select Objects']],
   // Page Layout: Excel's real KeyTips — Margins M, Orientation O, Size S Z, Print Area A, Breaks B, Background G, Print Titles I, the Page Setup launcher S P
-  'P': [['M', 'Margins'], ['O', 'Orientation'], ['S', 'Page Setup'], ['A', 'Print Area'], ['B', 'Breaks'], ['G', 'Background'], ['I', 'Print Titles']],
+  'P': [['M', 'Margins'], ['O', 'Orientation'], ['S', 'Page Setup'], ['R', 'Print Area'], ['B', 'Breaks'], ['G', 'Background'], ['I', 'Print Titles']],
+  'PR': [['S', 'Set Print Area'], ['C', 'Clear Print Area']],
+  'PB': [['I', 'Insert Page Break'], ['R', 'Remove Page Break'], ['A', 'Reset All Page Breaks']],
   'PO': [['P', 'Portrait'], ['L', 'Landscape']],
   'PS': [['P', 'Page Setup…'], ['Z', 'Size']],
-  'M': [['U', 'Σ AutoSum'], ['M', 'Define Name'], ['P', 'Trace precedents'], ['D', 'Trace dependents'], ['H', 'Show formulas']],
+  'M': [['U', 'Σ AutoSum'], ['M', 'Define Name'], ['P', 'Trace Precedents'], ['D', 'Trace Dependents'], ['A', 'Remove Arrows'], ['H', 'Show Formulas'], ['K', 'Error Checking'], ['V', 'Evaluate Formula'], ['W', 'Watch Window'], ['X', 'Calculation Options']],
+  'MA': [['A', 'Remove Arrows'], ['P', 'Remove Precedent Arrows'], ['D', 'Remove Dependent Arrows']],
+  'MX': [['A', 'Automatic'], ['E', 'Automatic Except for Data Tables'], ['M', 'Manual']],
   'MM': [['D', 'Define Name…']],
+  'N': [['V', 'PivotTable']],
+  'NV': [['T', 'From Table/Range…']],
   'MU': [['S', 'Sum']],
-  'A': [['S', 'Sort'], ['G', 'Group'], ['U', 'Ungroup'], ['H', 'Hide detail'], ['J', 'Show detail']],   // Excel's Outline group: Group, Ungroup, Hide / Show Detail
+  'A': [['K', 'Edit Links'], ['S', 'Sort'], ['T', 'Filter'], ['E', 'Text to Columns'], ['F', 'Flash Fill'], ['M', 'Remove Duplicates'], ['V', 'Data Validation'], ['W', 'What-If Analysis'], ['G', 'Group'], ['U', 'Ungroup'], ['H', 'Hide detail'], ['J', 'Show detail']],   // Excel's Data tab: Queries & Connections, Sort & Filter, Data Tools, Forecast, Outline
+  'AV': [['V', 'Data Validation…']],
+  'AW': [['G', 'Goal Seek…'], ['T', 'Data Table…']],
   'AG': [['G', 'Group…'], ['A', 'Auto Outline']],      // split buttons, as in Excel: Alt A G G groups, Alt A U U ungroups
   'AU': [['U', 'Ungroup…'], ['C', 'Clear Outline']],
-  'AS': [['A', 'Sort A→Z'], ['D', 'Sort Z→A']],
+  'AS': [['A', 'Sort A→Z'], ['D', 'Sort Z→A'], ['S', 'Sort…']],
   'E': [['S', 'Paste special…']],
-  'W': [['V', 'Show'], ['Q', 'Zoom'], ['J', '100%'], ['F', 'Freeze Panes']],
+  'W': [['L', 'Normal'], ['I', 'Page Break Preview'], ['P', 'Page Layout'], ['V', 'Show'], ['Q', 'Zoom'], ['J', '100%'], ['F', 'Freeze Panes']],
   'WV': [['G', 'Gridlines']],
   'WF': [['F', 'Freeze Panes'], ['R', 'Freeze Top Row'], ['C', 'Freeze First Column']],
 };
 
 /** Excel's real Home-tab groups — the renderer draws each as a labelled cluster. */
 export const RIBBON_GROUPS = {
-  'A': [['Sort & Filter', ['S']], ['Outline', ['G', 'U', 'H', 'J']]],
+  'A': [['Queries & Connections', ['K']], ['Sort & Filter', ['S', 'T']], ['Data Tools', ['E', 'F', 'M', 'V']], ['Forecast', ['W']], ['Outline', ['G', 'U', 'H', 'J']]],
+  'N': [['Tables', ['V']]],
   'P': [['Page Setup', ['M', 'O', 'S', 'A', 'B', 'G', 'I']]],
   'H': [
     ['Clipboard', ['V']],
@@ -115,7 +124,7 @@ export const tabName = k => (TABS.find(t => t.k === k) || { name: k }).name;
 export const DEAD = {
   'FI': 'Info', 'FN': 'New', 'FO': 'Open', 'FS': 'Save', 'FA': 'Save As', 'FP': 'Print', 'FH': 'Share', 'FE': 'Export', 'FC': 'Close', 'FD': 'Account',
   'HFDV': 'Data Validation', 'HFDO': 'Select Objects',
-  'PM': 'Margins', 'PA': 'Print Area', 'PB': 'Breaks', 'PG': 'Background', 'PSZ': 'Size', 'AGA': 'Auto Outline',
+  'PM': 'Margins', 'PG': 'Background', 'PSZ': 'Size', 'AGA': 'Auto Outline',
 };
 
 /* ---------------- Excel Options, Page Setup and the Quick Access Toolbar (data the Session reads) ---------------- */
@@ -175,18 +184,22 @@ export const COMMANDS = {
   'HBA': 'All borders', 'HBS': 'Outside borders', 'HBT': 'Thick outside borders', 'HBB': 'Double bottom border', 'HBD': 'Top and bottom border',
   'HFC': 'Font color', 'HFG': 'Increase font size', 'HFK': 'Decrease font size', 'HFIS': 'Series…', 'HFID': 'Fill down', 'HFIR': 'Fill right',
   'HH': 'Fill color', 'HJ': 'Cell styles', 'HIR': 'Insert sheet rows', 'HIC': 'Insert sheet columns', 'HDR': 'Delete sheet rows', 'HDC': 'Delete sheet columns',
-  'HIS': 'Insert sheet', 'HDS': 'Delete sheet', 'HOR': 'Rename sheet', 'HOM': 'Move or copy sheet…',
+  'HIS': 'Insert sheet', 'HDS': 'Delete sheet', 'HOR': 'Rename sheet', 'HOT': 'Tab Color', 'HOM': 'Move or copy sheet…',
   'HOI': 'AutoFit column width', 'HOA': 'AutoFit row height', 'HOW': 'Column width…', 'HOE': 'Format cells…', 'OE': 'Format cells…',
   'HEA': 'Clear all', 'HEF': 'Clear formats', 'HEC': 'Clear contents', 'HUS': 'AutoSum', 'MUS': 'AutoSum', 'MP': 'Trace precedents', 'MD': 'Trace dependents',
   'HVV': 'Paste values', 'HVS': 'Paste special…', 'ES': 'Paste special…', 'ASA': 'Sort A to Z', 'ASD': 'Sort Z to A', 'WVG': 'Gridlines', 'WG': 'Gridlines',
-  'FT': 'Excel Options…', 'HFDG': 'Go To…', 'PSP': 'Page Setup…', 'POP': 'Portrait', 'POL': 'Landscape', 'PI': 'Print Titles…',
+  'FT': 'Excel Options…', 'HFDG': 'Go To…', 'PSP': 'Page Setup…', 'PRS': 'Set Print Area', 'PRC': 'Clear Print Area', 'PBI': 'Insert Page Break', 'PBR': 'Remove Page Break', 'PBA': 'Reset All Page Breaks',
+  'WL': 'Normal', 'WI': 'Page Break Preview', 'WP': 'Page Layout', 'POP': 'Portrait', 'POL': 'Landscape', 'PI': 'Print Titles…',
   'AGG': 'Group…', 'AUU': 'Ungroup…', 'AUC': 'Clear outline', 'AH': 'Hide detail', 'AJ': 'Show detail', 'MH': 'Show formulas',
   'HFDF': 'Find…', 'HFDR': 'Replace…', 'HFDS': 'Go To Special…', 'HFDU': 'Select formulas', 'HFDN': 'Select constants',
   'HOH': 'Row height…', 'HOUR': 'Hide rows', 'HOUC': 'Hide columns', 'HOUO': 'Unhide rows', 'HOUL': 'Unhide columns',
   'HEM': 'Clear comments and notes', 'MMD': 'Define Name…', 'WQ': 'Zoom…', 'WJ': 'Zoom to 100%',
   'WFF': 'Freeze panes', 'WFR': 'Freeze top row', 'WFC': 'Freeze first column',
-  'HLHG': 'Greater Than…', 'HLHL': 'Less Than…', 'HLHB': 'Between…', 'HLHE': 'Equal To…', 'HLN': 'New Formatting Rule…',
+  'HLHG': 'Greater Than…', 'HLHL': 'Less Than…', 'HLHB': 'Between…', 'HLHE': 'Equal To…', 'HLHD': 'Duplicate Values…', 'HLN': 'New Formatting Rule…',
   'HLD': 'Data Bars', 'HLS': 'Color Scales', 'HLCS': 'Clear Rules from Selected Cells', 'HLCE': 'Clear Rules from Entire Sheet', 'HLR': 'Manage Rules…',
+  'MAA': 'Remove Arrows', 'MAP': 'Remove Precedent Arrows', 'MAD': 'Remove Dependent Arrows', 'MV': 'Evaluate Formula', 'MW': 'Watch Window', 'MK': 'Error Checking',
+  'MXA': 'Automatic', 'MXE': 'Automatic Except for Data Tables', 'MXM': 'Manual',
+  'AE': 'Text to Columns…', 'AF': 'Flash Fill', 'AM': 'Remove Duplicates…', 'AVV': 'Data Validation…', 'AK': 'Edit Links…', 'AT': 'Filter', 'ASS': 'Sort…', 'AWG': 'Goal Seek…', 'AWT': 'Data Table…', 'NVT': 'PivotTable…',
 };
 
 /**

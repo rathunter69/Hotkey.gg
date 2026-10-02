@@ -434,7 +434,8 @@ export function sheetStandard(sheet, { chapter = 1, read = true } = {}) {
   }
   if (labelCol === 2) for (let r = 5; r <= lastRow; r++) {
     const c = cellAt(r, 1);
-    if (c && typeof c.value === 'string' && c.value.length > 3) { out.push(`${refKey(r, 1)} holds a label, labels sit in column B from Chapter 2 on`); break; }
+    // A is the narrow helper column: a code or a helper beside a label in B is fine; text in A with nothing in B is a label in the wrong column
+    if (c && typeof c.value === 'string' && c.value.length > 3 && isBlank(cellAt(r, 2))) { out.push(`${refKey(r, 1)} holds a label, labels sit in column B from Chapter 2 on`); break; }
   }
   for (let r = 5; r <= lastRow; r++) {
     const l = cellAt(r, labelCol);

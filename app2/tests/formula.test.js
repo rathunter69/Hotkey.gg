@@ -3,6 +3,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { evalFormula, translateFormula, formulaRefs, formulaFunctions, autocorrectFormula, adjustFormulaStructure, parseFormula, textToNumber, parses, normalizeFormula } from '../engine/formula.js';
+import { Sheet } from '../engine/sheet.js';
+import { Session } from '../engine/keyboard.js';
 
 const cells = {
   A1: 1, A2: 2, A3: 3,
@@ -60,7 +62,7 @@ table('coercion of text, blanks and errors', [
   ['=F1+1', 1], ['=F1&"x"', 'x'], ['=F1', 0], ['=Z9', 0], ['=A1&F1&A2', '12'],
   ['=C1+1', '#N/A'], ['=SUM(A1:C1)', '#N/A'], ['=IFERROR(C1,0)', 0], ['=IFNA(C1,"missing")', 'missing'], ['=IFNA(1/0,0)', '#DIV/0!'],
   ['=1/0', '#DIV/0!'], ['=A1/F1', '#DIV/0!'], ['=0^-1', '#DIV/0!'], ['=SQRT(-1)', '#NUM!'], ['=FOO(1)', '#NAME?'], ['=foo', '#NAME?'], ['=#N/A', '#N/A'],
-  ['=A1:A3+1', '#VALUE!'], ['=ISERROR(1/0)', true], ['=ISERROR(1)', false], ['=ISNA(C1)', true], ['=ISBLANK(F1)', true], ['=ISBLANK(A1)', false], ['=ISNUMBER(B1)', false], ['=ISNUMBER(A1)', true], ['=ISTEXT(B1)', true],
+  ['=ISERROR(1/0)', true], ['=ISERROR(1)', false], ['=ISNA(C1)', true], ['=ISBLANK(F1)', true], ['=ISBLANK(A1)', false], ['=ISNUMBER(B1)', false], ['=ISNUMBER(A1)', true], ['=ISTEXT(B1)', true],
   // the IS* classifiers see an error as a value to classify, never as something to propagate (the ISNUMBER(MATCH()) / ISNUMBER(SEARCH()) idioms)
   ['=ISNUMBER(MATCH(99,D1:D3,0))', false], ['=IF(ISNUMBER(MATCH(99,D1:D3,0)),"found","missing")', 'missing'], ['=ISNUMBER(MATCH(20,D1:D3,0))', true], ['=IF(ISNUMBER(SEARCH("z",E1)),"yes","no")', 'no'], ['=ISNUMBER(SEARCH("p",E1))', true],
   ['=ISTEXT(1/0)', false], ['=ISLOGICAL(NA())', false], ['=ISNONTEXT(NA())', true], ['=ISBLANK(NA())', false], ['=ISNUMBER(C1)', false], ['=ISNONTEXT(C1)', true], ['=ISNUMBER("5")', false], ['=ISNUMBER(TRUE)', false],
@@ -77,7 +79,33 @@ table('aggregates: ranges skip text/booleans, literal arguments coerce', [
   ['=COUNT(A1:B3)', 3], ['=COUNT("3",TRUE,"x")', 2], ['=COUNTA(A1:C3)', 7], ['=COUNTA(F1:F3)', 0], ['=COUNTBLANK(A1:F3)', 5], ['=PRODUCT(A1:A3)', 6],
   ['=MEDIAN(D1:D3)', 20], ['=MEDIAN(D1:D2)', 15], ['=MEDIAN(F1:F3)', '#NUM!'], ['=LARGE(D1:D3,1)', 30], ['=SMALL(D1:D3,4)', '#NUM!'], ['=RANK(20,D1:D3)', 2], ['=RANK(20,D1:D3,1)', 2], ['=RANK(25,D1:D3)', '#N/A'],
   ['=SUMPRODUCT(A1:A3,D1:D3)', 140], ['=SUMPRODUCT(A1:A3,D1:D2)', '#VALUE!'],
+  // the inclusive percentile and quartile (Chapter 6's range on a comp set); text and blanks drop out as MEDIAN's do
+  ['=QUARTILE.INC(D1:D3,0)', 10], ['=QUARTILE.INC(D1:D3,1)', 15], ['=QUARTILE.INC(D1:D3,2)', 20], ['=QUARTILE.INC(D1:D3,3)', 25], ['=QUARTILE.INC(D1:D3,4)', 30], ['=QUARTILE.INC(D1:D3,5)', '#NUM!'],
+  ['=QUARTILE(H1:H3,2)', 20], ['=QUARTILE.INC(F1:F3,1)', '#NUM!'], ['=QUARTILE.INC(A1:B3,1)', 1.5], ['=PERCENTILE.INC(D1:D3,0.5)', 20], ['=PERCENTILE.INC(D1:D3,0.1)', 12], ['=PERCENTILE(D1:D3,1.1)', '#NUM!'], ['=PERCENTILE.INC(J1:J3,0.25)', 15],
+  // RRI: the rate that grows pv to fv over nper periods (an IRR on two flows)
+  ['=RRI(5,100,250)', Math.pow(2.5, 0.2) - 1], ['=RRI(2,100,121)', 0.1], ['=RRI(0,100,250)', '#NUM!'], ['=RRI(1,100,-50)', -1.5], ['=RRI(2,100,-50)', '#NUM!'],
 ]);
+
+// M75: array evaluation inside SUMPRODUCT (Excel evaluates each argument cell by cell; TRUE/FALSE
+// count as zero unless arithmetic coerces them, which is why the desks write --ISERROR(range))
+table('SUMPRODUCT evaluates its arguments as arrays: ABS, --ISERROR, ISNUMBER*(1-ISFORMULA), arithmetic and comparisons over a range', [
+  ['=SUMPRODUCT(ABS(G1:G3))', 5.5], ['=SUMPRODUCT(-G1:G3)', -0.5], ['=SUMPRODUCT(--ISERROR(A1:C1))', 1], ['=SUMPRODUCT(ISERROR(A1:C1))', 0],
+  ['=SUMPRODUCT(--ISNUMBER(A1:B3))', 3], ['=SUMPRODUCT(ISNUMBER(A1:B3)*1)', 3], ['=SUMPRODUCT(--ISTEXT(B1:B3))', 2], ['=SUMPRODUCT(--ISBLANK(F1:F3))', 3],
+  ['=SUMPRODUCT(ISNUMBER(A1:A3)*(1-ISFORMULA(A1:A3)))', 3], ['=SUMPRODUCT(D1:D3*2)', 120], ['=SUMPRODUCT(D1:D3*A1:A3)', 140], ['=SUMPRODUCT((D1:D3>15)*D1:D3)', 50],
+  ['=SUMPRODUCT(D1:D3,A1)', '#VALUE!'], ['=SUMPRODUCT(D1:D3*A1)', 60], ['=SUMPRODUCT(1/(1+G1)^A1:A3)', 1 / 1.5 + 1 / 2.25 + 1 / 3.375], ['=SUMPRODUCT(ABS(F1:F3))', 0],
+  ['=SUMPRODUCT(C1:C1)', '#N/A'], ['=SUMPRODUCT(ABS(C1:C1))', '#N/A'], ['=SUMPRODUCT(ABS(E1:E3))', '#VALUE!'], ['=SUMPRODUCT(N(B3:B3))', 1],
+  ['=ISFORMULA(A1)', false], ['=ISFORMULA(1)', '#VALUE!'], ['=ISFORMULA(A1:A2)', false],   // an array: one answer per cell, the first shown here
+  ['=HYPERLINK("#Inputs!A1","Inputs")', 'Inputs'], ['=HYPERLINK("https://hotkey.gg")', 'https://hotkey.gg'], ['=HYPERLINK("#A1",A1)', 1],
+]);
+
+test('ISFORMULA reads the cell through the sheet (true for a formula, false for a value), on this sheet and across the workbook', () => {
+  const S = new Sheet({ cells: { A1: { value: 3 }, A2: { formula: '=A1*2' }, B1: { formula: '=ISFORMULA(A1)' }, B2: { formula: '=ISFORMULA(A2)' }, B3: { formula: '=SUMPRODUCT(ISNUMBER(A1:A2)*(1-ISFORMULA(A1:A2)))' }, B4: { formula: '=ISFORMULA(Nope!A1)' } } });
+  assert.equal(S.value('B1'), false); assert.equal(S.value('B2'), true); assert.equal(S.value('B3'), 1); assert.equal(S.value('B4'), '#REF!');
+  const s = new Session(S);
+  s.addSheet('Other', new Sheet({ cells: { A1: { formula: '=1+1' } } }));
+  S.commitInput('=ISFORMULA(Other!A1)', 5, 2);
+  assert.equal(S.value('B5'), true);
+});
 
 table('rounding is decimal, half away from zero', [
   ['=ROUND(2.5,0)', 3], ['=ROUND(-2.5,0)', -3], ['=ROUND(G2,0)', -3], ['=ROUND(1.005,2)', 1.01], ['=ROUND(2.675,2)', 2.68], ['=ROUND(1234.5678,-2)', 1200], ['=ROUND(-1.45,1)', -1.5],

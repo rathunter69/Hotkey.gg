@@ -19,6 +19,7 @@ import { dispText, dispColor, PAD_MARK } from '../engine/format.js';
 import { colLetter, refKey, parseRef } from '../engine/refs.js';
 import { formulaRefs, isErrVal } from '../engine/formula.js';
 import { recordMouse, MODAL_DIALOGS } from './ribbon-commands.js';
+import { outlineMarks, outlineHeaderHtml, outlineLevelHtml, pageBoxes } from './sheet-overlays.js';
 import { isFormulaText } from '../engine/keyboard.js';
 
 // Excel's classic formula-highlighting palette — saturated, universally recognizable, works on
@@ -173,6 +174,16 @@ export class SheetView {
   onMouseDown(e) {
     if (e.button !== 0) return;
     // the outline bar's ⊖ / ⊕ (C2 gap 4): fold or unfold that group, recorded like any header click
+    const lb = e.target && e.target.closest ? e.target.closest('.ol-lv-b') : null;   // a level button in the corner: show that level of the outline
+    if (lb && this.grid.contains(lb)) {
+      e.preventDefault(); if (e.detail > 1) return;
+      const ssL = this.session, SL = this.sheet = ssL.sheet;
+      if (ssL.dialog && MODAL_DIALOGS.has(ssL.dialog)) return;
+      if (ssL.mode === 'ribbon') ssL.exitRibbon(false);
+      if (ssL.editing && !ssL.commitEdit(0, 0, { kind: 'move' })) { ssL.emit('mouse'); return; }
+      const [axis, n] = String(lb.dataset.olv || '').split(':');
+      ssL.startClock(); SL.showOutlineLevel(axis, +n); recordMouse(ssL, 'header'); ssL.emit('mouse'); return;
+    }
     const ob = e.target && e.target.closest ? e.target.closest('.ol-btn') : null;
     if (ob && this.grid.contains(ob)) {
       e.preventDefault();
@@ -275,19 +286,21 @@ export class SheetView {
     // through hiddenRows / hiddenCols, so graders can tell grouped from hidden — and every group
     // draws a bracket on the header with a ⊖ / ⊕ on the row or column just past it (Excel's bar)
     const groups = S.groups || { rows: [], cols: [] };
-    const foldC = new Set(), foldR = new Set(), olC = new Set(), olR = new Set(), btnC = {}, btnR = {};
-    // the button sits just past the band (Excel's summary row / column); a band ending on the sheet's last row or column keeps it just before, where it stays reachable folded
-    const host = (g2, g1, max) => (g2 < max ? g2 + 1 : g1 > 1 ? g1 - 1 : 0);
-    groups.cols.forEach((g, i) => { for (let c = g.c1; c <= g.c2; c++) { if (g.collapsed) foldC.add(c); else olC.add(c); } const h = host(g.c2, g.c1, COLS); if (h) btnC[h] = { i, on: !!g.collapsed }; });
-    groups.rows.forEach((g, i) => { for (let r = g.r1; r <= g.r2; r++) { if (g.collapsed) foldR.add(r); else olR.add(r); } const h = host(g.r2, g.r1, ROWS); if (h) btnR[h] = { i, on: !!g.collapsed }; });
+    // nested (up to seven levels): each level draws its own bracket and button lane (ui/sheet-overlays.js); the corner carries the level buttons
+    const foldC = new Set(), foldR = new Set();
+    groups.cols.forEach(g => { if (g.collapsed) for (let c = g.c1; c <= g.c2; c++) foldC.add(c); });
+    groups.rows.forEach(g => { if (g.collapsed) for (let r = g.r1; r <= g.r2; r++) foldR.add(r); });
+    const olMarksC = outlineMarks(S, 'c', COLS), olMarksR = outlineMarks(S, 'r', ROWS);
+    const olCorner = outlineLevelHtml(olMarksR, olMarksC);
+    // Page Break Preview (View › Page Break Preview): the cells outside the print range grey; the page boxes are an overlay (positionPages)
+    const pbp = pageBoxes(S); const pbr = pbp && pbp.range;
     const showFx = !!(ss.settings && ss.settings.showFormulas);   // Ctrl+` (C2 gap 5): formula text in place of values
     const cf = S.condFmt && S.condFmt.length ? S.condFmtMap() : null;   // conditional formatting (Chapter 2): evaluated once per paint
     const z = (S.zoom || 100) / 100, Z = px => Math.round(px * z);   // the sheet's zoom (M44, M99): every painted size scales, the engine's widths stay
     totalW = Z(ROWHDR_W);
     for (let c = 1; c <= COLS; c++) { const w = hidC.has(c) || foldC.has(c) ? 0 : (colW[c] || COLW_DEFAULT); W[c] = w; totalW += Z(w); L[c] = colLetter(c); }
     this.ew = W;
-    const olBtn = (axis, b) => (b ? '<button type="button" tabindex="-1" class="ol-btn' + (b.on ? ' on' : '') + '" data-ol="' + axis + ':' + b.i + '" title="' + (b.on ? 'Show detail' : 'Hide detail') + '">' + (b.on ? '+' : '−') + '</button>' : '');
-    const N = ROWS * COLS, shape = z + '@' + ROWS + 'x' + COLS + ':' + W.join(',') + '|' + [...hidR].join('.') + '|' + rowH.join('.') + '|' + freeze.r + ',' + freeze.c + '|' + JSON.stringify(groups);
+    const N = ROWS * COLS, shape = z + '@' + ROWS + 'x' + COLS + ':' + W.join(',') + '|' + [...hidR].join('.') + '|' + rowH.join('.') + '|' + freeze.r + ',' + freeze.c + '|' + JSON.stringify(groups) + '|' + S.view;
     const patch = this._shape === shape && !!this._tds && this._tds.length === N && this.grid.rows.length === ROWS + 1;
     if (!patch) { this._cls = new Array(N); this._sty = new Array(N); this._txt = new Array(N); }
     const oldCls = this._cls, oldSty = this._sty, oldTxt = this._txt, tds = this._tds;
@@ -307,8 +320,8 @@ export class SheetView {
       // column widths, then the header row — no active-column highlight (the old build had none)
       gh = '<colgroup><col style="width:' + Z(ROWHDR_W) + 'px">';
       for (let c = 1; c <= COLS; c++) gh += '<col style="width:' + Z(W[c]) + 'px">';
-      gh += '</colgroup><tr><th class="rowhdr"></th>';
-      for (let c = 1; c <= COLS; c++) gh += '<th class="' + (hidC.has(c) || foldC.has(c) ? 'hidc' : hidC.has(c - 1) ? 'seam-c' : '') + (olC.has(c) ? ' ol-c' : '') + (btnC[c] ? ' ol-host' : '') + '">' + olBtn('c', btnC[c]) + L[c] + '</th>';
+      gh += '</colgroup><tr><th class="rowhdr' + (olCorner ? ' ol-corner' : '') + '">' + olCorner + '</th>';
+      for (let c = 1; c <= COLS; c++) gh += '<th class="' + (hidC.has(c) || foldC.has(c) ? 'hidc' : hidC.has(c - 1) ? 'seam-c' : '') + (olMarksC.btns[c] ? ' ol-host' : '') + '">' + outlineHeaderHtml(olMarksC, 'c', c) + L[c] + '</th>';
       gh += '</tr>';
     }
 
@@ -316,7 +329,7 @@ export class SheetView {
     for (let r = 1; r <= ROWS; r++) {
       const rowIn = hasSel && r >= sr.r1 && r <= sr.r2;
       const rh = rowH[r] || ROW_H;
-      let row = patch ? '' : '<tr' + (hidR.has(r) || foldR.has(r) ? ' class="hidrow"' : rh !== ROW_H ? ' style="height:' + Z(rh) + 'px"' : '') + '><th class="rowhdr' + (hidR.has(r - 1) ? ' seam-r' : '') + (olR.has(r) ? ' ol-r' : '') + (btnR[r] ? ' ol-host' : '') + '" data-row="' + r + '">' + olBtn('r', btnR[r]) + r + '</th>';
+      let row = patch ? '' : '<tr' + (hidR.has(r) || foldR.has(r) ? ' class="hidrow"' : rh !== ROW_H ? ' style="height:' + Z(rh) + 'px"' : '') + '><th class="rowhdr' + (hidR.has(r - 1) ? ' seam-r' : '') + (olMarksR.btns[r] ? ' ol-host' : '') + '" data-row="' + r + '">' + outlineHeaderHtml(olMarksR, 'r', r) + r + '</th>';
       for (let c = 1; c <= COLS; c++, i++) {
         const isActive = (r === dA.r && c === dA.c);
         const inSel = rowIn && c >= sr.c1 && c <= sr.c2;
@@ -326,6 +339,7 @@ export class SheetView {
         if (freeze.r && r === freeze.r) cls += ' frz-b';
         if (freeze.c && c === freeze.c) cls += ' frz-r';
         if (isPoint) cls += ' point';
+        if (pbr && (r < pbr.r1 || r > pbr.r2 || c < pbr.c1 || c > pbr.c2)) cls += ' pbp-out';
         if (inSel) { if (r === sr.r1) cls += ' sel-t'; if (r === sr.r2) cls += ' sel-b'; if (c === sr.c1) cls += ' sel-l'; if (c === sr.c2) cls += ' sel-r'; }
         // Excel's fill-handle — the tiny green square at the selection's bottom-right (or on the lone active cell)
         if (hasSel ? (r === sr.r2 && c === sr.c2) : isActive) cls += ' fh';
@@ -443,6 +457,7 @@ export class SheetView {
     }
     this.keepActiveInView();
     this.positionMarquee();
+    this.positionPages(pbp);
     this.measurePage();
     this.updateFormulaBar();
     this.renderStatus();
@@ -469,7 +484,7 @@ export class SheetView {
   }
 
   /** The box changed size: the grid stands, the scroll position and the screen count follow. */
-  refit() { if (this.destroyed || !this.grid.rows.length) return; this.keepActiveInView(); this.positionMarquee(); this.measurePage(); }
+  refit() { if (this.destroyed || !this.grid.rows.length) return; this.keepActiveInView(); this.positionMarquee(); this.positionPages(pageBoxes(this.session.sheet)); this.measurePage(); }
 
   /**
    * A cell's painted box in .gridwrap content pixels ({ left, top, width, height }), for an
@@ -553,6 +568,20 @@ export class SheetView {
   }
 
   /** The marching ants over the copied block (sheet.clipboard.rect), placed over the live cells — only on the sheet the block was copied from. */
+  /** Page Break Preview's overlay: one box per printed page over its cells, numbered; removed in Normal view. */
+  positionPages(pbp) {
+    let ov = this.gw.querySelector('.pbp');
+    if (!pbp) { if (ov) ov.remove(); return; }
+    if (!ov) { ov = document.createElement('div'); ov.className = 'pbp'; ov.setAttribute('aria-hidden', 'true'); this.gw.appendChild(ov); }
+    const wrap = this.gw, wr = wrap.getBoundingClientRect(); let html = '';
+    const td = (r, c) => this.grid.querySelector('td[data-r="' + r + '"][data-c="' + c + '"]');
+    for (const p of pbp.pages) {
+      const a = td(p.r1, p.c1), b = td(p.r2, p.c2); if (!a || !b) continue;
+      const ar = a.getBoundingClientRect(), br = b.getBoundingClientRect(); if (br.right <= ar.left || br.bottom <= ar.top) continue;
+      html += '<div class="pbp-page' + (p.autoTop ? ' auto-t' : '') + (p.autoLeft ? ' auto-l' : '') + '" style="left:' + (ar.left - wr.left + wrap.scrollLeft) + 'px;top:' + (ar.top - wr.top + wrap.scrollTop) + 'px;width:' + (br.right - ar.left) + 'px;height:' + (br.bottom - ar.top) + 'px;--pbp-fs:' + Math.max(9, Math.min(28, Math.round((br.right - ar.left) / 6))) + 'px"><span class="pbp-num">Page ' + p.page + '</span></div>';
+    }
+    ov.innerHTML = html;
+  }
   positionMarquee() {
     const m = this.marquee; if (!m) return;
     const cb = this.sheet.clipboard;
