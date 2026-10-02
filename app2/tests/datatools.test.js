@@ -118,3 +118,18 @@ test('Flash Fill (Ctrl+E): one example beside the data fills the column; a heade
   S.goTo(3, 3); s.run('Alt A F'); assert.equal(S.value('C4'), 'DAL-ELM (Ruiz)', 'Data › Flash Fill does the same');
   const t = fresh({ A1: { value: 'abc' }, A2: { value: 'def' } }); t.sheet.goTo(1, 2); t.run('Ctrl+E'); assert.equal(t.toasts.at(-1), FLASH_FILL_NONE_NOTE);
 });
+
+test('Edit Links (Alt A K): the other workbooks the formulas read, their kept values, Change Source and Break Link', async () => {
+  const { NO_LINKS_NOTE, BREAK_LINKS_NOTE } = await import('../engine/tools.js');
+  const s = fresh({}); const S = s.sheet;
+  s.run('Alt A K'); assert.equal(s.toasts.at(-1), NO_LINKS_NOTE); assert.equal(s.mode, 'normal');
+  s.setExternalValues('Seller Model.xlsx', 'P&L', { C10: 4200 }); s.setExternalValues('Budget.xlsx', 'Annual', { C10: 125 });
+  S.commitInput("='[Seller Model.xlsx]P&L'!C10*2", 1, 1); S.commitInput('=[Budget.xlsx]Annual!C10+1', 2, 1); S.commitInput('=A1+A2', 3, 1);
+  assert.deepEqual([S.value('A1'), S.value('A2'), S.value('A3')], [8400, 126, 8526]);
+  s.run('Alt A K'); assert.equal(s.dialog, 'editlinks'); assert.deepEqual(s.dlg.list.map(x => x.file), ['Seller Model.xlsx', 'Budget.xlsx']);
+  s.run('Down Alt+N "Budget v2.xlsx" Enter'); assert.equal(S.formula('A2'), "='[Budget v2.xlsx]Annual'!C10+1"); assert.equal(S.value('A2'), 126, 'the kept values move with the source');
+  s.run('Up Alt+B'); assert.equal(s.note, BREAK_LINKS_NOTE); s.run('Enter');
+  assert.equal(S.formula('A1'), null); assert.equal(S.value('A1'), 8400, 'the formula became its value'); assert.equal(S.formula('A3'), '=A1+A2');
+  assert.deepEqual(s.dlg.list.map(x => x.file), ['Budget v2.xlsx']); s.run('Escape'); assert.equal(s.dialog, null);
+  S.commitInput('=[Nowhere.xlsx]Sheet1!A1', 4, 1); assert.equal(S.value('A4'), '#REF!', 'a link with no kept value');
+});

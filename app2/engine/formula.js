@@ -80,13 +80,13 @@ export function tokenize(src) {
     }
     if ((m = RE_ERR.exec(rest))) { out.push({ t: 'err', v: m[0].toUpperCase(), pos: i, end: i + m[0].length }); i += m[0].length; continue; }
     if ((m = RE_NUM.exec(rest))) { out.push({ t: 'num', v: parseFloat(m[0]), pos: i, end: i + m[0].length }); i += m[0].length; continue; }
-    if (ch === "'" || ch === '$' || /[A-Za-z_]/.test(ch)) {
+    if (ch === "'" || ch === '$' || ch === '[' || /[A-Za-z_]/.test(ch)) {
       // sheet-prefixed reference: Name!A1 or 'My Sheet'!A1 — the prefix and the ref are ONE token
       // (the whole span, so text rewriters replace it as a unit); the corner after ':' stays plain
       // a 3D reference names a run of sheets, First:Last!B5 or 'Jan 1:Mar 1'!B5 (never A1:Sheet2!B5, a cell before the colon)
       let sm = /^([A-Za-z_][A-Za-z0-9_.]*:[A-Za-z_][A-Za-z0-9_.]*)!/.exec(rest);
       if (sm && /^\$?[A-Za-z]{1,3}\$?\d+:/.test(sm[1])) sm = null;
-      if (sm) sm = [sm[0], undefined, sm[1]]; else sm = /^(?:'((?:[^']|'')+)'|([A-Za-z_][A-Za-z0-9_.]*))!/.exec(rest);
+      if (sm) sm = [sm[0], undefined, sm[1]]; else sm = /^(?:'((?:[^']|'')+)'|(\[[^\]'!]+\][A-Za-z_][A-Za-z0-9_.]*|[A-Za-z_][A-Za-z0-9_.]*))!/.exec(rest);   // [Book.xlsx]Sheet!A1: another workbook (Edit Links)
       if (sm) {
         const sheetName = sm[1] ? sm[1].replace(/''/g, "'") : sm[2];
         const tail = rest.slice(sm[0].length);
@@ -97,7 +97,7 @@ export function tokenize(src) {
         out.push({ t: 'ref', v: rm2[0].toUpperCase(), sheet: sheetName.toUpperCase(), sheetTxt: sm[0], pos: i, end: i + sm[0].length + rm2[0].length });
         i += sm[0].length + rm2[0].length; continue;
       }
-      if (ch === "'") throw new SyntaxError('unexpected character ' + ch);
+      if (ch === "'" || ch === '[') throw new SyntaxError('unexpected character ' + ch);
       // reference ($A$1, a1), function name (SUM( ), or a bare name (TRUE, FALSE, A for A:A)
       const dm = /^\$?[A-Za-z]{1,3}\$?\d+/.exec(rest);
       const im = RE_IDENT.exec(rest);

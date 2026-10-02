@@ -430,7 +430,7 @@ export class Sheet {
   evalCtx(extra) {
     return { raw: k => this.raw(k), rows: this.rows, cols: this.cols, today: this.today || undefined,
       // NAME!B3: another sheet of the workbook (the Session wires `resolver`); no workbook = #REF!
-      sheetRaw: (name, key) => { const sh = this.resolver ? this.resolver(name) : null; return sh ? sh.raw(key) : '#REF!'; },
+      sheetRaw: (name, key) => { const sh = this.resolver ? this.resolver(name) : null; return sh ? sh.raw(key) : this.externalRaw ? this.externalRaw(name, key) : '#REF!'; },
       // a 3D reference's run of sheets, first to last in tab order (either end missing: null, #REF!)
       sheetSpan: (a, b) => { const names = this.workbook().map(e => e.name); const i = names.findIndex(n => n.toLowerCase() === String(a).toLowerCase()), j = names.findIndex(n => n.toLowerCase() === String(b).toLowerCase()); if (i < 0 || j < 0) return null; return names.slice(Math.min(i, j), Math.max(i, j) + 1); },
       // ISFORMULA: whether a cell holds a formula, here or on another sheet (null = no such sheet)

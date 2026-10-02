@@ -25,7 +25,7 @@
 //                         field with Sum / Count / Average), Refresh (Alt+F5) and GETPIVOTDATA
 
 import { Sheet, CELL_STYLES } from './sheet.js';
-import { evalFormula, formulaRefs, evaluateStepper, valueText, translateFormula, isErrVal, textToNumber, dateTextValue, parses } from './formula.js';
+import { tokenize, evalFormula, formulaRefs, evaluateStepper, valueText, translateFormula, isErrVal, textToNumber, dateTextValue, parses } from './formula.js';
 import { refKey, parseRef, parseRange, rangeText, colLetter } from './refs.js';
 import { dispText } from './format.js';
 const clone = x => JSON.parse(JSON.stringify(x));
@@ -37,7 +37,7 @@ const STYLE_KEYS = { 'Alt+N': 'number', 'Alt+L': 'alignment', 'Alt+F': 'font', '
 /** The dialogs this module drives (keyboard.js routes their keys to toolKey). */
 export const TOOL_DIALOGS = new Set(['evalfx', 'errcheck', 'texttocols', 'removedup', 'validation', 'dvlist', 'editlinks', 'autofilter', 'sortdlg', 'goalseek', 'datatable', 'pivot', 'newstyle', 'hyperlink', 'ctxmenu']);
 /** The dialogs with a text field that keeps the case typed. */
-export const TOOL_TYPED = new Set(['newstyle', 'hyperlink', 'texttocols', 'validation', 'goalseek', 'datatable', 'sortdlg', 'autofilter']);
+export const TOOL_TYPED = new Set(['newstyle', 'hyperlink', 'editlinks', 'texttocols', 'validation', 'goalseek', 'datatable', 'sortdlg', 'autofilter']);
 /** Excel's messages the tools show verbatim. */
 export const ERRCHECK_DONE_NOTE = 'The error check is complete for the entire sheet.';
 export const FLASH_FILL_NONE_NOTE = "We looked at all the data next to your selection and didn't see a pattern for filling in values for you.";
@@ -49,6 +49,7 @@ export const TABLE_CELL_NOTE = "Cannot change part of a data table.";
 export const GOALSEEK_FORMULA_NOTE = 'Cell must contain a formula.';
 export const GOALSEEK_VALUE_NOTE = 'Cell must contain a value.';
 export const GOALSEEK_REF_NOTE = 'Reference is not valid.';
+export const BREAK_LINKS_NOTE = 'Breaking links permanently converts formulas and external references to their existing values. Because this cannot be undone, you may want to save a version of this file with a new name. Are you sure you want to break the links?';
 export const NO_LINKS_NOTE = 'This workbook contains no links to other files.';
 export const TTC_OVERWRITE_NOTE = "There's already data here. Do you want to replace it?";
 export const ALLOW = [['any', 'Any value'], ['whole', 'Whole number'], ['decimal', 'Decimal'], ['list', 'List'], ['date', 'Date'], ['time', 'Time'], ['textlen', 'Text length'], ['custom', 'Custom']];
@@ -800,6 +801,85 @@ const methods = {
     S.pushUndo();
     for (const [r, v] of out) { const cell = S.ensure(r, col); cell.formula = null; cell.value = v; cell.txt = false; }
     S.commit('edit'); return true;
+  },
+
+  /* ---------------- Edit Links (Alt A K): references to other workbooks ---------------- */
+  /** The other workbooks the formulas name ([Budget.xlsx]Annual!C10), each with the cells that read it: [{ file, cells: ['Sheet1!B2'] }] in first-seen order. */
+  externalLinks() {
+    const out = new Map();
+    for (const e of this.sheets) for (const k of Object.keys(e.sheet.cells)) {
+      const c = e.sheet.cells[k]; if (!c || !c.formula || c.formula.indexOf('[') < 0) continue;
+      let toks; try { toks = tokenize(c.formula.replace(/^=/, '')); } catch (x) { continue; }
+      for (const t of toks) if (t.t === 'ref' && t.sheet && t.sheet[0] === '[') {
+        const m = /^'?\[([^\]]+)\]/.exec(t.sheetTxt); const file = m ? m[1] : t.sheet.slice(1, t.sheet.indexOf(']'));
+        const key = file.toLowerCase(); if (!out.has(key)) out.set(key, { file, cells: [] });
+        const where = e.name + '!' + k; if (!out.get(key).cells.includes(where)) out.get(key).cells.push(where);
+      }
+    }
+    return [...out.values()];
+  },
+  /** The values another workbook's cells last had (what Excel keeps with the link): setExternalValues('Budget.xlsx', 'Annual', { C10: 125 }). */
+  setExternalValues(file, sheet, values) {
+    if (!this.externalValues) this.externalValues = {};
+    const k = ('[' + file + ']' + sheet).toLowerCase(); this.externalValues[k] = { ...(this.externalValues[k] || {}), ...values };
+    this.recalcAll();
+  },
+  /** One external cell's value: its stored value, or #REF! when the link has none. */
+  externalRaw(name, key) { const v = this.externalValues && this.externalValues[String(name).toLowerCase()]; if (!v) return '#REF!'; return v[key] === undefined ? null : v[key]; },
+  /**
+   * The Edit Links dialog: ↑ ↓ pick a source; Break Link (Alt+B) asks Excel's question, then (Enter)
+   * turns every formula that reads that workbook into its value; Change Source (Alt+N) takes the new
+   * file name (Enter) and rewrites the references; Close is Esc. A workbook without links: Excel's note.
+   */
+  openEditLinks() {
+    this.startClock(); const list = this.externalLinks();
+    if (!list.length) { this.exitRibbon(false); this.toast(NO_LINKS_NOTE); return; }
+    this.openDialog('editlinks', []);
+    this.dlg = { kind: 'editlinks', list, idx: 0, confirm: false, rename: null };
+  },
+  editLinksKey(key) {
+    const d = this.dlg; if (!d) return;
+    if (d.confirm) { if (key === 'Enter' || key === 'Alt+B') { d.confirm = false; this.breakLink(d.list[d.idx].file); d.list = this.externalLinks(); if (!d.list.length) this.exitRibbon(false); else d.idx = Math.min(d.idx, d.list.length - 1); } return; }
+    if (d.rename !== null) {
+      if (key === 'Enter') { const to = d.rename.trim(); d.rename = null; if (to) { this.changeLinkSource(d.list[d.idx].file, to); d.list = this.externalLinks(); d.idx = Math.max(0, d.list.findIndex(x => x.file.toLowerCase() === to.toLowerCase())); } return; }
+      if (key === 'Backspace') { d.rename = d.rename.slice(0, -1); return; }
+      if (key.length === 1) d.rename += key; return;
+    }
+    if (key === 'ArrowDown') { d.idx = Math.min(d.list.length - 1, d.idx + 1); return; } if (key === 'ArrowUp') { d.idx = Math.max(0, d.idx - 1); return; }
+    if (key === 'Alt+B') { d.confirm = true; this.note = BREAK_LINKS_NOTE; return; }
+    if (key === 'Alt+N') { d.rename = ''; return; }
+    if (key === 'Enter') this.exitRibbon(false);
+  },
+  /** Break Link: every formula reading the workbook becomes the value it shows (one undo step per sheet touched, as the commit records it). */
+  breakLink(file) {
+    const tag = '[' + String(file).toLowerCase() + ']';
+    for (const e of this.sheets) {
+      const S = e.sheet; let touched = false;
+      for (const k of Object.keys(S.cells)) { const c = S.cells[k]; if (!c || !c.formula || c.formula.toLowerCase().indexOf(tag) < 0) continue; if (!touched) { S.pushUndo(); touched = true; } c.formula = null; if (c.value && typeof c.value === 'object') c.value = null; }
+      if (touched) S.commit('edit');
+    }
+  },
+  /** Change Source: the references to one workbook point at another (the cached values go with them until updated). */
+  changeLinkSource(from, to) {
+    const lo = String(from).toLowerCase();
+    if (this.externalValues) for (const k of Object.keys(this.externalValues)) if (k.startsWith('[' + lo + ']')) { this.externalValues['[' + to.toLowerCase() + ']' + k.slice(lo.length + 2)] = this.externalValues[k]; }
+    for (const e of this.sheets) {
+      const S = e.sheet; let touched = false;
+      for (const k of Object.keys(S.cells)) {
+        const c = S.cells[k]; if (!c || !c.formula || c.formula.toLowerCase().indexOf('[' + lo + ']') < 0) continue;
+        let toks; try { toks = tokenize(c.formula.slice(1)); } catch (x) { continue; }
+        let f = c.formula.slice(1), shift = 0;
+        for (const t of toks) if (t.t === 'ref' && t.sheetTxt && t.sheetTxt.toLowerCase().includes('[' + lo + ']')) {
+          const quoted = t.sheetTxt[0] === "'"; let inner = quoted ? t.sheetTxt.slice(1, -2).replace(/''/g, "'") : t.sheetTxt.slice(0, -1);
+          const i = inner.toLowerCase().indexOf('[' + lo + ']'); inner = inner.slice(0, i) + '[' + to + ']' + inner.slice(i + lo.length + 2);
+          const nt = (/^\[[^\]'!]+\][A-Za-z_][A-Za-z0-9_.]*$/.test(inner) && !/\s/.test(inner) ? inner : "'" + inner.replace(/'/g, "''") + "'") + '!';   // quoted when the new name needs it
+          f = f.slice(0, t.pos + shift) + nt + f.slice(t.pos + shift + t.sheetTxt.length); shift += nt.length - t.sheetTxt.length;
+        }
+        if (!touched) { S.pushUndo(); touched = true; } c.formula = '=' + f;
+      }
+      if (touched) S.commit('edit');
+    }
+    this.recalcAll();
   },
 
   /* ---------------- references typed into a tool's box ---------------- */

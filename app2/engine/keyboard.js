@@ -253,6 +253,7 @@ export class Session {
     sh.resolver = name => { const e = this.sheets.find(x => x.name.toLowerCase() === String(name).toLowerCase()); return e ? e.sheet : null; };
     Object.defineProperty(sh, 'calc', { configurable: true, enumerable: false, get: () => this.settings });   // the workbook's calculation settings (Options › Formulas)
     sh.allSheets = () => this.sheets.map(e => ({ name: e.name, sheet: e.sheet }));
+    sh.externalRaw = (name, key) => this.externalRaw(name, key);   // [Book.xlsx]Sheet!A1: the link's last known value (Edit Links)
     if (!this.book) this.book = new CalcGraph(() => this.sheets);   // one calculation graph for the workbook: a commit on any sheet brings its readers everywhere up to date
     sh.book = this.book;
     sh.onChange(what => {

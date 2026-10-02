@@ -128,7 +128,7 @@ export class CalcGraph {
     const ctxs = new Map();   // one logging context per sheet for the whole recalc
     const ctxFor = S => { let c = ctxs.get(S); if (!c) { c = S.evalCtx({
       raw: kk => { logRead(S, kk); return S.raw(kk); },
-      sheetRaw: (name, kk) => { const T = this.named(S, name); if (!T) return '#REF!'; logRead(T, kk); return T.raw(kk); },
+      sheetRaw: (name, kk) => { const T = this.named(S, name); if (!T) return S.externalRaw ? S.externalRaw(name, kk) : '#REF!'; logRead(T, kk); return T.raw(kk); },   // [Book.xlsx]Sheet!A1: the link's last known value
     }); ctxs.set(S, c); } return c; };
     const clearSpill = (S, key, c) => {
       if (!c.spillTo) return;
