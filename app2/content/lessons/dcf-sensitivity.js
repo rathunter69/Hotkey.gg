@@ -3,7 +3,7 @@
 // drivers by the steps on Inputs), formatted but for the figures. The learner writes the drivers,
 // then each grid as one formula with mixed anchors over the block (every cell values the business
 // at its own row's WACC and column's growth or multiple), formats both in millions with one decimal
-// and boxes the base case. Each grid cell is graded on its value, worked out from the learner's own
+// and bolds the base case. Each grid cell is graded on its value, worked out from the learner's own
 // free cash flow and periods, and on reading its own edge cells; the base case must equal the
 // enterprise value the page carries for that method.
 import { sheetIn, settled, reads, near, formatsOf, formatOnly, doneCell, doneFormula, R, PROJ_COLS } from './lib/model-checks.js';
@@ -18,8 +18,8 @@ const EDGES = p => [...GRID.map(col => col + row(p + 'H')), ...[0, 1, 2, 3, 4].m
 const MILL = doneCell(D, 'D' + row('sg0')).numFmt;
 const F = { ptW: doneFormula(D, C('ptW')), ptG: doneFormula(D, C('ptG')), ptM: doneFormula(D, C('ptM')), sg: doneFormula(D, 'D' + row('sg0')), sm: doneFormula(D, 'D' + row('sm0')) };
 const BASE = { sg: 'F' + row('sg2'), sm: 'F' + row('sm2') };
-/** A grid cell's figure without its look: the planted cell keeps everything but the number format, the bold and the box. */
-const bare = (ref) => { const { fmtStyle, numFmt, decimals, bold, ball, ...rest } = formatOnly(doneCell(D, ref)); return rest; };
+/** A grid cell's figure without its look: the planted cell keeps everything but the number format and the bold. */
+const bare = (ref) => { const { fmtStyle, numFmt, decimals, bold, ...rest } = formatOnly(doneCell(D, ref)); return rest; };
 const dcf = ses => sheetIn(ses, D);
 const val = (ses, ref) => dcf(ses).value(ref);
 const inp = (ses, ref) => sheetIn(ses, 'Inputs').value(ref);
@@ -37,15 +37,14 @@ function gridOk(ses, p) {
   })) && near(sh.value(BASE[p]), val(ses, C(p === 'sg' ? 'evPerp' : 'evExit')), 1e-6 * Math.abs(val(ses, C('ev'))));
 }
 const millionsOk = ses => ['sg', 'sm'].every(p => block(p).every(ref => (dcf(ses).cellAt(ref) || {}).numFmt === MILL));
-const boxed = c => !!c && !!c.bold && (!!c.ball || (!!c.bt && !!c.bb && !!c.bl && !!c.br));
-const baseOk = ses => ['sg', 'sm'].every(p => boxed(dcf(ses).cellAt(BASE[p])));
+const baseOk = ses => ['sg', 'sm'].every(p => !!(dcf(ses).cellAt(BASE[p]) || {}).bold);
 const CODE = MILL;
 const KEYS = {
   drivers: `Ctrl+G "DCF!${C('ptW')}" ↵ "${F.ptW}" ↵ ↓ "${F.ptG}" ↵ ↓ "${F.ptM}" ↵`,
   sg: `Ctrl+G "${range('sg')}" ↵ "${F.sg}" Ctrl+↵`,
   sm: `Ctrl+G "${range('sm')}" ↵ "${F.sm}" Ctrl+↵`,
   millions: `Ctrl+G "${range('sg')}" ↵ Ctrl+1 N Tab End Alt+T "${CODE}" ↵ Ctrl+G "${range('sm')}" ↵ F4`,
-  base: `Ctrl+G "${BASE.sg}" ↵ Ctrl+B Alt H B S Ctrl+G "${BASE.sm}" ↵ Ctrl+B Alt H B S`,
+  base: `Ctrl+G "${BASE.sg}" ↵ Ctrl+B Ctrl+G "${BASE.sm}" ↵ Ctrl+B`,
 };
 
 export default {
@@ -68,7 +67,7 @@ export default {
   headline: 'F4',
   conventions: ['B2', 'C3', 'D2', 'F4'],
   teaches: ['sensitivity-grid'],
-  uses: ['defined-name', 'cross-sheet-ref', 'f4-anchor', 'relative-absolute', 'sumproduct', 'ctrl-enter-fill', 'custom-number-format', 'format-units', 'f4-repeat', 'bold-italic-underline', 'borders-menu', 'go-to', 'arrow-keys', 'keytips'],
+  uses: ['defined-name', 'cross-sheet-ref', 'f4-anchor', 'relative-absolute', 'sumproduct', 'ctrl-enter-fill', 'custom-number-format', 'format-units', 'f4-repeat', 'bold-italic-underline', 'go-to', 'arrow-keys'],
   prerequisites: ['discounting-mid-year'],
   brief: 'No one believes a single DCF number, so the page ends on two tables: enterprise value at five WACCs against five growth rates, and against five exit multiples. Each table reads the value built on its own terminal method, so neither goes flat when the switch moves. The edges are laid out; write each grid as one formula, format both the way the book prints them, and read the range a buyer will negotiate inside. The key is `F4`.',
   goals: [
@@ -92,9 +91,9 @@ export default {
       keys: KEYS.millions, requires: ['custom-number-format', 'format-units', 'f4-repeat', 'go-to'], convention: 'D2',
       hintStuck: `pulse range ${range('sg')} · Ctrl+1, N, then type the code into the Custom box.`,
       check: (s, ses) => settled(ses) && millionsOk(ses) },
-    { id: 'base', teach: 'The middle cell of each grid is the base case, and it equals the enterprise value above for its method. Bold it and box it so the eye starts there.',
-      text: `Bold ${BASE.sg} and give it an outside border, Alt, H, B, S, then the same for ${BASE.sm}.`,
-      keys: KEYS.base, requires: ['bold-italic-underline', 'borders-menu', 'keytips', 'go-to'], convention: 'F4',
+    { id: 'base', teach: 'The middle cell of each grid is the base case, and it equals the enterprise value above for its method. Bold it so the eye starts there; the house style boxes nothing.',
+      text: `Bold the base case of each grid: ${BASE.sg}, then ${BASE.sm}, with Ctrl+B.`,
+      keys: KEYS.base, requires: ['bold-italic-underline', 'go-to'], convention: 'F4',
       hintStuck: `pulse cell ${BASE.sg} · It should read the same as the enterprise value for its method, in millions.`,
       check: (s, ses) => settled(ses) && baseOk(ses) },
     { id: 'tie', closer: true, demo: { script: `Ctrl+G "Inputs!F${R('Inputs', 'bNew')}" Enter "3" Enter Ctrl+G "DCF!${BASE.sg}" Enter Ctrl+G "${BASE.sm}" Enter`, cadence: 360 },
@@ -104,7 +103,7 @@ export default {
   ],
   endState: [
     { text: 'Two grids value the business at five WACCs by five growth rates and five multiples, each one formula', check: (s, ses) => driversOk(ses) && gridOk(ses, 'sg') && gridOk(ses, 'sm') },
-    { text: 'Both grids print in millions with one decimal, and the base cases are bold in a box', check: (s, ses) => millionsOk(ses) && baseOk(ses) },
+    { text: 'Both grids print in millions with one decimal, and the base cases are bold', check: (s, ses) => millionsOk(ses) && baseOk(ses) },
   ],
   closing: [
     'Two tables show the range inside which the whole negotiation will happen.',

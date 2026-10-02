@@ -739,8 +739,8 @@ function pageDCF() {
   timeline(sheet);
   sheet.cells.K4 = { value: 'FY31 normalized', bold: true, align: 'r' };
   for (const prefix of ['sg', 'sm']) for (let i = 0; i < 5; i++) for (const col of ['D', 'E', 'F', 'G', 'H']) Object.assign(sheet.cells[col + R(me, prefix + i)], MILLIONS);
-  // each table's edge across is bold, and its base case (the middle cell) bold inside a box (2.3.3)
-  for (const prefix of ['sg', 'sm']) { for (const col of ['D', 'E', 'F', 'G', 'H']) sheet.cells[col + R(me, prefix + 'H')].bold = true; Object.assign(sheet.cells['F' + R(me, prefix + '2')], { bold: true, ball: true }); }
+  // each table's edge across is bold, and its base case (the middle cell) bold (the sheet standard boxes nothing)
+  for (const prefix of ['sg', 'sm']) { for (const col of ['D', 'E', 'F', 'G', 'H']) sheet.cells[col + R(me, prefix + 'H')].bold = true; sheet.cells['F' + R(me, prefix + '2')].bold = true; }
   titled(sheet, caseTitle('DCF'));
   return sheet;
 }
@@ -1236,6 +1236,12 @@ const B56C = derive(B561, s => {
   const done = sheetOf(DONE, 'DCF'); const sh = sheetOf(s, 'DCF');
   PROJ_COLS.forEach((col, i) => { sh.cells[col + rowOf('DCF', 'fcf')] = { ...clone(done.cells[col + rowOf('DCF', 'fcf')]), value: FCF_GIVEN[i], fontColor: 'blue' }; delete sh.cells[col + rowOf('DCF', 'fcf')].formula; });
   sh.cells['K' + rowOf('DCF', 'fcf')] = { ...clone(done.cells['K' + rowOf('DCF', 'fcf')]), value: FCF_GIVEN[4], fontColor: 'blue' }; delete sh.cells['K' + rowOf('DCF', 'fcf')].formula;
+  // given with it, so the clock goes on the valuation: EBITDA, the periods, the WACC block but its last line, the drivers and the tables' edges
+  const keep = (key, cols) => { for (const col of cols) { const ref = col + rowOf('DCF', key); if (done.cells[ref]) sh.cells[ref] = clone(done.cells[ref]); } };
+  keep('ebitda', COLS); keep('t', COLS);
+  for (const key of span('DCF', 'rf', 'eqW')) keep(key, ['C']);
+  for (const key of ['ptW', 'ptG', 'ptM']) keep(key, ['C']);
+  for (const p of ['sg', 'sm']) { keep(p + 'H', ['D', 'E', 'F', 'G', 'H']); for (let i = 0; i < 5; i++) keep(p + i, ['C']); }
 });
 
 /* ---------------- the challenges' seeds ---------------- */
