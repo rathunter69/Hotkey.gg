@@ -2403,6 +2403,18 @@ export const COPY = {
    "mac_note": "",
    "story_beat": ""
   },
+  "the-waterfall": {
+   "id": "the-waterfall",
+   "module": "bids-and-waterfall",
+   "order": "6.4.2",
+   "title": "From enterprise value to the owners’ proceeds: the waterfall",
+   "brief": "Enterprise value is what the buyer pays for the business; the owners’ proceeds are what is left once everyone ahead of them is paid. Net debt is repaid, the advisers’ and lawyers’ fees come off, the management option pool takes its share of the equity, and the rest is split by ownership: two founders at 35% each, the family office at 30%. That’s the waterfall, one line per claim. Build it for bid A, then fill it across the three. The key is `=`.",
+   "closing": "The waterfall runs from what the buyer pays to what each owner takes home, one claim at a time. || Best practice: the waterfall reads top to bottom in the order the claims are paid. A line out of order is a line a lawyer will move, and every line after it moves too.",
+   "wow": "",
+   "convention_line": "The check is a live difference → 0; Ctrl+D down, Ctrl+R across; Parentheses, never a leading minus; A top border, never an all-borders grid",
+   "mac_note": "",
+   "story_beat": ""
+  },
   "remix-format-on-the-pnl": {
    "id": "remix-format-on-the-pnl",
    "module": "remixes",
@@ -15001,6 +15013,72 @@ export const COPY = {
     "teach": "",
     "why": "",
     "hint_stuck": "pulse cell D26 · Only bid B carries an earnout, so only its priced value moves."
+   }
+  ],
+  "the-waterfall": [
+   {
+    "lesson_id": "the-waterfall",
+    "goal_index": "0",
+    "text": "Start bid A’s waterfall in C30:C32: enterprise value from the priced value, less net debt as a MIN, then equity value.",
+    "teach": "The waterfall pays claims in the order they rank: net debt first, then the fees, then the option pool, the owners last. Each deduction is a MIN of the claim and what is left above it, so a price below the claims floors the owners at zero instead of showing a negative.",
+    "why": "",
+    "hint_stuck": "pulse range C30:C32 · =C18 takes the priced value; =-MIN($C$48,C30) repays net debt, never more than the price."
+   },
+   {
+    "lesson_id": "the-waterfall",
+    "goal_index": "1",
+    "text": "Take off the fees in C33 and the option pool in C34, each a MIN of the claim and what is left above it.",
+    "teach": "Fees are 2% of enterprise value, the advisers’ and the lawyers’. The option pool takes 5% of the equity above the strike the options were set at, MAX floors that at zero, and MIN stops it taking more than the fees left.",
+    "why": "",
+    "hint_stuck": "pulse range C33:C34 · The fee rate is C49, the pool C50 and the strike C51; anchor each with F4."
+   },
+   {
+    "lesson_id": "the-waterfall",
+    "goal_index": "2",
+    "text": "Total the net proceeds in C35, then split them in C36:C38 by the ownership in C54:C56.",
+    "teach": "What is left is the net proceeds to the owners, pre-tax: the structure changes what each keeps after tax, and that is the tax adviser’s question. Each owner takes their share from the ownership table.",
+    "why": "",
+    "hint_stuck": "pulse range C35:C38 · Each owner is =C35*$C$54, the share’s row anchored with F4."
+   },
+   {
+    "lesson_id": "the-waterfall",
+    "goal_index": "3",
+    "text": "Check the split in C39: =ROUND(SUM(C36:C38)-C35,2), which reads zero.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C39 · The three owners’ lines less the proceeds, rounded to the cent."
+   },
+   {
+    "lesson_id": "the-waterfall",
+    "goal_index": "4",
+    "text": "Select C30:E39 and fill bid A’s waterfall across to bids B and C with Ctrl+R.",
+    "teach": "Every line in bid A’s column reads its own column’s priced value and the anchored inputs, so one Ctrl+R over the block writes bids B and C.",
+    "why": "",
+    "hint_stuck": "pulse range C30:E39 · Ctrl+R copies the left column of the selection into every column to its right."
+   },
+   {
+    "lesson_id": "the-waterfall",
+    "goal_index": "5",
+    "text": "Give the three deductions the desk format #,##0_);(#,##0);\"-\"_): rows 31, 33 and 34, the last two with F4.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C31:E31 · Ctrl+1, N, then type the code into the Custom box; F4 repeats it on the next range."
+   },
+   {
+    "lesson_id": "the-waterfall",
+    "goal_index": "6",
+    "text": "Give the proceeds line, C35:E35, its double bottom border with Alt, H, B, B.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C35:E35 · The double bottom marks the one answer on the block."
+   },
+   {
+    "lesson_id": "the-waterfall",
+    "goal_index": "7",
+    "text": "Does it tie? Watch the fees in C49 go from 2% to 3%: every owner’s line under every bid falls.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C36:E38 · The fees come off before the owners, so each of them pays a share."
    }
   ]
  },
