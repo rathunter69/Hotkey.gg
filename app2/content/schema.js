@@ -380,6 +380,16 @@ export const CONCEPTS = {
   'speed-build': 'a build on the clock: each row’s formula written once in its first column and filled right, anchors set with F4 as the formula is typed, the check read at the end',
   'one-pass-format': 'a block filled with one Ctrl+R and formatted by whole-block actions, F4 repeating each one on the next range, so no cell is touched twice',
   'keyboard-linking': 'statement links made without the mouse: the reference typed, or pointed with Ctrl+PgDn and the arrows, then Ctrl+Enter across the row and F4 repeating the green',
+  // Chapter 6 · 6.2 Precedent transactions and 6.3 the LBO (the valuation pack)
+  'deal-multiples': 'a precedent is a deal that closed: the enterprise value paid over the target’s LTM EBITDA, and where the target was listed, the premium is the offer over the price before the announcement, less one',
+  'comparable-screen': 'deciding what is comparable: an include flag of 1 or 0 with its reason beside it, and a helper column =IF(include=1,multiple,"") that MEDIAN and QUARTILE.INC read, so a screened deal drops out of every statistic',
+  'precedents-range': 'a range applied: the low, median and high multiples times the company’s own EBITDA or sites give enterprise value, and net debt off gives equity value',
+  'sources-uses': 'sources and uses: what a buyout pays (the price and the fees) against where the money comes from (debt sized on EBITDA, the stake the owners keep, and the sponsor’s equity as the plug)',
+  'lbo-sweep': 'a cash sweep: each year’s spare cash, after interest net of tax and the mandatory amortization, repays the senior loan with MAX(MIN(cash available, balance), 0), while a short year draws the revolver',
+  'sale-leaseback': 'a sale-leaseback sells the land under a site to a landlord and rents it back: cash today, rent a year at the cap rate on the price, and an EBITDA that falls by the rent',
+  'lbo-returns': 'a sponsor’s return: equity at the exit (the exit multiple on EBITDA, less net debt) over equity at entry is the MOIC, and IRR on the cash flows (in at closing, out at the exit) is the annual rate',
+  'returns-bridge': 'a returns bridge splits the equity gain into EBITDA growth at the entry multiple, the change in multiple on the exit EBITDA, debt paid down and the fees, and the four sum to the gain',
+  'lbo-ceiling': 'what a sponsor can pay: the most equity that still earns the hurdle is the PV of the exit equity at that rate, and adding the debt and taking off the fees turns it into the top price',
 };
 
 /**
