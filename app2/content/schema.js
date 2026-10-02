@@ -359,6 +359,23 @@ export const CONCEPTS = {
   'cash-sweep': 'the revolver draws MAX(minimum cash − cash before the revolver, 0) and repays MIN(MAX(surplus, 0), its balance): MIN and MAX, never an IF tower',
   'balance-order': 'when the balance sheet is off, read the size of the difference first, then check in order: cash, working-capital signs, depreciation, capex, debt, net income to equity, openings',
   'select-precedents': 'Ctrl+[ jumps to the cells a formula reads, on another sheet too, so a link can be followed back to its source',
+  // Chapter 5 · 5.5 Auditing a model and 5.6 DCF (the operating model)
+  'tie-out': 'a tie-out is a live difference between one figure in two places, wrapped in ROUND so it reads exactly 0 while they agree',
+  'cross-foot': 'a cross-foot adds a block both ways, every line across every year and the total row across the years, and checks the two sums agree',
+  'limit-check': 'a limit check counts what should never happen, COUNTIF(range,"<0") on the closing balances, and reads 0 while none does',
+  'error-count': 'SUMPRODUCT(--ISERROR(block)) counts the error cells on a sheet, so one check knows about a #REF! three sheets away',
+  'error-checking': 'Error Checking (Alt, M, K) walks the error cells of the active sheet one by one; it works on one sheet at a time',
+  'watch-window': 'the Watch Window (Alt, M, W) keeps chosen cells in view with their values and formulas whatever sheet you are on; Add Watch is Alt+A',
+  'row-differences': 'Go To Special, Row differences (Alt, H, F, D, S, W) selects every cell of the selected row whose formula is not the active cell\'s, filled across',
+  'hardcode-count': 'SUMPRODUCT(ISNUMBER(block)*(1-ISFORMULA(block))) counts the typed numbers in a projected block, which should hold none',
+  'stress-test': 'a stress test types an input to an extreme (zero, a hundred, a loss), reads what breaks, fixes the formula that should have held, and puts the input back',
+  'dcf': 'a discounted cash flow values a business as the cash it will generate, discounted to today, plus what it is worth after the forecast ends',
+  'unlevered-fcf': 'unlevered free cash flow is EBIT less tax on EBIT, plus depreciation, less capex and the cash tied up in working capital: the cash before anyone is paid',
+  'wacc': 'WACC blends the cost of equity (risk-free plus beta times the premium, plus a size premium) with the after-tax cost of debt, by the target weights',
+  'terminal-value': 'a terminal value stands for the years after the forecast: the normalized last cash flow grown forever over WACC less growth, or the last EBITDA times an exit multiple',
+  'mid-year-discounting': 'a discount factor is 1/(1+WACC)^t; the mid-year convention counts t from the middle of each year (0.5, 1.5 and on) because cash arrives through the year',
+  'enterprise-to-equity': 'enterprise value is the discounted cash flows plus the discounted terminal value; take off net debt and what is left is equity value',
+  'sensitivity-grid': 'a sensitivity grid is one formula with mixed anchors ($C69 and D$68) written over a block, so each cell values the business at its own row and column inputs',
 };
 
 /**

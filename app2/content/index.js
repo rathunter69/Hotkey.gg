@@ -196,6 +196,19 @@ import bs_cash_not_a_plug from './lessons/bs-cash-not-a-plug.js';
 import cash_sweep_revolver from './lessons/cash-sweep-revolver.js';
 import when_it_doesnt_balance from './lessons/when-it-doesnt-balance.js';
 import challenge_linked_statements from './lessons/challenge-linked-statements.js';
+// Chapter 5 · Finance and Accounting (Run R5): 5.5 Auditing a model, 5.6 DCF
+import tie_outs_cross_foots from './lessons/tie-outs-cross-foots.js';
+import error_flags_checks_summary from './lessons/error-flags-checks-summary.js';
+import model_wide_sweep from './lessons/model-wide-sweep.js';
+import stress_tests from './lessons/stress-tests.js';
+import challenge_eight_faults from './lessons/challenge-eight-faults.js';
+import what_a_dcf_is from './lessons/what-a-dcf-is.js';
+import unlevered_free_cash_flow from './lessons/unlevered-free-cash-flow.js';
+import wacc_block from './lessons/wacc-block.js';
+import terminal_value from './lessons/terminal-value.js';
+import discounting_mid_year from './lessons/discounting-mid-year.js';
+import dcf_sensitivity from './lessons/dcf-sensitivity.js';
+import challenge_dcf from './lessons/challenge-dcf.js';
 
 export const CHAPTERS = [
   {
@@ -323,8 +336,8 @@ export const CHAPTERS = [
       { name: 'Model setup and efficiencies', blurb: 'Inputs, calculations and outputs, sheet order and a Cover; the timeline row with its flags and counters; the fill patterns at model speed; the checks sheet from day one; the statements populated from the data tab; the drivers block.' },
       { name: 'Schedules', blurb: 'The revenue build, the cost build, working capital from days to balances, PP&E with its depreciation waterfall, debt and interest with the average-balance circle and a breaker, and tax.' },
       { name: 'Linking the statements', blurb: 'The income statement from the schedules, the cash flow statement by the indirect method, the balance sheet with cash as the plug that isn’t a plug, the cash sweep and the revolver, and the order to check when it doesn’t balance.' },
-      { name: 'Auditing a model', blurb: 'Tie-outs and cross-foots; error flags and the checks summary; the model-wide sweep; stress tests.' },
-      { name: 'DCF', blurb: 'Unlevered free cash flow, the WACC block, terminal value both ways, discounting with the mid-year convention, and the sensitivity tables.' },
+      { name: 'Auditing a model', blurb: 'Tie-outs and cross-foots; error flags and the checks summary; the model-wide sweep for hardcodes and pattern breaks; stress tests.' },
+      { name: 'DCF', blurb: 'What a DCF is; unlevered free cash flow; the WACC block; terminal value both ways; discounting and the mid-year convention; sensitivity tables.' },
       { name: 'Model speed', blurb: 'The revenue build in three minutes, a block filled and formatted in one pass, the statements linked by keyboard.' },
       { name: 'Project and assessment', blurb: 'The operating model with its DCF page, then one schedule and the links from it against the clock.' },
     ],
@@ -332,6 +345,8 @@ export const CHAPTERS = [
       the_income_statement, accrual_and_cash, the_cash_flow_statement, the_balance_sheet, how_the_statements_link, one_week_three_statements, read_like_a_buyer, challenge_one_site_month, model_architecture, timeline_flags_counters, fill_patterns, checks_sheet_day_one, populate_from_data, drivers_block, challenge_model_shell,
       revenue_build, cost_build, working_capital_schedule, ppe_and_depreciation, debt_and_interest_circle, tax_schedule, challenge_schedules,
       is_from_schedules, cf_indirect, bs_cash_not_a_plug, cash_sweep_revolver, when_it_doesnt_balance, challenge_linked_statements,
+      tie_outs_cross_foots, error_flags_checks_summary, model_wide_sweep, stress_tests, challenge_eight_faults,
+      what_a_dcf_is, unlevered_free_cash_flow, wacc_block, terminal_value, discounting_mid_year, dcf_sensitivity, challenge_dcf,
     ],
   },
 ];

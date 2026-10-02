@@ -124,16 +124,19 @@ test('the plantings: breaks, faults, the #REF!, the sweep, the shell and the pro
   for (const [name, ref] of WB.BREAKS) { const done = cell(WB.stateOf('DONE'), name, ref); const c = cell(WB.stateOf('B545'), name, ref); assert.notDeepEqual(c, done, `${name}!${ref} is planted`); }
   // 5.5.2: one #REF! in a memo cell on Schedules (so the ties still read zero and the count reads 1); the errors block is the lesson's to build
   assert.equal(cell(WB.stateOf('B552'), 'Checks', 'C' + WB.ROW.Checks.errSch), undefined);
-  assert.match(cell(WB.stateOf('B552'), 'Schedules', WB.PLANT_REF[1]).formula, /#REF!/);
+  assert.match(WB.plantPatch('B552', [WB.PLANT_REF])['Schedules!' + WB.PLANT_REF[1]].formula, /#REF!/, 'the lesson plants it over its clean start');
+  assert.doesNotMatch(cell(WB.stateOf('B552'), 'Schedules', WB.PLANT_REF[1]).formula, /#REF!/);
   assert.equal(WB.ROW.Schedules.capexToDep, +WB.PLANT_REF[1].slice(1), 'the #REF! sits in the capex-to-depreciation memo row');
   // 5.5.3: two typed numbers in the IS projection and a pattern break in FY29; the hardcode count would catch the two
-  const sweep = WB.stateOf('B553');
-  assert.equal(cell(sweep, 'IS', WB.PLANT_SWEEP[0][1]).value, -3100);
-  assert.equal(cell(sweep, 'IS', WB.PLANT_SWEEP[1][1]).value, -1400);
-  assert.ok(cell(sweep, 'Schedules', WB.PLANT_SWEEP[2][1]).formula.includes('Inputs!H$' + WB.ROW.Inputs.labor), 'FY29 labor lost its anchor');
-  assert.equal(cell(sweep, 'Checks', 'C' + WB.ROW.Checks.hcIS), undefined, 'the hardcode count is the lesson\'s to build');
+  const sweep = WB.plantPatch('B553', WB.PLANT_SWEEP);
+  assert.equal(sweep['IS!' + WB.PLANT_SWEEP[0][1]].value, -3100); assert.equal(sweep['IS!' + WB.PLANT_SWEEP[0][1]].formula, undefined, 'typed, not a formula');
+  assert.equal(sweep['IS!' + WB.PLANT_SWEEP[1][1]].value, -1400);
+  assert.ok(sweep['Schedules!' + WB.PLANT_SWEEP[2][1]].formula.includes('Inputs!H$' + WB.ROW.Inputs.labor), 'FY29 labor lost its anchor');
+  assert.equal(cell(WB.stateOf('B553'), 'Checks', 'C' + WB.ROW.Checks.hcIS), undefined, 'the hardcode count is the lesson\'s to build');
+  assert.deepEqual(WB.stateOf('B553').watches, WB.WATCHES, '5.5.2 leaves the Watch Window\'s two rows');
   // 5.5.4: the margins divide bare
-  assert.equal(cell(WB.stateOf('B554'), 'IS', 'F' + WB.ROW.IS.gm).formula.includes('IFERROR'), false);
+  assert.equal(WB.plantPatch('B554', WB.PLANT_MARGINS)['IS!F' + WB.ROW.IS.gm].formula.includes('IFERROR'), false);
+  assert.deepEqual(WB.diffStates(WB.stateOf('B554'), WB.stateOf('B561')), [], 'the auditing chain ends where the DCF begins');
   assert.equal(cell(WB.stateOf('DONE'), 'IS', 'F' + WB.ROW.IS.gm).formula.includes('IFERROR'), true);
   // 5.5.C: eight faults
   const faults = WB.stateOf('B55C');
@@ -170,7 +173,7 @@ test('the plantings: breaks, faults, the #REF!, the sweep, the shell and the pro
   assert.equal(cell(WB.stateOf('B543'), 'CF', 'F' + WB.ROW.CF.ni).formula, `=IS!F${WB.ROW.IS.ni}`);
   assert.equal(cell(WB.stateOf('B543'), 'BS', 'C' + WB.ROW.BS.cash).value, WB.HIST.cash[1]);
   // 5.6.x: the DCF page arrives block by block
-  assert.deepEqual(Object.keys(WB.stateOf('B561').sheets.find(x => x.name === 'DCF').cells), ['A1', 'A2']);
+  assert.ok(Object.keys(WB.stateOf('B561').sheets.find(x => x.name === 'DCF').cells).every(k => /^B|\D[1-4]$/.test(k)), 'the DCF page is its title, timeline and labels');
   assert.ok(cell(WB.stateOf('B562'), 'DCF', 'F' + WB.ROW.DCF.ebitda) && !cell(WB.stateOf('B562'), 'DCF', 'F' + WB.ROW.DCF.fcf));
   assert.equal(WB.stateOf('B563').names.WACC, undefined); assert.equal(WB.stateOf('B564').names.WACC, 'DCF!$C$' + WB.ROW.DCF.wacc);
   assert.equal(cell(WB.stateOf('B56C'), 'DCF', 'F' + WB.ROW.DCF.fcf).value, WB.FCF_GIVEN[0]);

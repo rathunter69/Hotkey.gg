@@ -98,6 +98,11 @@ const BEATS_DEFAULT = {
     body: 'A statement line like revenue or interest is the last row of a schedule that builds it: sites times washes times ticket; a debt balance that rolls forward and charges interest on its average. Six schedules (revenue, costs, working capital, PP&E, debt, tax), and every one rolls a balance from one year to the next. Build them on Schedules, and the statements in module 5.4 read their last lines.' },
   'linking-the-statements': { eyebrow: 'Module 5.4 · linking the statements', title: 'Link it.',
     body: 'The schedules are built; the statements read their last lines. Income statement first, from revenue to net income. Cash flow from net income and the schedules’ changes. Balance sheet last, with cash from the cash flow, and if it doesn’t balance, there’s an order to look, and you’ll learn it by breaking it.' },
+  // Chapter 5 · Finance and accounting (script-ch5.md story cards)
+  'auditing-a-model': { eyebrow: 'Module 5.5 · auditing a model', title: 'Audit it before they do.',
+    body: 'Three buyers’ analysts are about to open this model looking for the mistake that lets them pay less, so find it first. A model gets audited the way a databook does, and then for the things only a model can get wrong: a row that doesn’t cross-foot, a formula that breaks pattern halfway across, an input that survives a stress test by luck.' },
+  dcf: { eyebrow: 'Module 5.6 · DCF', title: 'What the cash flows are worth.',
+    body: 'The model says what the business will earn; the DCF says what that’s worth today. Take the cash the business throws off after tax, capex and working capital, before anyone is paid interest, discount it at the return its investors require, add what it’s worth beyond the forecast, and you have an enterprise value. Take off the debt and what’s left is what the owners are selling.' },
   'project-and-assessment': { eyebrow: 'Module 1.8 · project, assessment, test-out', title: 'Management’s next feed is in.',
     body: 'A fresh week, a blank Report, and everything the chapter taught. Build the page start to finish, then prove it against the clock on Monday morning; or test out of the chapter in five minutes.' },
 };

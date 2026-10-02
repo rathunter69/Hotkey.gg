@@ -61,7 +61,7 @@ export const CAPS_OK = new Set([
   'CTRL', 'SHIFT', 'ENTER', 'HOME', 'PGUP', 'PGDN', 'BACKSPACE', 'DELETE', 'CAPS', 'LOCK', 'TAB', 'ESC',
   // acronyms of the course and the site
   'EBITDA', 'EBIT', 'DCF', 'LBO', 'IRR', 'XIRR', 'MOIC', 'WACC', 'CAGR', 'LTM', 'NTM', 'P&L', 'CFO', 'COGS', 'SG&A', 'PP&E',
-  'CAPEX', 'UFCF', 'FCF', 'USD', 'NYSE', 'NASDAQ', 'IPO', 'IOI', 'LOI', 'SPA', 'CIM', 'VDR', 'GAAP', 'IFRS', 'KPI', 'KPIS', 'POS', 'QAT',
+  'CAPEX', 'UFCF', 'FCF', 'NOPAT', 'USD', 'NYSE', 'NASDAQ', 'IPO', 'IOI', 'LOI', 'SPA', 'CIM', 'VDR', 'GAAP', 'IFRS', 'KPI', 'KPIS', 'POS', 'QAT',
   'HTML', 'JSON', 'UTC', 'URL', 'FAQ', 'EULA', 'PDF', 'XLSX', 'CSV', 'ASAP', 'NULL', 'TRUE', 'FALSE', 'MMMM', 'YYYY', 'DDDD',
   'AUS', 'SATX', 'DFW', 'HOU', 'TBD', 'TBC', 'LLC', 'TEXAS', 'MACABACUS', 'EXCEL',
   'SUMM',   // the misspelled function 1.6.6 plants (#NAME?)
