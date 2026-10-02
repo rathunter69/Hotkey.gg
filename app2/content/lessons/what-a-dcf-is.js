@@ -3,7 +3,7 @@
 // it from Checks with Ctrl+PgDn, links the valuation date from Inputs, then the three lines the
 // statements feed it: EBITDA from the IS, capex and the working-capital cash effect from Schedules.
 // Each link is graded on the cell it reads and the figure it brings, whatever route typed it.
-import { sheetIn, settled, onSheet, reads, near, formatsOf, doneFormula, R, rowRefs, linkRow, pressedSince } from './lib/model-checks.js';
+import { sheetIn, settled, onSheet, reads, near, formatsOf, doneFormula, R, rowRefs, linkRow, pressedSince, liveFrom } from './lib/model-checks.js';
 
 const D = 'DCF';
 const VAL = 'C' + R(D, 'valDate');
@@ -42,22 +42,22 @@ export default {
       text: `Link the valuation date in ${VAL} to Inputs: ${F.val}.`,
       keys: `Ctrl+G "DCF!${VAL}" ↵ "${F.val}" ↵`, requires: ['dcf', 'cross-sheet-ref', 'f4-anchor', 'go-to'], convention: 'B2',
       hintStuck: `pulse cell ${VAL} · Row ${R('Inputs', 'valDate')} on Inputs holds 12/31/2026.`,
-      check: (s, ses) => settled(ses) && dateOk(ses) },
+      check: (s, ses) => settled(ses) && dateOk(ses) && liveFrom(ses, 'DCF', 'valDate', 'C', 'valDate') },
     { id: 'ebitda', teach: 'The cash flows start from EBITDA, the operating profit before depreciation, interest and tax. The IS already has it, so the DCF reads it and never retypes it.',
       text: `Link EBITDA across C${R(D, 'ebitda')}:J${R(D, 'ebitda')}: ${F.ebitda}, entered with Ctrl+Enter.`,
       keys: `Ctrl+G "DCF!C${R(D, 'ebitda')}:J${R(D, 'ebitda')}" ↵ "${F.ebitda}" Ctrl+↵`, requires: ['dcf', 'cross-sheet-ref', 'ctrl-enter-fill', 'go-to'], convention: 'C3',
       hintStuck: `pulse range C${R(D, 'ebitda')}:J${R(D, 'ebitda')} · EBITDA is row ${R('IS', 'ebitda')} on the IS.`,
-      check: (s, ses) => settled(ses) && linked(ses, 'ebitda') },
+      check: (s, ses) => settled(ses) && linked(ses, 'ebitda') && liveFrom(ses, 'DCF', 'ebitda', 'J', 'labor') },
     { id: 'capex', teach: 'Capex is cash out the door, so it comes in with a minus sign: the schedule shows it as a positive spend.',
       text: `Link capex across C${R(D, 'capex')}:J${R(D, 'capex')}: ${F.capex}.`,
       keys: `Ctrl+G "DCF!C${R(D, 'capex')}:J${R(D, 'capex')}" ↵ "${F.capex}" Ctrl+↵`, requires: ['cross-sheet-ref', 'ctrl-enter-fill', 'go-to'], convention: 'C3',
       hintStuck: `pulse range C${R(D, 'capex')}:J${R(D, 'capex')} · Total capex is row ${R('Schedules', 'capexTotal')} on Schedules.`,
-      check: (s, ses) => settled(ses) && linked(ses, 'capex') },
+      check: (s, ses) => settled(ses) && linked(ses, 'capex') && liveFrom(ses, 'DCF', 'capex', 'J', 'maintCapex') },
     { id: 'nwc', teach: 'The working-capital schedule already shows its cash effect with the sign the cash flow needs, so this link takes it as it stands.',
       text: `Link the change in working capital across C${R(D, 'nwc')}:J${R(D, 'nwc')}: ${F.nwc}.`,
       keys: `Ctrl+G "DCF!C${R(D, 'nwc')}:J${R(D, 'nwc')}" ↵ "${F.nwc}" Ctrl+↵`, requires: ['cross-sheet-ref', 'ctrl-enter-fill', 'go-to'], convention: 'C3',
       hintStuck: `pulse range C${R(D, 'nwc')}:J${R(D, 'nwc')} · The cash effect of working capital is row ${R('Schedules', 'wcCash')} on Schedules.`,
-      check: (s, ses) => settled(ses) && linked(ses, 'nwc') },
+      check: (s, ses) => settled(ses) && linked(ses, 'nwc') && liveFrom(ses, 'DCF', 'nwc', 'J', 'recDays') },
     { id: 'tie', closer: true, demo: { script: `Ctrl+G "Inputs!G${R('Inputs', 'bNew')}" Enter "3" Enter Ctrl+G "DCF!G${R(D, 'capex')}" Enter`, cadence: 360 },
       text: 'Does it tie? Watch three new sites in FY28 instead of six: capex on the DCF falls with them.', requires: [],
       hintStuck: `pulse cell G${R(D, 'capex')} · The DCF reads the schedule, so it moves with the rollout.`,

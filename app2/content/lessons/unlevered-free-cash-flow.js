@@ -4,7 +4,7 @@
 // interest), adds depreciation back, sums to unlevered free cash flow and adds the memo of FCF as a
 // share of EBITDA. Each row is graded on the figure it gives from the learner's own cells and on
 // the rows it reads, so any formula that gets there passes.
-import { sheetIn, settled, reads, near, isNum, formatsOf, doneFormula, R, rowRefs, linkRow, COLS } from './lib/model-checks.js';
+import { sheetIn, settled, reads, near, isNum, formatsOf, doneFormula, R, rowRefs, linkRow, COLS, liveFrom } from './lib/model-checks.js';
 
 const D = 'DCF';
 const r = key => R(D, key);
@@ -55,27 +55,27 @@ export default {
       ...step('depLess', 'Link depreciation across %R, as a deduction: %F.'),
       requires: ['unlevered-fcf', 'cross-sheet-ref', 'ctrl-enter-fill', 'go-to'], convention: 'C3',
       hintStuck: `pulse range ${range('depLess')} · Depreciation is row ${R('Schedules', 'dep')} on Schedules, shown positive there.`,
-      check: (s, ses) => settled(ses) && depOk(ses) },
+      check: (s, ses) => settled(ses) && depOk(ses) && liveFrom(ses, 'DCF', 'depLess', 'J', 'capexSite') },
     { id: 'ebit', ...step('ebit', 'EBIT across %R: %F.'), requires: ['ctrl-enter-fill', 'go-to'], convention: 'C3',
       hintStuck: `pulse range ${range('ebit')} · EBITDA plus the line below it, which is negative.`,
-      check: (s, ses) => settled(ses) && ebitOk(ses) },
+      check: (s, ses) => settled(ses) && ebitOk(ses) && liveFrom(ses, 'DCF', 'ebit', 'J', 'labor') },
     { id: 'tax', teach: 'Tax here is on EBIT at the rate, not the tax on the IS, which is lower because interest came off first. MAX keeps a loss year from turning into a refund.',
       ...step('taxEbit', 'Tax on EBIT across %R: %F.'), requires: ['unlevered-fcf', 'min-max-cap', 'f4-anchor', 'cross-sheet-ref', 'ctrl-enter-fill', 'go-to'], convention: 'B2',
       hintStuck: `pulse range ${range('taxEbit')} · The tax rate is row ${R('Inputs', 'tax')} on Inputs; anchor it with F4.`,
-      check: (s, ses) => settled(ses) && taxOk(ses) },
+      check: (s, ses) => settled(ses) && taxOk(ses) && liveFrom(ses, 'DCF', 'taxEbit', 'J', 'tax') },
     { id: 'nopat', ...step('nopat', 'NOPAT, EBIT after that tax, across %R: %F.'), requires: ['ctrl-enter-fill', 'go-to'], convention: 'C3',
       hintStuck: `pulse range ${range('nopat')} · EBIT plus the tax line, which is negative.`,
-      check: (s, ses) => settled(ses) && nopatOk(ses) },
+      check: (s, ses) => settled(ses) && nopatOk(ses) && liveFrom(ses, 'DCF', 'nopat', 'J', 'tax') },
     { id: 'back', teach: 'Depreciation is a charge that never left the bank account, so it comes back now that tax is done.',
       ...step('depBack', 'Add depreciation back across %R: %F.'), requires: ['ctrl-enter-fill', 'go-to'], convention: 'C3',
       hintStuck: `pulse range ${range('depBack')} · The deduction in row ${r('depLess')}, turned around.`,
-      check: (s, ses) => settled(ses) && backOk(ses) },
+      check: (s, ses) => settled(ses) && backOk(ses) && liveFrom(ses, 'DCF', 'depBack', 'J', 'capexSite') },
     { id: 'fcf', ...step('fcf', 'Unlevered free cash flow across %R: %F.'), requires: ['unlevered-fcf', 'sum-family', 'ctrl-enter-fill', 'go-to'], convention: 'C3',
       hintStuck: `pulse range ${range('fcf')} · NOPAT, depreciation back, capex and working capital, rows ${r('nopat')} to ${r('nwc')}.`,
-      check: (s, ses) => settled(ses) && fcfOk(ses) },
+      check: (s, ses) => settled(ses) && fcfOk(ses) && liveFrom(ses, 'DCF', 'fcf', 'J', 'maintCapex') },
     { id: 'share', ...step('fcfShare', 'The memo, FCF as a share of EBITDA, across %R: %F.'), requires: ['iferror-function', 'ctrl-enter-fill', 'go-to'], convention: 'C3',
       hintStuck: `pulse range ${range('fcfShare')} · Free cash flow over EBITDA; IFERROR shows a dash where EBITDA is nothing.`,
-      check: (s, ses) => settled(ses) && shareOk(ses) },
+      check: (s, ses) => settled(ses) && shareOk(ses) && liveFrom(ses, 'DCF', 'fcfShare', 'J', 'maintCapex') },
     { id: 'tie', closer: true, demo: { script: `Ctrl+G "Inputs!F${R('Inputs', 'bNew')}" Enter "3" Enter Ctrl+G "DCF!F${r('fcf')}" Enter`, cadence: 360 },
       text: 'Does it tie? Watch three new sites in FY27 instead of six: capex falls, and free cash flow rises that year.', requires: [],
       hintStuck: `pulse cell F${r('fcf')} · Fewer sites, less capex, more cash.`,

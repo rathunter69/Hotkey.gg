@@ -3,7 +3,7 @@
 // (risk-free plus beta times the premium, plus the size premium), the after-tax cost of debt, the
 // weights and the WACC, then names the WACC cell so every discount factor reads it by name. Each line
 // is graded on the figure it gives from the learner's own cells and the cells it reads.
-import { sheetIn, settled, reads, near, formatsOf, doneFormula, R } from './lib/model-checks.js';
+import { sheetIn, settled, reads, near, formatsOf, doneFormula, R, liveFrom } from './lib/model-checks.js';
 
 const D = 'DCF';
 const c = key => 'C' + R(D, key);
@@ -46,30 +46,30 @@ export default {
       text: `Link the four cost of equity inputs into ${c('rf')}:${c('size')}, starting with ${c('rf')} ${F.rf}.`,
       keys: type(['rf', 'erp', 'beta', 'size'], c('rf')), requires: ['wacc', 'cross-sheet-ref', 'f4-anchor', 'go-to', 'arrow-keys'], convention: 'B2',
       hintStuck: `pulse range ${c('rf')}:${c('size')} · Rows ${R('Inputs', 'rf')} to ${R('Inputs', 'size')} on Inputs, in the same order.`,
-      check: (s, ses) => settled(ses) && eqInputs(ses) },
+      check: (s, ses) => settled(ses) && eqInputs(ses) && liveFrom(ses, 'DCF', 'beta', 'C', 'beta') },
     { id: 'coe', teach: 'The size premium is the extra return investors ask of a company as small as Clearcoat. It is added after beta times the premium, never inside it.',
       text: `Cost of equity in ${c('coe')}: ${F.coe}, about 13.2%.`,
       keys: `Ctrl+G "DCF!${c('coe')}" ↵ "${F.coe}" ↵`, requires: ['wacc', 'formula-operators', 'go-to'],
       hintStuck: `pulse cell ${c('coe')} · Risk-free, plus beta times the premium, plus the size premium.`,
-      check: (s, ses) => settled(ses) && coeOk(ses) },
+      check: (s, ses) => settled(ses) && coeOk(ses) && liveFrom(ses, 'DCF', 'coe', 'C', 'rf') },
     { id: 'debt-inputs', text: `Link the cost of debt and the tax rate into ${c('cod')}:${c('taxW')}: ${F.cod}, then ${F.taxW}.`,
       keys: type(['cod', 'taxW'], c('cod')), requires: ['cross-sheet-ref', 'f4-anchor', 'go-to', 'arrow-keys'], convention: 'B2',
       hintStuck: `pulse range ${c('cod')}:${c('taxW')} · The loan’s 7% is what Clearcoat could borrow at today.`,
-      check: (s, ses) => settled(ses) && debtInputs(ses) },
+      check: (s, ses) => settled(ses) && debtInputs(ses) && liveFrom(ses, 'DCF', 'cod', 'C', 'cod') },
     { id: 'atcod', teach: 'Interest is deducted before tax, so every dollar of it saves a quarter in tax. Debt costs its rate times one less the tax rate.',
       text: `After-tax cost of debt in ${c('atcod')}: ${F.atcod}.`,
       keys: `Ctrl+G "DCF!${c('atcod')}" ↵ "${F.atcod}" ↵`, requires: ['wacc', 'formula-operators', 'go-to'],
       hintStuck: `pulse cell ${c('atcod')} · 7% times 75%.`,
-      check: (s, ses) => settled(ses) && atcodOk(ses) },
+      check: (s, ses) => settled(ses) && atcodOk(ses) && liveFrom(ses, 'DCF', 'atcod', 'C', 'cod') },
     { id: 'weights', teach: 'The weights come from a target capital structure, the mix a buyer would fund the business with, not whatever today’s balance sheet happens to show.',
       text: `The weights: ${c('debtW')} ${F.debtW}, and ${c('eqW')} ${F.eqW}.`,
       keys: type(['debtW', 'eqW'], c('debtW')), requires: ['wacc', 'cross-sheet-ref', 'go-to', 'arrow-keys'], convention: 'B2',
       hintStuck: `pulse range ${c('debtW')}:${c('eqW')} · Equity funds whatever debt does not.`,
-      check: (s, ses) => settled(ses) && weightsOk(ses) },
+      check: (s, ses) => settled(ses) && weightsOk(ses) && liveFrom(ses, 'DCF', 'eqW', 'C', 'debtW') },
     { id: 'wacc', text: `WACC in ${c('wacc')}: ${F.wacc}, about 10%.`,
       keys: `Ctrl+G "DCF!${c('wacc')}" ↵ "${F.wacc}" ↵`, requires: ['wacc', 'formula-operators', 'go-to'],
       hintStuck: `pulse cell ${c('wacc')} · Each cost times its weight, added.`,
-      check: (s, ses) => settled(ses) && waccOk(ses) },
+      check: (s, ses) => settled(ses) && waccOk(ses) && liveFrom(ses, 'DCF', 'wacc', 'C', 'rf') },
     { id: 'name', teach: 'Every discount factor on the page reads this one cell, so it gets a name: WACC reads better in a formula than a cell address, and it cannot drift when rows move.',
       text: `With ${c('wacc')} selected, define the name WACC with Alt, M, M, D.`,
       keys: 'Alt M M D "WACC" ↵', requires: ['defined-name', 'keytips'], convention: 'C9',

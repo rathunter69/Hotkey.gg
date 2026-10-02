@@ -4,7 +4,7 @@
 // steady level), builds both terminal values, the implied multiple of one and the implied growth of
 // the other, a round trip graded on Checks, and the switch that picks the value the page uses.
 // Each figure is graded from the learner's own cells; the round trip on its value and references.
-import { sheetIn, settled, reads, near, formatsOf, doneFormula, R, checkRow } from './lib/model-checks.js';
+import { sheetIn, settled, reads, near, formatsOf, doneFormula, R, checkRow, liveFrom } from './lib/model-checks.js';
 
 const D = 'DCF';
 const row = key => R(D, key);
@@ -74,32 +74,32 @@ export default {
       text: `Carry FY31 into the normalized column: ${K('ebitda')} ${F[K('ebitda')]}, and ${K('depLess')} ${F[K('depLess')]}.`,
       keys: KEYS.carry, requires: ['terminal-value', 'go-to', 'arrow-keys'],
       hintStuck: `pulse range ${K('ebitda')}:${K('depLess')} · Each reads the cell to its left.`,
-      check: (s, ses) => settled(ses) && carryOk(ses) },
+      check: (s, ses) => settled(ses) && carryOk(ses) && liveFrom(ses, 'DCF', 'ebitda', 'K', 'labor') },
     { id: 'fill', teach: 'The rest of the column runs the same formulas as the forecast, so Ctrl+R fills them across from FY31.',
       text: `Fill J${row('ebit')}:K${row('depBack')} and J${row('fcf')}:K${row('fcfShare')} across with Ctrl+R.`,
       keys: KEYS.fill, requires: ['fill-down-right', 'go-to'], convention: 'C3',
       hintStuck: `pulse range J${row('ebit')}:K${row('depBack')} · Capex and working capital get their own formulas next, so skip rows ${row('capex')} and ${row('nwc')}.`,
-      check: (s, ses) => settled(ses) && fillOk(ses) },
+      check: (s, ses) => settled(ses) && fillOk(ses) && liveFrom(ses, 'DCF', 'ebit', 'K', 'labor') },
     { id: 'steady', teach: 'In a steady year capex only replaces what wears out, so it is set to depreciation; working capital moves by its steady amount from Inputs.',
       text: `Set ${K('capex')} to ${F[K('capex')]} and ${K('nwc')} to ${F[K('nwc')]}.`,
       keys: KEYS.steady, requires: ['terminal-value', 'cross-sheet-ref', 'f4-anchor', 'go-to', 'arrow-keys'], convention: 'B2',
       hintStuck: `pulse range ${K('capex')}:${K('nwc')} · Capex is the depreciation added back, turned around.`,
-      check: (s, ses) => settled(ses) && steadyOk(ses) },
+      check: (s, ses) => settled(ses) && steadyOk(ses) && liveFrom(ses, 'DCF', 'nwc', 'K', 'termWC') },
     { id: 'perp', teach: 'The perpetuity grows the normalized cash flow a year and divides by WACC less growth. Growth is 3%, no faster than the economy, and it has to sit below WACC or the formula breaks.',
       text: `The perpetuity value in ${C('tvPerp')}: ${F[C('tvPerp')]}.`,
       keys: KEYS.perp, requires: ['terminal-value', 'defined-name', 'cross-sheet-ref', 'go-to'],
       hintStuck: `pulse cell ${C('tvPerp')} · ${K('fcf')} is the normalized cash flow; growth is row ${R('Inputs', 'growth')} on Inputs.`,
-      check: (s, ses) => settled(ses) && perpOk(ses) },
+      check: (s, ses) => settled(ses) && perpOk(ses) && liveFrom(ses, 'DCF', 'tvPerp', 'C', 'growth') },
     { id: 'exit', teach: 'The exit multiple sells the business at the end of FY31 for 11.0 times that year’s EBITDA, sourced to the listed operators and the precedent deals.',
       text: `The exit value in ${C('tvExit')}: ${F[C('tvExit')]}.`,
       keys: KEYS.exit, requires: ['terminal-value', 'cross-sheet-ref', 'go-to'],
       hintStuck: `pulse cell ${C('tvExit')} · FY31 EBITDA is ${J('ebitda')}.`,
-      check: (s, ses) => settled(ses) && exitOk(ses) },
+      check: (s, ses) => settled(ses) && exitOk(ses) && liveFrom(ses, 'DCF', 'tvExit', 'C', 'exit') },
     { id: 'implied', teach: 'Each method implies the other’s input: the perpetuity value over FY31 EBITDA is a multiple, and the perpetuity formula solved for growth turns the exit value into a growth rate.',
       text: `Implied multiple in ${C('impMult')}: ${F[C('impMult')]}, and implied growth in ${C('impGrowth')}: ${F[C('impGrowth')]}.`,
       keys: KEYS.implied, requires: ['terminal-value', 'defined-name', 'go-to', 'arrow-keys'],
       hintStuck: `pulse range ${C('impMult')}:${C('impGrowth')} · Read them against 11.0x and 3%.`,
-      check: (s, ses) => settled(ses) && impliedOk(ses) },
+      check: (s, ses) => settled(ses) && impliedOk(ses) && liveFrom(ses, 'DCF', 'impMult', 'C', 'growth') },
     { id: 'trip', teach: 'Feed the implied multiple back into the exit method, solve for growth, and the growth input must come back. If it doesn’t, the two values aren’t built on the same cash flow.',
       text: `The round trip in ${C('roundTrip')}: ${F[C('roundTrip')]}, then on Checks ${RT}: ${F.rt}.`,
       keys: KEYS.trip, requires: ['terminal-value', 'round-function', 'check-cell', 'cross-sheet-ref', 'go-to'], convention: 'F1',
@@ -108,7 +108,7 @@ export default {
     { id: 'switch', text: `The switch: ${C('method')} ${F[C('method')]}, and ${C('tv')} ${F[C('tv')]}.`,
       keys: KEYS.switch, requires: ['case-switch', 'cross-sheet-ref', 'go-to', 'arrow-keys'], convention: 'E9',
       hintStuck: `pulse range ${C('method')}:${C('tv')} · 1 picks the perpetuity, 2 the exit multiple.`,
-      check: (s, ses) => settled(ses) && switchOk(ses) },
+      check: (s, ses) => settled(ses) && switchOk(ses) && liveFrom(ses, 'DCF', 'tv', 'C', 'tvMethod') },
     { id: 'tie', closer: true, demo: { script: `Ctrl+G "Inputs!C${R('Inputs', 'exit')}" Enter "13" Enter Ctrl+G "DCF!${C('impGrowth')}" Enter`, cadence: 360 },
       text: 'Does it tie? Watch the exit multiple on Inputs go from 11.0x to 13.0x: the implied growth in C30 climbs.', requires: [],
       hintStuck: `pulse cell ${C('impGrowth')} · A higher multiple says the market expects faster growth.`,

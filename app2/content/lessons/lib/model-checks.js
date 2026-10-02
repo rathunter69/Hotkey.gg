@@ -159,10 +159,8 @@ export const tabsAre = (ses, names) => names.every((n, i) => ses.sheets[i] && se
 
 /* ---------------- the model lines (5.3, 5.4): graded on the reference formula, in the learner's sheet ---------------- */
 
-const STATE_CACHE = {};
-const stateCached = id => (STATE_CACHE[id] || (STATE_CACHE[id] = stateOf(id)));
-/** A named state's cells on one sheet (read only; cached). */
-export const cellsAt = (id, name) => stateCached(id).sheets.find(s => s.name === name).cells;
+/** A named state's cells on one sheet, read only: the master state itself (built on first read), never a clone. */
+export const cellsAt = (id, name) => STATES[id].sheets.find(s => s.name === name).cells;
 /** The cells of keyed lines over `cols`, as refs. */
 export const refsOf = (name, keys, cols = COLS) => keys.flatMap(k => cols.map(c => c + rowOf(name, k)));
 /** An Inputs cell by key ('Inputs!C43'), column C unless named. */
@@ -359,22 +357,17 @@ const cfSource = (col, v, key) => (key === 'rev' ? v('Schedules', col + SR.revDr
 export const cfLinked = (ses, keys) => echoes(ses, 'CF', keys, cfSource);
 
 /**
- * The what-if (the shared liveness rule, at the model's scale): nudge the typed input `input`
- * ('Inputs!J21'), recalculate the workbook, see `target` ('Schedules!J9') move, then put the input
- * back and recalculate, so the sheet ends exactly as it was. A typed number never moves.
+ * The shared liveness rule (engine/live.js) on a model cell: `target` ('Schedules!J9') moves when
+ * the typed input `input` ('Inputs!J21') is nudged. The model iterates, so the rule probes a
+ * recalculated clone of the whole workbook and the learner's sheets are never touched. A typed
+ * number never moves.
  */
 export function moves(ses, target, input) {
-  const [tn, tr] = target.split('!'), [inName, inRef] = input.split('!');
-  const T = sheetIn(ses, tn), I = sheetIn(ses, inName); if (!T || !I) return false;
-  const tc = T.cells[tr], ic = I.cells[inRef];
-  if (!tc || !tc.formula || !ic || ic.formula || !isNum(ic.value)) return false;
-  const before = tc.value, old = ic.value;
-  // through the workbook's own graph, naming the one cell changed: only its readers recalculate
-  const recalc = () => (I.book ? I.book.recalc(I, [{ sheet: I, key: inRef }]) : ses.recalcAll());
-  ic.value = old === 0 ? 1 : old * 1.5 + 1;
-  try { recalc(); return isNum(T.cells[tr].value) && !agree(T.cells[tr].value, before); }
-  finally { ic.value = old; recalc(); }
+  const bang = target.indexOf('!');
+  return liveVia(ses, target.slice(0, bang), target.slice(bang + 1), [].concat(input));
 }
+/** The same by keyed rows: cell `col` of line `key` on `sheet` moves when the Inputs line `inKey` (column `inCol`) moves. */
+export const liveFrom = (ses, sheet, key, col, inKey, inCol = 'C') => liveVia(ses, sheet, col + rowOf(sheet, key), [`Inputs!${inCol}${rowOf('Inputs', inKey)}`]);
 
 /**
  * A what-if with a verdict: type `values` ({ 'Inputs!G21': 18 }) over the typed inputs, recalculate,

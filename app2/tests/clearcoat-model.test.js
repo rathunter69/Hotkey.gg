@@ -114,6 +114,24 @@ test('the finished model ties: every check zero, no errors, the flag OK, and the
   }
 });
 
+test('R5 exit check: the model balances in every case, every year (Management, Base, Downside)', () => {
+  const s = session('DONE');
+  for (const caseName of WB.CASES) {
+    sh(s, 'Cover').cells['C' + WB.ROW.Cover.case].value = caseName;
+    s.recalcAll();
+    assert.equal(sh(s, 'Cover').value('C' + WB.ROW.Cover.casen), WB.CASES.indexOf(caseName) + 1, `the switch reads ${caseName}`);
+    assert.deepEqual(errors(s), [], caseName);
+    // the balance sheet's own check row and the Checks row that reads it: zero in all eight years
+    assert.deepEqual(row(s, 'BS', 'check'), WB.COLS.map(() => 0), `${caseName}: BS balance check`);
+    assert.deepEqual(row(s, 'Checks', 'bs'), WB.COLS.map(() => 0), `${caseName}: Checks balance row`);
+    // and unrounded: assets less liabilities and equity inside a cent, every year
+    const ta = row(s, 'BS', 'ta'), tle = row(s, 'BS', 'tle');
+    assert.ok(ta.every(v => typeof v === 'number' && v > 0), `${caseName}: total assets are figures`);
+    WB.COLS.forEach((col, i) => near(ta[i] - tle[i], 0, 0.01, `${caseName} ${col}: assets less liabilities and equity`));
+    assert.equal(sh(s, 'Checks').value('C' + WB.ROW.Checks.flag), 'OK', `${caseName}: the flag`);
+  }
+});
+
 test('the plantings: breaks, faults, the #REF!, the sweep, the shell and the project', () => {
   // 5.4.5: six breaks, the check off in every projected year, zero once each is put back
   const broken = session('B545');

@@ -5,7 +5,7 @@
 // equity value, and one sensitivity grid. Every figure is graded on its value worked out from the
 // learner's own cells; any formula that gets there passes.
 import { challengeSeed } from '../workbooks/clearcoat-model.js';
-import { sheetIn, settled, near, R, PROJ_COLS } from './lib/model-checks.js';
+import { sheetIn, settled, near, R, PROJ_COLS, liveFrom } from './lib/model-checks.js';
 import { parsFrom } from '../../app/pars.js';
 
 const ID = 'challenge-dcf';
@@ -82,13 +82,13 @@ export default {
     { id: 'wacc', text: `Build the WACC in ${C('wacc')} from the block above it and name the cell WACC.`,
       keys: KEYS.wacc, check: (s, ses) => settled(ses) && waccOk(ses) },
     { id: 'perp', text: `The perpetuity value in ${C('tvPerp')}, on the normalized cash flow in K${row('fcf')} at the growth on Inputs.`,
-      keys: KEYS.perp, check: (s, ses) => settled(ses) && perpOk(ses) },
+      keys: KEYS.perp, check: (s, ses) => settled(ses) && perpOk(ses) && liveFrom(ses, 'DCF', 'tvPerp', 'C', 'growth') },
     { id: 'exit', text: `The exit value in ${C('tvExit')}, FY31 EBITDA at the multiple on Inputs.`,
-      keys: KEYS.exit, check: (s, ses) => settled(ses) && exitOk(ses) },
+      keys: KEYS.exit, check: (s, ses) => settled(ses) && exitOk(ses) && liveFrom(ses, 'DCF', 'tvExit', 'C', 'exit') },
     { id: 'factors', text: `Mid-year discount factors across F${row('df')}:J${row('df')}, on the periods in row ${row('t')}.`,
-      keys: KEYS.factors, check: (s, ses) => settled(ses) && factorsOk(ses) },
+      keys: KEYS.factors, check: (s, ses) => settled(ses) && factorsOk(ses) && liveFrom(ses, 'DCF', 'df', 'J', 'rf') },
     { id: 'ev', text: `Enterprise value in ${C('ev')} on the method the switch names, and equity value in ${C('eqv')} after FY26 net debt.`,
-      keys: KEYS.ev, check: (s, ses) => settled(ses) && evOk(ses) },
+      keys: KEYS.ev, check: (s, ses) => settled(ses) && evOk(ses) && liveFrom(ses, 'DCF', 'ev', 'C', 'rf') },
     { id: 'table', text: 'Fill one sensitivity grid, perpetuity or exit multiple, against its edges.',
       keys: KEYS.table, check: (s, ses) => settled(ses) && tableOk(ses) },
   ],
