@@ -30,7 +30,7 @@ export function mountTeamsPage(root) {
   el.innerHTML = `<div class="page-head"><h1>Teams and schools</h1><p class="page-sub">For banks, training providers, finance clubs, classes and friend groups. Two things a group can do here.</p></div>
     <div class="teams-grid">
       <section class="tcard">
-        <div class="tcard-cap"><span>start a desk</span><span class="pcard-tag on">free to create</span></div>
+        <div class="tcard-cap"><span>Start a desk</span><span class="pcard-tag on">Free to create</span></div>
         <div class="tcard-body">
           <h2>A private group with its own board</h2>
           <p>A desk is a private group: its own leaderboard, assignments set by a captain, and progress the captain can see (your times on assignments, nothing else).</p>
@@ -45,7 +45,7 @@ export function mountTeamsPage(root) {
         </div>
       </section>
       <section class="tcard">
-        <div class="tcard-cap"><span>group access</span><span class="pcard-tag">Pro for organizations</span></div>
+        <div class="tcard-cap"><span>Group access</span><span class="pcard-tag">Pro for organizations</span></div>
         <div class="tcard-body">
           <h2>One code, a number of seats, one end date</h2>
           <p>Group access unlocks the paid tier for everyone on the code or link, with a progress view for the organizer and invoice-friendly billing. No self-serve checkout for groups at launch: send a request and we reply by email.</p>

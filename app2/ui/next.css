@@ -55,12 +55,6 @@
 .dp-compact .keyflash.dp-keys{flex-wrap:nowrap; justify-content:flex-end; gap:5px; min-width:0}
 .dp-compact .keyflash.demo .kchip{font-size:12.5px; padding:2px 8px; border-radius:5px; line-height:1.5}
 
-   /* the whole card is the link */
-
-/* ---------- 6. the data room (app/learn-next.js) ---------- */
-
-/* ---------- the workspace: the cues ---------- */
-
 /* the perimeter outline (B7): one ring around the target range, drawn inside the scroll box like the marquee */
 @keyframes cueRing{0%{opacity:0} 15%{opacity:1} 70%{opacity:1} 100%{opacity:0}}
 @keyframes cueHalo{0%{opacity:.9; transform:scale(1)} 100%{opacity:0; transform:scale(1.06)}}
@@ -74,9 +68,6 @@
 .cue-glow{position:relative; z-index:2; border-radius:6px; box-shadow:0 0 0 2px var(--accent), 0 0 10px var(--accent-glow); animation:cueGlow 1.3s ease-in-out 3}
 .rf-tab.cue-glow{color:var(--text)}
 @media (prefers-reduced-motion: reduce){ .cue-glow{animation:none; box-shadow:0 0 0 2px var(--accent)} .wb-tab.cue-pulse{animation:none; border-top-color:var(--accent)} }
-
-/* ---------- 9. the Daily result card (ui/result-card.js) ---------- */
-
 
 /* the demo's poster (C2, item 9): a still of the real lesson, painted at once; the live demo replaces it */
 .dp-poster{display:flex; flex-direction:column}
@@ -138,9 +129,7 @@ body[data-route="lesson"] .site-footer, body[data-route="due"] .site-footer, bod
 body[data-route="lesson"] > .app, body[data-route="due"] > .app{flex:1 1 auto; min-height:0; display:flex; flex-direction:column; padding-bottom:10px}
 body[data-route="lesson"] #root, body[data-route="due"] #root{flex:1 1 auto; min-height:0; display:flex; flex-direction:column}
 
-
 /* the drill and Daily workspace: no footer under the sheet, and the sheet takes the room the footer left (critic pass) */
 body[data-route="drill"] .site-footer, body[data-route="drill"] #footMount{display:none}
 body[data-route="drill"] .drill-page .stage-row{min-height:clamp(400px, calc(100vh - 304px), 900px)}
 html[data-density="compact"] body[data-route="drill"] .drill-page .stage-row{min-height:clamp(400px, calc(100vh - 284px), 900px)}
-

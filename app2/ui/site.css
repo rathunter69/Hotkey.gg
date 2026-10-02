@@ -24,10 +24,10 @@ a.btn{text-decoration:none}
 .muted{color:var(--muted)}
 .page{max-width:1180px; margin:6px auto 40px; font-family:var(--sans); color:var(--text)}
 .page-head{margin:6px 0 20px}
-.page-head h1{font-family:var(--mono); font-size:22px; font-weight:700; letter-spacing:-.3px; margin:0 0 6px}
-.page-sub{font-size:14.5px; color:var(--muted); max-width:70ch; line-height:1.55; margin:0}
+.page-head h1{font-family:var(--font); font-size:var(--fs-title); font-weight:var(--fw-heavy); line-height:var(--lh-tight); margin:0 0 var(--s2)}
+.page-sub{font-family:var(--font); font-size:var(--fs-body); color:var(--ink-2); max-width:70ch; line-height:var(--lh-body); margin:0}
 .page-sub b{color:var(--text); font-weight:600}
-.page-fine{font-family:var(--mono); font-size:11.5px; color:var(--faint); line-height:1.7; margin:14px 0 0; max-width:80ch}
+.page-fine{font-family:var(--font); font-size:var(--fs-min); color:var(--ink-2); line-height:var(--lh-body); margin:var(--s3) 0 0; max-width:80ch}
 .page-fine a, .page p a, .plain-list a{color:var(--accent); text-decoration:none}
 .page-fine a:hover, .page p a:hover, .plain-list a:hover{text-decoration:underline}
 .page h2{font-family:var(--sans); font-size:17px; font-weight:700; letter-spacing:-.3px; margin:0 0 8px}
@@ -40,7 +40,7 @@ a.btn{text-decoration:none}
 .plain-list li{display:flex; justify-content:space-between; gap:12px; padding:5px 0; border-bottom:1px solid color-mix(in srgb, var(--line) 55%, transparent)}
 .plain-list li:last-child{border-bottom:0}
 .coming{font-family:var(--mono); font-size:11.5px; color:var(--warn); margin:0}
-.pcard-tag{font-family:var(--mono); font-size:9.5px; letter-spacing:.1em; text-transform:uppercase; border:1px solid var(--line); color:var(--faint); border-radius:4px; padding:2px 6px}
+.pcard-tag{font-family:var(--font); font-size:var(--fs-min); font-weight:var(--fw-semi); border:1px solid var(--line); color:var(--faint); border-radius:4px; padding:2px 6px}
 .pcard-tag.on{color:var(--accent); border-color:var(--accent-dim)}
 kbd{font-family:var(--mono); font-size:11.5px; color:var(--text); background:var(--surface2); border:1px solid var(--line); border-bottom-width:2px; border-radius:5px; padding:1px 6px; white-space:nowrap}
 .btn-primary kbd{color:var(--on-accent, #fff); background:transparent; border-color:color-mix(in srgb, var(--on-accent, #fff) 45%, transparent)}
@@ -49,11 +49,10 @@ kbd{font-family:var(--mono); font-size:11.5px; color:var(--text); background:var
 .site-footer{border-top:1px solid var(--line); margin-top:64px; padding:30px 0 40px; background:var(--bg)}
 
 /* ---------- 3. load-error card, narrow-screen notice ---------- */
-.err-card, .nf-card, .narrow-msg{background:var(--surface); border:1px solid var(--line); border-radius:14px; max-width:520px; margin:40px auto; overflow:hidden; font-family:var(--sans)}
-.err-cap, .nf-cap, .narrow-cap, .tcard-cap, .acard-cap{min-height:34px; display:flex; align-items:center; justify-content:space-between; gap:8px; padding:6px 16px;
-  background:var(--surface2); border-bottom:1px solid var(--line); font-family:var(--mono); font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted)}
-.err-body, .nf-body{padding:22px 24px 24px}
-.err-body h1, .nf-body h1, .narrow-msg h1{font-size:20px; letter-spacing:-.3px; margin:0 0 8px; font-family:var(--sans)}
+.err-card, .nf-card, .narrow-msg{background:var(--sheet); border:0; border-radius:0; max-width:calc(var(--side-col) * 2); margin:var(--s12) auto; overflow:hidden; font-family:var(--font)}   /* the one panel (3.0): white on paper, no border */
+.err-cap, .nf-cap, .narrow-cap, .tcard-cap{display:flex; align-items:center; justify-content:space-between; gap:var(--s2); padding:var(--s4) var(--s6) 0; font-family:var(--font); font-size:var(--fs-label); font-weight:var(--fw-semi); color:var(--ink-2)}
+.err-body, .nf-body{padding:var(--s4) var(--s6) var(--s6)}
+.err-body h1, .nf-body h1, .narrow-msg h1{font-size:var(--fs-head); font-weight:var(--fw-heavy); margin:0 0 var(--s2); font-family:var(--font)}
 .err-body p, .nf-body p, .narrow-msg p{font-size:14px; color:var(--muted); line-height:1.65; margin:0 0 16px}
 .err-actions, .nf-row, .narrow-actions{display:flex; gap:10px; flex-wrap:wrap}
 .nf-ref{font-family:var(--mono); font-size:13px; color:var(--muted); margin-bottom:6px}
@@ -113,12 +112,10 @@ kbd{font-family:var(--mono); font-size:11.5px; color:var(--text); background:var
 /* the drill list (Timed runs under it) takes two thirds; the rail stacks the Daily, Keep sharp,
    rapid-fire and the sandbox. Below 1000px one column, the rail first as a 2 × 2 grid. */
 
-.tcard, .acard{background:var(--surface); border:1px solid var(--line); border-radius:14px; overflow:hidden; display:flex; flex-direction:column}
+.tcard{background:var(--sheet); border:0; border-radius:0; overflow:hidden; display:flex; flex-direction:column}
 
-.tcard-body, .acard-body{padding:18px 20px 20px; display:flex; flex-direction:column; gap:6px; align-items:flex-start; flex:1}
-.tcard-body, .acard-body) p{margin:0 0 8px}
-/* the body keeps buttons at their own width (flex-start); lists and grids take the full width */
-.acard-body .plain-list, .acard-body .stats-grid, .acard-body .stats-badges{width:100%; align-self:stretch}
+.tcard-body{padding:var(--s3) var(--s6) var(--s6); display:flex; flex-direction:column; gap:6px; align-items:flex-start; flex:1}
+.tcard-body{margin:0 0 8px}
 
 /* ---------- 8. drill workspace (index.html 1485–1500, 1308–1370, 1412–1440, 824–845, 760–768) ---------- */
 .drill-page{max-width:1380px; margin:0 auto 24px; font-family:var(--sans)}
@@ -167,26 +164,19 @@ kbd{font-family:var(--mono); font-size:11.5px; color:var(--text); background:var
 .req-actions{display:flex; gap:10px}
 @media (max-width:820px){ .teams-grid{grid-template-columns:1fr} .req-grid{grid-template-columns:1fr} }
 
-/* ---------- 12. account ---------- */
-.acct-grid{display:grid; grid-template-columns:1fr; gap:16px; margin-bottom:16px}
-.acct-col{display:grid; grid-template-columns:repeat(3,1fr); gap:16px}
-.acard-signin{border-color:var(--accent-dim)}
-.acard + .acard, .account > .acard{margin-top:16px}
-.acct-col > .acard{margin-top:0}   /* side by side in a row, the cards' tops line up */
-.acard.flash{box-shadow:0 0 0 2px var(--accent)}
-.settings-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px 22px; align-items:start}
+   /* side by side in a row, the cards' tops line up */
+
 .set{display:flex; flex-direction:column; gap:6px; font-size:13.5px; font-weight:600; color:var(--text)}
 .set-note{font-family:var(--mono); font-size:11px; font-weight:400; color:var(--faint)}
 .set-check{flex-direction:row; flex-wrap:wrap; align-items:center; gap:8px}
 .set-check .set-note{flex-basis:100%}
 .set-check input{width:16px; height:16px; accent-color:var(--accent)}
 .data-actions{display:flex; gap:10px; flex-wrap:wrap}
-@media (max-width:820px){ .acct-col, .settings-grid{grid-template-columns:1fr} }
 
 /* ---------- 13. legal, about, 404 ---------- */
 .draft-banner{background:color-mix(in srgb, var(--warn) 12%, var(--surface)); border:1px solid var(--warn); color:var(--text); border-radius:10px; padding:10px 14px; font-family:var(--mono); font-size:12px; margin:0 0 18px}
 .draft-banner b{color:var(--warn); margin-right:8px; letter-spacing:.1em}
-.legal-body{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:6px 24px}
+.legal-body{background:var(--sheet); border:0; border-radius:0; padding:var(--s2) var(--s6)}
 .legal-sec{padding:16px 0; border-bottom:1px solid color-mix(in srgb, var(--line) 55%, transparent)}
 .legal-sec:last-child{border-bottom:0}
 .legal-sec h2{font-size:15px; margin-bottom:6px}

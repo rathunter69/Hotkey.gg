@@ -83,9 +83,8 @@ html[data-density="comfortable"] .fbar{font-size:13.5px}
 /* the workspace frame follows the taller nav */
 html[data-density="comfortable"] .lesson{height:calc(100vh - 110px)}
 /* the Learn / Home / Practice cards */
-html[data-density="comfortable"] .acard-cap, html[data-density="comfortable"] .tcard-cap{font-size:11px; min-height:36px}
 
 /* ---------- 3. compact: today's type sizes, and the content pages tighten (never the workspace) ---------- */
 html[data-density="compact"] .page-head{margin-bottom:14px}
 
-html[data-density="compact"] .acard-body, html[data-density="compact"] .tcard-body{padding:14px 16px 16px}
+html[data-density="compact"] .tcard-body{padding:14px 16px 16px}

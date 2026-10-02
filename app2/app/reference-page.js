@@ -142,7 +142,7 @@ export function mountReferencePage(root, opts = {}) {
     const lesson = e.lessonId ? lessonById(e.lessonId) : null;
     const num = lesson ? taughtIn(lessonNumberOf(lesson)) : '';
     const state = keyState(e, ctx);
-    const drill = e.concept && MICRO[e.concept] ? `<a class="btn btn-small" href="#/due/${esc(e.concept)}" tabindex="-1">${esc(t('ref_drill_it', 'Drill it'))}</a>` : '';
+    const drill = e.concept && MICRO[e.concept] && state !== 'not-yet' ? `<a class="btn btn-small" href="#/due/${esc(e.concept)}" tabindex="-1">${esc(t('ref_drill_it', 'Drill it'))}</a>` : '';
     return `<tr class="kr-row" data-id="${esc(e.id)}" data-cursor data-cursor-enter="a.kr-lesson" data-state="${state}">
       <td class="kr-keys">${keysHtml(e)}${r.ribbon ? `<span class="kr-or label">${esc(t('ref_or', 'or'))}</span>${keysHtml(r.ribbon)}` : ''}</td>
       <td class="kr-what">${esc(e.name)}${e.note && e.note !== 'Windows only' ? `<span class="kr-note">${esc(e.note)}</span>` : ''}</td>

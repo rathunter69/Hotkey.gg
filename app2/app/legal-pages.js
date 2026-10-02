@@ -91,7 +91,6 @@ export function mountNotFound(root) {
   const el = document.createElement('div');
   el.className = 'page notfound';
   el.innerHTML = `<div class="nf-card">
-      <div class="nf-cap">hotkey.gg · cell reference check</div>
       <div class="nf-body">
         <div class="nf-ref">=IFERROR(this_page, <b>#REF!</b>)</div>
         <h1>That reference does not resolve.</h1>

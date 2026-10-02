@@ -4,7 +4,7 @@
 // device settings, server export, delete account. States are honest; guest mode is untouched
 // when config.js is empty ("Sign-in is not configured").
 import { progress } from './progress.js';
-import { prefs, PLATFORMS } from './prefs.js';
+import { prefs } from './prefs.js';
 import { store } from './store.js';
 import { auth } from './auth.js';
 import { validateHandle } from './handle.js';
@@ -17,7 +17,7 @@ import { badgesHtml } from '../ui/badges.js';
 import { siteCopy } from '../content/copy/apply.js';
 
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const SECTIONS = ['desks', 'stats', 'profile', 'settings', 'data'];
+const SECTIONS = ['stats', 'profile', 'data'];   // Settings is its own page (#/account?section=settings, settings-page.js)
 
 /** Everything this device holds for the learner, as one JSON-able record (guest export). */
 export function exportRecord() {
@@ -33,7 +33,7 @@ function download(name, data) {
 
 export function mountAccountPage(root, ctx = {}) {
   const el = document.createElement('div');
-  el.className = 'page account';
+  el.className = 'pg account';
   const want = ctx.query && SECTIONS.includes(ctx.query.section) ? ctx.query.section : null;
   let tab = 'signin';          // signin | signup | magic
   let busy = false;
@@ -67,23 +67,20 @@ export function mountAccountPage(root, ctx = {}) {
             <button class="btn btn-ghost" type="button" id="googleBtn"${unavailable || busy ? ' disabled' : ''}>Google</button>
           </div>
           ${unavailable ? '<p class="form-msg" role="status">Sign-in is not configured.</p>' : ''}
-          ${tab === 'signup' ? '<p class="page-fine">You pick a handle right after — one is suggested. Minimum age 13.</p>' : ''}
+          ${tab === 'signup' ? '<p class="fine">You pick a handle right after, and one is suggested. Minimum age 13.</p>' : ''}
         </form>`;
-    return `<section class="acard acard-signin">
-        <div class="acard-cap">sign in</div>
-        <div class="acard-body">
-          <h2>Keep your progress across devices.</h2>
+    return `<section class="panel acct-panel" id="sec-profile">
+          <div class="panel-head"><h2 class="panel-h">Keep your progress across devices.</h2></div>
           <p>Email and password, a magic link, or Google. No anonymous accounts: as a guest your work stays in this browser.</p>
           ${form}
-          <h3>What is carried over when you sign up</h3>
+          <h3 class="row-name">What is carried over when you sign up</h3>
           <ul class="plain-list">
             <li>Lesson progress: ${ids.length} lesson${ids.length === 1 ? '' : 's'} started, ${done} completed</li>
             <li>Personal bests: ${bests}</li>
             <li>Platform (${p.platform === 'mac' ? 'Mac' : 'Windows'}) and theme</li>
             <li>Skipped lessons from placement: ${p.skipped.length}</li>
           </ul>
-          <p class="page-fine">Carried once, to the account you create, never from another account. Your handle appears on public boards and your public profile only if you allow it.</p>
-        </div>
+          <p class="fine">Carried once, to the account you create, never from another account. Your handle appears on public boards and your public profile only if you allow it.</p>
       </section>`;
   }
 
@@ -91,14 +88,12 @@ export function mountAccountPage(root, ctx = {}) {
   function profileCard() {
     const prof = store.profile();
     const u = auth.user();
-    return `<section class="acard acard-signin">
-        <div class="acard-cap">your account</div>
-        <div class="acard-body">
-          <h2>${prof && prof.handle ? esc(prof.handle) : '…'} <span class="page-fine">· level ${prof ? prof.level : '…'}</span></h2>
-          <p class="page-fine">${esc(u && u.email || '')} · ${esc(store.saveText())}</p>
+    return `<section class="panel acct-panel" id="sec-profile">
+          <div class="panel-head"><h2 class="panel-h">${prof && prof.handle ? esc(prof.handle) : '…'}</h2><span class="panel-facts">${esc(siteCopy('account_level', 'Level {n}').replace('{n}', prof ? prof.level : '…'))}</span></div>
+          <p class="fine">${esc(u && u.email || '')}</p><p class="fine">${esc(store.saveText())}</p>
           <form id="handleForm" class="acct-form">
             <label>Handle<input id="handleInput" type="text" value="${prof ? esc(prof.handle) : ''}" maxlength="20" autocomplete="off" spellcheck="false"></label>
-            <p class="page-fine">Appears on public boards and your public profile if you allow it; change any time (once a day).</p>
+            <p class="fine">Appears on public boards and your public profile if you allow it; change any time (once a day).</p>
             ${notice && notice.kind === 'error' ? `<p class="form-msg form-err" role="alert">${esc(notice.text)}</p>` : ''}
             <div class="data-actions"><button class="btn btn-primary" type="submit"${busy ? ' disabled' : ''}>Save handle</button></div>
           </form>
@@ -109,7 +104,6 @@ export function mountAccountPage(root, ctx = {}) {
             <div class="data-actions"><button class="btn btn-ghost" type="submit">Redeem</button></div>
           </form>
           <div class="data-actions"><button class="btn btn-ghost" id="signOutBtn" type="button">Sign out</button></div>
-        </div>
       </section>`;
   }
 
@@ -118,24 +112,23 @@ export function mountAccountPage(root, ctx = {}) {
     const s = statsFor();
     const fmtDur = secs => { const m = Math.floor(secs / 60); return m >= 60 ? Math.floor(m / 60) + 'h ' + (m % 60) + 'm' : m >= 1 ? m + 'm ' + Math.round(secs % 60) + 's' : Math.round(secs) + 's'; };
     if (!s.attempts && !Object.keys(s.ctx.progress).length) {
-      return `<section class="acard" id="sec-stats"><div class="acard-cap">stats</div><div class="acard-body"><h2>Stats</h2><p>Nothing yet: stats build from your lessons, drills and Dailies as you play.</p></div></section>`;
+      return `<section class="panel acct-panel" id="sec-stats"><div class="panel-head"><h2 class="panel-h">Stats</h2></div><p class="panel-line">Nothing yet: stats build from your lessons, drills and Dailies as you play.</p></section>`;
     }
     const improving = s.improvement.filter(r => r.first > r.best);
-    return `<section class="acard" id="sec-stats"><div class="acard-cap">stats</div><div class="acard-body">
-      <h2>Stats</h2>
+    return `<section class="panel acct-panel" id="sec-stats"><div class="panel-head"><h2 class="panel-h">Stats</h2></div>
       <div class="stats-grid">
-        <div class="stat-cell"><b>${s.ctx.level}</b><span>level · ${s.ctx.xp} XP</span></div>
+        <div class="stat-cell"><b>${s.ctx.level}</b><span>level, ${s.ctx.xp} XP</span></div>
         <div class="stat-cell"><b>${fmtDur(s.timePractised)}</b><span>timed practice</span></div>
         <div class="stat-cell"><b>${s.attempts}</b><span>recorded runs</span></div>
         <div class="stat-cell"><b>${s.keystrokes}</b><span>keystrokes in runs</span></div>
         <div class="stat-cell"><b>${Object.keys(s.ctx.pbs).length}</b><span>personal bests</span></div>
         <div class="stat-cell"><b>${s.streak}</b><span>day streak</span></div>
       </div>
-      ${improving.length ? `<p class="stats-improve">Improvement: ${improving.slice(0, 4).map(r => `${esc(r.title)} <b>${r.first.toFixed(1)}s → ${r.best.toFixed(1)}s</b>`).join(' · ')}</p>` : ''}
+      ${improving.length ? `<p class="stats-improve">Improvement: ${improving.slice(0, 4).map(r => `${esc(r.title)} <b>${r.first.toFixed(1)}s → ${r.best.toFixed(1)}s</b>`).join(', ')}</p>` : ''}
       ${s.shortcuts.length ? `<p class="stats-keys">Most-used shortcuts (from your best runs): ${s.shortcuts.sort((a, b) => b.count - a.count).slice(0, 6).map(u => `<kbd>${esc(u.keys)}</kbd>${u.count > 1 ? '×' + u.count : ''}`).join(' ')}</p>` : ''}
-      ${s.timeSaved > 5 ? `<p class="page-fine">Estimated time saved vs a mouse-and-menus route: ~${fmtDur(s.timeSaved)}. An estimate: keystroke counts against a slow route at half a second an action.</p>` : ''}
+      ${s.timeSaved > 5 ? `<p class="fine">Estimated time saved vs a mouse-and-menus route: ~${fmtDur(s.timeSaved)}. An estimate: keystroke counts against a slow route at half a second an action.</p>` : ''}
       <div class="stats-badges">${badgesHtml(s.ctx)}</div>
-    </div></section>`;
+    </section>`;
   }
 
   /** What the learner types to delete: their handle, or DELETE while the profile is still loading. */
@@ -154,44 +147,22 @@ export function mountAccountPage(root, ctx = {}) {
 
   function render() {
     const signedIn = auth.state() === 'in';
-    const all = store.all(); const p = prefs.get();
+    const all = store.all();
     const ids = Object.keys(all);
     const secs = ids.reduce((n, id) => n + (all[id].best || 0), 0);
-    el.innerHTML = `<div class="page-head"><h1>Account</h1><p class="page-sub">${signedIn ? `Signed in. Progress is <b>${esc(store.saveText().toLowerCase())}</b>.` : esc(siteCopy('account_guest', 'You’re a guest, so everything here is saved on this device only.'))}</p></div>
-      <div class="acct-grid">
-        ${signedIn ? profileCard() : signinCard()}
-        <div class="acct-col">
-          ${statsCard()}
-          ${[['desks', 'Desks', 'Create a desk, invite by code or link, a private board and assignments from a captain.', ''],
-            ['profile', 'Profile', 'Handle, level, rank, featured achievements, best times. School and desk by opt-in only.', '']].map(([id, t, d, note]) =>
-            `<section class="acard" id="sec-${id}"><div class="acard-cap">${t.toLowerCase()}</div><div class="acard-body"><h2>${t}</h2><p>${d}</p><p class="coming">Coming in a later phase.</p></div></section>`).join('')}
-        </div>
-      </div>
-      <section class="acard" id="sec-settings">
-        <div class="acard-cap">settings</div>
-        <div class="acard-body settings-grid">
-          <label class="set">Keys follow<select id="setPlatform">${PLATFORMS.map(v => `<option value="${v}"${p.platform === v ? ' selected' : ''}>${v === 'mac' ? 'Mac (⌘, ⌥)' : 'Windows (Ctrl, Alt)'}</option>`).join('')}</select><span class="set-note">Instructions and keycaps follow this. Stays with this device.</span></label>
-          <label class="set">Ribbon<select id="setRibbon"><option value=""${!p.ribbon ? ' selected' : ''}>Default (full in Chapter 1, slim after)</option><option value="full"${p.ribbon === 'full' ? ' selected' : ''}>Always the full ribbon</option><option value="slim"${p.ribbon === 'slim' ? ' selected' : ''}>Always the slim strip</option></select><span class="set-note">Alt shows KeyTips on either.</span></label>
-          <label class="set set-check"><input id="setMute" type="checkbox"${p.mute ? ' checked' : ''}> Mute sounds<span class="set-note">Sounds are soft and off until you start.</span></label>
-          <label class="set">Celebrations<select id="setEffects">${[['full', 'Full (ticks, chimes, banners)'], ['subtle', 'Subtle (small and quiet)'], ['off', 'Off (results only)']].map(([v, t]) => `<option value="${v}"${p.effects === v ? ' selected' : ''}>${t}</option>`).join('')}</select><span class="set-note">Also follows your system's reduced-motion setting.</span></label>
-          <label class="set set-check"><input id="setGhost" type="checkbox"${p.ghost !== false ? ' checked' : ''}> PB ghost in drills<span class="set-note">A faint cursor races your best run once you have one.</span></label>
-          <label class="set">Density<select id="setDensity">${[['comfortable', 'Comfortable (a step up, breathing room)'], ['compact', 'Compact (tighter, more on screen)']].map(([v, t]) => `<option value="${v}"${p.density === v ? ' selected' : ''}>${t}</option>`).join('')}</select><span class="set-note">Type, keycaps and the Ribbon; the sheet stays at Excel’s 100%.</span></label>
-          <label class="set">Lesson panel<select id="setPanelSide">${[['overlay', 'Floating card over the sheet (moves out of the way)'], ['right', 'Docked right of the sheet'], ['left', 'Docked left of the sheet']].map(([v, t]) => `<option value="${v}"${p.panelSide === v ? ' selected' : ''}>${t}</option>`).join('')}</select><span class="set-note">Also on the workspace strip. Ctrl+Shift+K hides or shows the card; Ctrl+Shift+J moves it.</span></label>
-          <div class="set"><span>Theme</span><button class="btn btn-ghost" id="setTheme" type="button">Open the theme picker</button><span class="set-note">${signedIn ? 'Follows your account.' : 'Also top right, on every page.'}</span></div>
-        </div>
-      </section>
-      <section class="acard" id="sec-data">
-        <div class="acard-cap">your data</div>
-        <div class="acard-body">
-          <p>${signedIn ? 'Your progress lives in your account. Export everything we hold, or delete the account and all of it.' : "Progress and settings live in this browser's storage. Export them as a file, or delete them here."}</p>
+    el.innerHTML = `<div class="h-row h-row-title"><h1 class="h-title">${esc(siteCopy('account_title', 'Account'))}</h1><span class="label">${signedIn ? esc(store.saveText()) : esc(siteCopy('account_guest', 'You’re a guest, so everything here is saved on this device only.'))}</span></div>
+      <div class="pg-two"><div class="pg-main">${signedIn ? profileCard() : signinCard()}</div>
+      <div class="pg-side">${statsCard()}
+      <section class="panel acct-panel" id="sec-data">
+        <div class="panel-head"><h2 class="panel-h">${esc(siteCopy('account_data', 'Your data'))}</h2></div>
+          <p class="panel-line">${signedIn ? 'Your progress lives in your account. Export everything we hold, or delete the account and all of it.' : "Progress and settings live in this browser's storage. Export them as a file, or delete them here."}</p>
           <div class="data-actions">
             <button class="btn btn-ghost" id="exportBtn" type="button">Export data (JSON)</button>
             ${signedIn ? (confirmDelete ? '' : '<button class="btn btn-danger" id="deleteAcctBtn" type="button">Delete account</button>') : '<button class="btn btn-danger" id="deleteBtn" type="button">Delete local data</button>'}
           </div>
           ${signedIn && confirmDelete ? deleteConfirmHtml() : ''}
-          <p class="page-fine">${ids.length ? `${ids.length} of ${LESSONS.length} lessons have progress${secs ? `; best times total ${secs.toFixed(1)} s` : ''}.` : 'Nothing is stored yet.'}${signedIn ? ' Deleting the account removes your profile, attempts and board entries. It cannot be undone.' : ''}</p>
-        </div>
-      </section>`;
+          <p class="fine">${ids.length ? `${ids.length} of ${LESSONS.length} lessons have progress${secs ? `; best times total ${secs.toFixed(1)} s` : ''}.` : 'Nothing is stored yet.'}${signedIn ? ' Deleting the account removes your profile, attempts and board entries. It cannot be undone.' : ''}</p>
+      </section></div></div>`;
     wire(signedIn);
   }
 
@@ -213,7 +184,7 @@ export function mountAccountPage(root, ctx = {}) {
       else if (tab === 'signup') res = await auth.signUpPassword(email, pw);
       else res = await auth.magicLink(email);
       busy = false;
-      if (res && res.error) notice = { kind: 'error', text: /Failed to fetch|NetworkError|fetch failed/i.test(res.error) ? 'Network error — check your connection and try again.' : res.error };
+      if (res && res.error) notice = { kind: 'error', text: /Failed to fetch|NetworkError|fetch failed/i.test(res.error) ? 'Network error. Check your connection and try again.' : res.error };
       else if (res && res.confirm) { notice = { kind: 'check', text: tab === 'magic' ? 'The sign-in link is on its way; it works on this device.' : 'Click the confirmation link to finish creating your account.' }; if (tab === 'signup') track('signup'); }
       else { notice = null; track(tab === 'signup' ? 'signup' : 'sign_in'); }   // signed in: onChange re-renders
       render();
@@ -224,7 +195,7 @@ export function mountAccountPage(root, ctx = {}) {
       busy = true; notice = null; render();
       const res = await auth.google();
       busy = false;
-      if (res && res.error) { notice = { kind: 'error', text: /provider is not enabled|validation_failed/i.test(res.error) ? 'Google sign-in is not switched on yet — use email for now.' : res.error }; render(); }
+      if (res && res.error) { notice = { kind: 'error', text: /provider is not enabled|validation_failed/i.test(res.error) ? 'Google sign-in isn’t switched on yet, so use email for now.' : res.error }; render(); }
     };
 
     // signed-in: handle + public toggle + sign out
@@ -247,7 +218,7 @@ export function mountAccountPage(root, ctx = {}) {
         await store.hydrate();
         showToast('Handle saved');
         render();
-      } catch (err) { if (auth.current(t)) { busy = false; notice = { kind: 'error', text: 'Network error — try again.' }; render(); } }
+      } catch (err) { if (auth.current(t)) { busy = false; notice = { kind: 'error', text: 'Network error. Try again.' }; render(); } }
     };
     const pub = el.querySelector('#pubToggle');
     if (pub) pub.onchange = async e => {
@@ -257,10 +228,10 @@ export function mountAccountPage(root, ctx = {}) {
       try {
         const { error } = await sb.rpc('rpc_set_profile', { p: { public_profile: v } });
         if (!auth.current(t)) return;
-        if (error) { showToast('Could not save — try again'); e.target.checked = !v; return; }
+        if (error) { showToast('Couldn’t save. Try again'); e.target.checked = !v; return; }
         showToast(v ? 'Profile is public' : 'Profile is private');
         store.hydrate();
-      } catch (err) { if (auth.current(t)) { showToast('Could not save — try again'); e.target.checked = !v; } }
+      } catch (err) { if (auth.current(t)) { showToast('Couldn’t save. Try again'); e.target.checked = !v; } }
     };
     const out = el.querySelector('#signOutBtn');
     if (out) out.onclick = async () => {
@@ -286,29 +257,19 @@ export function mountAccountPage(root, ctx = {}) {
         if (!auth.current(t)) return;
         if (error) {
           const m = String(error.message || '');
-          msg.textContent = m.includes('bad code') ? 'That code is not right — check it and try again.'
+          msg.textContent = m.includes('bad code') ? 'That code isn’t right. Check it and try again.'
             : m.includes('already used') ? 'That code has already been used.'
             : m.includes('expired') ? 'That code has expired.'
-            : m.includes('too many tries') ? 'Too many tries — wait an hour.'
-            : 'Could not redeem — try again.';
+            : m.includes('too many tries') ? 'Too many tries. Wait an hour.'
+            : 'Couldn’t redeem. Try again.';
           return;
         }
         const until = data && data.ends_at ? new Date(data.ends_at).toLocaleDateString() : null;
         msg.textContent = until ? `Paid access is on until ${until}.` : 'Paid access is on.';
         showToast('Code redeemed');
         el.querySelector('#redeemInput').value = '';
-      } catch (err) { if (auth.current(t)) msg.textContent = 'Network error — try again.'; }
+      } catch (err) { if (auth.current(t)) msg.textContent = 'Network error. Try again.'; }
     };
-
-    // settings (device prefs, unchanged)
-    el.querySelector('#setPlatform').onchange = e => { prefs.set({ platform: e.target.value }); showToast('Keys follow ' + (e.target.value === 'mac' ? 'Mac' : 'Windows')); };
-    el.querySelector('#setRibbon').onchange = e => { const v = e.target.value || null; prefs.set({ ribbon: v }); showToast('Ribbon: ' + (v || 'default')); };
-    el.querySelector('#setMute').onchange = e => { prefs.set({ mute: e.target.checked }); showToast(e.target.checked ? 'Sounds muted' : 'Sounds on'); };
-    el.querySelector('#setEffects').onchange = e => { prefs.set({ effects: e.target.value }); showToast('Celebrations: ' + e.target.value); };
-    el.querySelector('#setGhost').onchange = e => { prefs.set({ ghost: e.target.checked }); showToast(e.target.checked ? 'Ghost on' : 'Ghost off'); };
-    el.querySelector('#setDensity').onchange = e => { prefs.set({ density: e.target.value }); showToast('Density: ' + e.target.value); };
-    el.querySelector('#setPanelSide').onchange = e => { prefs.set({ panelSide: e.target.value }); showToast('Panel: ' + e.target.value); };
-    el.querySelector('#setTheme').onclick = () => { if (ctx.nav && ctx.nav.openThemes) ctx.nav.openThemes(); else { const b = document.getElementById('navThemes'); if (b) b.click(); } };
 
     // data
     el.querySelector('#exportBtn').onclick = async () => {
@@ -318,7 +279,7 @@ export function mountAccountPage(root, ctx = {}) {
           const t = auth.token();
           const { data, error } = await sb.rpc('rpc_export_my_data');
           if (!auth.current(t)) return;
-          if (error || !data) { showToast('Export failed — try again'); return; }
+          if (error || !data) { showToast('Export failed. Try again'); return; }
           download('hotkey-account-' + new Date().toISOString().slice(0, 10) + '.json', data);
         } else {
           download('hotkey-progress-' + new Date().toISOString().slice(0, 10) + '.json', exportRecord());
@@ -354,14 +315,14 @@ export function mountAccountPage(root, ctx = {}) {
           const { error } = await sb.rpc('rpc_delete_account');
           if (!auth.current(t)) return;
           busy = false;
-          if (error) { delGo.disabled = false; delGo.textContent = 'Delete my account'; msg.textContent = 'Could not delete — try again or contact support.'; return; }
+          if (error) { delGo.disabled = false; delGo.textContent = 'Delete my account'; msg.textContent = 'Couldn’t delete. Try again or contact support.'; return; }
           confirmDelete = false;
           await auth.signOut();
           showToast('Account deleted');
         } catch (e) {
           if (!auth.current(t)) return;
           busy = false; delGo.disabled = false; delGo.textContent = 'Delete my account';
-          msg.textContent = 'Network error — nothing was deleted. Try again.';
+          msg.textContent = 'Network error, so nothing was deleted. Try again.';
         }
       };
     }

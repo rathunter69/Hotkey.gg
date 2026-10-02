@@ -27,6 +27,7 @@ body[data-route="lesson"], body[data-route="drill"], body[data-route="due"]{over
 .wsc .rf-tab:hover{color:var(--ink); background:var(--sheet)}
 .wsc .rf-tab.on{color:var(--on-fill); background:var(--mode); margin:0; padding:var(--s1) var(--s3); font-weight:var(--fw-semi); border:0}
 .wsc .rf-tab.dead{color:var(--edge)}
+.wsc .rf-tab.rf-file, .wsc .rf-tab.rf-file.dead{color:var(--on-accent); background:var(--accent)}   /* File reads as Excel's: never dimmed with the tabs a run doesn't use */
 .wsc .rf-tab k{bottom:calc(-1 * var(--s2))}
 .wsc .rf-tools, .wsc .rf-tabs .rf-qat{display:none}   /* the toolbar has its own row; the layout toggle is a setting */
 .wsc .rf-body{background:var(--chrome)}
@@ -210,6 +211,7 @@ body[data-route="lesson"] #hkToast, body[data-route="due"] #hkToast, body[data-r
 .rp-best{position:absolute; top:50%; width:var(--s2); height:var(--s2); background:var(--sheet); border:var(--cursor-w) solid var(--clock-ink); transform:translate(-50%, -50%) rotate(45deg)}
 .rp-track-labels{display:flex; justify-content:space-between; gap:var(--s2); margin-top:var(--s2); font-size:var(--fs-min); color:var(--ink-2); font-variant-numeric:tabular-nums}
 .rp-check{display:flex; flex-direction:column; margin:0 calc(-1 * var(--s5))}
+.rp-task{position:relative}   /* the cursor's handle sits on the current task, not at the panel's foot */
 .rp-done, .rp-task, .rp-more{display:flex; gap:var(--s3); align-items:baseline; padding:var(--s3) var(--s5); border-bottom:1px solid var(--line); font-size:var(--fs-label); color:var(--ink)}
 .rp-done{font-weight:var(--fw-semi); align-items:center}
 .rp-task.rp-cur{background:var(--mode-tint); color:var(--mode-ink); font-weight:var(--fw-bold); padding-top:var(--s4); padding-bottom:var(--s4); font-size:var(--fs-name)}
