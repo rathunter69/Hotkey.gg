@@ -207,6 +207,7 @@ export const CONCEPTS = {
   'source-line': 'every table carries a source line under it, and a footnote marker where a figure needs a word',
   'label-column': 'a page has a shape: a narrow margin in A, the labels fitted in B, and one set width across the period columns',
   'paste-formats-tile': 'Paste Special Formats from one column onto a wider block repeats the column’s formats across every column of the block',
+  'header-alignment': 'headers sit bold and right-aligned over their figures, and a long header wraps inside its column rather than widening it',
   'outline-detail': 'Hide Detail (Alt, A, H) folds a group to its total and Show Detail (Alt, A, J) opens it again',
   'group-not-hide': 'hidden rows get forgotten: group detail that belongs on the page, and give a different page its own sheet',
   'navigation-column': 'a navigation column lists a long sheet’s named blocks at the top, and Go To with a name lands on each one',
