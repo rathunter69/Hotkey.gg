@@ -1923,6 +1923,18 @@ export const COPY = {
    "mac_note": "",
    "story_beat": ""
   },
+  "challenge-one-site-month": {
+   "id": "challenge-one-site-month",
+   "module": "the-three-statements",
+   "order": "5.1.C",
+   "title": "Challenge: one site’s month through the three statements",
+   "brief": "Mueller’s month: the inputs given and most lines in place, the ones that carry each statement left for you. Write them, from revenue to the balance check at zero and the three ratios.",
+   "closing": "",
+   "wow": "",
+   "convention_line": "The check is a live difference → 0; Cash balances the sheet; nothing is forced",
+   "mac_note": "",
+   "story_beat": ""
+  },
   "remix-format-on-the-pnl": {
    "id": "remix-format-on-the-pnl",
    "module": "remixes",
@@ -12145,6 +12157,56 @@ export const COPY = {
     "teach": "",
     "why": "",
     "hint_stuck": "pulse cell C97 · Debt sits below EBITDA, so the margin never sees it."
+   }
+  ],
+  "challenge-one-site-month": [
+   {
+    "lesson_id": "challenge-one-site-month",
+    "goal_index": "0",
+    "text": "Revenue in C33, EBITDA in C45 and net income in C52.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-one-site-month",
+    "goal_index": "1",
+    "text": "The payable in C59 and the receivable in C60.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-one-site-month",
+    "goal_index": "2",
+    "text": "Cash from operations in C69 and closing cash in C76.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-one-site-month",
+    "goal_index": "3",
+    "text": "Balance-sheet cash in C79 from the cash flow, closing equity in C89 and the total in C90.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-one-site-month",
+    "goal_index": "4",
+    "text": "The balance check in C91, reading zero.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-one-site-month",
+    "goal_index": "5",
+    "text": "EBITDA margin in C94, cash conversion in C95 and leverage in C97.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
    }
   ]
  },

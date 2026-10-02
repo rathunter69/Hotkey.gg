@@ -1235,3 +1235,9 @@ read-like-a-buyer,2,"Net debt =C85-C79 in C96, and leverage =C96/(C45*12) in C97
 read-like-a-buyer,3,"Interest cover in C98: =-C45/C49, a positive multiple because interest is a negative.",Interest cover is EBITDA over interest: how many times the profit pays the interest. Leverage says how much debt; cover says whether the earnings can carry it.,,pulse cell C98 · The minus turns the negative interest into a positive ratio.
 read-like-a-buyer,4,"Return on the site in C99: =C43*12/C16, a year of site contribution over the build.","The return on the site is a year of site contribution, which is after rent, over the $2,500,000 Clearcoat spent building it. Best practice: the same ratios on every set of statements, in the same place, in the same formats, so a reader compares sites at a glance.",,pulse cell C99 · Site contribution is C43 and the build C16.
 read-like-a-buyer,5,"Does it tie? Watch the loan in C18 fall to $1,000,000: leverage drops and cover rises, while the margin doesn’t move.",,,"pulse cell C97 · Debt sits below EBITDA, so the margin never sees it."
+challenge-one-site-month,0,"Revenue in C33, EBITDA in C45 and net income in C52.",,,
+challenge-one-site-month,1,The payable in C59 and the receivable in C60.,,,
+challenge-one-site-month,2,Cash from operations in C69 and closing cash in C76.,,,
+challenge-one-site-month,3,"Balance-sheet cash in C79 from the cash flow, closing equity in C89 and the total in C90.",,,
+challenge-one-site-month,4,"The balance check in C91, reading zero.",,,
+challenge-one-site-month,5,"EBITDA margin in C94, cash conversion in C95 and leverage in C97.",,,

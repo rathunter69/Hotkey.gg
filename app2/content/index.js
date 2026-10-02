@@ -174,6 +174,7 @@ import the_balance_sheet from './lessons/the-balance-sheet.js';
 import how_the_statements_link from './lessons/how-the-statements-link.js';
 import one_week_three_statements from './lessons/one-week-three-statements.js';
 import read_like_a_buyer from './lessons/read-like-a-buyer.js';
+import challenge_one_site_month from './lessons/challenge-one-site-month.js';
 
 export const CHAPTERS = [
   {
@@ -307,7 +308,7 @@ export const CHAPTERS = [
       { name: 'Project and assessment', blurb: 'The operating model with its DCF page, then one schedule and the links from it against the clock.' },
     ],
     lessons: [
-      the_income_statement, accrual_and_cash, the_cash_flow_statement, the_balance_sheet, how_the_statements_link, one_week_three_statements, read_like_a_buyer,
+      the_income_statement, accrual_and_cash, the_cash_flow_statement, the_balance_sheet, how_the_statements_link, one_week_three_statements, read_like_a_buyer, challenge_one_site_month,
     ],
   },
 ];
