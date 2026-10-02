@@ -1851,6 +1851,18 @@ export const COPY = {
    "mac_note": "",
    "story_beat": ""
   },
+  "fill-and-format-block": {
+   "id": "fill-and-format-block",
+   "module": "model-speed",
+   "order": "5.7.2",
+   "title": "Fill and format a block in one pass",
+   "brief": "The cost build, working capital and PP&E on Schedules hold their FY24 column and nothing else: forty rows waiting to be filled and finished. Fill each block in one motion with Ctrl+R, then format by whole lines: the desk number format, the top border on every total, italic on the margins, each done once and repeated with F4. One pass, no cell touched twice. The key is `Ctrl+R`.",
+   "closing": "You filled and formatted forty rows without touching a cell twice. || Two presses filled the block and three formats finished it, each set once and repeated with F4. The habit scales: a schedule four times this size takes the same handful of moves. Best practice: format by line, never cell by cell, so a line can only ever look one way.",
+   "wow": "You filled and formatted forty rows without touching a cell twice.",
+   "convention_line": "Ctrl+D down, Ctrl+R across; A top border, never an all-borders grid",
+   "mac_note": "",
+   "story_beat": ""
+  },
   "remix-format-on-the-pnl": {
    "id": "remix-format-on-the-pnl",
    "module": "remixes",
@@ -11733,6 +11745,56 @@ export const COPY = {
     "teach": "",
     "why": "",
     "hint_stuck": "pulse cell J10 · The check is the IS’s revenue less the build’s, so it reads 0 whatever the case says."
+   }
+  ],
+  "fill-and-format-block": [
+   {
+    "lesson_id": "fill-and-format-block",
+    "goal_index": "0",
+    "text": "Select C30:J56 on Schedules, the cost build and working capital, and fill the block right with Ctrl+R.",
+    "teach": "A block fills in one motion: select from its first formula column to FY31 and press Ctrl+R, and every row takes its own first cell’s formula and format. The memo cells in C57 and C67 live in one column only, so the selections stop short of them.",
+    "why": "",
+    "hint_stuck": "pulse range C30:J56 · Every row’s formula is in C already; one press carries all of them."
+   },
+   {
+    "lesson_id": "fill-and-format-block",
+    "goal_index": "1",
+    "text": "Fill the PP&E block the same way: select C60:J66 and press Ctrl+R.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C60:J66 · Stop at row 66: the implied life in C67 is one cell, not a row."
+   },
+   {
+    "lesson_id": "fill-and-format-block",
+    "goal_index": "2",
+    "text": "Desk number format on the cost lines C32:J37 through Ctrl+1, then F4 on C41:J41, C47:J48, C53:J55, C61:J62 and C64:J64.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C32:J37 · The first line of each block and the totals carry the $ already; the lines between take the plain code."
+   },
+   {
+    "lesson_id": "fill-and-format-block",
+    "goal_index": "3",
+    "text": "Top border on Site costs C38:J38 with Alt H B P, then F4 on the totals in rows 39, 42, 49, 56, 63 and 65.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C38:J38 · A top border marks a total; F4 repeats the border, not the selection."
+   },
+   {
+    "lesson_id": "fill-and-format-block",
+    "goal_index": "4",
+    "text": "Italic on the cost of sales share C31:J31 with Ctrl+I, then F4 on the two margins, C40:J40 and C43:J43.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C31:J31 · Italic sets a ratio apart from the dollars around it."
+   },
+   {
+    "lesson_id": "fill-and-format-block",
+    "goal_index": "5",
+    "text": "Does it tie? Watch labor per site, Inputs C50, go from 257 to 300: every cost line moves and the cross-foot in Checks C11 holds at 0.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C11 · The cross-foot sums the block down, then across, and takes one from the other."
    }
   ]
  },

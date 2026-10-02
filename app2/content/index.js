@@ -168,6 +168,7 @@ import ch4_project from './lessons/ch4-project.js';
 import ch4_assessment from './lessons/ch4-assessment.js';
 // Chapter 5 · Finance and Accounting (Run R5): 5.7 Model speed, 5.8 Project and assessment
 import revenue_build_in_three from './lessons/revenue-build-in-three.js';
+import fill_and_format_block from './lessons/fill-and-format-block.js';
 
 export const CHAPTERS = [
   {
@@ -302,6 +303,7 @@ export const CHAPTERS = [
     ],
     lessons: [
       revenue_build_in_three,
+      fill_and_format_block,
     ],
   },
 ];
