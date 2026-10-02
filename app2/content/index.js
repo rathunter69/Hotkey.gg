@@ -224,6 +224,7 @@ import challenge_precedents from './lessons/challenge-precedents.js';
 import sources_and_uses from './lessons/sources-and-uses.js';
 import tranches_and_sweep from './lessons/tranches-and-sweep.js';
 import sale_leasebacks from './lessons/sale-leasebacks.js';
+import irr_moic from './lessons/irr-moic.js';
 
 export const CHAPTERS = [
   {
@@ -381,7 +382,7 @@ export const CHAPTERS = [
     ],
     lessons: [
       deal_multiples_premiums, sort_and_decide, applying_precedents, challenge_precedents,
-      sources_and_uses, tranches_and_sweep, sale_leasebacks,
+      sources_and_uses, tranches_and_sweep, sale_leasebacks, irr_moic,
     ],
   },
 ];
