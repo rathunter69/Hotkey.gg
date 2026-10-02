@@ -1875,6 +1875,18 @@ export const COPY = {
    "mac_note": "",
    "story_beat": ""
   },
+  "the-balance-sheet": {
+   "id": "the-balance-sheet",
+   "module": "the-three-statements",
+   "order": "5.1.4",
+   "title": "The balance sheet",
+   "brief": "The balance sheet is a snapshot: what the company owns (cash, receivables, the tunnels net of wear), what it owes (payables, deferred revenue, debt) and what is left for the owners, equity, which grows by net income. The cash flow statement’s closing cash lands in the top line, and if everything else is right, assets equal liabilities plus equity. That equality is the check that proves the other two statements. Build Domain’s at September 30 and watch it balance. The key is `=`.",
+   "closing": "Assets equal liabilities plus equity, and that one zero proves the other two statements. || Cash came from the cash flow, net income from the income statement, and the two sides agreed without a number forced. Best practice: never type cash, never plug the check; when it doesn’t read zero, something upstream is wrong, and 5.4.5 is the order to look in.",
+   "wow": "Assets equal liabilities plus equity, and that one zero proves the other two statements.",
+   "convention_line": "Cash balances the sheet; nothing is forced; The check is a live difference → 0",
+   "mac_note": "",
+   "story_beat": ""
+  },
   "remix-format-on-the-pnl": {
    "id": "remix-format-on-the-pnl",
    "module": "remixes",
@@ -11873,6 +11885,64 @@ export const COPY = {
     "teach": "",
     "why": "",
     "hint_stuck": "pulse cell C76 · Capex is the only line the rate moves."
+   }
+  ],
+  "the-balance-sheet": [
+   {
+    "lesson_id": "the-balance-sheet",
+    "goal_index": "0",
+    "text": "Assets from C79: cash =C76 from the cash flow, receivables =C60, and PP&E net =C16-C30+C47-C70.",
+    "teach": "Assets are what the site owns: the cash, the card revenue not yet collected, and the tunnel at what it cost, less the wear charged so far, plus the month’s capex. Domain’s land is rented, so there is no land on this page.",
+    "why": "",
+    "hint_stuck": "pulse range C79:C81 · Depreciation in C47 and capex in C70 are both negatives, so they flip."
+   },
+   {
+    "lesson_id": "the-balance-sheet",
+    "goal_index": "1",
+    "text": "Total assets in C82, =SUM(C79:C81).",
+    "teach": "Assets list most liquid first and liabilities soonest due first, and current means inside twelve months: receivables are a current asset, payables and deferred revenue current liabilities. Cash is current too, though it sits outside working capital.",
+    "why": "",
+    "hint_stuck": "pulse cell C82 · Three lines above it."
+   },
+   {
+    "lesson_id": "the-balance-sheet",
+    "goal_index": "2",
+    "text": "Liabilities from C83: payables =C59, deferred revenue =C57, the loan =C18+C72, and their SUM in C86.",
+    "teach": "Liabilities are what the site owes: the chemical bill, the washes members have paid for, and the loan less this month’s repayment. Published accounts split next year’s repayments out as the current portion of debt; the model keeps each loan on one row.",
+    "why": "",
+    "hint_stuck": "pulse range C83:C86 · The repayment in C72 is a negative, so the loan is a plain sum."
+   },
+   {
+    "lesson_id": "the-balance-sheet",
+    "goal_index": "3",
+    "text": "Equity: opening =C29+C28+C16-C30-C27-C18 in C87, net income =C52, closing =C87+C88 in C89.",
+    "teach": "Equity is what is left for the owners: what the opening balances leave once the debts are paid, plus what the month earned. Net income is the link from the income statement into the balance sheet.",
+    "why": "",
+    "hint_stuck": "pulse range C87:C89 · Opening cash, receivables and the tunnel net, less payables and the loan."
+   },
+   {
+    "lesson_id": "the-balance-sheet",
+    "goal_index": "4",
+    "text": "Total liabilities and equity =C86+C89 in C90, and the balance check =ROUND(C82-C90,2) in C91, reading zero.",
+    "teach": "The balance check is a live difference (1.7.2): assets less liabilities and equity, rounded so floating-point dust reads as nil. Every figure here is what was paid, not what it would sell for, so this equity isn’t what Clearcoat is worth; Chapter 6 answers that.",
+    "why": "",
+    "hint_stuck": "pulse range C90:C91 · Assets in C82 less the total in C90."
+   },
+   {
+    "lesson_id": "the-balance-sheet",
+    "goal_index": "5",
+    "text": "Break it on purpose: type 60000 over the cash in C79, watch the check leave zero, then Ctrl+Z.",
+    "teach": "A typed cash figure would make the check meaningless, because it can be set to anything. Best practice: cash is never typed on a balance sheet; it is the cash flow statement’s closing line, so the check proves something.",
+    "why": "",
+    "hint_stuck": "pulse cell C79 · Ctrl+↑ climbs the block to the cash line; Ctrl+Z puts the link back."
+   },
+   {
+    "lesson_id": "the-balance-sheet",
+    "goal_index": "6",
+    "text": "Does it tie? Watch the ticket in C7 go to $15: all three statements move, and the check stays at zero.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C91 · Net income, cash and equity all move by the same story."
    }
   ]
  },
