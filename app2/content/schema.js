@@ -197,6 +197,15 @@ export const CONCEPTS = {
   'concatenate-amp': '& joins text and cell values into one string: ="FY"&TEXT(B3,"yy")&"A"',
   'conditional-format-code': 'a section may open with a condition or a color, [>=1000]0,"k" or [Red], and Excel uses the first section whose condition the value meets',
   'hide-zeros': 'an empty section shows nothing: #,##0;(#,##0); hides the zeros of a working block',
+  // Chapter 2, modules 2.5 and 2.6: conditional formatting, and dates and text for presentation
+  'highlight-rule': 'Conditional Formatting (Alt, H, L) › Highlight Cells Rules: Less Than, Greater Than, Between, Equal To paint a cell whose value meets the test',
+  'manage-rules': 'Manage Rules (Alt, H, L, R) lists the sheet\u2019s rules in the order they run: read, delete, move up or down, Stop If True',
+  'formula-rule': 'New Rule › Use a formula (Alt, H, L, N): written for the top-left cell of the selection and read in every cell as if filled, so $A7 locks the column and lets the row move',
+  'rule-order': 'rules run top-down; Move Up puts one first, and Stop If True ends the walk for a cell where it holds',
+  'data-bars': 'Data Bars and Color Scales (Alt, H, L, D and S) draw a chart inside the cells; Clear Rules (Alt, H, L, C) takes rules off the selection or the sheet',
+  'eomonth-edate': 'EOMONTH(date, n) is the last day of the month n months on; EDATE(date, n) the same day n months on',
+  'clean-text': 'TRIM strips stray spaces, PROPER capitalizes each word, SUBSTITUTE swaps one piece of text for another: together they clean an imported label',
+  'single-source-line': 'a line every page shows is built once from the inputs and read everywhere, so one edit changes every page',
 };
 
 /**
@@ -254,7 +263,7 @@ export function validateLesson(l) {
     need(WORKBOOKS[l.workbook], `unknown workbook "${l.workbook}" (content/workbooks)`);
     need(isObject(l.state) && typeof l.state.before === 'string', 'a module lesson needs state.before');
     need(SEEDED_KINDS.includes(kind) || typeof l.state.after === 'string', 'a module lesson needs state.after (a seeded kind is graded by its goals)');
-    if (l.plant !== undefined) need(isObject(l.plant) && Object.keys(l.plant).every(k => /^[A-Za-z0-9 ]+!(#?[A-Za-z]+[0-9]*)$/.test(k)), 'plant is a state patch: { "Sheet!A1": cell | null, "Sheet!#colW": {…} }');
+    if (l.plant !== undefined) need(isObject(l.plant) && Object.keys(l.plant).every(k => /^[A-Za-z0-9 &]+!(#?[A-Za-z]+[0-9]*)$/.test(k)), 'plant is a state patch: { "Sheet!A1": cell | null, "Sheet!#colW": {…} }');
     if (kind !== 'challenge') {
       need(typeof l.headline === 'string' && l.headline.trim(), 'headline (the one concept the lesson exists to teach) missing');
       need(Array.isArray(l.conventions) && l.conventions.length > 0 && l.conventions.every(id => CONVENTIONS[id]), 'every module lesson carries at least one canon convention id');
