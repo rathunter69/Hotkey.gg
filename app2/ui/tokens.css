@@ -15,6 +15,7 @@
   --ink:#17201B;          /* text */
   --ink-2:#525D57;        /* secondary text */
   --rail:#16201A; --rail-hi:#2B3A31; --rail-text:#C9D3CD; --rail-sub:#AEBBB4;   /* the left rail */
+  --rail-on:#FFFFFF; --rail-accent:#5CC48A;   /* the rail's current item and its green (the wordmark, the bars, the avatar): the rail is dark in every theme */
   --note:#FFF6C7; --note-ink:#17201B; --note-edge:#B9A53C;   /* a note on the sheet: Excel's yellow paper and dark ink, the same in every theme */
   --red:#C23B2A;          /* the reviewer's pen, a note's corner, errors */
   --on-fill:#FFFFFF;      /* text on a mode's fill */
@@ -54,6 +55,7 @@
   --font:'Hanken Grotesk',system-ui,sans-serif;          /* every label, button, heading and sentence */
   --mono:'JetBrains Mono',ui-monospace,monospace;        /* keys, addresses, formulas, times, the wordmark */
   --cellfont:Arial,'Calibri','Segoe UI',system-ui,sans-serif;   /* the sheet's own face */
+  --fx-font:Georgia,'Times New Roman',serif;   /* the formula bar's italic fx */
   --fs-landing:64px; --fs-landing-narrow:40px; --fs-prompt:52px; --fs-time:34px; --fs-title:28px; --fs-head:22px; --fs-clock:26px;
   --fs-item:18px; --fs-panel:17px; --fs-body:15px; --fs-name:14.5px; --fs-label:13px; --fs-key:12.5px; --fs-min:12px;
   --fw-heavy:800; --fw-bold:700; --fw-semi:600; --fw-key:500; --fw-body:400;
@@ -71,7 +73,7 @@
   --r-plate:12px; /* plates on the landing page */
 
   /* ---------- sizes ---------- */
-  --rail-w:232px; --content-top:30px; --content-side:36px; --side-col:336px;
+  --rail-w:232px; --rail-pad:14px; --rail-indent:28px; --rail-item-h:40px; --rail-sub-h:32px; --rail-acct-h:48px; --rail-avatar:30px; --rail-cell:6px; --rail-streak-w:110px; --content-top:30px; --content-side:36px; --side-col:336px;
   --panel-w:340px; --card-w:330px; --card-gap:16px;
   --tabrow-h:34px; --titlebar-h:32px; --xl-tabs-h:28px; --foot-h:30px; --cursor-cell-w:3px; --sel-edge-w:2px; --veil-w:420px; --sbar-h:22px; --ws-foot-h:calc(var(--foot-h) + 1px); --ribbon-h:96px; --ribbon-groups-h:72px; --ribbon-tabs-h:24px; --qat-h:26px;
   --cursor-w:2px; --bw-1-5:1.5px; --bw-2:2px; --bw-3:3px; --tick-check:5px; --cursor-handle:6px; --mode-mark:9px; --mode-rule:3px; --key-edge:3px; --route-bar:3px;
@@ -80,6 +82,9 @@
   --lp-max:1240px; --lp-gap:88px; --lp-demo-h:440px; --lp-demo-h-narrow:380px; --lp-plate-h:236px; --lp-card-w:264px; --lp-sq:7px; --lp-sq-gap:2px;
   /* the site pages' parts (M89, M104): goal segments, the level and field bars, tier marks, badge tiles, the sheet preview, a table row */
   --seg-w:24px; --seg-h:5px; --bar-h:6px; --field-bar-w:200px; --tier-mark:9px; --badge-tile:48px; --preview-h:300px; --sp-row:17px; --row-h:36px; --level-tile:40px;
+  /* the path (Learn, the drill catalog): a lesson's node, the node where the learner is, the line between them, a module's key, a lesson row's status column */
+  --set-len-w:56px; --kb-u:34px; --kb-gap:3px; --kb-pad:2px; --fs-kb:10px; --kr-focus-w:300px; --kr-what-min:150px; --theme-card-w:140px; --theme-card-h:96px; --prof-lvl:72px; --ach-art:48px; --cert-bar-w:120px; --cert-n:28px;
+  --pn:14px; --pn-now:20px; --pn-gap:14px; --mod-n-w:48px; --ls-st-w:96px; --lc-n-w:64px;
 
   /* ---------- durations (3.0, Motion and moments) ---------- */
   --d-cursor:80ms; --d-key:90ms; --d-menu:140ms; --d-beat:140ms; --d-route:150ms; --d-note:160ms; --d-card:200ms; --d-goal:250ms;
@@ -91,6 +96,7 @@
 
   /* ---------- the one shadow, for floating things only ---------- */
   --shadow-float:0 14px 36px -14px rgba(0,0,0,.35);
+  --scrim:color-mix(in srgb, var(--rail) 55%, transparent);   /* behind a pop-out over the product (the first run) */
 
   /* ---------- the names the older stylesheets read: they resolve to the tokens above ----------
      (app.css, shell.css, site.css, next.css and workbook.css were written against these; a theme

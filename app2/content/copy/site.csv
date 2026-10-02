@@ -112,7 +112,7 @@ level_title_ties_out,Ties Out
 level_title_model_owner,Model Owner
 level_title_hard_clock,Hard Clock
 level_title_top_bucket,Top Bucket
-level_reward_themes_start,"Workbook, Daylight and six more themes"
+level_reward_themes_start,"Workbook, High Contrast and Graphite"
 level_reward_theme,A theme
 level_reward_crimson,Crimson and the Top Bucket frame
 level_reward_profile_frame,The profile frame
@@ -222,7 +222,7 @@ col_module,Module
 col_lesson,Lesson
 col_minutes,Minutes
 col_status,Status
-status_complete,Complete
+status_complete,Done
 status_lessons_done,"Lessons done, challenge open"
 status_in_progress,In progress
 status_not_started,Not started
@@ -233,7 +233,7 @@ status_verified,Verified
 status_lesson_of,Lesson {n} of {m}
 home_level,Level {n}
 home_xp,{n} of {next} XP
-home_next_reward,At level {n}: {reward}.
+home_next_reward,Level {n}:
 home_top_level,The top level.
 home_today,Today
 home_today_done,{d} of {n} done
@@ -253,7 +253,7 @@ home_ach_next,Next: {badge}
 paywall_go_pro,Get full access
 paywall_not_now,Not now
 learn_tab,Chapter {n}
-learn_page_fill,Pass the challenge to fill this in.
+learn_page_fill,Pass its challenge to finish the module and earn its badge.
 learn_page_built,"{page}, built"
 learn_coming,Chapter {n} is being written. Its modules land here.
 practice_drills,Drills
@@ -309,7 +309,7 @@ col_player,Player
 col_field,Time against the field
 col_time,Time
 col_gap,Gap
-col_keys,Keys
+col_keys,Keys it drills
 boards_keys_route,Keys ({n} on the route)
 boards_up,up {k}
 boards_down,down {k}
@@ -345,7 +345,7 @@ first_run_fine,Instructions and keycaps follow the keyboard choice. Both setting
 first_run_then,then
 first_run_next,Next
 first_run_skip,Skip
-first_run_start,Start lesson 1.1.1
+first_run_start,Open the workbook
 landing_start,Start learning
 landing_fact_lessons,{n} lessons.
 landing_fact_challenges,{n} challenges.
@@ -529,7 +529,7 @@ more_expand,Show the Ribbon
 more_move,Move the card
 more_report,Report a problem
 restart_title,Restart this lesson?
-restart_body,"The sheet goes back to how the lesson started. Your other lessons aren’t touched."
+restart_body,The sheet goes back to how the lesson started. Your other lessons aren’t touched.
 restart_action,Restart
 dialog_cancel,Cancel
 card_intro,"This card shows your goal and its keys, and it follows the work around the sheet."
@@ -682,6 +682,121 @@ account_get,Get full access
 account_cancel_note,Cancelling keeps your access to the end of the month you paid for.
 account_billing_err,Billing didn’t open. Try again in a minute.
 account_billing_none,There is no subscription on this account yet.
+home_xp_to_go,{n} XP to go
+learn_free,Free
+learn_being_written,Being written
+learn_up_next,Up next
+learn_reward,Finish {module} to earn it
+learn_reward_earned,Earned
+practice_chapter_coming,Chapter {n} is being written. Its drills land here as its lessons do.
+learn_keys_n,{n} keys
+home_xp_why,"Lessons, drills and the Daily pay XP. Every level opens a reward."
+save_title,Save your progress
+save_line,Your progress lives in this browser for now. A free account keeps it on any device and puts your times on the boards.
+save_go,Make a free account
+rapid_start_len,Play {len}
+rapid_lengths,Pick a length
+rapid_keys_hint,"Press 1, 2 or 3 to play"
+rapid_deck,The deck
+rapid_deck_n,{n} commands
+rapid_how,How a round works
+rapid_how_1,We name a command. Press its keys; they show only if you stall.
+rapid_how_2,"Every hit scores, and every fifth hit in a row scores more."
+rapid_how_3,"When the clock runs out, your hits and best combo are your score."
+challenges_intro,"Each module ends on a challenge: the whole module on a fresh file, against the clock."
+challenges_passed,{n} of {m} passed
+boards_clean_runs_one,One clean run
+boards_day_runs_one,"{day}, one clean run"
+daily_today,Today
+daily_not_clean,No clean run
+daily_missed,Not played
+daily_week,Your week
+daily_week_played,{n} of 7 days played clean
+daily_keys,The keys it drills
+daily_rules,"One public board a day. Only a clean run posts a time: no help, no mouse."
+save_line_boards,"A free account puts your Daily time on the public board next to everyone else's, and keeps your progress on any device."
+first_run_free_k,Free
+first_run_free,"Chapter 1, all of it, with its drills, the Daily and the boards."
+first_run_full,"Chapters 2 to 6 and their timed play, when you want them."
+first_run_save,Progress saves in this browser. A free account keeps it on any device; make one now or after a lesson.
+first_run_tour,Show me around
+orientation_pro,"Chapter 1 is free in full, and Full Access opens Chapters 2 to 6 with their timed play."
+orientation_account,Progress saves in this browser until a free account keeps it on any device and puts your times on the boards.
+coach_done,Done
+signin_head,Sign in or make a free account
+signin_line,Type your email and we send a 6-digit code. New here? The same code makes your account.
+signin_google,Continue with Google
+signin_fine,Your progress in this browser moves to the account. Chapter 1 stays free either way.
+home_tour,Take the tour
+rapid_len_short_30,30 s
+rapid_len_short_60,60 s
+rapid_len_short_120,120 s
+col_command,Command
+col_keys_press,Keys
+ach_hidden_name,Hidden
+ach_hidden_desc,Keep playing to find it
+rarity_common,Common
+rarity_rare,Rare
+rarity_epic,Epic
+rarity_legendary,Legendary
+profile_guest,Guest
+profile_lessons,Lessons done
+profile_drills_pass,Drills at Pass or better
+profile_dailies,Dailies played
+profile_best_daily,Best Daily
+col_level,Level
+col_title,Title
+col_reward,What it pays
+profile_levels,Level titles
+profile_you_are,"You: level {n}, {title}"
+profile_levels_line,"Every level pays something: a theme every third level, keycap skins, sounds and board flair between."
+profile_account_link,"Account details, and export or delete your data"
+cert_next_done,"All six chapters are Verified, and your certificate is issued."
+cert_next_writing,Chapter {n} is being written. It opens on Learn when it lands.
+cert_next_assess,"Take the Chapter {n} assessment: a hard clock, no help and no mouse."
+cert_next_lessons,"Finish Chapter {n}: {left} lessons to go, then its assessment."
+cert_next_lessons_one,"Finish Chapter {n}: one lesson to go, then its assessment."
+cert_issued,Issued
+cert_not_yet,Not issued yet
+cert_awarded_to,Awarded to
+cert_you,You
+cert_issued_at,Issued at 6 of 6
+cert_see,See your certificate
+cert_verified_time,"Verified, {t}"
+cert_verified,Verified
+cert_ready,Ready for the assessment
+cert_lessons,{d} of {m} lessons
+cert_next_k,Next
+cert_go,Go
+cert_earn_head,What you earn
+cert_earn_1,"A certificate with your name and the date, issued when all six chapters are Verified."
+cert_earn_2,"A public page anyone can check, with your assessment times."
+cert_earn_3,One click to add it to your LinkedIn profile.
+cert_how,"Each chapter ends in an assessment on a hard clock, no help and no mouse. Pass it and the chapter is Verified."
+settings_look_line,How hotkey.gg looks. Nothing here changes how you play.
+settings_game_head,Game options
+settings_game_line,"How lessons, drills and the keyboard behave."
+setting_on,On
+setting_off,Off
+theme_light,Light
+theme_dark,Dark
+pricing_line,Chapter 1 is free in full. Full Access opens the other five chapters and the certificate.
+pricing_sheet_head,What each plan opens
+pricing_col_what,In the course
+pricing_row_play,"Rapid-fire, the Daily and the boards"
+pricing_row_cert,The certificate
+pricing_included,Included
+pricing_not_included,Not included
+ref_board_hint,"Press any shortcut with Ctrl, or a function key, to find it here. Or point at a row."
+ref_open_lesson,Lesson {n}
+ref_no_key,Nothing in the course uses {k} yet.
+ref_board,The keyboard
+ref_leg_open,Not yet
+ref_leg_got,Yours
+save_line_ch1,Chapter 1 is nearly done. A free account keeps your progress on any device and puts your name on the certificate.
+certificate_name,hotkey.gg Certified
+certificate_course,Excel for Finance
+certificate_progress,{n} of 6 chapters Verified
 teams_title,Teams and schools
 teams_sub,"For banks, training providers, finance clubs, classes and friend groups. There are two things a group can do here."
 teams_desk_cap,Start a desk

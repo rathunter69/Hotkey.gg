@@ -26,6 +26,7 @@ import { settings } from './settings.js';
 import { dayOf } from './records.js';
 import { store } from './store.js';
 import { auth } from './auth.js';
+import { wireSigninLinks } from '../ui/components/signin-dialog.js';
 import { entitlement } from './entitlement.js';
 import { track, installErrorLog } from './telemetry.js';
 import { captureInstall } from './install.js';
@@ -171,6 +172,7 @@ const LOADERS = {
   pricing: { file: './pricing-page.js', pick: m => m.mountPricingPage },
   teams: { file: './teams-page.js', pick: m => m.mountTeamsPage },
   account: { file: './account-page.js', pick: m => m.mountAccountPage },
+  profile: { file: './profile-page.js', pick: m => m.mountProfilePage },   // #/account (profile, certificate): the band, the shelf, the level titles; the certificate as progress
   checkout: { file: './checkout-page.js', pick: m => m.mountCheckoutPage },   // Phase E: the embedded form, behind the payments flag
   about: { file: './legal-pages.js', pick: m => m.mountAboutPage },
   terms: { file: './legal-pages.js', pick: m => r => m.mountLegalPage(r, 'terms') },
@@ -258,7 +260,7 @@ export function startApp({ navEl, rootEl, footEl }) {
   // the rail's foot: the level with its XP, the streak with the week's cells, Go Pro for a free account (none on the landing and the first run)
   function refreshLevel() {
     const name = document.body.dataset.route;
-    if (name === 'landing' || name === 'start') { nav.setLevel(null); nav.setStreak(null); return; }
+    if (name === 'landing') { nav.setLevel(null); nav.setStreak(null); return; }
     const set = () => {
       try {
         const ctx = stats.gameCtx();
@@ -280,6 +282,7 @@ export function startApp({ navEl, rootEl, footEl }) {
     nav.setSaveState(store.saveText());
   }
   installErrorLog();
+  wireSigninLinks(document.body);   // signed out, every link to the account opens the sign-in pop-out (Wolf, 28)
   captureInstall();
   // signed in at boot: the page mounted from the device cache, so once the account's records arrive a
   // dashboard page that would read differently is drawn again (never a workspace mid-run)
@@ -346,6 +349,7 @@ export function startApp({ navEl, rootEl, footEl }) {
     }
     nav.setLanding(name === 'landing');
     nav.setActive(navKeyFor(name, r.params));
+    if (nav.setSection) nav.setSection(name === 'account' ? (['profile', 'settings', 'billing', 'certificate'].includes(r.query.section) ? r.query.section : 'profile') : null);
     document.title = titleFor(name, lesson ? lesson.title : name === 'drill' ? (drill ? drill.title : 'Sandbox') : '');
     document.body.dataset.route = name;
     document.body.dataset.mode = modeOf(name, r.params);
@@ -355,7 +359,8 @@ export function startApp({ navEl, rootEl, footEl }) {
     // the workspace routes need a keyboard and width; below the breakpoint show the notice instead
     if ((name === 'lesson' || name === 'drill' || name === 'rapid' || name === 'due') && narrowMq && narrowMq.matches) { current = narrowNotice(rootEl, lesson, content); return; }
 
-    const entry = (name === 'account' && r.query.section === 'settings' ? LOADERS.settings : LOADERS[name]) || LOADERS.notfound;
+    const sec = name === 'account' ? (r.query.section || 'profile') : '';
+    const entry = (sec === 'settings' ? LOADERS.settings : sec === 'profile' || sec === 'certificate' ? LOADERS.profile : LOADERS[name]) || LOADERS.notfound;
     let mount;
     // a page module that is not in hand within 50 ms gets the page's shape painted meanwhile (C2)
     const skel = setTimeout(() => { if (myGen === gen && !rootEl.firstChild) rootEl.innerHTML = skeletonHtml(name); }, 50);
@@ -378,20 +383,20 @@ export function startApp({ navEl, rootEl, footEl }) {
       if (res && typeof res.then === 'function') { res = await res; if (myGen !== gen) { if (res && typeof res.destroy === 'function') { try { res.destroy(); } catch (e) { /* ignore */ } } return; } }
       current = res && typeof res.destroy === 'function' ? res : { destroy() { rootEl.innerHTML = ''; } };
       // the first visit to Home after a lesson: one coach mark on each rail item, once (3.0, The first run; M92)
-      if (name === 'home') showCoachMarks();
+      if (name === 'home') showCoachMarks(r.query && r.query.tour === '1');
     } catch (e) {
       console.error(e);
       errorCard(rootEl, { name, params: r.params, kind: 'mount' }, route);
     }
   }
   let coach = null;
-  function showCoachMarks() {
+  function showCoachMarks(asked = false) {
     try {
       const all = store.all();
       const done = Object.values(all).filter(e => e && e.completed).length;
-      if (!coachMarksDue(prefs.get(), done)) return;
+      if (!asked && !coachMarksDue(prefs.get(), done)) return;
       if (coach) coach.destroy();
-      coach = mountCoachMarks({ railEl: navEl, onDone: () => { coach = null; prefs.set({ coachMarksDone: true }); } });
+      coach = mountCoachMarks({ railEl: navEl, signedIn: auth.state() === 'in', onDone: () => { coach = null; prefs.set({ coachMarksDone: true }); if (asked) { try { history.replaceState(null, '', '#/'); } catch (e) { /* stays */ } } } });
     } catch (e) { /* a page without records: no marks today */ }
   }
   let retrying = false;

@@ -28,10 +28,10 @@ test('the paywall (M105) is one panel: the heading with Full Access at its right
   assert.equal(lockHeading(null, null, 0, ''), 'This lesson');
 });
 
-test('Settings (M101) renders from SETTINGS_GROUPS: two columns, every setting a row with its control at the right, account rows only signed in', () => {
+test('Settings (M101) renders from SETTINGS_GROUPS: the look apart, game options in the wide column, every setting a row with its control at the right, account rows only signed in', () => {
   const [left, right] = columnsFor();
-  assert.deepEqual(left.map(g => g.id), ['keyboard', 'lessons', 'practice']);
-  assert.deepEqual(right.map(g => g.id), ['appearance', 'sound', 'email', 'account']);
+  assert.deepEqual(left.map(g => g.id), ['practice', 'lessons', 'keyboard']);
+  assert.deepEqual(right.map(g => g.id), ['sound', 'email', 'account']);
   const rec = defaultSettings('win');
   const themes = themeTiles();
   assert.ok(themes.length > 5 && themes.every(th => th.key && th.label && /^#/.test(th.bg)), 'a tile per theme with its palette');
@@ -45,7 +45,8 @@ test('Settings (M101) renders from SETTINGS_GROUPS: two columns, every setting a
   assert.equal(visibleSettings(acct, false).length, 0, 'a guest sees no account rows');
   assert.ok(groupHtml(acct, rec, false, themes).includes('guest'), 'the guest line instead');
   assert.ok(controlHtml({ key: 'density', type: 'choice', options: ['comfortable', 'compact'] }, rec, themes).includes('aria-checked="true"'));
-  assert.ok(controlHtml({ key: 'sound', type: 'switch' }, rec, themes).includes('role="switch"'));
+  const sw = controlHtml({ key: 'sound', type: 'switch' }, rec, themes);
+  assert.ok(sw.includes('data-v="true"') && sw.includes('data-v="false"') && (sw.match(/aria-checked="true"/g) || []).length === 1, 'a switch reads On and Off, one lit');
   assert.equal((controlHtml({ key: 'theme', type: 'theme' }, rec, themes).match(/role="radio"/g) || []).length, themes.length);
 });
 
@@ -60,4 +61,15 @@ test('every site.csv row the screens read exists and is free of the tells', () =
   const missing = SITE_KEYS.filter(k => !(k in COPY.site));
   assert.deepEqual(missing, [], 'missing rows: ' + missing.join(', '));
   for (const k in COPY.site) for (const part of String(COPY.site[k]).split(/\s*\|\|\s*/)) assert.deepEqual(tells(part, { label: /_(next|skip|start|go|not_now|drill_it|see_pricing)$/.test(k) }), [], `${k}: "${part}"`);
+});
+
+test('every site.csv key a site page asks for by name is in the sheet (a page never shows a raw key)', async () => {
+  const { readFileSync } = await import('node:fs');
+  const files = ['ui/components/certificate.js', 'app/profile-page.js', 'app/practice-page.js', 'app/home-page.js', 'app/learn-page.js', 'app/settings-page.js', 'app/pricing-page.js', 'app/reference-page.js', 'ui/components/nudge.js', 'ui/components/signin-dialog.js', 'app/first-run.js', 'app/leaderboard-page.js', 'ui/components/path.js'];
+  const missing = [];
+  for (const f of files) {
+    const src = readFileSync(new URL('../' + f, import.meta.url), 'utf8');
+    for (const m of src.matchAll(/\b(?:t|siteCopy)\('([a-z0-9_]+[a-z0-9])'/g)) if (!(m[1] in COPY.site)) missing.push(f + ': ' + m[1]);
+  }
+  assert.deepEqual(missing, []);
 });

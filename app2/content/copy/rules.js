@@ -10,6 +10,46 @@ export const RIBBON_WORDS = [
 ];
 
 export const SITE_KEYS = [
+  // the interface match (2026-10-02)
+  'certificate_name', 'certificate_course', 'certificate_progress',
+  // the interface match (2026-10-02)
+  'save_line_ch1',
+  // the interface match (2026-10-02)
+  'ref_board_hint', 'ref_open_lesson', 'ref_no_key', 'ref_board', 'ref_leg_open', 'ref_leg_got',
+  // the interface match (2026-10-02)
+  'pricing_line', 'pricing_sheet_head', 'pricing_col_what', 'pricing_row_play', 'pricing_row_cert', 'pricing_included', 'pricing_not_included',
+  // the interface match (2026-10-02)
+  'settings_look_line', 'settings_game_head', 'settings_game_line', 'setting_on', 'setting_off', 'theme_light', 'theme_dark',
+  // the interface match (2026-10-02)
+  'ach_hidden_name', 'ach_hidden_desc', 'rarity_common', 'rarity_rare', 'rarity_epic', 'rarity_legendary', 'profile_guest', 'profile_lessons', 'profile_drills_pass', 'profile_dailies', 'profile_best_daily', 'col_level', 'col_title', 'col_reward', 'profile_levels', 'profile_you_are', 'profile_levels_line', 'profile_account_link', 'cert_next_done', 'cert_next_writing', 'cert_next_assess', 'cert_next_lessons', 'cert_next_lessons_one', 'cert_issued', 'cert_not_yet', 'cert_awarded_to', 'cert_you', 'cert_issued_at', 'cert_see', 'cert_verified_time', 'cert_verified', 'cert_ready', 'cert_lessons', 'cert_next_k', 'cert_go', 'cert_earn_head', 'cert_earn_1', 'cert_earn_2', 'cert_earn_3', 'cert_how',
+  // the interface match (2026-10-02)
+  'rapid_len_short_30', 'rapid_len_short_60', 'rapid_len_short_120', 'col_command', 'col_keys_press',
+  // the interface match (2026-10-02)
+  'home_tour',
+  // the interface match (2026-10-02)
+  'coach_done', 'signin_head', 'signin_line', 'signin_google', 'signin_fine',
+  // the interface match (2026-10-02)
+  'first_run_free_k', 'first_run_free', 'first_run_full', 'first_run_save', 'first_run_tour', 'orientation_pro', 'orientation_account',
+  // the interface match (2026-10-02)
+  'daily_today', 'daily_not_clean', 'daily_missed', 'daily_week', 'daily_week_played', 'daily_keys', 'daily_rules', 'save_line_boards',
+  // the interface match (2026-10-02)
+  'boards_clean_runs_one', 'boards_day_runs_one',
+  // the interface match (2026-10-02)
+  'challenges_passed',
+  // the interface match (2026-10-02)
+  'challenges_intro',
+  // the interface match (2026-10-02)
+  'rapid_start_len', 'rapid_lengths', 'rapid_keys_hint', 'rapid_deck', 'rapid_deck_n', 'rapid_how', 'rapid_how_1', 'rapid_how_2', 'rapid_how_3',
+  // the interface match (2026-10-02)
+  'home_xp_why', 'save_title', 'save_line', 'save_go',
+  // the interface match (2026-10-02)
+  'learn_keys_n',
+  // the interface match (2026-10-02)
+  'practice_chapter_coming',
+  // the interface match (2026-10-02)
+  'learn_free', 'learn_being_written', 'learn_up_next', 'learn_reward', 'learn_reward_earned',
+  // the interface match (2026-10-02)
+  'home_xp_to_go',
   'briefing_1_eyebrow', 'briefing_1_title', 'briefing_1_body',
   'briefing_2_eyebrow', 'briefing_2_title', 'briefing_2_body',
   'briefing_3_eyebrow', 'briefing_3_title', 'briefing_3_body',

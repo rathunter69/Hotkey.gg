@@ -9,7 +9,7 @@
 <link rel="icon" type="image/svg+xml" href="./favicon.svg">
 <link rel="apple-touch-icon" href="./apple-touch-icon.png">
 <!-- the saved palette lands before the first paint: a classic script restores the vars themes.js persisted -->
-<script>try{var v=JSON.parse(localStorage.getItem('hotkey_theme_vars'));if(v&&v.vars){var r=document.documentElement;for(var k in v.vars)r.style.setProperty('--'+k,v.vars[k]);r.setAttribute('data-dark',v.dark?'1':'0');}}catch(e){}
+<script>try{var v=JSON.parse(localStorage.getItem('hk2_theme_vars'));if(v&&v.vars){var r=document.documentElement;for(var k in v.vars)r.style.setProperty('--'+k,v.vars[k]);r.setAttribute('data-dark',v.dark?'1':'0');}}catch(e){}
 try{var p=JSON.parse(localStorage.getItem('hk2_prefs')||'{}');document.documentElement.setAttribute('data-density',p.density==='compact'?'compact':'comfortable');document.documentElement.setAttribute('data-panel',p.panelSide==='left'?'left':p.panelSide==='right'?'right':'overlay');}catch(e){}</script>
 <script type="module">import { loadTheme } from './ui/themes.js'; loadTheme();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">

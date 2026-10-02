@@ -25,6 +25,9 @@ import { panelHtml, tableHtml, buttonHtml, wireRows } from '../ui/components/tab
 import { tierMarksHtml, segmentsHtml, barHtml, modeMarkHtml } from '../ui/components/marks.js';
 import { sheetPreviewHtml, previewOfLesson } from '../ui/components/sheet-preview.js';
 import { entitlement } from './entitlement.js';
+import { routeKeys, moduleRowHtml, continueHtml } from '../ui/components/path.js';
+import { saveNudgeHtml, wireSaveNudge } from '../ui/components/nudge.js';
+import { courseNow, certTeaserHtml } from '../ui/components/certificate.js';
 
 const t = (key, vars) => fill(siteCopy(key, key), vars);
 /** Retired lessons never come up as next. */
@@ -82,7 +85,15 @@ export function achievementsModel(states, { latest = 10 } = {}) {
   return { shown, earned: earned.length, of: states.length, next: open[0] || null };
 }
 
-const badgeTile = s => `<span class="badge-tile${s.done ? ' on' : ''}" title="${esc(s.def.name)}">${renderPixel(GLYPHS[s.def.glyph] || GLYPHS.star, { b: RARITY_COLOURS[s.def.rarity] || RARITY_COLOURS.common }, { size: 28 })}</span>`;
+/** A badge on Home: a keycap in its rarity's color holding the sprite (01-home); a locked one is a blank key with "?". */
+const badgeTile = s => `<span class="badge-tile badge-key r-${esc(s.def.rarity)}${s.done ? ' on' : ''}" title="${esc(s.def.name)}">${renderPixel(GLYPHS[s.def.glyph] || GLYPHS.star, { b: RARITY_COLOURS[s.def.rarity] || RARITY_COLOURS.common }, { size: 28 })}</span>`;
+/** The next level's reward, drawn (3.0, Home): a theme as its swatch, a keycap skin as a brass key, anything else as the level's key. */
+function rewardTileHtml(reward, n) {
+  const kind = reward && reward.kind;
+  if (kind === 'theme' || kind === 'themes_start' || kind === 'crimson') return '<span class="level-tile level-tile-theme" aria-hidden="true"><i></i></span>';
+  if (kind === 'keycap_skin') return '<span class="level-tile level-tile-key" aria-hidden="true">Alt</span>';
+  return `<span class="level-tile level-tile-key" aria-hidden="true">${esc(n)}</span>`;
+}
 
 export function mountHomePage(root, ctx = {}) {
   const el = document.createElement('div');
@@ -96,31 +107,28 @@ export function mountHomePage(root, ctx = {}) {
   const rows = chapterModel(chapter, all, skipped, gate);
   const completedN = Object.values(all).filter(p => p && p.completed).length;
 
-  // ---- left: the next lesson, the preview, the chapter table
-  let heading, button, facts = '', sheet = null, line = '';
-  if (next.kind === 'none') { heading = t('home_all_done', { n: chapter === CHAPTERS[0] ? 1 : 2 }); button = buttonHtml({ label: t('rail_practice'), key: 'Enter', href: '#/practice', primary: true, id: 'homeResume' }); }
+  // ---- left: the one next step (its number, title, keys and the module's path), then the chapter as a path
+  const nodesOf = r => r.lessons.map(l => ({ id: l.id, num: l.n, title: l.title, kind: l.kind === 'challenge' ? 'challenge' : 'lesson', st: l.next ? 'next' : l.status, href: '#/lesson/' + l.id }));
+  let nextPanel;
+  if (next.kind === 'none') nextPanel = continueHtml({ title: t('home_all_done', { n: chapter === CHAPTERS[0] ? 1 : 2 }), id: 'homeResume', button: buttonHtml({ label: t('rail_practice'), key: 'Enter', href: '#/practice', primary: true, id: 'homeResume' }) });
   else {
     const l = next.lesson;
-    if (next.kind === 'assessment') { heading = t('home_next_assessment', { n: 1 }); button = buttonHtml({ label: t('home_start_assessment'), key: 'Enter', href: '#/lesson/' + l.id, primary: true, id: 'homeResume' }); }
-    else if (next.kind === 'pro') { heading = t('home_next_lesson', { title: l.title }); line = siteCopy('paywall_line', 'Get full access for the rest of the content.'); button = buttonHtml({ label: t('paywall_go_pro'), key: 'Enter', href: '#/pricing', primary: true, id: 'homeResume' }); }
-    else { heading = t('home_next_lesson', { title: l.title }); button = buttonHtml({ label: next.started ? t('home_resume') : t('home_start'), key: 'Enter', href: '#/lesson/' + l.id, primary: true, id: 'homeResume' }); }
-    facts = `<span>${esc(next.module)}</span>${next.of ? `<span>${esc(t('home_lesson_of', { n: next.n, m: next.of }))}</span>` : ''}${next.goals ? `<span class="fact-segs">${segmentsHtml(0, next.goals, true)}<span>${esc(t('home_goal_of', { n: 1, m: next.goals }))}</span></span>` : ''}${next.minutes ? `<span>${esc(t('home_minutes_left', { n: next.minutes }))}</span>` : ''}`;
-    sheet = previewOfLesson(l, 'before');
+    const row = rows.find(r => r.lessons.some(x => x.id === l.id)) || null;
+    const num = row ? (row.lessons.find(x => x.id === l.id) || {}).n : '';
+    const button = next.kind === 'assessment' ? buttonHtml({ label: t('home_start_assessment'), key: 'Enter', href: '#/lesson/' + l.id, primary: true, id: 'homeResume' })
+      : next.kind === 'pro' ? buttonHtml({ label: t('paywall_go_pro'), key: 'Enter', href: '#/pricing', primary: true, id: 'homeResume' })
+      : buttonHtml({ label: next.started ? t('home_resume') : t('home_start'), key: 'Enter', href: '#/lesson/' + l.id, primary: true, id: 'homeResume' });
+    nextPanel = continueHtml({ num, title: next.kind === 'assessment' ? t('home_next_assessment', { n: 1 }) : l.title, eyebrow: next.kind === 'pro' ? t('paywall_pro') : t('learn_up_next'), where: next.module, keys: routeKeys(l.solution),
+      nodes: row && next.kind === 'lesson' ? nodesOf(row) : [], place: next.of ? t('home_lesson_of', { n: next.n, m: next.of }) : '', line: next.kind === 'pro' ? siteCopy('paywall_line', 'Get full access for the rest of the content.') : '', id: 'homeResume', button });
   }
-  const nextPanel = `<section class="panel panel-mode panel-next" data-cursor data-cursor-enter="#homeResume" tabindex="-1" aria-label="${esc(heading)}">
-      <div class="panel-head"><h1 class="panel-h panel-h-page">${esc(heading)}</h1>${button}</div>
-      ${line ? `<p class="panel-line">${esc(line)}</p>` : ''}${facts ? `<div class="facts">${facts}</div>` : ''}
-      ${sheet ? sheetPreviewHtml(sheet, { rows: 16, cols: 9 }) : ''}
-    </section>`;
   const chapterN = (CHAPTERS.indexOf(chapter) >= 0 ? CHAPTERS.indexOf(chapter) : 0) + 1;
-  const columns = [{ key: 'n', label: '', cls: 'n' }, { key: 'title', label: t('col_module') }, { key: 'minutes', label: t('col_minutes'), align: 'right', cls: 'min' }, { key: 'status', label: t('col_status'), cls: 'status' }, { key: 'tier', label: '', align: 'right', cls: 'tier' }];
-  const trs = rows.map(r => ({ cells: { n: esc(r.n), title: esc(r.title), minutes: fmtMinutes(r.minutes), status: esc(r.statusText), tier: tierMarksHtml(r.tier) }, cls: `row-module${r.current ? ' current' : ''}`, href: '#/learn?ch=' + chapter.id + '&doc=' + r.id }));
-  const chapterPanel = panelHtml({ heading: esc(t('chapter_heading', { n: chapterN, name: chapter.title })), facts: esc(t('chapter_modules_done', { d: rows.filter(r => r.status === 'complete').length, m: rows.length })), body: tableHtml({ columns, rows: trs, cls: 'tbl-chapter' }), cls: 'home-chapter', stretch: true });
+  const modRows = rows.map(r => moduleRowHtml({ ...r, nodes: nodesOf(r) }, { status: r.status === 'complete' || r.current ? r.statusText : '', minutes: fmtMinutes(r.minutes), href: '#/learn?ch=' + chapter.id + '&doc=' + r.id })).join('');
+  const chapterPanel = panelHtml({ heading: esc(t('chapter_heading', { n: chapterN, name: chapter.title })), facts: esc(t('chapter_modules_done', { d: rows.filter(r => r.status === 'complete').length, m: rows.length })), body: `<div class="mod-list">${modRows}</div>`, cls: 'home-chapter', stretch: true });
 
   // ---- right: Level, Today, Achievements
   const lv = game.levelInfo;
   const reward = lv.lvl < MAX_LEVEL ? rewardAt(lv.lvl + 1) : null;
-  const levelPanel = panelHtml({ heading: esc(t('home_level', { n: lv.lvl })), facts: esc(t('home_xp', { n: lv.into, next: lv.need })), body: `${barHtml(lv.pct, 'bar-level')}<div class="level-next"><span class="level-tile" aria-hidden="true">${lv.lvl < MAX_LEVEL ? lv.lvl + 1 : lv.lvl}</span><span>${esc(reward ? t('home_next_reward', { n: lv.lvl + 1, reward: reward.label }) : t('home_top_level'))}</span></div>`, cls: 'home-level' });
+  const levelPanel = panelHtml({ heading: esc(t('home_level', { n: lv.lvl })), facts: esc(t('home_xp', { n: lv.into, next: lv.need })), body: `${barHtml(lv.pct, 'bar-level')}<div class="level-next">${rewardTileHtml(reward, lv.lvl < MAX_LEVEL ? lv.lvl + 1 : lv.lvl)}<span class="level-next-words">${reward ? `<span>${esc(t('home_next_reward', { n: lv.lvl + 1 }))} <b>${esc(reward.label)}</b></span><span>${esc(t('home_xp_to_go', { n: Math.max(0, lv.need - lv.into) }))}</span>` : `<span>${esc(t('home_top_level'))}</span>`}</span></div><p class="panel-line ink-2 xp-why">${esc(t('home_xp_why'))} <a href="#/?tour=1">${esc(t('home_tour'))}</a></p>`, cls: 'home-level' });
 
   const played = store.attempts({ kind: 'daily', day }).filter(a => a.secs != null);
   const clean = played.filter(a => a.clean).sort((a, b) => a.secs - b.secs);
@@ -137,7 +145,9 @@ export function mountHomePage(root, ctx = {}) {
   const achPanel = panelHtml({ heading: esc(t('home_achievements')), facts: esc(t('home_count_of', { n: ach.earned, m: ach.of })), body: `<div class="badge-grid">${ach.shown.map(badgeTile).join('')}${ach.earned < 5 ? Array.from({ length: 5 - ach.earned }, () => '<span class="badge-tile locked" aria-hidden="true">?</span>').join('') : ''}</div>
       ${ach.next ? `<div class="ach-next" data-cursor tabindex="-1" data-href="#/account?section=profile"><div class="row-line"><span class="row-name">${esc(t('home_ach_next', { badge: ach.next.def.name }))}</span><span class="panel-facts">${esc(t('home_count_of', { n: ach.next.prog, m: ach.next.goal }))}</span></div><span class="row-sub">${esc(ach.next.def.desc)}</span>${barHtml(100 * ach.next.prog / ach.next.goal, 'bar-ach')}</div>` : ''}`, cls: 'home-ach', stretch: true });
 
-  el.innerHTML = `<div class="pg-two"><div class="pg-main">${nextPanel}${chapterPanel}</div><div class="pg-side">${levelPanel}${todayPanel}${achPanel}</div></div>`;
+  const nudge = completedN >= 1 ? saveNudgeHtml() : '';
+  el.innerHTML = `<div class="pg-two"><div class="pg-main">${nextPanel}${chapterPanel}</div><div class="pg-side">${nudge}${levelPanel}${todayPanel}${achPanel}${certTeaserHtml(courseNow())}</div></div>`;
+  wireSaveNudge(el);
   root.appendChild(el);
   const unwire = wireRows(el);
   if (ctx.keytips) ctx.keytips.register([

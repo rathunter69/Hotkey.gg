@@ -5,7 +5,9 @@
 // catalog, the boards and the side panels all render from data through it.
 //
 //   panelHtml({ heading, facts, body, mode, cls, id, stretch })
-//   tableHtml({ columns: [{ key, label, align: 'left'|'right'|'center', cls }], rows: [{ cells: { key: html }, href, cls, attrs, cursor, enter }], head })
+//   tableHtml({ columns: [{ key, label, align: 'left'|'right'|'center', cls }], rows: [{ cells: { key: html }, href, cls, attrs, cursor, enter }], head, sheet })
+//     sheet: true draws it as a worksheet: the column letters on the chrome strip, a row number down the
+//     left, the labels as row 1 typed in bold, gridlines; the selected row lights its number, as Excel does
 //   tabsHtml(tabs: [{ key, label, mode, on }], label)   the page tabs
 //   wireTabs(el, onPick)                                 arrows and Home/End move across them
 //   buttonHtml({ label, key, href, primary, quiet, id, mode, attrs })
@@ -21,8 +23,26 @@ export function panelHtml({ heading = '', facts = '', body = '', mode = '', cls 
   return `<section class="panel${mode ? ' panel-mode' : ''}${stretch ? ' panel-stretch' : ''} ${esc(cls)}"${mode ? ` style="--mode:var(--${esc(mode)})"` : ''}${id ? ` id="${esc(id)}"` : ''}${attrsOf(attrs)}>${head}${body}</section>`;
 }
 
-export function tableHtml({ columns = [], rows = [], head = true, cls = '', label = '' } = {}) {
+export const colLetter = i => { let s = ''; i += 1; while (i > 0) { const m = (i - 1) % 26; s = String.fromCharCode(65 + m) + s; i = Math.floor((i - 1) / 26); } return s; };
+
+export function tableHtml({ columns = [], rows = [], head = true, cls = '', label = '', sheet = false, fill = 0 } = {}) {
   const col = c => `${c.align === 'right' ? ' class="num"' : c.align === 'center' ? ' class="mid"' : ''}`;
+  if (sheet) {
+    const letters = `<thead><tr class="sh-letters"><th class="sh-corner" aria-hidden="true"></th>${columns.map((c, i) => `<th class="sh-col${c.align === 'right' ? ' num' : ''}"${c.cls ? ` data-col="${esc(c.cls)}"` : ''} aria-hidden="true">${colLetter(i)}</th>`).join('')}</tr></thead>`;
+    const labels = head ? `<tr class="sh-labels"><td class="sh-row" aria-hidden="true">1</td>${columns.map(c => `<td${col(c)}${c.cls ? ` data-col="${esc(c.cls)}"` : ''}>${c.label || ''}</td>`).join('')}</tr>` : '';
+    const first = head ? 2 : 1;
+    const body = rows.map((r, k) => {
+      const tds = columns.map(c => `<td${col(c)}${c.cls ? ` data-col="${esc(c.cls)}"` : ''}>${r.cells && r.cells[c.key] != null ? r.cells[c.key] : ''}</td>`).join('');
+      const a = { ...(r.attrs || {}) };
+      if (r.href) a['data-href'] = r.href;
+      if (r.cursor !== false) { a['data-cursor'] = true; a.tabindex = '-1'; }
+      if (r.enter) a['data-cursor-enter'] = r.enter;
+      return `<tr class="${esc(r.cls || '')}"${attrsOf(a)}><td class="sh-row" aria-hidden="true">${k + first}</td>${tds}</tr>`;
+    }).join('');
+    // fill: blank gridded rows to that many, so a short board still reads as a sheet waiting for its rows
+    const blanks = Array.from({ length: Math.max(0, fill - rows.length) }, (_, k) => `<tr class="sh-blank" aria-hidden="true"><td class="sh-row">${rows.length + k + first}</td>${columns.map(() => '<td></td>').join('')}</tr>`).join('');
+    return `<table class="tbl tbl-sheet ${esc(cls)}"${label ? ` aria-label="${esc(label)}"` : ''}>${letters}<tbody>${labels}${body}${blanks}</tbody></table>`;
+  }
   const thead = head && columns.some(c => c.label) ? `<thead><tr>${columns.map(c => `<th${col(c)}${c.cls ? ` data-col="${esc(c.cls)}"` : ''}>${c.label || ''}</th>`).join('')}</tr></thead>` : '';
   const body = rows.map(r => {
     const tds = columns.map(c => `<td${col(c)}${c.cls ? ` data-col="${esc(c.cls)}"` : ''}>${r.cells && r.cells[c.key] != null ? r.cells[c.key] : ''}</td>`).join('');
@@ -67,7 +87,7 @@ export function buttonHtml({ label, key = '', href = '', primary = false, quiet 
 /** The header block of a Practice page: the title, one line, a control at the right and the primary button. */
 export function headerBlockHtml({ title, line = '', control = '', button = '', facts = '', cls = '' } = {}) {
   // the block is the page's selected item when it opens: the cursor sits on it and Enter presses its primary button
-  return `<section class="panel hdr ${esc(cls)}" data-cursor data-cursor-enter=".btn2-primary" tabindex="-1" aria-label="${esc(title)}"><div class="hdr-main"><div class="hdr-row"><h1 class="hdr-title">${esc(title)}</h1>${facts ? `<span class="panel-facts">${facts}</span>` : ''}</div>${line ? `<p class="hdr-line">${line}</p>` : ''}</div><div class="hdr-acts">${control}${button}</div></section>`;
+  return `<section class="panel hdr ${esc(cls)}" data-cursor data-cursor-enter=".btn2-primary" tabindex="-1" aria-label="${esc(title)}"><div class="hdr-main"><div class="hdr-row"><h1 class="hdr-title">${esc(title)}</h1>${facts ? `<span class="panel-facts">${facts}</span>` : ''}</div>${line ? `<div class="hdr-fx"><i class="hdr-fx-mark" aria-hidden="true">fx</i><p class="hdr-line">${line}</p></div>` : ''}</div><div class="hdr-acts">${control}${button}</div></section>`;
 }
 
 /** A click anywhere on a row that carries data-href follows it (a link inside the row keeps its own). */

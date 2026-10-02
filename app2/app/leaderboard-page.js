@@ -15,6 +15,11 @@ import { siteCopy } from '../content/copy/apply.js';
 import { esc, fill, fmtClock, fmtGap, prettyDay, weekdayOf } from '../ui/components/format.js';
 import { panelHtml, tableHtml, tabsHtml, wireTabs, buttonHtml } from '../ui/components/table.js';
 import { barHtml, levelChipHtml } from '../ui/components/marks.js';
+import { saveNudgeHtml, wireSaveNudge } from '../ui/components/nudge.js';
+import { courseNow, certTeaserHtml } from '../ui/components/certificate.js';
+
+/** The boards' side, under your runs: the account step while signed out (your time joins the field), and the certificate the clean runs lead to. */
+const boardSide = () => `${saveNudgeHtml({ line: siteCopy('save_line_boards', '') })}${certTeaserHtml(courseNow())}`;
 
 const t = (key, vars) => fill(siteCopy(key, key), vars);
 /** Global rows shown per board before your own row is pinned below them. */
@@ -82,7 +87,7 @@ const runsText = n => t(n === 1 ? 'boards_clean_run' : 'boards_clean_runs', { n 
 export function boardTableHtml(model, { routeKeys = null } = {}) {
   const columns = [{ key: 'place', label: t('col_place'), cls: 'n' }, { key: 'player', label: t('col_player') }, { key: 'field', label: t('col_field'), cls: 'field' }, { key: 'time', label: t('col_time'), align: 'right', cls: 'time' }, { key: 'gap', label: t('col_gap'), align: 'right', cls: 'gap' }, { key: 'keys', label: routeKeys ? t('boards_keys_route', { n: routeKeys }) : t('col_keys'), align: 'right', cls: 'keys' }];
   const rows = model.rows.map(r => ({ cells: { place: String(r.place), player: `<span class="row-name">${esc(r.handle)}</span>${levelChipHtml(r.level)}${r.mine && model.move ? `<span class="move">${esc(model.move > 0 ? t('boards_up', { k: model.move }) : t('boards_down', { k: -model.move }))}</span>` : ''}`, field: barHtml(r.pct, 'bar-field'), time: fmtClock(r.secs, true), gap: fmtGap(r.gap), keys: r.keys != null ? String(r.keys) : '' }, cls: `row-board${r.mine ? ' mine' : ''}${r.pinned ? ' pinned' : ''}`, cursor: false }));
-  return tableHtml({ columns, rows, cls: 'tbl-board' });
+  return tableHtml({ columns, rows, cls: 'tbl-board', sheet: true, fill: 10 });
 }
 
 /** The side panel: your last five runs and the line on where the time goes. */
@@ -98,7 +103,7 @@ export function sidePanelHtml({ title, runs, where, drill, empty }) {
  * Mount one board with its side panel into `el`: { ref, seed, title, yours, mode }. The field is
  * read through the store when signed in; signed out it is the device's own runs. Returns { destroy }.
  */
-export function mountBoard(el, { ref, seed = null, title, yours, dayLabel = '' } = {}) {
+export function mountBoard(el, { ref, seed = null, title, yours, dayLabel = '', side = '' } = {}) {
   let gone = false;
   const drill = DRILLS_BY_ID[ref] || null;
   const routeKeys = drill ? drill.optimalKeys : null;
@@ -118,7 +123,8 @@ export function mountBoard(el, { ref, seed = null, title, yours, dayLabel = '' }
     }
     const attempts = store.attempts({ ref }).filter(a => seed == null || a.seed === seed);
     const runs = lastRuns(attempts);
-    el.innerHTML = `<div class="pg-two"><div class="pg-main">${panelHtml({ heading: esc(title), facts, body: table + line, cls: 'board', stretch: true })}</div><div class="pg-side">${sidePanelHtml({ title: yours, runs, where: whereTimeGoes(attempts.filter(a => a.clean)), drill, empty: seed != null ? t('daily_not_played') : t('boards_none_yet') })}</div></div>`;
+    el.innerHTML = `<div class="pg-two"><div class="pg-main">${panelHtml({ heading: esc(title), facts, body: table + line, cls: 'board', stretch: true })}</div><div class="pg-side">${sidePanelHtml({ title: yours, runs, where: whereTimeGoes(attempts.filter(a => a.clean)), drill, empty: seed != null ? t('daily_not_played') : t('boards_none_yet') })}${side}</div></div>`;
+    wireSaveNudge(el);
     const retry = el.querySelector('.board-retry'); if (retry) retry.onclick = () => { state = undefined; draw(); load(); };
   }
   function load() {
@@ -171,10 +177,10 @@ export function mountLeaderboardPage(root, ctx = {}) {
     if (hostEl) {
       if (tab === 'daily') {
         const day = dayOf(); const p = dailyFor(day); const d = DRILLS_BY_ID[p.drillId];
-        board = mountBoard(hostEl, { ref: p.drillId, seed: p.seed, title: d ? d.title : t('daily_title'), yours: t('boards_yours_daily'), dayLabel: weekdayOf(day) });
+        board = mountBoard(hostEl, { ref: p.drillId, seed: p.seed, title: d ? d.title : t('daily_title'), yours: t('boards_yours_daily'), dayLabel: weekdayOf(day), side: boardSide() });
       } else {
         const e = entriesFor(tab).find(x => x.id === ref);
-        board = mountBoard(hostEl, { ref, title: e ? e.title : ref, yours: t('boards_yours') });
+        board = mountBoard(hostEl, { ref, title: e ? e.title : ref, yours: t('boards_yours'), side: boardSide() });
       }
     }
     if (focusTab) { const on = el.querySelector('.tab.on'); if (on) on.focus(); }

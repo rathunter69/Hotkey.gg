@@ -133,6 +133,23 @@
 .badge-tile.on{background:var(--sheet); border:1px solid var(--line)}
 .badge-tile.locked{border:1px solid var(--line); background:var(--sheet)}
 .badge-tile .px{display:block}
+/* Home's badges are keys (01-home): the rarity's tint with its fill as the edge; a locked one is a blank key with ? */
+.badge-key{border:1px solid var(--edge); border-bottom-width:var(--key-edge); background:var(--sheet); font-family:var(--mono); font-size:var(--fs-body); color:var(--ink-2)}
+.badge-key.on.r-common{background:var(--learn-tint); border-color:var(--learn)}
+.badge-key.on.r-rare{background:var(--drills-tint); border-color:var(--drills)}
+.badge-key.on.r-epic{background:var(--challenges-tint); border-color:var(--challenges)}
+.badge-key.on.r-legendary{background:var(--clock-tint); border-color:var(--clock)}
+.badge-tile.locked{border:1px solid var(--edge); border-bottom-width:var(--key-edge)}
+/* the chapter table on Home has no header row: the rule sits above its first row */
+.tbl-headless tbody tr:first-child > td{border-top:var(--bw-2) solid var(--ink)}
+.home-chapter .tbl td:nth-child(2){font-weight:var(--fw-semi)}
+.mstat-complete{color:var(--learn-ink); font-weight:var(--fw-semi)}
+.level-next-words{display:flex; flex-direction:column; color:var(--ink); line-height:1.35}
+.level-next-words b{font-weight:var(--fw-bold)}
+.level-next-words span + span{color:var(--ink-2)}
+.level-tile-key{font-family:var(--mono); font-size:var(--fs-key); width:auto; min-width:var(--level-tile); padding:0 var(--s2)}
+.level-tile-theme{background:var(--paper); border-color:var(--edge); align-content:end; justify-items:start; padding:var(--s2)}
+.level-tile-theme i{display:block; width:var(--s4); height:var(--s1); background:var(--learn)}
 .ach-next{margin-top:auto; padding-top:var(--s3); border-top:1px solid var(--line)}
 
 /* ---------- the sheet preview (Home, Learn): a still of the sheet, read-only ---------- */
@@ -166,7 +183,10 @@ table.sp{border-collapse:collapse; font-family:var(--cellfont); font-size:var(--
 .hdr-main{display:flex; flex-direction:column; gap:var(--s1); min-width:0}
 .hdr-row{display:flex; align-items:baseline; gap:var(--s4)}
 .hdr-title{font-size:var(--fs-title); font-weight:var(--fw-heavy); margin:0; line-height:1.15}
-.hdr-line{margin:0; color:var(--ink-2); font-size:var(--fs-name)}
+.hdr-main{flex:1 1 auto}
+.hdr-fx{display:flex; align-items:stretch; border:1px solid var(--grid); background:var(--sheet); min-height:var(--row-h); margin-top:var(--s2); max-width:calc(var(--side-col) * 2.2)}   /* the line sits in a formula bar: fx, then the words */
+.hdr-fx-mark{display:flex; align-items:center; padding:0 var(--s3); border-right:1px solid var(--grid); background:var(--chrome); color:var(--ink-2); font-style:italic; font-family:var(--fx-font); font-size:var(--fs-name)}
+.hdr-line{margin:0; display:flex; align-items:center; padding:var(--s1) var(--s3); color:var(--ink); font-size:var(--fs-name); font-family:var(--cellfont)}
 .hdr-acts{display:flex; align-items:center; gap:var(--s4); flex:none}
 .hdr .btn2{padding:var(--s4) var(--s6); font-size:var(--fs-panel)}
 .paywall .panel-line{font-size:var(--fs-body); color:var(--ink)}
@@ -181,9 +201,235 @@ table.sp{border-collapse:collapse; font-family:var(--cellfont); font-size:var(--
 .tbl-board tr.mine td[data-col="n"], .tbl-board tr.mine td[data-col="gap"], .tbl-board tr.mine td[data-col="keys"]{color:var(--mode-ink)}
 .board-host{display:flex; flex-direction:column; gap:var(--s4)}
 
+/* ---------- the path: Learn and the drill catalog (ui/components/path.js) ---------- */
+.keys-row{display:inline-flex; flex-wrap:wrap; gap:var(--s1); align-items:center}
+.keys-row .key{font-size:var(--fs-min)}
+.keys-more{font-size:var(--fs-min); color:var(--ink-2); font-weight:var(--fw-semi)}
+
+/* the one obvious next step, at the top of Learn */
+.learn-continue{flex-direction:row; align-items:center; gap:var(--s5); padding:var(--s5) var(--s6)}
+.learn-continue.cursor-on{outline-color:transparent}
+.learn-continue.cursor-on::after{content:none}
+.lc-n{min-width:var(--lc-n-w); font-size:var(--fs-panel); padding:var(--s2) var(--s3)}
+.lc-main{flex:1 1 auto; min-width:0; display:flex; flex-direction:column; gap:var(--s2)}
+.lc-title{margin:0; font-size:var(--fs-title); font-weight:var(--fw-heavy); line-height:1.15}
+.lc-eyebrow{font-size:var(--fs-label); font-weight:var(--fw-bold); color:var(--mode-ink)}
+.lc-path{display:flex; align-items:center; gap:var(--s3)}
+.lc-place{font-size:var(--fs-label); font-weight:var(--fw-semi); color:var(--ink-2)}
+.learn-keys{display:flex}
+.xp-why{font-size:var(--fs-label)}
+/* a plain link in running text takes the page's mode ink, never the browser's blue */
+.pg a:not([class]), .page a:not([class]){color:var(--mode-ink); font-weight:var(--fw-semi)}
+.lc-sub{display:flex; flex-wrap:wrap; align-items:center; gap:var(--s3); font-size:var(--fs-label); font-weight:var(--fw-semi); color:var(--ink-2)}
+.learn-continue .btn2{padding:var(--s4) var(--s6); font-size:var(--fs-panel); flex:none}
+
+/* the chapter strip: six cards, each a tab */
+/* the chapter strip: the workbook's sheet tabs, one per chapter, sitting on the panel they open (Excel's
+   active tab: white, bold, the green rule under it; the rest on the chrome grey). Each carries its number,
+   its name, a hairline of progress and its count or its lock. */
+.ch-cards{display:flex; align-items:stretch; gap:0; background:var(--chrome); border:1px solid var(--grid); border-bottom:0; margin-bottom:calc(-1 * var(--s4)); position:relative; z-index:1; overflow-x:auto}
+.ch-cards .ch-card{flex:1 1 auto; min-width:0; display:grid; grid-template-columns:auto minmax(0,1fr) auto; grid-template-areas:"n title note" "bar bar bar"; align-items:center; column-gap:var(--s2); row-gap:var(--s1); text-align:left; background:transparent; border:0; border-right:1px solid var(--grid); margin:0; padding:var(--s3) var(--s4) var(--s2); border-radius:0; color:var(--ink-2); font-weight:var(--fw-body); cursor:pointer}
+.ch-cards .ch-card:last-child{border-right:0}
+.ch-cards .ch-card:hover{background:var(--sheet); color:var(--ink)}
+.ch-cards .ch-card.on{background:var(--sheet); color:var(--learn-ink); box-shadow:inset 0 calc(-1 * var(--bw-3)) 0 var(--learn)}
+.ch-cards .ch-card:focus-visible{outline:var(--cursor-w) solid var(--learn); outline-offset:calc(-1 * var(--cursor-w)); border-radius:0}
+.ch-top{display:contents}
+.ch-n{grid-area:n; font-family:var(--mono); font-weight:var(--fw-bold); font-size:var(--fs-key); line-height:1; color:inherit; background:none; border:0; padding:0; min-width:0}
+.ch-card.full .ch-n{color:var(--learn-ink)}
+.ch-title{grid-area:title; font-size:var(--fs-name); font-weight:var(--fw-semi); line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.ch-card.on .ch-title{font-weight:var(--fw-heavy)}
+.ch-note{grid-area:note; font-size:var(--fs-min); font-weight:var(--fw-bold); color:var(--learn-ink)}
+.ch-card.locked .ch-note{display:inline-flex; align-items:center; gap:var(--s1); color:var(--challenges-ink)}
+.ch-card.locked .ch-note::before{content:''; width:var(--s2); height:var(--s2); border:var(--bw-2) solid currentColor; border-bottom:0; border-radius:var(--s1) var(--s1) 0 0; box-shadow:0 var(--s2) 0 calc(-1 * var(--bw-2)) currentColor; margin-bottom:var(--s1)}   /* a small drawn lock */
+.ch-card.locked .ch-note{font-size:0; gap:0}   /* in the tab the lock speaks alone; the word is the tab's title */
+.ch-bar{grid-area:bar; display:block; height:var(--bw-2); background:var(--grid)}
+.ch-bar i{display:block; height:100%; background:var(--learn)}
+.ch-count{display:none}   /* the panel under the tabs carries the count */
+
+/* a module: its number on a key, its name, its path of lessons ending on the challenge */
+.mod-list{display:flex; flex-direction:column; border-top:var(--bw-2) solid var(--ink)}
+.mod-row{display:grid; grid-template-columns:var(--mod-n-w) minmax(0,1fr) auto; align-items:center; gap:var(--s4); padding:var(--s2) var(--s3); border-bottom:1px solid var(--line); cursor:pointer}
+.mod-row:hover{background:var(--chrome)}
+.mod-row.current{background:var(--mode-tint)}
+.mod-row.locked{cursor:default; color:var(--ink-2)}
+.mod-row.locked:hover{background:transparent}
+.mod-n{font-family:var(--mono); font-size:var(--fs-key); font-weight:var(--fw-bold); line-height:1; color:var(--ink); background:var(--sheet); border:1px solid var(--edge); border-bottom-width:var(--key-edge); border-radius:var(--r-btn); padding:var(--s1) var(--s2); text-align:center}
+.mod-complete .mod-n{background:var(--learn); color:var(--on-fill); border-color:var(--learn-ink)}
+.mod-main{display:flex; flex-direction:column; gap:var(--s1); min-width:0}
+.mod-head{display:flex; align-items:baseline; gap:var(--s3)}
+.mod-title{font-weight:var(--fw-bold); font-size:var(--fs-name)}
+.mod-min{font-size:var(--fs-min); color:var(--ink-2); font-variant-numeric:tabular-nums}
+.mod-end{display:flex; align-items:center; gap:var(--s3)}
+.mod-status{font-size:var(--fs-label); font-weight:var(--fw-semi); color:var(--ink-2)}
+.mod-complete .mod-status{color:var(--learn-ink)}
+.mod-row.current .mod-status{color:var(--ink); font-weight:var(--fw-bold)}
+
+/* the nodes: one per lesson, the line between them filling as the path is walked; the challenge is a diamond */
+.path{display:flex; align-items:center; min-height:var(--pn-now)}
+.pn{position:relative; display:inline-block; width:var(--pn); height:var(--pn); border:var(--bw-2) solid var(--edge); border-radius:50%; background:var(--sheet); flex:none; box-sizing:border-box}
+.pn + .pn{margin-left:var(--pn-gap)}
+.pn + .pn::before{content:''; position:absolute; top:50%; left:calc(-1 * var(--pn-gap) - var(--bw-2)); width:var(--pn-gap); height:var(--bw-2); background:var(--line); transform:translateY(-50%)}
+.pn-done{background:var(--learn); border-color:var(--learn)}
+.pn-done + .pn::before{background:var(--learn)}
+.pn-started{border-color:var(--learn)}
+.pn-next{width:var(--pn-now); height:var(--pn-now); border-color:var(--learn); box-shadow:0 0 0 var(--bw-3) var(--learn-tint)}
+.pn-next::after{content:''; position:absolute; inset:var(--bw-3); border-radius:50%; background:var(--learn)}
+.pn-ch{border:0; background:transparent; border-radius:0; display:inline-grid; place-items:center}
+.pn-ch i{display:block; width:calc(var(--pn) - var(--bw-2)); height:calc(var(--pn) - var(--bw-2)); transform:rotate(45deg); border:var(--bw-2) solid var(--challenges); background:var(--sheet); box-sizing:border-box}
+.pn-ch.pn-done i{background:var(--challenges)}
+.pn-ch.pn-next{box-shadow:none}
+.pn-ch.pn-next::after{content:none}
+.pn-ch.pn-next i{background:var(--challenges-tint); box-shadow:0 0 0 var(--bw-3) var(--challenges-tint)}
+a.pn:hover{border-color:var(--ink)}
+a.pn-ch:hover i{border-color:var(--challenges-ink)}
+a.pn:focus-visible{outline:var(--cursor-w) solid var(--mode); outline-offset:var(--bw-2)}
+
+/* the open module's lessons, under its row */
+.mod-lessons{display:flex; flex-direction:column; padding:var(--s1) 0 var(--s2); border-bottom:1px solid var(--line)}
+.ls-row{display:grid; grid-template-columns:var(--s12) minmax(0,1fr) auto var(--ls-st-w); align-items:center; gap:var(--s3); min-height:var(--row-h); padding:0 var(--s3) 0 calc(var(--mod-n-w) + var(--s4)); color:var(--ink); text-decoration:none; font-size:var(--fs-name)}
+.ls-row:hover{background:var(--chrome)}
+.ls-row.next{background:var(--mode-tint); font-weight:var(--fw-semi)}
+.ls-n{font-family:var(--mono); font-size:var(--fs-min); color:var(--ink-2)}
+.ls-ch .ls-title{color:var(--challenges-ink); font-weight:var(--fw-semi)}
+.ls-st{font-size:var(--fs-label); font-weight:var(--fw-semi); color:var(--ink-2); text-align:right}
+.ls-done .ls-st, .ls-row.next .ls-st{color:var(--learn-ink)}
+
+/* the badge a module pays out, under its page */
+.learn-reward{display:flex; align-items:center; gap:var(--s3); padding-top:var(--s3); border-top:1px solid var(--line)}
+.learn-reward .px{flex:none}
+@media (max-width:900px){ .ch-cards .ch-card{flex:none; width:var(--side-col)} .learn-continue{flex-wrap:wrap} }
+
+/* a drill's state in the catalog sheet: your time, not played, or the lock and why */
+.dt-time{font-family:var(--mono); font-weight:var(--fw-bold); font-size:var(--fs-key); font-variant-numeric:tabular-nums}
+.dt-new{font-size:var(--fs-label); font-weight:var(--fw-semi); color:var(--ink-2)}
+.dt-lock{display:inline-flex; align-items:center; gap:var(--s2); font-size:var(--fs-label); font-weight:var(--fw-bold); color:var(--challenges-ink)}
+.dt-lock::before{content:''; width:var(--s2); height:var(--s2); border:var(--bw-2) solid currentColor; border-bottom:0; border-radius:var(--s1) var(--s1) 0 0; box-shadow:0 var(--s2) 0 calc(-1 * var(--bw-2)) currentColor; margin-bottom:var(--s1)}
+.dt-lock.dt-after{color:var(--ink-2); font-weight:var(--fw-semi)}
+
+/* the set, inline at the side of the catalog */
+.set-list{display:flex; flex-direction:column; border-top:var(--bw-2) solid var(--ink)}
+.set-row{display:grid; grid-template-columns:auto minmax(0,1fr) var(--set-len-w); align-items:center; gap:var(--s3); padding:var(--s2) 0; border-bottom:1px solid var(--line); color:var(--ink); text-decoration:none}
+.set-row:hover{background:var(--chrome)}
+.set-n{min-width:var(--s6); text-align:center}
+.set-main{display:flex; flex-direction:column; min-width:0}
+.set-len{font-size:var(--fs-min); color:var(--ink-2); text-align:right; font-variant-numeric:tabular-nums}
+
+/* Rapid-fire: the lengths as a toolbar in the header (Monkeytype's row of numbers), the deck as a sheet */
+.rf-lens{display:flex; align-items:center; gap:var(--s1); padding:var(--s1); background:var(--chrome); border-radius:var(--r-btn)}
+.rf-len{display:inline-flex; align-items:center; gap:var(--s2); padding:var(--s2) var(--s3); background:transparent; border:0; border-radius:var(--r-btn); color:var(--ink-2); font:inherit; font-size:var(--fs-body); font-weight:var(--fw-semi); cursor:pointer}
+.rf-len:hover{color:var(--ink)}
+.rf-len.on{background:var(--sheet); color:var(--mode-ink); font-weight:var(--fw-heavy)}
+.rf-len .key{font-size:var(--fs-min)}
+.tbl-deck td:nth-child(3){width:1%}
+.tbl-sheet .keys-row{flex-wrap:nowrap}
+.tbl-rounds td b{font-size:var(--fs-panel)}
+.how-list{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:var(--s3)}
+.how-list li{display:grid; grid-template-columns:auto minmax(0,1fr); gap:var(--s3); align-items:start; font-size:var(--fs-name); line-height:1.45}
+
+/* the tiers a challenge pays, with the times they take */
+.tier-list{display:flex; flex-direction:column; border-top:var(--bw-2) solid var(--ink)}
+.tier-row{display:grid; grid-template-columns:auto minmax(0,1fr) auto; align-items:center; gap:var(--s3); min-height:var(--row-h); border-bottom:1px solid var(--line)}
+.tier-row.on .row-name{color:var(--challenges-ink)}
+.tier-time{font-family:var(--mono); font-weight:var(--fw-bold); font-size:var(--fs-key); font-variant-numeric:tabular-nums}
+
+/* the Daily's week: a row a day with its drill, its keys and your time */
+.wk-list{display:flex; flex-direction:column; border-top:var(--bw-2) solid var(--ink)}
+.wk-row{display:grid; grid-template-columns:var(--ls-st-w) minmax(0,1fr) auto var(--ls-st-w); align-items:center; gap:var(--s3); min-height:var(--row-h); border-bottom:1px solid var(--line); font-size:var(--fs-name)}
+.wk-row.today{background:var(--mode-tint)}
+.wk-day{font-size:var(--fs-label); font-weight:var(--fw-semi); color:var(--ink-2); white-space:nowrap}
+.wk-res{display:flex; justify-content:flex-end; align-items:center; gap:var(--s2)}
+
+/* a table drawn as a worksheet (tableHtml sheet): letters on the chrome strip, numbers down the left, gridlines */
+.tbl-sheet{border:1px solid var(--grid); border-collapse:collapse}
+.tbl-sheet th.sh-col, .tbl-sheet th.sh-corner{background:var(--chrome); color:var(--ink-2); font-size:var(--fs-min); font-weight:var(--fw-body); text-align:center; height:var(--sp-row); padding:0 var(--s2); border:1px solid var(--grid); border-top:0}
+.tbl-sheet th.sh-col.num{text-align:center}
+.tbl-sheet td{border-bottom:1px solid var(--grid); border-right:1px solid var(--grid)}
+.tbl-sheet td.sh-row{width:var(--s8); min-width:var(--s8); padding:0; text-align:center; background:var(--chrome); color:var(--ink-2); font-size:var(--fs-min); font-variant-numeric:tabular-nums}
+.tbl-sheet tr.sh-labels td:not(.sh-row){font-weight:var(--fw-bold); color:var(--ink); font-size:var(--fs-label)}
+.tbl-sheet td:first-child, .tbl-sheet th:first-child{padding-left:0}
+.tbl-sheet td:nth-child(2){padding-left:var(--s3)}
+.tbl-sheet tr.cursor-on > td.sh-row, .tbl-sheet tr.next > td.sh-row{background:var(--grid); color:var(--learn-ink); font-weight:var(--fw-bold); box-shadow:inset calc(-1 * var(--bw-2)) 0 0 var(--learn)}
+.tbl-sheet tr.cursor-on > td:first-child{box-shadow:inset calc(-1 * var(--bw-2)) 0 0 var(--learn)}
+.tbl-sheet tr.cursor-on{outline-color:var(--learn)}
+
+.tbl-drills td[data-col="best"]{font-family:var(--font)}
+.tbl-drills .row-sub{display:block; font-size:var(--fs-min); color:var(--ink-2); font-weight:var(--fw-body)}
+.tbl-drills .keys-row{flex-wrap:nowrap}
+.tbl-drills td:nth-child(2){white-space:normal}
+.tbl-drills tr.later .keys-row, .tbl-drills tr.pro .keys-row{opacity:.7}
+.tbl-drills tr.next > td:not(.sh-row){background:var(--mode-tint)}
+
+/* ---------- the profile: the band, the shelf, the level titles ---------- */
+.prof-band{flex-direction:row; align-items:center; gap:var(--s6); padding:var(--s5) var(--s6)}
+.prof-band .prof-lvl-key{flex:none; display:grid; place-items:center; width:var(--prof-lvl); height:var(--prof-lvl); font-family:var(--mono); font-size:var(--fs-title); font-weight:var(--fw-heavy); color:var(--on-fill); background:var(--learn); border:1px solid var(--learn-ink); border-bottom-width:calc(var(--key-edge) * 2); border-radius:var(--r-btn)}
+.prof-who{flex:1 1 auto; min-width:0; display:flex; flex-direction:column; gap:var(--s1)}
+.prof-name{margin:0; font-size:var(--fs-title); font-weight:var(--fw-heavy); line-height:1.1}
+.prof-title{font-size:var(--fs-body); font-weight:var(--fw-semi); color:var(--learn-ink)}
+.prof-xp{font-size:var(--fs-label); color:var(--ink-2); font-variant-numeric:tabular-nums}
+.prof-facts{display:grid; grid-template-columns:repeat(4, auto); gap:0; margin:0; border:1px solid var(--grid)}
+.prof-facts > div{padding:var(--s2) var(--s4); border-right:1px solid var(--grid); min-width:var(--ls-st-w)}
+.prof-facts > div:last-child{border-right:0}
+.prof-facts dt{font-size:var(--fs-min); color:var(--ink-2)}
+.prof-facts dd{margin:0; font-size:var(--fs-head); font-weight:var(--fw-heavy); font-variant-numeric:tabular-nums}
+.ach-grid{display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); border-top:var(--bw-2) solid var(--ink)}
+.ach{display:grid; grid-template-columns:var(--ach-art) minmax(0,1fr); gap:var(--s3); align-items:start; padding:var(--s3) var(--s3) var(--s3) 0; border-bottom:1px solid var(--line)}
+.ach-art{width:var(--ach-art); height:var(--ach-art); display:grid; place-items:center}
+.ach-q{font-weight:var(--fw-heavy); font-size:var(--fs-head); color:var(--ink-2); border:var(--bw-2) dashed var(--line); box-sizing:border-box}
+.ach-words{display:flex; flex-direction:column; gap:var(--s1); min-width:0}
+.ach-name{font-size:var(--fs-name); font-weight:var(--fw-bold); line-height:1.25}
+.ach-desc{font-size:var(--fs-label); color:var(--ink-2); line-height:1.35}
+.ach-rar{font-size:var(--fs-min); font-weight:var(--fw-bold)}
+.ach-rar.r-common{color:var(--learn-ink)} .ach-rar.r-rare{color:var(--drills-ink)} .ach-rar.r-epic{color:var(--challenges-ink)} .ach-rar.r-legendary{color:var(--daily-ink)}
+.ach.locked .ach-name, .ach.hidden .ach-name{color:var(--ink-2)}
+.ach.locked .ach-rar, .ach.hidden .ach-rar{color:var(--ink-2)}
+.ach-prog{display:flex; align-items:center; gap:var(--s2); font-size:var(--fs-min); color:var(--ink-2)}
+.ach-prog .bar{flex:1 1 auto}
+.pg-profile .pg-two{grid-template-columns:minmax(0,1fr) calc(var(--side-col) * 1.4)}
+.tbl-levels td{white-space:normal}
+.tbl-levels .row-name{white-space:nowrap}
+.tbl-levels tr.later td:not(.sh-row){color:var(--ink-2)}
+.tbl-levels tr.later .row-name{font-weight:var(--fw-body)}
+
+/* ---------- the certificate: the chapters as progress, the next step, the page it will be ---------- */
+.cert-rows{display:flex; flex-direction:column; border-top:var(--bw-2) solid var(--ink)}
+.cert-row{display:grid; grid-template-columns:var(--cert-n) minmax(0,1fr) var(--cert-bar-w) var(--ls-st-w) var(--ls-st-w); align-items:center; gap:var(--s4); min-height:calc(var(--row-h) * 1.4); border-bottom:1px solid var(--line)}
+.cert-n{display:grid; place-items:center; width:var(--cert-n); height:var(--cert-n); border:var(--bw-2) solid var(--line); border-radius:50%; font-size:var(--fs-label); font-weight:var(--fw-bold); color:var(--ink-2)}
+.cert-row.started .cert-n{border-color:var(--learn); color:var(--learn-ink)}
+.cert-row.verified .cert-n{background:var(--learn); border-color:var(--learn); color:var(--on-fill)}
+.cert-ch{font-weight:var(--fw-bold)}
+.cert-count{font-size:var(--fs-label); color:var(--ink-2); text-align:right; font-variant-numeric:tabular-nums}
+.cert-st{font-size:var(--fs-label); font-weight:var(--fw-semi); color:var(--ink-2); text-align:right}
+.cert-ok{color:var(--learn-ink); font-weight:var(--fw-bold)}
+.cert-next{display:flex; align-items:center; gap:var(--s4); padding:var(--s4); background:var(--mode-tint); font-size:var(--fs-body)}
+.cert-next > span:nth-child(2){flex:1 1 auto}
+.cert-next-k{font-weight:var(--fw-heavy); color:var(--learn-ink)}
+.pg-cert .cert-main.cursor-on{outline-color:transparent}
+.pg-cert .cert-main.cursor-on::after{content:none}
+.cert-card{background:var(--sheet); border-left:var(--s2) solid var(--learn); box-shadow:var(--shadow-float); padding:var(--s6); display:flex; flex-direction:column; gap:var(--s2)}
+.cert-top{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:var(--s4)}
+.cert-mark{font-family:var(--mono); font-weight:var(--fw-bold); font-size:var(--fs-body)}
+.cert-mark b{color:var(--learn)}
+.cert-state{font-size:var(--fs-min); font-weight:var(--fw-bold); color:var(--ink-2)}
+.cert-name{font-size:var(--fs-title); font-weight:var(--fw-heavy); line-height:1.1}
+.cert-course{font-size:var(--fs-panel); font-weight:var(--fw-semi)}
+.cert-to{display:flex; flex-direction:column; margin:var(--s3) 0; font-size:var(--fs-label); color:var(--ink-2)}
+.cert-to b{font-size:var(--fs-head); color:var(--ink)}
+.cert-segs{display:grid; grid-template-columns:repeat(6, 1fr); gap:var(--s1)}
+.cert-segs i{display:block; height:var(--bar-h); background:var(--line)}
+.cert-segs i.half{background:var(--learn-tint)}
+.cert-segs i.on{background:var(--learn)}
+.cert-foot{display:flex; justify-content:space-between; font-size:var(--fs-label); font-weight:var(--fw-semi); color:var(--ink-2)}
+.cert-foot span:first-child{color:var(--ink)}
+.cert-earn{margin:0; padding-left:var(--s5); display:flex; flex-direction:column; gap:var(--s2); font-size:var(--fs-name); line-height:1.45}
+.cert-teaser .cert-segs{margin-top:var(--s1)}
+@media (max-width:900px){ .pg-profile .pg-two{grid-template-columns:minmax(0,1fr)} .prof-band{flex-wrap:wrap} .prof-facts{grid-template-columns:repeat(2, auto)} .ach-grid{grid-template-columns:minmax(0,1fr)} .cert-row{grid-template-columns:var(--cert-n) minmax(0,1fr) var(--ls-st-w)} .cert-row .bar, .cert-row .cert-count{display:none} }
+
 /* below 900px the columns stack */
 @media (max-width:900px){
   .pg-two, .pg-cols{grid-template-columns:minmax(0,1fr)}
   .hdr{flex-direction:column; align-items:stretch}
 }
 @media (prefers-reduced-motion: reduce){ .bar i{transition:none} }
+.tbl-sheet tr.sh-blank td{height:var(--row-h)}
+.tbl-board.tbl-sheet tr.mine > td.sh-row{color:var(--mode-ink); font-weight:var(--fw-bold)}
+.tbl.tbl-sheet tr.sh-labels td[data-col]{font-family:var(--cellfont); font-size:var(--fs-label); font-weight:var(--fw-bold); color:var(--ink)}

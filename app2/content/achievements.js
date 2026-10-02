@@ -42,6 +42,10 @@ const rapidBest = (c, i) => Math.max(0, ...A(c).filter(a => a.kind === 'rapid').
 export const RARITIES = ['common', 'rare', 'epic', 'legendary'];
 
 export const ACHIEVEMENTS = [
+  // ---- the three starters (Wolf, 2026-10-02): opening a lesson, making an account, and one for the scenic route ----
+  { id: 'first-open', glyph: 'cursor', rarity: 'common', name: 'Clocked In', desc: 'Open your first lesson', test: c => count(Object.values(P(c)).some(p => p && (p.started || p.completed)) ? 1 : 0, 1) },
+  { id: 'account', glyph: 'nametag', rarity: 'common', name: 'On the Roster', desc: 'Make a free account', test: c => count(c && c.signedIn ? 1 : 0, 1) },
+  { id: 'scenic-route', glyph: 'snail', rarity: 'common', name: 'Scenic Route', desc: 'Finish a drill with twice the keys its route needs', test: c => count(drillAttempts(c).filter(a => { const o = optimalOf(a.ref); return o != null && a.keys >= 2 * o; }).length, 1) },
   // ---- the campaign: sections and the chapter ----
   { id: 'first-lesson', glyph: 'seed', rarity: 'common', name: 'First Steps', desc: 'Complete your first lesson', test: c => count(lessonsDone(c), 1) },
   { id: 'mod-setup', glyph: 'flag', rarity: 'common', name: 'Through the Door', desc: 'Finish the Open and set up module', test: c => sectionDone(c, 'Open and set up') },

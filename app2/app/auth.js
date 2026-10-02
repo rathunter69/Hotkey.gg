@@ -43,7 +43,7 @@ export function makeOwnerTracker() {
  */
 // records, the game-sync marker and the review schedule are account history on this device: left
 // behind, the next account to sign in here would replay them into ITS account as guest runs
-export const SIGNOUT_WIPE_KEYS = ['hk2_progress_v1', 'hk2_outbox_v1', 'hk2_cache_v1', 'hk2_game_outbox_v1', 'hk2_guest_id', 'hotkey_theme', 'hk2_records_v1', 'hk2_game_sync_v1', 'hk2_schedule_v1'];
+export const SIGNOUT_WIPE_KEYS = ['hk2_progress_v1', 'hk2_outbox_v1', 'hk2_cache_v1', 'hk2_game_outbox_v1', 'hk2_guest_id', 'hk2_theme', 'hk2_records_v1', 'hk2_game_sync_v1', 'hk2_schedule_v1'];
 /**
  * A session that died on its own (expiry, revoked refresh token, a 401 the refresh cannot fix) is
  * not a sign-out: the uid-owned cache and outboxes stay, so nothing queued is lost and the same

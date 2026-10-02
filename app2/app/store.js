@@ -378,7 +378,7 @@ async function maybeCarryOver(sb, t) {
   if (!guestId) { guestId = newId(); try { store_() && store_().setItem(GUEST_ID_KEY, guestId); } catch (e) { /* blocked */ } }
   const payload = buildCarryPayload(local, prefs.get(), guestId);
   let theme = null;
-  try { theme = localStorage.getItem('hotkey_theme'); } catch (e) { /* blocked */ }
+  try { theme = localStorage.getItem('hk2_theme'); } catch (e) { /* blocked */ }
   try {
     const { error } = await sb.rpc('rpc_carry_over', {
       p_guest_id: payload.guest_id,

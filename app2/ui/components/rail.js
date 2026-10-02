@@ -13,6 +13,7 @@
 //   rail.setLevel({ lvl, into, need } | number | null); rail.setStreak({ day, week: [bool × 7] }); rail.setPro(bool);
 //   rail.setLanding(bool); rail.openAccount(); rail.closeAccount(); rail.destroy();
 import { siteCopy } from '../../content/copy/apply.js';
+import { openSigninDialog } from './signin-dialog.js';
 
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const fill = (s, vars) => String(s).replace(/\{(\w+)\}/g, (m, k) => (vars && vars[k] != null ? vars[k] : m));
@@ -131,10 +132,11 @@ export function mountRail(el, opts = {}) {
   let active = String(opts.active || '').toLowerCase();
   let landing = false, user = null, pro = false, level = null, streak = null, saveText = '';
   let menuOpen = false;
+  let section = null;   // the account page's section while an account page is showing: its item is lit and the items stay open
 
   function render() {
     el.innerHTML = landing ? landingHtml() : railHtml(active);
-    if (!landing) { paintUser(); paintLevel(); paintStreak(); paintSave(); wire(); }
+    if (!landing) { paintUser(); paintLevel(); paintStreak(); paintSave(); wire(); paintSection(); }
   }
   const q = sel => el.querySelector(sel);
 
@@ -166,6 +168,10 @@ export function mountRail(el, opts = {}) {
     const letters = weekLetters();
     q('#railWeek').innerHTML = (streak.week || []).slice(0, 7).map((on, i) => `<i class="${on ? 'on' : ''}${i === streak.today ? ' today' : ''}">${esc(letters[i] || '')}</i>`).join('');
   }
+  function paintSection() {
+    el.querySelectorAll('.rail-acct-item[data-page]').forEach(a => { const on = a.dataset.page === section; a.classList.toggle('on', on); if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
+    if (section) openAccount(null); else if (menuOpen) closeAccount(false);
+  }
   function paintSave() { const s = q('#railSave'); if (s) s.textContent = saveText; }
 
   /* ---------------- the account row opens its items in the rail ---------------- */
@@ -177,15 +183,17 @@ export function mountRail(el, opts = {}) {
   }
   function closeAccount(refocus) {
     const box = q('#railAcctItems'), btn = q('#railAcctBtn'); if (!box) return;
+    if (section && !refocus) { menuOpen = false; btn.setAttribute('aria-expanded', 'true'); return; }   // an account page keeps its items in view
     menuOpen = false; box.hidden = true; btn.setAttribute('aria-expanded', 'false'); btn.classList.remove('open');
     if (refocus) btn.focus();
   }
   function wire() {
     const btn = q('#railAcctBtn'), box = q('#railAcctItems');
     if (btn) {
-      btn.addEventListener('click', () => (menuOpen ? closeAccount(false) : openAccount(null)));
+      // signed out, the account button is Sign in: it opens the sign-in pop-out, never the account menu (Wolf, 28)
+      btn.addEventListener('click', () => { if (!user) { openSigninDialog(); return; } if (menuOpen) closeAccount(false); else openAccount(null); });
       btn.addEventListener('keydown', e => {
-        if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); e.stopPropagation(); openAccount(e.key === 'ArrowUp' ? -1 : 0); }
+        if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && user) { e.preventDefault(); e.stopPropagation(); openAccount(e.key === 'ArrowUp' ? -1 : 0); }
         else if (e.key === 'Escape' && menuOpen) { e.preventDefault(); e.stopPropagation(); closeAccount(true); }
       });
     }
@@ -211,6 +219,8 @@ export function mountRail(el, opts = {}) {
     el.querySelectorAll('.rail-item').forEach(a => { const on = a.dataset.page === active; a.classList.toggle('on', on); if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
     const r = el.querySelector('.rail'); if (r) r.classList.remove('open');
   }
+  /** The account page's section ('profile', 'settings', 'billing', 'certificate'), or null off the account pages. */
+  function setSection(key) { section = key ? String(key) : null; paintSection(); }
   function setUser(u) { user = u || null; paintUser(); }
   function setSaveState(text) { saveText = String(text || ''); paintSave(); }
   /** The level: { lvl, into, need } (content/levels.js levelOf), a bare level number, or null to hide. */
@@ -220,12 +230,12 @@ export function mountRail(el, opts = {}) {
     else level = { lvl: info.lvl, into: info.into || 0, need: info.need || 0 };
     paintLevel();
   }
-  function setStreak(s) { streak = s && typeof s === 'object' ? { day: s.day | 0, week: Array.isArray(s.week) ? s.week : [], today: Number.isInteger(s.today) ? s.today : -1 } : null; paintStreak(); }
+  function setStreak(s) { streak = s && typeof s === 'object' ? { day: s.day | 0, week: Array.isArray(s.week) ? s.week : Array.isArray(s.cells) ? s.cells : [], today: Number.isInteger(s.today) ? s.today : -1 } : null; paintStreak(); }
   function setPro(on) { pro = !!on; paintLevel(); }
   function setLanding(on) { on = !!on; if (on === landing) return; landing = on; render(); }
   function destroy() { document.removeEventListener('mousedown', onDocClick); el.innerHTML = ''; }
 
   render();
-  return { setActive, setUser, setSaveState, setLevel, setStreak, setPro, setLanding, openAccount, closeAccount, destroy,
+  return { setActive, setSection, setUser, setSaveState, setLevel, setStreak, setPro, setLanding, openAccount, closeAccount, destroy,
     get menuOpen() { return menuOpen; }, get landing() { return landing; } };
 }

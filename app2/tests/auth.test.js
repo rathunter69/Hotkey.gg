@@ -42,7 +42,7 @@ test('generation: A → B → A is three generations and every stale token is re
 test('signOutWipe: account traces go, device keys stay', () => {
   const s = fakeStorage({
     hk2_progress_v1: '{}', hk2_outbox_v1: '{}', hk2_cache_v1: '{}', hk2_guest_id: 'g',
-    hotkey_theme: 'noir', hotkey_theme_vars: '{"vars":{}}', hk2_prefs: '{"platform":"mac"}',
+    hk2_theme: 'noir', hk2_theme_vars: '{"vars":{}}', hk2_prefs: '{"platform":"mac"}',
     'sb-wepejasrnskvftgnnecr-auth-token': 'jwt', 'sb-xyz-auth-token.0': 'chunk', 'supabase.auth.token': 'legacy',
   });
   signOutWipe(s);
@@ -51,7 +51,7 @@ test('signOutWipe: account traces go, device keys stay', () => {
   assert.equal(s.getItem('sb-xyz-auth-token.0'), null, 'chunked token wiped');
   assert.equal(s.getItem('supabase.auth.token'), null, 'legacy token wiped');
   assert.equal(s.getItem('hk2_prefs'), '{"platform":"mac"}', 'device prefs stay');
-  assert.equal(s.getItem('hotkey_theme_vars'), '{"vars":{}}', 'the paint cache stays (repainted on next theme apply)');
+  assert.equal(s.getItem('hk2_theme_vars'), '{"vars":{}}', 'the paint cache stays (repainted on next theme apply)');
 });
 
 test('auth in Node (no window): unavailable and harmless', async () => {

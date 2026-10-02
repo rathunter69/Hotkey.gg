@@ -44,13 +44,13 @@ export const LEVEL_BANDS = [
   { from: 1, to: 2, title: 'new_workbook', reward: 'themes_start' },
   { from: 3, to: 5, title: 'arrow_keys', reward: 'theme' },
   { from: 6, to: 8, title: 'ctrl_arrow', reward: 'theme' },
-  { from: 9, to: 11, title: 'mouse_retired', reward: 'theme' },
-  { from: 12, to: 14, title: 'alt_native', reward: 'theme' },
-  { from: 15, to: 17, title: 'chord_player', reward: 'theme' },
-  { from: 18, to: 20, title: 'live_links', reward: 'theme' },
-  { from: 21, to: 23, title: 'ties_out', reward: 'theme' },
-  { from: 24, to: 26, title: 'model_owner', reward: 'theme' },
-  { from: 27, to: 29, title: 'hard_clock', reward: 'theme' },
+  { from: 9, to: 11, title: 'mouse_retired', reward: 'keycap_skin' },
+  { from: 12, to: 14, title: 'alt_native', reward: 'sound_set' },
+  { from: 15, to: 17, title: 'chord_player', reward: 'board_flair' },
+  { from: 18, to: 20, title: 'live_links', reward: 'cursor_color' },
+  { from: 21, to: 23, title: 'ties_out', reward: 'panel_style' },
+  { from: 24, to: 26, title: 'model_owner', reward: 'keycap_skin' },
+  { from: 27, to: 29, title: 'hard_clock', reward: 'board_flair' },
   { from: 30, to: 30, title: 'top_bucket', reward: 'crimson' },
 ];
 
@@ -98,7 +98,7 @@ const FALLBACK_TITLES = {
   chord_player: 'Chord Player', live_links: 'Live Links', ties_out: 'Ties Out', model_owner: 'Model Owner', hard_clock: 'Hard Clock', top_bucket: 'Top Bucket',
 };
 const FALLBACK_REWARDS = {
-  themes_start: 'Workbook, Daylight and six more themes', theme: 'A theme', crimson: 'Crimson and the Top Bucket frame',
+  themes_start: 'Workbook, High Contrast and Graphite', theme: 'A theme', crimson: 'Crimson and the Top Bucket frame',
   profile_frame: 'The profile frame', ghost_trail: 'The ghost trail', keycap_skin: 'A keycap skin', sound_set: 'A sound set',
   board_flair: 'Board flair', cursor_color: 'A cursor color', panel_style: 'A panel style',
 };

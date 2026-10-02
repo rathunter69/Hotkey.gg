@@ -226,8 +226,28 @@ html[data-effects="off"] .lp-in .lp-mod i, html[data-effects="off"] .lp-in .lp-m
 
 /* ---------- pricing ---------- */
 /* three columns that end on the same line; Full Access carries the mode's rule, the mark and the one primary button */
-.plans{display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:var(--s5); align-items:stretch}
+.pricing{display:flex; flex-direction:column; gap:var(--s5)}
+.pr-head{display:flex; flex-direction:column; gap:var(--s2)}
+.pr-head .h-title{margin:0}
+.pr-line{margin:0; font-size:var(--fs-body); color:var(--ink-2)}
+.plans{display:grid; grid-template-columns:minmax(0,0.72fr) minmax(0,0.95fr) minmax(0,1.3fr); gap:var(--s5); align-items:start}
+.plans > .plan:first-child .plan-foot{margin-top:var(--s2)}
+/* Teams: the third plan, one row across the page under the two */
+.plans > .plan:last-child{grid-column:1 / -1; display:grid; grid-template-columns:minmax(0,0.72fr) minmax(0,0.95fr) minmax(0,1.3fr); gap:var(--s5); align-items:center}
+.plans > .plan:last-child .ticks{flex-direction:column}
+.plans > .plan:last-child .plan-foot{margin:0}
+.pt-who{display:flex; flex-direction:column; gap:var(--s2)}
+.pt-who .plan-sub{margin:0}
+.plan-full .plan-figure{font-size:var(--fs-landing-narrow)}
+.tbl-course td[data-col="free"], .tbl-course td[data-col="full"]{width:1%; white-space:nowrap; padding-left:var(--s3); padding-right:var(--s3)}
+.tbl-course .cs-what{display:flex; align-items:baseline; padding:var(--s1) 0; line-height:1.3}
+.tbl-course .row-name{white-space:normal}
+.tbl-course .cs-n{flex:none; min-width:var(--s5); font-weight:var(--fw-heavy); color:var(--ink-2)}
+.tbl-course tr.paid .row-name{font-weight:var(--fw-semi)}
+.tbl.tbl-course th[data-col="full"], .tbl.tbl-course tr.sh-labels td[data-col="full"]{background:var(--learn-tint); color:var(--learn-ink)}
+.inc-tick{display:inline-block; width:var(--s3); height:var(--s2); border:solid var(--learn); border-width:0 0 var(--bw-3) var(--bw-3); transform:rotate(-45deg) translate(var(--bw-1-5), calc(-1 * var(--bw-1-5)))}
 .plan{gap:var(--s4)}
+.sr-only{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
 .plan-price{display:flex; align-items:baseline; gap:var(--s3)}
 .plan-figure{font-size:var(--fs-time); font-weight:var(--fw-heavy); font-variant-numeric:tabular-nums}
 .plan-sub{margin:calc(-1 * var(--s2)) 0 0; font-size:var(--fs-name); line-height:var(--lh-body)}
@@ -250,39 +270,117 @@ html[data-effects="off"] .lp-in .lp-mod i, html[data-effects="off"] .lp-in .lp-m
 
 /* ---------- Reference (3.0, Reference; M106) ---------- */
 .reference .tbl td{padding:var(--s2) var(--s2)}
-.kr-keys{white-space:normal}
+/* Reference: each group has its colour (the theme's mode colours, so every theme keeps its contrast) */
+[data-g="move"]{--g:var(--drills); --g-ink:var(--drills-ink); --g-tint:var(--drills-tint); --g-on:var(--on-fill)}
+[data-g="select"]{--g:var(--challenges); --g-ink:var(--challenges-ink); --g-tint:var(--challenges-tint); --g-on:var(--on-fill)}
+[data-g="edit"]{--g:var(--rapid); --g-ink:var(--rapid-ink); --g-tint:var(--rapid-tint); --g-on:var(--on-fill)}
+[data-g="format"]{--g:var(--daily); --g-ink:var(--daily-ink); --g-tint:var(--daily-tint); --g-on:var(--on-fill)}
+[data-g="formulas"]{--g:var(--learn); --g-ink:var(--learn-ink); --g-tint:var(--learn-tint); --g-on:var(--on-fill)}
+[data-g="ribbon"]{--g:var(--clock); --g-ink:var(--clock-ink); --g-tint:var(--clock-tint); --g-on:var(--ink)}
+[data-g="data"]{--g:var(--ink-2); --g-ink:var(--ink); --g-tint:var(--chrome); --g-on:var(--sheet)}
+.reference{display:flex; flex-direction:column; gap:var(--s5)}
+.reference .h-row-title{margin:0}
+/* the board: the keyboard, its legend, and the card for the key in hand */
+.kr-board{display:grid; grid-template-columns:minmax(0,1fr) var(--kr-focus-w); gap:var(--s6); align-items:stretch}
+.kr-board-main{display:flex; flex-direction:column; gap:var(--s3); min-width:0}
+.kb{display:flex; gap:var(--s4); align-items:flex-start}
+.kb-main, .kb-nav{display:flex; flex-direction:column; gap:var(--kb-gap)}
+.kb-row{display:flex; gap:var(--kb-gap)}
+.kb-row:first-child{margin-bottom:var(--s2)}
+.kb-key, .kb-gap{flex:none; width:calc(var(--kb-u) * var(--w, 1) + var(--kb-gap) * (var(--w, 1) - 1)); height:var(--kb-u); box-sizing:border-box}
+.kb-key{display:flex; align-items:flex-end; justify-content:flex-start; padding:0 var(--s1) var(--kb-pad); font-family:var(--mono); font-style:normal; font-size:var(--fs-kb); font-weight:var(--fw-key); color:var(--ink-2); background:var(--sheet); border:1px solid var(--line); border-bottom-width:var(--key-edge); border-radius:var(--r-btn); transition:transform var(--d-key), background var(--d-key)}
+.kb-key.kb-used{border-color:var(--g); color:var(--g-ink); background:var(--sheet)}
+.kb-key.kb-used.kb-on{background:var(--g-tint); font-weight:var(--fw-bold)}
+.kb-key.kb-down{background:var(--g, var(--ink)); border-color:var(--g, var(--ink)); color:var(--g-on, var(--sheet)); transform:translateY(var(--bw-2)); border-bottom-width:1px}
+.kb-key[data-k="Ctrl"].kb-down, .kb-key[data-k="Shift"].kb-down, .kb-key[data-k="Alt"].kb-down{background:var(--ink); border-color:var(--ink); color:var(--sheet)}
+.kr-legend{display:flex; flex-wrap:wrap; align-items:center; gap:var(--s2) var(--s4); font-size:var(--fs-label)}
+.kr-leg{display:inline-flex; align-items:center; gap:var(--s2); color:var(--ink); text-decoration:none; font-weight:var(--fw-semi)}
+.kr-leg:hover span:nth-child(2){text-decoration:underline}
+.kr-leg-n{color:var(--ink-2); font-weight:var(--fw-body); font-variant-numeric:tabular-nums}
+.kr-sw{display:inline-block; width:var(--s3); height:var(--s3); background:var(--g); border-radius:var(--s1)}
+.kr-leg-key{display:inline-flex; align-items:center; gap:var(--s2); margin-left:auto; color:var(--ink-2)}
+.kr-leg-key .kb-key{--g:var(--ink-2); --g-tint:var(--chrome); --g-ink:var(--ink); width:var(--s5); height:var(--s5); padding:0}
+.kr-focus{border-left:1px solid var(--line); padding-left:var(--s6); display:flex; flex-direction:column; min-width:0}
+.kr-focus-empty{flex:1 1 auto; display:grid; place-items:center; text-align:center}
+.kr-focus-try{display:flex; align-items:center; justify-content:center; gap:var(--s2); margin-bottom:var(--s4)}
+.kr-focus-try .key{font-size:var(--fs-panel); padding:var(--s2) var(--s3)}
+.kr-focus-hint{margin:0; color:var(--ink-2); font-size:var(--fs-name); line-height:var(--lh-body); max-width:var(--side-col)}
+.kr-focus-card{display:flex; flex-direction:column; gap:var(--s2); border-top:var(--bw-3) solid var(--g); padding-top:var(--s3); height:100%}
+.kr-focus-group{font-size:var(--fs-label); font-weight:var(--fw-bold); color:var(--g-ink)}
+.kr-focus-keys .key, .kr-focus-or .key{font-size:var(--fs-body); padding:var(--s1) var(--s2)}
+.kr-focus-or{display:flex; align-items:center; gap:var(--s2)}
+.kr-focus-name{margin:var(--s1) 0 0; font-size:var(--fs-head); font-weight:var(--fw-heavy); line-height:1.15}
+.kr-focus-what, .kr-focus-note{margin:0; font-size:var(--fs-name); line-height:var(--lh-body); color:var(--ink-2)}
+.kr-focus-foot{margin-top:auto; display:flex; align-items:center; justify-content:space-between; gap:var(--s3); flex-wrap:wrap}
+/* the groups: two dense columns, each group's colour on its rule and its swatch */
+.kr-grid{columns:2; column-gap:var(--s5)}
+.kr-group{break-inside:avoid; margin-bottom:var(--s5); min-width:0; border-top:var(--bw-3) solid var(--g); display:block}
+.kr-group .panel-h{display:inline-flex; align-items:center; gap:var(--s2)}
+.kr-tbl td{padding-top:var(--s1); padding-bottom:var(--s1); height:var(--row-h)}
+.kr-tbl{table-layout:auto; width:100%}
+.kr-tbl td.kr-keys, .kr-tbl td.kr-what{white-space:normal}
+.kr-tbl td.kr-what{min-width:var(--kr-what-min); line-height:1.3; padding-top:var(--s1); padding-bottom:var(--s1)}
+.kr-tbl td.kr-state{width:1%}
 .kr-keys .chord{white-space:nowrap; display:inline-flex; align-items:center; margin:calc(var(--s1) / 2) 0}
-.kr-grid{display:grid; grid-template-columns:minmax(0,1fr); gap:var(--s5)}
-.kr-group{min-width:0}
-.kr-act .btn{padding-left:var(--s2); padding-right:var(--s2)}
-.kr-group .tbl th{white-space:nowrap}
-.kr-act .btn{white-space:nowrap}
+.kr-what{font-weight:var(--fw-semi); font-size:var(--fs-name)}
 .kr-or{margin:0 var(--s1)}
-.kr-what{font-weight:var(--fw-semi)}
-.kr-note{display:block; font-weight:var(--fw-body); font-size:var(--fs-min); color:var(--ink-2)}
-.kr-lesson{color:var(--ink); text-decoration:none}
-.kr-lesson:hover{text-decoration:underline}
+.kr-lesson{color:var(--ink-2); text-decoration:none}
+.kr-lesson:hover{text-decoration:underline; color:var(--ink)}
+.kr-state{white-space:nowrap; display:inline-flex; align-items:center; gap:var(--s1); font-size:var(--fs-label); font-weight:var(--fw-semi); color:var(--ink-2)}
+td.kr-state{display:table-cell}
+.kr-dot{display:inline-block; width:var(--s2); height:var(--s2); border:var(--bw-2) solid var(--g, var(--ink-2)); border-radius:50%; box-sizing:border-box; margin-right:var(--s1); vertical-align:middle}
 .kr-state[data-state="taught"]{color:var(--ink)}
-.kr-state[data-state="practiced"], .kr-state[data-state="under-par"]{color:var(--learn-ink)}
-.kr-act{text-align:right}
+.kr-state[data-state="taught"] .kr-dot{background:var(--g-tint, var(--chrome))}
+.kr-state[data-state="practiced"], .kr-state[data-state="under-par"]{color:var(--g-ink, var(--learn-ink))}
+.kr-state[data-state="practiced"] .kr-dot, .kr-state[data-state="under-par"] .kr-dot{background:var(--g, var(--learn))}
+.kr-act{text-align:right; white-space:nowrap}
+.kr-drill{font-size:var(--fs-label); font-weight:var(--fw-semi); color:var(--g-ink); text-decoration:none}
+.kr-drill:hover{text-decoration:underline}
+.kr-row.kr-lit td{background:var(--g-tint)}
+.kr-row[data-state="not-yet"] .kr-what{color:var(--ink-2); font-weight:var(--fw-body)}
 .kr-row[hidden]{display:none}
 .kr-group[hidden]{display:none}
+@media (max-width:1100px){ .kr-board{grid-template-columns:minmax(0,1fr)} .kr-focus{border-left:0; padding-left:0; border-top:1px solid var(--line); padding-top:var(--s4)} .kb-nav{display:none} }
+@media (max-width:900px){ .kr-grid{columns:1} .kb{display:none} }
 
-/* ---------- Settings (3.0, Account; M101) ---------- */
-.setting{padding:var(--s3) 0; border-bottom:1px solid var(--line); display:flex; flex-direction:column; gap:var(--s2)}
+/* ---------- Settings (3.0, Account; M101): the Theme band, then Game options ---------- */
+.settings{display:flex; flex-direction:column; gap:var(--s5)}
+.settings .h-row-title{margin:0}
+.setting{padding:var(--s2) 0; border-bottom:1px solid var(--grid); display:flex; flex-direction:column; gap:var(--s2)}
 .setting:last-child{border-bottom:0}
-.setting-row{display:flex; align-items:center; justify-content:space-between; gap:var(--s4)}
-.setting-name{font-size:var(--fs-name); font-weight:var(--fw-semi)}
-.setting-help{margin:0; font-size:var(--fs-label); line-height:var(--lh-body)}
+.setting-row{display:flex; align-items:center; justify-content:space-between; gap:var(--s4); min-height:var(--row-h)}
+.setting-words{display:flex; flex-direction:column; gap:var(--s1); min-width:0}
+.setting-name{font-size:var(--fs-name); font-weight:var(--fw-bold)}
+.setting-help{margin:0; font-size:var(--fs-label); line-height:var(--lh-body); color:var(--ink-2)}
 .setting-help:empty{display:none}
-.tiles{display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:var(--s3)}
-.tile{font-family:var(--font); background:transparent; border:0; padding:0; cursor:pointer; display:flex; flex-direction:column; gap:var(--s1); align-items:flex-start; text-align:left; color:var(--ink)}
-.tile-swatch{width:var(--theme-tile-w); height:var(--theme-tile-h); background:var(--tile-bg); border:1px solid var(--edge); border-radius:var(--r-btn); display:flex; align-items:center; padding-left:var(--s2); box-sizing:border-box}
-.tile-swatch i{width:var(--s6); height:var(--s1); background:var(--tile-accent); display:block}
-.tile.on .tile-swatch{outline:var(--cursor-w) solid var(--mode); outline-offset:var(--cursor-w)}
-.tile-name{font-size:var(--fs-label); font-weight:var(--fw-semi)}
-.tile.locked{opacity:.55; cursor:default}
-.tile-lock{font-weight:var(--fw-body)}
+.setting-control{flex:none}
+.set-group .panel-head{border-bottom:1px solid var(--line); padding-bottom:var(--s2); margin-bottom:var(--s1)}
+.set-guest .btn-row{margin-top:var(--s3)}
+.set-game-head{display:flex; align-items:baseline; gap:var(--s4); border-bottom:var(--bw-2) solid var(--ink); padding-bottom:var(--s2)}
+.set-game-h{margin:0; font-size:var(--fs-title); font-weight:var(--fw-heavy)}
+.set-game{align-items:start}
+.set-game .col{display:flex; flex-direction:column; gap:var(--s5)}
+.set-look .setting-wide{border-bottom:0; padding-top:var(--s3)}
+.set-look-row{display:flex; flex-wrap:wrap; gap:var(--s8); border-top:1px solid var(--grid); padding-top:var(--s3)}
+.setting-inline{flex-direction:row; align-items:center; gap:var(--s4); padding:0; border:0}
+.seg-onoff .seg-btn{min-width:var(--s12)}
+/* the theme cards: each one a corner of a sheet in that theme's own colours */
+.tiles{display:grid; grid-template-columns:repeat(auto-fill, minmax(var(--theme-card-w), 1fr)); gap:var(--s4)}
+.tile{font-family:var(--font); background:transparent; border:0; padding:0; cursor:pointer; display:flex; flex-direction:column; gap:var(--s1); align-items:stretch; text-align:left; color:var(--ink)}
+.tile-sheet{display:flex; height:var(--theme-card-h); background:var(--tile-bg); border:1px solid var(--edge); overflow:hidden}
+.ts-rail{flex:none; width:var(--s4); background:var(--tile-rail)}
+.ts-grid{flex:1 1 auto; display:grid; grid-template-columns:var(--s5) repeat(3, minmax(0,1fr)); grid-auto-rows:1fr; margin:var(--s2) var(--s2) var(--s2) var(--s2); background:var(--tile-sheet); border:1px solid var(--tile-grid)}
+.ts-grid i{font-family:var(--cellfont); font-style:normal; font-size:var(--fs-min); color:var(--tile-fg); display:flex; align-items:center; justify-content:flex-end; padding:0 var(--s1); border-right:1px solid var(--tile-grid); border-bottom:1px solid var(--tile-grid); min-width:0; overflow:hidden}
+.ts-grid i.ts-hd{background:var(--tile-chrome); color:var(--tile-fg2); justify-content:center}
+.ts-grid i.ts-cur{outline:var(--bw-2) solid var(--tile-accent); outline-offset:calc(-1 * var(--bw-2))}
+.ts-grid i.ts-tot{font-weight:var(--fw-bold); color:var(--tile-accent-ink); border-top:1px solid var(--tile-fg)}
+.tile.on .tile-sheet{outline:var(--cursor-w) solid var(--mode); outline-offset:var(--cursor-w)}
+.tile:not(.locked):hover .tile-sheet{border-color:var(--ink)}
+.tile-name{font-size:var(--fs-name); font-weight:var(--fw-bold); margin-top:var(--s1)}
+.tile-lock{font-size:var(--fs-label); color:var(--ink-2)}
+.tile.locked .tile-sheet{opacity:.6}
+.tile.locked{cursor:default}
+.tile.locked .tile-name{color:var(--ink-2)}
 
 /* ---------- the footer on every site page ---------- */
 .site-footer{border-top:1px solid var(--line); margin-top:var(--s12); padding:var(--s6) var(--content-side) var(--s8); font-family:var(--font); display:flex; flex-direction:column; gap:var(--s3); background:var(--paper)}
@@ -323,3 +421,23 @@ html[data-effects="off"] .lp-in .lp-mod i, html[data-effects="off"] .lp-in .lp-m
   .lp-headline{font-size:var(--fs-landing-narrow)}
   .lp-demo .dp{height:var(--lp-demo-h-narrow)}
 }
+
+/* the first run as pop-outs over the product: Home behind a scrim, the card centred over it */
+.fr-behind{pointer-events:none; user-select:none}
+.fr.fr-pop{position:fixed; inset:0; z-index:50; display:flex; align-items:center; justify-content:center; padding:var(--s6); background:var(--scrim); font-family:var(--font)}
+.fr-pop .fr-panel{box-shadow:var(--shadow-float); max-height:calc(100vh - var(--s12)); overflow:auto}
+.fr-facts{display:flex; flex-direction:column; border-top:1px solid var(--line)}
+.fr-fact{display:grid; grid-template-columns:var(--ls-st-w) minmax(0,1fr); gap:var(--s3); padding:var(--s2) 0; border-bottom:1px solid var(--line); font-size:var(--fs-name); line-height:1.45; color:var(--ink)}
+.fr-fact-k{font-weight:var(--fw-bold); color:var(--learn-ink)}
+.fr-fact-k.fr-fact-pro{color:var(--challenges-ink)}
+.fr-acct{font-weight:var(--fw-semi)}
+
+/* a pop-out over the page: the sign-in dialog */
+.pop{position:fixed; inset:0; z-index:70; display:flex; align-items:center; justify-content:center; padding:var(--s6); background:var(--scrim); font-family:var(--font)}
+.pop-card{width:min(100%, calc(var(--side-col) * 1.5)); box-shadow:var(--shadow-float); gap:var(--s4)}
+.pop-card .panel-head{align-items:center}
+.pop-card .input{width:100%}
+.pop-card .co-form{align-items:stretch}
+.fr-pop .fr-panel:not(.fr-story){width:min(100%, calc(var(--side-col) * 1.5))}
+.fr-pop .fr-opt-sub{display:none}
+.fr-pop .fr-opt{padding:var(--s2) var(--s4)}
