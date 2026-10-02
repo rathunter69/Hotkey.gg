@@ -53,7 +53,8 @@ export const liveVia = (ses, sheet, ref, inputs) => { const sh = sheetIn(ses, sh
 /** A link: a formula reading `src` ('LBO!C108') and showing its figure. */
 export function linked(ses, sheet, ref, src) {
   const sh = sheetIn(ses, sheet); const [sn, sr] = src.split('!'); const from = sheetIn(ses, sn);
-  return !!sh && !!from && !!sh.formula(ref) && reads(sh, ref, [src]) && near(sh.value(ref), from.value(sr), 1e-6);
+  const v = sh && sh.value(ref), w = from && from.value(sr);
+  return !!sh && !!from && !!sh.formula(ref) && reads(sh, ref, [src]) && (isNum(w) ? near(v, w, 1e-6) : v === w);
 }
 /** Every ref carries the format field `field` at `value` (fmtStyle, numFmt, bdbl, …). */
 export const carries = (ses, sheet, refs, field, value = true) => { const sh = sheetIn(ses, sheet); return !!sh && refs.every(r => { const c = sh.cells[r]; return !!c && c[field] === value; }); };

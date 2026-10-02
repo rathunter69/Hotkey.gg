@@ -220,6 +220,7 @@ import ch5_assessment from './lessons/ch5-assessment.js';
 import bids_side_by_side from './lessons/bids-side-by-side.js';
 import the_waterfall from './lessons/the-waterfall.js';
 import your_stake from './lessons/your-stake.js';
+import football_field_board_page from './lessons/football-field-board-page.js';
 
 export const CHAPTERS = [
   {
@@ -376,7 +377,7 @@ export const CHAPTERS = [
       { name: 'Project and assessment', blurb: 'The valuation summary for the board from a fresh set, then the bids and the board’s page again on the clock; the assessment is the test-out.' },
     ],
     lessons: [
-      bids_side_by_side, the_waterfall, your_stake,
+      bids_side_by_side, the_waterfall, your_stake, football_field_board_page,
     ],
   },
 ];

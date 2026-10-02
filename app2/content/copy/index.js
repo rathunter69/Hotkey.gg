@@ -2427,6 +2427,18 @@ export const COPY = {
    "mac_note": "",
    "story_beat": ""
   },
+  "football-field-board-page": {
+   "id": "football-field-board-page",
+   "module": "bids-and-waterfall",
+   "order": "6.4.4",
+   "title": "The football-field table and the one-page summary for the board",
+   "brief": "The football field puts every valuation range on one line each: comps, precedents, the DCF, the LBO ceiling and the three bids, low, mid and high, as a table, so the board sees in one look where the bids sit against every method. Under it go the waterfall for the recommended bid and one line of recommendation. Every figure on the page is a link to the sheet that built it, a Ctrl+PgDn away. The key is `Ctrl+PgDn`.",
+   "closing": "Every method and every bid on one page, and the board can see where the money is. || Best practice: green on every link, and one sentence in blue. The board will ask where a number came from, and the answer is always one Ctrl+[ away.",
+   "wow": "",
+   "convention_line": "Links green; external links avoided; Title, units, timeline, then the answer; A units line: \"USD unless stated\"; The check is a live difference → 0; Borders carry structure, not gridlines",
+   "mac_note": "",
+   "story_beat": ""
+  },
   "remix-format-on-the-pnl": {
    "id": "remix-format-on-the-pnl",
    "module": "remixes",
@@ -15149,6 +15161,88 @@ export const COPY = {
     "teach": "",
     "why": "",
     "hint_stuck": "pulse range C42:E42 · Your options sit inside the 5% pool, so the owners never pay for them twice."
+   }
+  ],
+  "football-field-board-page": [
+   {
+    "lesson_id": "football-field-board-page",
+    "goal_index": "0",
+    "text": "On Summary, link the comps range to C9:E9 and the precedents range to row 10.",
+    "teach": "A football field is every method’s range on its own line, low, mid and high, all in enterprise value. Each line links the range block of the page that built it, so the board’s page never holds a typed figure.",
+    "why": "",
+    "hint_stuck": "pulse range C9:E10 · Comps row 45 and Precedents row 38 hold each low, median and high."
+   },
+   {
+    "lesson_id": "football-field-board-page",
+    "goal_index": "1",
+    "text": "Row 11: the DCF grid’s MIN, enterprise value and MAX; row 12: the LBO’s top prices from LBO row 146.",
+    "teach": "The DCF’s range is its exit-multiple sensitivity grid, lowest to highest, with the page’s enterprise value as the mid. The LBO line is what the sponsor can pay at three hurdles: a ceiling, not a valuation.",
+    "why": "",
+    "hint_stuck": "pulse range C11:E12 · The exit grid is DCF D77:H81 and the enterprise value DCF C42."
+   },
+   {
+    "lesson_id": "football-field-board-page",
+    "goal_index": "2",
+    "text": "Link each bid’s expected, priced and headline value from Bids into rows 13 to 15, low to high.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C13:E15 · Bid A is Bids column C: row 22, row 18, then row 6."
+   },
+   {
+    "lesson_id": "football-field-board-page",
+    "goal_index": "3",
+    "text": "Show where each line sits in F9:F15: =D9/$D$11, entered with Ctrl+Enter.",
+    "teach": "One ratio says where each line sits: its mid over the DCF’s mid. A bid at 95% of the DCF is a bid below what the cash flows say the business is worth.",
+    "why": "",
+    "hint_stuck": "pulse range F9:F15 · The DCF’s mid, D11, anchored with F4."
+   },
+   {
+    "lesson_id": "football-field-board-page",
+    "goal_index": "4",
+    "text": "Type A in C18 for the recommended bid, then find its column in C19: =MATCH(\"Bid \"&C18,Bids!$C$4:$E$4,0).",
+    "teach": "The waterfall shows one bid, the one recommended. MATCH finds that bid’s column on Bids from its letter, so changing one typed letter changes the whole block.",
+    "why": "",
+    "hint_stuck": "pulse range C18:C19 · The headers on Bids row 4 read Bid A, Bid B and Bid C."
+   },
+   {
+    "lesson_id": "football-field-board-page",
+    "goal_index": "5",
+    "text": "Pull the recommended bid’s waterfall into C20:C29 with INDEX on C19, starting =INDEX(Bids!$C$30:$E$30,$C$19).",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C20:C29 · Each line reads its own row of the Bids waterfall, and your options are Bids row 42."
+   },
+   {
+    "lesson_id": "football-field-board-page",
+    "goal_index": "6",
+    "text": "Type the recommendation in C32, one sentence: bid A, the lowest headline, has the highest expected value and is all cash at close.",
+    "teach": "The recommendation is the one place on the page a person wrote, so it is typed, in blue, in one sentence. Everything above it is a link the board can follow.",
+    "why": "",
+    "hint_stuck": "pulse cell C32 · Say which bid and why, in the words the board uses."
+   },
+   {
+    "lesson_id": "football-field-board-page",
+    "goal_index": "7",
+    "text": "Title A1 from Inputs, units in A2, the Cover’s flag and the valuation date in C5:C6, the source in B33, gridlines off.",
+    "teach": "The page has the anatomy every page in the pack has: a title from Inputs, a units line, the model’s checks flag from the Cover, a source line under the table, and no gridlines on a page someone reads.",
+    "why": "",
+    "hint_stuck": "pulse cell A1 · =Inputs!$C$104&\": valuation summary for the board\"; Alt, W, V, G turns the gridlines off."
+   },
+   {
+    "lesson_id": "football-field-board-page",
+    "goal_index": "8",
+    "text": "Fill the checks block in C36:C39: sources equal uses from Checks, the Cover’s flag, the ranges in order, the owners’ lines.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C36:C39 · =Checks!C14, then =IF(Cover!C7=\"OK\",0,1); each reads zero when the page ties."
+   },
+   {
+    "lesson_id": "football-field-board-page",
+    "goal_index": "9",
+    "text": "Does it tie? Watch bid B’s earnout odds on Bids go to 90%: bid B’s line on the football field, row 14, answers on the board’s page.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C14:F14 · Every figure on the page is a link, so a change on Bids reaches it at once."
    }
   ]
  },
