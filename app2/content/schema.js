@@ -197,6 +197,10 @@ export const CONCEPTS = {
   'concatenate-amp': '& joins text and cell values into one string: ="FY"&TEXT(B3,"yy")&"A"',
   'conditional-format-code': 'a section may open with a condition or a color, [>=1000]0,"k" or [Red], and Excel uses the first section whose condition the value meets',
   'hide-zeros': 'an empty section shows nothing: #,##0;(#,##0); hides the zeros of a working block',
+  // Chapter 2 · 2.7 Printing and page layout
+  'page-numbers-footer': 'Page &[Page] of &[Pages] in the footer numbers every printed page of a pack, beside the file and the date',
+  'center-on-page': 'Page Setup › Margins: Center on page Horizontally (Alt+Z) sits a narrow page in the middle of the paper',
+  'summary-links': 'a summary page holds no typed figure: every number is a link to the detail behind it, so the two can never disagree',
 };
 
 /**

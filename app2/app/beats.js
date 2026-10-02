@@ -30,6 +30,8 @@ const BEATS_DEFAULT = {
     body: 'The owners have hired advisers to run the sale, and the first document is the book: the information memorandum that describes the company to buyers. Its financials section starts with three years of P&L, and what the accounting system exported is account codes in capitals, costs as positives and numbers to four decimal places. Before anyone reads it, the figures have to read like figures.' },
   'custom-number-formats': { eyebrow: 'Module 2.2 · custom number formats', title: 'Every number on the page has to say what it is.',
     body: 'A buyer flips to the financials and reads margins, multiples and thousands without a legend, so the number format has to carry the unit. A format code can write k or m after a figure, show a zero as a dash, color a negative and turn a plain date into FY26E, with the value underneath untouched. This module is the format code, one section at a time.' },
+  'printing-and-page-layout': { eyebrow: 'Module 2.7 · printing and page layout', title: 'The book goes to print.',
+    body: 'The financials section is three pages, and the book is a PDF that gets printed, so each page has to land on one sheet, carry its title rows, and say which file and which page it is. The one-page summary reads from the detail behind it. Set the pack up to print and it’s ready for the data room.' },
   'project-and-assessment': { eyebrow: 'Module 1.8 · project, assessment, test-out', title: 'Management’s next feed is in.',
     body: 'A fresh week, a blank Report, and everything the chapter taught. Build the page start to finish, then prove it against the clock on Monday morning; or test out of the chapter in five minutes.' },
 };

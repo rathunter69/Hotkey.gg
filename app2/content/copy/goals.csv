@@ -396,6 +396,27 @@ challenge-house-format-set,3,"On Monthly, show the month ends in C4:N4 as dates 
 challenge-house-format-set,4,"On the P&L, give the check in C39 the code 0_);[Red](0);-_) so a miss turns red.",,,
 challenge-house-format-set,5,"Put the $ code $#,##0_);($#,##0);-_) on C7:E7, then on total revenue C10:E10 and EBITDA C24:E24 with F4.",,,
 challenge-house-format-set,6,Give the margins block C27:F30 the percent code 0.0%_);(0.0%);-_).,,,
+print-areas-titles-footers,0,"The P&L and Monthly both run wider than they are tall: turn the pack landscape with Alt, P, O, L.",,,"pulse the Page Layout tab · Orientation sits on Page Layout, and L is landscape."
+print-areas-titles-footers,1,"Open Page Setup with Alt, P, S, P and set Fit to 1 page wide by 2 tall, so Monthly runs down the page and not off it.",,,pulse the Page Setup dialog · Alt+F picks Fit to; Tab moves to the tall count.
+print-areas-titles-footers,2,"Repeat the title, units line, timeline and flags on every printed page: Print Titles with Alt, P, I, rows 1:5.",,,pulse the Sheet tab of Page Setup · Rows to repeat at top takes 1:5.
+print-areas-titles-footers,3,"In Page Setup's Custom Footer, Alt+U, put &[File] left, Page &[Page] of &[Pages] in the center and &[Date] right.","A pack prints many pages, so the footer numbers them: &[Page] is this page and &[Pages] the count, and Page &[Page] of &[Pages] reads Page 2 of 3. Alt+L, Alt+C and Alt+R move between the three sections of Custom Footer.",,"pulse the Header/Footer tab · H reaches the tab, Alt+U opens Custom Footer."
+print-areas-titles-footers,4,"On Page Setup's Margins tab, tick Center on page Horizontally with Alt+Z and keep the margins as they are.","Center on page puts the same white space either side of the figures, so a page narrower than the paper sits in the middle. Excel's Normal margins keep the header margin, 0.3 inches, under the top margin, 0.75, so the header never prints over the title row.",,"pulse the Margins tab · M reaches the tab, and Alt+Z ticks Horizontally."
+print-areas-titles-footers,5,Does it tie? Watch C7 change to 18500 and total revenue in C10 answer: the print set-up changed nothing on the sheet.,,,"pulse cell C10 · Print settings live beside the sheet, not in it."
+one-page-summary,0,"On Print, type the six labels down B5:B10: Revenue, Site contribution, EBITDA, EBITDA margin, Sites (year end), Washes (thousands).",,,pulse cell B5 · Print is the last of the pack's pages; the labels run down from B5.
+one-page-summary,1,"Select Print!C5:E5, type =, point at P&L!C10 across sheets and press Ctrl+Enter for a row of links to total revenue.","A summary holds no typed figure: every number is a link to the detail behind it, so the two can never disagree. With C5:E5 selected, one pointed link and Ctrl+Enter writes all three, each reading its own year.",,pulse range C5:E5 · Ctrl+PgUp walks back to the P&L while the formula is open.
+one-page-summary,2,"Link rows 6 to 10 the same way, to P&L rows 22, 24, 29, 33 and 34: site contribution, EBITDA, its margin, sites and washes.",,,"pulse range C6:E10 · One row at a time: select it, point, Ctrl+Enter."
+one-page-summary,3,"Under the lines, put Source: the P&L sheet in B11 in italic, Checks in B13 in bold and Last year EBITDA less the P&L in B14, indented.",,,"pulse cell B11 · The foot reads like the P&L's: the source, then the checks."
+one-page-summary,4,"In C14, point =E7-'P&L'!E24 so the check reads zero, and give it the red check code 0_);[Red](0);-_).",,,pulse cell C14 · Last year's EBITDA on Print less the same figure on the P&L.
+one-page-summary,5,"Bring the P&L's number formats onto C5:E10 with Paste Formats, Ctrl+Alt+V then T: lines from C7:E8, margins from C27:E27, memo from C33:E34.",,,"pulse range C5:E10 · Copy on the P&L, Paste Special Formats on Print."
+one-page-summary,6,"Every figure on Print is a link to another sheet: turn C5:E10 green with Alt, H, F, C.",,,pulse range C5:E10 · Green is the ninth swatch along.
+one-page-summary,7,"Draw the A/E divider on Print: a right border down D4:D10 with Alt, H, B, R, and the gray shade on E4 with Alt, H, H.",,,"pulse range D4:D10 · The estimate year is E, so the line runs down the right of D."
+one-page-summary,8,"Lay Print out like the P&L: A at width 2, B fitted over B4:B10, C:E at 12, gridlines off and the panes frozen at C5.",,,"pulse column B · Alt, H, O, W sets a width and Alt, H, O, I fits one."
+one-page-summary,9,"Does it tie? Watch P&L!E7 change to 27000, and Print's revenue in E5 and EBITDA in E7 answer while the check in C14 stays at zero.",,,"pulse cell E5 · Every figure on Print is a link, so it moves with the P&L."
+challenge-print-pack,0,"Turn the pack landscape with Alt, P, O, L.",,,
+challenge-print-pack,1,"In Page Setup, Alt, P, S, P, fit the pack to 1 page wide by 2 tall.",,,
+challenge-print-pack,2,"Repeat rows 1:5 at the top of every printed page with Print Titles, Alt, P, I.",,,
+challenge-print-pack,3,"In Custom Footer, Alt+U, put &[File] left, Page &[Page] of &[Pages] in the center and &[Date] right.",,,
+challenge-print-pack,4,"On Page Setup's Margins tab, center the page horizontally with Alt+Z.",,,
 remix-format-on-the-pnl,0,"The figures C5:F10 are General with stray decimals: comma style, no decimals, so the new site’s loss reads in parentheses.",,,
 remix-format-on-the-pnl,1,"Margin % in G5:G10 is a fraction: show it as a percentage to one decimal, Total included.",,,
 remix-format-on-the-pnl,2,"A grid of borders sits over the whole block A4:G10: remove every border from it, because a grid is not structure.",,,

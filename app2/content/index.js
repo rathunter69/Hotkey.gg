@@ -53,6 +53,9 @@ import units_in_the_format from './lessons/units-in-the-format.js';
 import dynamic_headers_with_text from './lessons/dynamic-headers-with-text.js';
 import conditional_codes_and_hidden_zeros from './lessons/conditional-codes-and-hidden-zeros.js';
 import challenge_house_format_set from './lessons/challenge-house-format-set.js';
+import print_areas_titles_footers from './lessons/print-areas-titles-footers.js';
+import one_page_summary from './lessons/one-page-summary.js';
+import challenge_print_pack from './lessons/challenge-print-pack.js';
 import remix_format_on_the_pnl from './remixes/formatting-on-the-pnl.js';   // Chapter 1's format challenge, re-clothed (content/remix.js)
 
 export const CHAPTERS = [
@@ -91,11 +94,13 @@ export const CHAPTERS = [
     sections: [
       { name: 'Number formats', blurb: 'Number formats on a P&L: the desk number format and decimals by line, the sign convention stated once, currency and percent lines, real dates on the timeline.' },
       { name: 'Custom number formats', blurb: 'Custom number formats: the four-section code, units in the format, custom date codes for the timeline, conditions and hidden zeros.' },
+      { name: 'Printing and page layout', blurb: 'Printing at pack scale: landscape, fit to one page wide, the title rows repeated, one footer on every page, and the one-page summary linked from the detail.' },
       { name: 'Remixes', blurb: 'Chapter 1’s challenges re-clothed in this chapter’s material: the same keys on a new sheet, so old skills stay warm.' },
     ],
     lessons: [
       built_in_formats_on_a_pnl, sign_convention_costs_negative, currency_and_percent_lines, dates_on_the_timeline, challenge_format_the_numbers,
       the_four_section_format, units_in_the_format, dynamic_headers_with_text, conditional_codes_and_hidden_zeros, challenge_house_format_set,
+      print_areas_titles_footers, one_page_summary, challenge_print_pack,
       remix_format_on_the_pnl,
     ],
   },

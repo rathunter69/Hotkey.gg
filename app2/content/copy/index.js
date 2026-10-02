@@ -603,6 +603,42 @@ export const COPY = {
    "mac_note": "",
    "story_beat": ""
   },
+  "print-areas-titles-footers": {
+   "id": "print-areas-titles-footers",
+   "module": "printing-and-page-layout",
+   "order": "2.7.1",
+   "title": "Print areas, titles, fit to width, headers and footers",
+   "brief": "Chapter 1 set one page to print; a pack needs the same on every sheet, and Monthly is wider than a page. Fit to one page wide lets a wide sheet run down two pages tall; print titles repeat the header rows on each; the footer carries the file, the page number and the date on every sheet. The key is `Alt P S P`.",
+   "closing": "Three sheets share one footer, so every page knows which file it came from. || Landscape, one page wide, the title rows on every page, and a footer that names the file, the page and the day: the pack prints the way a reader turns it. Monthly runs to two pages tall, and the next lesson decides where the second one starts.",
+   "wow": "",
+   "convention_line": "Fit to page, titles, footer; Title, units, timeline, then the answer",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "one-page-summary": {
+   "id": "one-page-summary",
+   "module": "printing-and-page-layout",
+   "order": "2.7.3",
+   "title": "The one-page summary linked from the detail",
+   "brief": "The first page of the section is the summary: six lines, three years, no detail, and every figure a link to the P&L behind it, so the summary can never disagree with the detail. Build Print from links and format it to the standard. The key is `Ctrl+PgDn`.",
+   "closing": "Every one of the six lines is a link, so the summary can't disagree with the detail. || Six lines and three years, each figure pointed at the P&L, formatted from it and shown green, with a check that reads zero. Change any line on the P&L and the summary answers before anyone can ask. The pack is ready for the data room.",
+   "wow": "",
+   "convention_line": "Links green; external links avoided; Build references by pointing; F2 to read back; The check is a live difference → 0; Title, units, timeline, then the answer",
+   "mac_note": "",
+   "story_beat": ""
+  },
+  "challenge-print-pack": {
+   "id": "challenge-print-pack",
+   "module": "printing-and-page-layout",
+   "order": "2.7.C",
+   "title": "Challenge: a three-sheet model prints as a clean pack",
+   "brief": "Three sheets, no print set-up. Orientation, fit, titles, one footer everywhere and the page centered: a pack a reader can print without thinking.",
+   "closing": "",
+   "wow": "",
+   "convention_line": "Fit to page, titles, footer; Title, units, timeline, then the answer",
+   "mac_note": "",
+   "story_beat": ""
+  },
   "remix-format-on-the-pnl": {
    "id": "remix-format-on-the-pnl",
    "module": "remixes",
@@ -3893,6 +3929,180 @@ export const COPY = {
     "hint_stuck": ""
    }
   ],
+  "print-areas-titles-footers": [
+   {
+    "lesson_id": "print-areas-titles-footers",
+    "goal_index": "0",
+    "text": "The P&L and Monthly both run wider than they are tall: turn the pack landscape with Alt, P, O, L.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse the Page Layout tab · Orientation sits on Page Layout, and L is landscape."
+   },
+   {
+    "lesson_id": "print-areas-titles-footers",
+    "goal_index": "1",
+    "text": "Open Page Setup with Alt, P, S, P and set Fit to 1 page wide by 2 tall, so Monthly runs down the page and not off it.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse the Page Setup dialog · Alt+F picks Fit to; Tab moves to the tall count."
+   },
+   {
+    "lesson_id": "print-areas-titles-footers",
+    "goal_index": "2",
+    "text": "Repeat the title, units line, timeline and flags on every printed page: Print Titles with Alt, P, I, rows 1:5.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse the Sheet tab of Page Setup · Rows to repeat at top takes 1:5."
+   },
+   {
+    "lesson_id": "print-areas-titles-footers",
+    "goal_index": "3",
+    "text": "In Page Setup's Custom Footer, Alt+U, put &[File] left, Page &[Page] of &[Pages] in the center and &[Date] right.",
+    "teach": "A pack prints many pages, so the footer numbers them: &[Page] is this page and &[Pages] the count, and Page &[Page] of &[Pages] reads Page 2 of 3. Alt+L, Alt+C and Alt+R move between the three sections of Custom Footer.",
+    "why": "",
+    "hint_stuck": "pulse the Header/Footer tab · H reaches the tab, Alt+U opens Custom Footer."
+   },
+   {
+    "lesson_id": "print-areas-titles-footers",
+    "goal_index": "4",
+    "text": "On Page Setup's Margins tab, tick Center on page Horizontally with Alt+Z and keep the margins as they are.",
+    "teach": "Center on page puts the same white space either side of the figures, so a page narrower than the paper sits in the middle. Excel's Normal margins keep the header margin, 0.3 inches, under the top margin, 0.75, so the header never prints over the title row.",
+    "why": "",
+    "hint_stuck": "pulse the Margins tab · M reaches the tab, and Alt+Z ticks Horizontally."
+   },
+   {
+    "lesson_id": "print-areas-titles-footers",
+    "goal_index": "5",
+    "text": "Does it tie? Watch C7 change to 18500 and total revenue in C10 answer: the print set-up changed nothing on the sheet.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C10 · Print settings live beside the sheet, not in it."
+   }
+  ],
+  "one-page-summary": [
+   {
+    "lesson_id": "one-page-summary",
+    "goal_index": "0",
+    "text": "On Print, type the six labels down B5:B10: Revenue, Site contribution, EBITDA, EBITDA margin, Sites (year end), Washes (thousands).",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell B5 · Print is the last of the pack's pages; the labels run down from B5."
+   },
+   {
+    "lesson_id": "one-page-summary",
+    "goal_index": "1",
+    "text": "Select Print!C5:E5, type =, point at P&L!C10 across sheets and press Ctrl+Enter for a row of links to total revenue.",
+    "teach": "A summary holds no typed figure: every number is a link to the detail behind it, so the two can never disagree. With C5:E5 selected, one pointed link and Ctrl+Enter writes all three, each reading its own year.",
+    "why": "",
+    "hint_stuck": "pulse range C5:E5 · Ctrl+PgUp walks back to the P&L while the formula is open."
+   },
+   {
+    "lesson_id": "one-page-summary",
+    "goal_index": "2",
+    "text": "Link rows 6 to 10 the same way, to P&L rows 22, 24, 29, 33 and 34: site contribution, EBITDA, its margin, sites and washes.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C6:E10 · One row at a time: select it, point, Ctrl+Enter."
+   },
+   {
+    "lesson_id": "one-page-summary",
+    "goal_index": "3",
+    "text": "Under the lines, put Source: the P&L sheet in B11 in italic, Checks in B13 in bold and Last year EBITDA less the P&L in B14, indented.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell B11 · The foot reads like the P&L's: the source, then the checks."
+   },
+   {
+    "lesson_id": "one-page-summary",
+    "goal_index": "4",
+    "text": "In C14, point =E7-'P&L'!E24 so the check reads zero, and give it the red check code 0_);[Red](0);-_).",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C14 · Last year's EBITDA on Print less the same figure on the P&L."
+   },
+   {
+    "lesson_id": "one-page-summary",
+    "goal_index": "5",
+    "text": "Bring the P&L's number formats onto C5:E10 with Paste Formats, Ctrl+Alt+V then T: lines from C7:E8, margins from C27:E27, memo from C33:E34.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C5:E10 · Copy on the P&L, Paste Special Formats on Print."
+   },
+   {
+    "lesson_id": "one-page-summary",
+    "goal_index": "6",
+    "text": "Every figure on Print is a link to another sheet: turn C5:E10 green with Alt, H, F, C.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C5:E10 · Green is the ninth swatch along."
+   },
+   {
+    "lesson_id": "one-page-summary",
+    "goal_index": "7",
+    "text": "Draw the A/E divider on Print: a right border down D4:D10 with Alt, H, B, R, and the gray shade on E4 with Alt, H, H.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range D4:D10 · The estimate year is E, so the line runs down the right of D."
+   },
+   {
+    "lesson_id": "one-page-summary",
+    "goal_index": "8",
+    "text": "Lay Print out like the P&L: A at width 2, B fitted over B4:B10, C:E at 12, gridlines off and the panes frozen at C5.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse column B · Alt, H, O, W sets a width and Alt, H, O, I fits one."
+   },
+   {
+    "lesson_id": "one-page-summary",
+    "goal_index": "9",
+    "text": "Does it tie? Watch P&L!E7 change to 27000, and Print's revenue in E5 and EBITDA in E7 answer while the check in C14 stays at zero.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell E5 · Every figure on Print is a link, so it moves with the P&L."
+   }
+  ],
+  "challenge-print-pack": [
+   {
+    "lesson_id": "challenge-print-pack",
+    "goal_index": "0",
+    "text": "Turn the pack landscape with Alt, P, O, L.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-print-pack",
+    "goal_index": "1",
+    "text": "In Page Setup, Alt, P, S, P, fit the pack to 1 page wide by 2 tall.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-print-pack",
+    "goal_index": "2",
+    "text": "Repeat rows 1:5 at the top of every printed page with Print Titles, Alt, P, I.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-print-pack",
+    "goal_index": "3",
+    "text": "In Custom Footer, Alt+U, put &[File] left, Page &[Page] of &[Pages] in the center and &[Date] right.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-print-pack",
+    "goal_index": "4",
+    "text": "On Page Setup's Margins tab, center the page horizontally with Alt+Z.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
   "remix-format-on-the-pnl": [
    {
     "lesson_id": "remix-format-on-the-pnl",
@@ -4014,6 +4224,13 @@ export const COPY = {
    "objective": "Custom number formats: the four-section code, units in the format, custom date codes for the timeline, conditions and hidden zeros.",
    "story_beat": "Every number on the page has to say what it is. || A buyer flips to the financials and reads margins, multiples and thousands without a legend, so the number format has to carry the unit. A format code can write k or m after a figure, show a zero as a dash, color a negative and turn a plain date into FY26E, with the value underneath untouched. This module is the format code, one section at a time.",
    "page_name": "The number-format set"
+  },
+  "printing-and-page-layout": {
+   "id": "printing-and-page-layout",
+   "name": "Printing and page layout",
+   "objective": "Printing at pack scale: fit to one page wide, print titles, one footer on every page; the one-page summary linked from the detail.",
+   "story_beat": "The book goes to print. || The financials section is three pages, and the book is a PDF that gets printed, so each page has to land on one sheet, carry its title rows, say which file and which page it is, and break where a reader would break. The one-page summary reads from the detail behind it. Set the pack up to print and it's ready for the data room.",
+   "page_name": "The pack, print-ready"
   },
   "remixes": {
    "id": "remixes",
