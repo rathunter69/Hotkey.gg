@@ -484,7 +484,7 @@ export function validateLesson(l) {
  * may legitimately hold at the start — they are gated behind the earlier ones.
  */
 function validateStartingSheet(l, goals, ends, need, opts = {}) {
-  const build = sp => new Sheet({ rows: sp.rows, cols: sp.cols, cells: sp.cells, colW: sp.colW, active: sp.active, rowH: sp.rowH, hiddenRows: sp.hiddenRows, hiddenCols: sp.hiddenCols, freeze: sp.freeze, gridlines: sp.gridlines, groups: sp.groups });
+  const build = sp => new Sheet({ rows: sp.rows, cols: sp.cols, cells: sp.cells, colW: sp.colW, active: sp.active, rowH: sp.rowH, hiddenRows: sp.hiddenRows, hiddenCols: sp.hiddenCols, freeze: sp.freeze, gridlines: sp.gridlines, groups: sp.groups, recalc: false });   // recalculated once, assembled, as the runner does
   let sheet, session;
   if (opts.moduleLesson) {
     // a module lesson starts from the previous lesson's `after` (the named workbook state);
@@ -502,7 +502,8 @@ function validateStartingSheet(l, goals, ends, need, opts = {}) {
     try {
       session = new Session(build(state.sheets[0]), {}); session.demoDone = new Set();
       session.sheets[0].name = state.sheets[0].name;
-      for (const sh of state.sheets.slice(1)) session.addSheet(sh.name, build(sh));
+      for (const sh of state.sheets.slice(1)) session.addSheet(sh.name, build(sh), undefined, { recalc: false });
+      session.recalcAll();   // once every sheet is in, as the runner does (a recalc per added sheet only repeated it)
       sheet = session.sheet;
     } catch (e) { need(false, `module state does not build: ${e.message}`); return; }
   } else {
@@ -522,8 +523,9 @@ function validateStartingSheet(l, goals, ends, need, opts = {}) {
       const sheets = Array.isArray(l.sheets) ? l.sheets : [];
       if (sheets.length) {
         if (sheets[0] && sheets[0].name) session.sheets[0].name = sheets[0].name;
-        for (const sh of sheets.slice(1)) session.addSheet(sh.name, build(sh));
+        for (const sh of sheets.slice(1)) session.addSheet(sh.name, build(sh), undefined, { recalc: false });
       }
+      session.recalcAll();
     }   // as the runner sets it up
     catch (e) { need(false, `sheet does not build: ${e.message}`); return; }
   }

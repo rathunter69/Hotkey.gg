@@ -44,3 +44,15 @@ test('the Custom box: m inside quotes is a literal; a bare m after a scaling com
   assert.equal(normalizeCode('0.0,,M'), null); assert.equal(normalizeCode('0 "mm"'), '0 "mm"'); assert.equal(normalizeCode('0 mm'), null);
   assert.equal(numberTabResult({ cat: 'custom', code: '#,##0.0,,m' }), null); assert.deepEqual(numberTabResult({ cat: 'custom', code: '#,##0.0,,"m"' }), { style: 'custom', numFmt: '#,##0.0,,"m"' });
 });
+
+test('SUBTOTAL runs again when hidden, filtered or folded rows change, and not on a recalc that moved nothing it reads', () => {
+  const S = new Sheet({ cells: { A1: { value: 1 }, A2: { value: 2 }, A3: { value: 4 }, B1: { formula: '=SUBTOTAL(109,A1:A3)' }, B2: { formula: '=B1*10' }, C1: { formula: '=TODAY()' }, D1: { value: 5 } }, today: () => 46000 });
+  assert.equal(S.value('B1'), 7);
+  S.recalc(); assert.equal(S.book.evals, 1, 'a recalc that moved nothing runs TODAY only (SUBTOTAL waits for its rows)');
+  S.cells.D1.value = 6; S.recalc(); assert.equal(S.book.evals, 1, 'an edit SUBTOTAL does not read leaves it alone');
+  S.hiddenRows.add(2); S.recalc(); assert.equal(S.value('B1'), 5, 'hiding a row reaches SUBTOTAL 109'); assert.equal(S.value('B2'), 50, 'and its readers');
+  S.hiddenRows.delete(2); S.filterRows.add(3); S.recalc(); assert.equal(S.value('B1'), 3, 'a filtered row');
+  S.filterRows.delete(3); S.groups = { rows: [{ r1: 1, r2: 1, collapsed: true }], cols: [] }; S.recalc(); assert.equal(S.value('B1'), 6, 'a folded row');
+  S.groups = { rows: [{ r1: 1, r2: 1, collapsed: false }], cols: [] }; S.recalc(); assert.equal(S.value('B1'), 7, 'unfolded again');
+  S.cells.A3.value = 10; S.recalc(); assert.equal(S.value('B1'), 13, 'an input still reaches it');
+});

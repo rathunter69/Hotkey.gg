@@ -32,6 +32,7 @@ import { tokenize, evalFormula, formulaRefs, evaluateStepper, valueText, transla
 import { refKey, parseRef, parseRange, rangeText, colLetter } from './refs.js';
 import { dispText } from './format.js';
 import { pivotCache, pivotLayout, PIVOT_FNS } from './pivot.js';
+import { sheetId } from './calc.js';
 import { isValidName, NAME_BAD_NOTE, NAME_TAKEN_NOTE } from './dialogs.js';
 const clone = x => JSON.parse(JSON.stringify(x));
 /** The Style dialog's tick boxes and the format fields each one carries (Style Includes, By Example). */
@@ -1090,7 +1091,7 @@ const methods = {
     return { sheet, key: refKey(p.r, p.c), r: p.r, c: p.c, name };
   },
   /** Recalculate the workbook after a tool wrote a cell directly (the graph sees the change; nothing is emitted). */
-  toolRecalc(S) { if (this.book) this.book.recalc(S); else S.recalc(); },
+  toolRecalc(S, only) { if (this.book) this.book.recalc(S, only); else S.recalc(); },
 
   /* ---------------- Name Manager (Ctrl+F3, Alt M N) and Paste Name (F3) ---------------- */
   /**
@@ -1255,23 +1256,62 @@ const methods = {
     const list = only ? [only] : this.sheets.map(e => e.sheet);
     this._tables = true;
     try {
+      const sigs = this._tableSig || (this._tableSig = new WeakMap());   // table → what its results were filled from
+      if (this.book) this.toolRecalc(list[0]);   // bring the graph current once (a no-op after a commit)
       for (const S of list) for (const t of (S.dataTables || [])) {
+        // nothing the table reads changed since it was filled: its results stand
+        const sig = force ? null : this.tableSig(S, t);
+        if (sig !== null && sigs.get(t) === sig) continue;
         const keys = [t.row, t.col].filter(Boolean); const saved = keys.map(k => clone(S.cells[k] || null));
         const put = (k, v) => { const c = S.ensure(parseRef(k).r, parseRef(k).c); c.formula = null; c.value = v; };
+        // each step names the cells it changed (the input cells, then the results), so a recalc diffs
+        // those and evaluates only their readers, not every cell of every sheet
+        const inputs = keys.map(key => ({ sheet: S, key }));
         const out = [];
         for (let r = t.r1 + 1; r <= t.r2; r++) for (let c = t.c1 + 1; c <= t.c2; c++) {
           let fr, fc;
           if (t.row && t.col) { put(t.row, S.get(t.r1, c).value); put(t.col, S.get(r, t.c1).value); fr = t.r1; fc = t.c1; }
           else if (t.col) { put(t.col, S.get(r, t.c1).value); fr = t.r1; fc = c; }
           else { put(t.row, S.get(t.r1, c).value); fr = r; fc = t.c1; }
-          this.toolRecalc(S); out.push([r, c, S.get(fr, fc).value]);
+          this.toolRecalc(S, inputs); out.push([r, c, S.get(fr, fc).value]);
         }
         keys.forEach((k, i) => { if (saved[i]) S.cells[k] = saved[i]; else delete S.cells[k]; });
-        this.toolRecalc(S);
+        this.toolRecalc(S, inputs);
         for (const [r, c, v] of out) { const cell = S.ensure(r, c); cell.value = v; }
-        this.toolRecalc(S);
+        this.toolRecalc(S, out.map(([r, c]) => ({ sheet: S, key: refKey(r, c) })));
+        const after = this.tableSig(S, t); if (after !== null) sigs.set(t, after); else sigs.delete(t);
       }
     } finally { this._tables = false; }
+  },
+
+  /**
+   * What a data table's results are a function of, as one string: its edges and axis values, its
+   * results, and every cell its formula(s) reach through the calculation graph (formula text and
+   * value), with the graph's epoch and the calculation settings. null when it cannot be trusted to
+   * cover everything (no graph; a reference built at run time, a volatile or a circle on the path),
+   * and the table is then filled every time, as it always was.
+   */
+  tableSig(S, t) {
+    const book = this.book; if (!book || S.book !== book) return null;
+    const heads = [];
+    if (t.row && t.col) heads.push(refKey(t.r1, t.c1));
+    else if (t.col) for (let c = t.c1 + 1; c <= t.c2; c++) heads.push(refKey(t.r1, c));
+    else for (let r = t.r1 + 1; r <= t.r2; r++) heads.push(refKey(r, t.c1));
+    const parts = [book.epoch, book.calcSig, book.rowSig, t.r1, t.c1, t.r2, t.c2, t.row, t.col];
+    const val = c => (c ? (c.formula || '') + '\u0001' + (typeof c.value) + ':' + String(c.value) : '');
+    for (let r = t.r1; r <= t.r2; r++) for (let c = t.c1; c <= t.c2; c++) parts.push(val(S.cells[refKey(r, c)]));   // axes, corner, results
+    for (const k of [t.row, t.col]) if (k) parts.push(val(S.cells[k]));
+    const seen = new Set(); const stack = heads.map(k => book.fk(S, k));
+    while (stack.length) {
+      const fk = stack.pop(); if (seen.has(fk)) continue; seen.add(fk);
+      const T = book.sheetOf(fk) || (fk.startsWith(sheetId(S) + '!') ? S : null); if (!T) return null;
+      const c = T.cells[fk.slice(fk.indexOf('!') + 1)];
+      parts.push(fk + '=' + val(c));
+      if (!c || !c.formula) continue;
+      if ((book.volatile.has(fk) && !book.rowsOnly.has(fk)) || book.cyclic.has(fk) || /\b(OFFSET|INDIRECT)\s*\(/i.test(c.formula)) return null;
+      const d = book.deps.get(fk); if (d) for (const x of d) if (!seen.has(x)) stack.push(x);
+    }
+    return parts.join('\u0002');
   },
 
   /* ---------------- Evaluate Formula (Alt M V) ---------------- */

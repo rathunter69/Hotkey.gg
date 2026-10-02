@@ -18,9 +18,25 @@ import { refKey, parseRef } from './refs.js';
 
 // SUBTOTAL rides along: hiding, filtering or folding rows changes what it reads without touching a cell
 const VOLATILE = /\b(TODAY|NOW|RAND|RANDBETWEEN|RANDARRAY|SUBTOTAL)\s*\(/i;
+// ...but SUBTOTAL moves only when the rows it may skip do: a formula volatile through nothing else runs
+// again when some sheet's hidden, filtered or folded rows changed since the last recalc (or its inputs did)
+const TIMELY = /\b(TODAY|NOW|RAND|RANDBETWEEN|RANDARRAY)\s*\(/i;
+/** What SUBTOTAL's skipping reads of a sheet: its hidden, filtered and folded rows. */
+const rowsSig = S => (S.hiddenRows ? [...S.hiddenRows].join(',') : '') + '|' + (S.filterRows ? [...S.filterRows].join(',') : '') + '|' + (S.groups ? JSON.stringify(S.groups) : '');
 const rectKeys = rg => { const out = []; for (let r = rg.r1; r <= rg.r2; r++) for (let c = rg.c1; c <= rg.c2; c++) out.push(refKey(r, c)); return out; };
 const same = (a, b) => a === b || (Number.isNaN(a) && Number.isNaN(b));
 const byPos = (a, b) => { const A = parseRef(a), B = parseRef(b); return (A.r - B.r) || (A.c - B.c); };
+/**
+ * A formula's references for a sheet of this size, memoised on the text: every workbook a session
+ * loads names the same formulas again, and tokenizing them was most of building a graph. The lists
+ * are only read here. Cleared whole when full, as the parse cache is.
+ */
+const REFS = new Map(); const REFS_MAX = 50000;
+const refsOf = (formula, rows, cols) => {
+  const k = rows + '|' + cols + '|' + formula; let hit = REFS.get(k);
+  if (!hit) { if (REFS.size >= REFS_MAX) REFS.clear(); hit = formulaRefs(formula, { rows, cols }); REFS.set(k, hit); }
+  return hit;
+};
 let CID = 0;
 /** A sheet's id in the graph (stable for the object's life; sheet names may change). */
 export const sheetId = sheet => sheet._cid || (sheet._cid = ++CID);
@@ -34,13 +50,15 @@ export class CalcGraph {
     this.stat = new Map();      // formula cell → { f, set }: its static references, memoised on the formula text
     this.seen = new Map();      // cid → Map key → { f, v }: what the last recalc saw
     this.volatile = new Set();  // formula cells that recalculate on every pass (TODAY, RAND…)
+    this.rowsOnly = new Set();  // the volatile cells whose only volatile function is SUBTOTAL: they run again when the rows move (rowsSig)
     this.cyclic = new Set();    // the cells in a circular reference after the last recalc
     this.known = new Map();     // cid → sheet, for every sheet the graph has touched (the list, plus sheets reached through a resolver)
     this.evals = 0;             // formula evaluations in the last recalc (the benchmark reads it)
     this.created = null;        // while a caller collects them (the liveness probe): [{ sheet, key }] of the cells a spill created, so it can remove them again
+    this.epoch = 0;             // moves on with every invalidate (names, sheets): a memo of what formulas read is stale across it
   }
   /** Forget everything: the next recalc evaluates every formula (a sheet renamed, added or removed; names changed). */
-  invalidate() { this.deps.clear(); this.rdeps.clear(); this.stat.clear(); this.seen.clear(); this.volatile.clear(); this.cyclic.clear(); this.known.clear(); }
+  invalidate() { this.epoch++; this.deps.clear(); this.rdeps.clear(); this.stat.clear(); this.seen.clear(); this.volatile.clear(); this.rowsOnly.clear(); this.rowSig = undefined; this.cyclic.clear(); this.known.clear(); }
 
   /* ---- keys ---- */
   fk(sheet, key) { let m = sheet._fks; if (!m) m = sheet._fks = new Map(); let f = m.get(key); if (!f) { f = sheetId(sheet) + '!' + key; m.set(key, f); } return f; }   // interned: a recalc reads the same keys thousands of times
@@ -73,13 +91,13 @@ export class CalcGraph {
     let m = this.stat.get(fk);
     if (!m || m.f !== c.formula) {
       const set = new Set();
-      for (const ref of formulaRefs(c.formula, { rows: S.rows, cols: S.cols })) {
+      for (const ref of refsOf(c.formula, S.rows, S.cols)) {
         const T = ref.sheet ? this.named(S, ref.sheet) : S; if (!T) continue;
         if (ref.key) set.add(this.fk(T, ref.key));
         else { const rg = ref.range; for (let r = Math.max(1, rg.r1); r <= Math.min(rg.r2, T.rows); r++) for (let cc = Math.max(1, rg.c1); cc <= Math.min(rg.c2, T.cols); cc++) set.add(this.fk(T, refKey(r, cc))); }
       }
       m = { f: c.formula, set }; this.stat.set(fk, m);
-      if (VOLATILE.test(c.formula)) this.volatile.add(fk); else this.volatile.delete(fk);
+      if (VOLATILE.test(c.formula)) { this.volatile.add(fk); if (TIMELY.test(c.formula)) this.rowsOnly.delete(fk); else this.rowsOnly.add(fk); } else { this.volatile.delete(fk); this.rowsOnly.delete(fk); }
     }
     if (!c.spillTo && !c.spillWant) return m.set;   // shared with the memo: callers copy before adding
     const out = new Set(m.set);
@@ -114,11 +132,19 @@ export class CalcGraph {
     if (only) {   // the caller names every cell it changed since the last recalc (the liveness probe): diff those, not every sheet
       for (const { sheet: S, key } of only) { if (!this.known.has(sheetId(S))) this.known.set(sheetId(S), S); diffKey(S, sheetId(S), seenOf(sheetId(S)), key); }
     } else for (const S of sheets) {
-      const cid = sheetId(S); const seen = seenOf(cid);
-      for (const k in S.cells) diffKey(S, cid, seen, k);
-      for (const k of [...seen.keys()]) if (!S.cells[k]) diffKey(S, cid, seen, k);
+      const cid = sheetId(S); const seen = seenOf(cid); const cells = S.cells;
+      let kept = 0;   // cells of the sheet that the snapshot holds: when it holds no others, no cell was removed
+      for (const k in cells) {
+        const c = cells[k];
+        if (c) { const s0 = seen.get(k); if (s0 !== undefined && s0.f === (c.formula || null) && same(s0.v, c.value)) { kept++; continue; } }   // unchanged: the common case, without the call
+        diffKey(S, cid, seen, k);
+        if (seen.has(k)) kept++;
+      }
+      if (seen.size > kept) for (const k of seen.keys()) if (!cells[k]) diffKey(S, cid, seen, k);   // a removed cell (deleting the entry being visited is safe in a Map)
     }
-    for (const fk of this.volatile) push(fk);
+    let rowSig = ''; for (const S of sheets) rowSig += sheetId(S) + ':' + rowsSig(S) + ';';
+    const rowsMoved = rowSig !== this.rowSig; this.rowSig = rowSig;
+    for (const fk of this.volatile) if (rowsMoved || !this.rowsOnly.has(fk)) push(fk);
     // the calculation settings changed (iteration on or off, its limits): every circle runs again under the new rule
     const calc = (sheets[0] && sheets[0].calc) || {};
     const sig = (calc.iterative ? 1 : 0) + '|' + (calc.maxIterations | 0) + '|' + calc.maxChange;

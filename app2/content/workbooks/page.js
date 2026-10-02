@@ -14,7 +14,7 @@
 // final total, a source line under the table, a checks block at the foot, one font and size,
 // nothing merged or hidden, gridlines off on a page someone reads, panes frozen at the first figure.
 import { Sheet, ROWH_DEFAULT, FSZ_LADDER, FSZ_BASE } from '../../engine/sheet.js';
-import { colLetter } from '../../engine/refs.js';
+import { colLetter, colIndex } from '../../engine/refs.js';
 import { formulaRefs } from '../../engine/formula.js';
 
 /** The desk number formats (screenplay 5; source-checklist H: graded by code). */
@@ -188,14 +188,22 @@ export function buildPage(spec) {
   if (labelCol === 2) colW[1] = HELPER_W;
   const figW = spec.figureW || FIGURE_W;
   for (let c = figCol; c <= lastCol; c++) colW[c] = figW;
-  const fit = new Sheet({ cells: JSON.parse(JSON.stringify(cells)), colW });
+  // the measuring sheets are calculated only when a formula could show in what they measure (a
+  // formula at or left of the labels, which might spill into them; a formula in the header row):
+  // the labels and headers are typed text, and calculating every page at import was most of its cost
+  const colOf = k => colIndex(/^[A-Z]+/.exec(k)[0]);
+  const calcLabels = Object.keys(cells).some(k => cells[k] && cells[k].formula && colOf(k) <= labelCol);
+  const fit = new Sheet({ cells: JSON.parse(JSON.stringify(cells)), colW, recalc: calcLabels });
   // the source line overflows to the right as text does; the labels and the check lines set the width
   const fitTo = Math.max(FIGURE_W, fit.neededWidth(labelCol, 4, r - 1), checksRow ? fit.neededWidth(labelCol, checksRow, foot) : 0);
   colW[labelCol] = spec.labelW || fitTo;
-  // a wrapped header row grows to fit, as Excel's autofit would
-  const sized = new Sheet({ cells: JSON.parse(JSON.stringify(cells)), colW });
-  sized.select(`A4:${colLetter(lastCol)}4`); sized.autofitRows();
-  const rowH = sized.rowH[4] !== ROWH_DEFAULT ? { 4: sized.rowH[4] } : {};
+  // a wrapped header row grows to fit, as Excel's autofit would (no wrapped text in row 4: it keeps the default height)
+  let rowH = {};
+  if (Object.keys(cells).some(k => /^[A-Z]+4$/.test(k) && cells[k] && (cells[k].wrap || cells[k].formula))) {
+    const sized = new Sheet({ cells: JSON.parse(JSON.stringify(cells)), colW });
+    sized.select(`A4:${colLetter(lastCol)}4`); sized.autofitRows();
+    rowH = sized.rowH[4] !== ROWH_DEFAULT ? { 4: sized.rowH[4] } : {};
+  }
 
   const sheet = {
     name: spec.name, cells, colW, rowH,

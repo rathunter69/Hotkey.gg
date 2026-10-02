@@ -86,6 +86,73 @@ export const CELL_STYLES = [
 ];
 
 const clone = o => JSON.parse(JSON.stringify(o));
+/*
+ * A sheet's cells, copied for an undo step, a restore or a read: exactly what clone() returns, but a
+ * record whose fields are all plain values (nearly every cell) is copied field by field rather than
+ * through a string, which halves the cost of the copy every edit makes. A record holding anything
+ * else (an object, an array, a BigInt) takes the round trip, so the result never differs.
+ */
+const own = Object.prototype.hasOwnProperty;
+export function cloneCell(c) {
+  if (c === null || typeof c !== 'object' || Array.isArray(c) || typeof c.toJSON === 'function') return clone(c);
+  const o = {};
+  for (const p in c) {
+    if (!own.call(c, p)) continue;
+    const v = c[p]; const t = typeof v;
+    if (t === 'string' || t === 'boolean' || v === null) o[p] = v;
+    else if (t === 'number') o[p] = Number.isFinite(v) ? (v === 0 ? 0 : v) : null;   // as JSON writes them: -0 is 0, NaN and ±Infinity null
+    else if (t === 'undefined' || t === 'function' || t === 'symbol') continue;   // JSON leaves the field out
+    else return clone(c);
+  }
+  return o;
+}
+export function cloneCells(cells, prev) {
+  const out = {};
+  for (const k in cells) {
+    if (!own.call(cells, k)) continue;
+    const c = cells[k]; const t = typeof c;
+    if (t === 'undefined' || t === 'function' || t === 'symbol') continue;
+    const p = prev && own.call(prev, k) ? prev[k] : undefined;
+    out[k] = p !== undefined && sameAsCopy(c, p) ? p : cloneCell(c);
+  }
+  return out;
+}
+/**
+ * True when the live cells already are what cloneCells(frame) would make of the frame: the same
+ * keys in the same order, every record the same plain fields and values (strict: nothing a JSON
+ * copy would have rewritten). A restore then keeps them rather than copying the frame again.
+ */
+function sameCells(cells, frame) {
+  const keys = Object.keys(frame); let i = 0;
+  for (const k in cells) {
+    if (!own.call(cells, k)) continue;
+    if (keys[i] !== k || !sameAsCopy(cells[k], frame[k], true)) return false;
+    i++;
+  }
+  return i === keys.length;
+}
+/**
+ * True when cloneCell(c) would equal the copy `p` exactly (the same fields, in the same order, with
+ * the same plain values): an undo step then shares the record with the step before it instead of
+ * copying it again. Only for copies nothing writes to (the undo and redo frames). Strict: also
+ * false when c holds anything the copy rewrote (-0, NaN, ±Infinity, an undefined field), so c
+ * itself equals the copy.
+ */
+function sameAsCopy(c, p, strict) {
+  if (c === null || typeof c !== 'object' || p === null || typeof p !== 'object' || Array.isArray(c) || typeof c.toJSON === 'function') return false;
+  const keys = Object.keys(p); let i = 0;
+  for (const k in c) {
+    if (!own.call(c, k)) continue;
+    const v = c[k]; const t = typeof v; let nv;
+    if (t === 'string' || t === 'boolean' || v === null) nv = v;
+    else if (t === 'number') { nv = Number.isFinite(v) ? (v === 0 ? 0 : v) : null; if (strict && !Object.is(nv, v)) return false; }
+    else if (t === 'undefined' || t === 'function' || t === 'symbol') { if (strict) return false; continue; }
+    else return false;   // a field holding an object: copied afresh
+    if (keys[i] !== k || p[k] !== nv) return false;
+    i++;
+  }
+  return i === keys.length;
+}
 /** Excel's built-in fill lists: the weekday and month names, short and long. */
 const FILL_LISTS = [
   ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
@@ -343,6 +410,7 @@ export class Sheet {
    * @param {object} [opts.colW]     map col index → px
    * @param {{r:number,c:number}} [opts.active]
    * @param {() => number} [opts.today]  Excel serial for TODAY()
+   * @param {boolean} [opts.recalc=true]  false: no recalculation yet (the caller recalculates the assembled workbook)
    */
   constructor(opts = {}) {
     this.rows = opts.rows || 100;   // the visible canvas is Excel-like: many rows and columns, scrolled by the view
@@ -402,7 +470,7 @@ export class Sheet {
     if (opts.tabColor && TAB_COLORS.some(t => t.k === opts.tabColor)) this.tabColor = opts.tabColor;
     if (Array.isArray(opts.dataTables)) this.dataTables = clone(opts.dataTables);   // What-If data tables: [{ r1, c1, r2, c2, row, col }] (the input cells' keys)
     if (opts.active) this.active = this.clamp(opts.active.r, opts.active.c);
-    this.recalc();
+    if (opts.recalc !== false) this.recalc();   // a loader assembling a workbook passes recalc: false and recalculates the whole workbook once (alone, a cross-sheet formula only reads #REF!)
   }
 
   /* ---------------- change notification ---------------- */
@@ -434,7 +502,7 @@ export class Sheet {
 
   /* ---------------- reading back ---------------- */
   /** Cell object (a copy) at 'B3' — blank record if empty. */
-  cellAt(ref) { const p = parseRef(ref); return p ? clone(this.get(p.r, p.c)) : null; }
+  cellAt(ref) { const p = parseRef(ref); return p ? cloneCell(this.get(p.r, p.c)) : null; }
   /** Computed value at 'B3': number | string | boolean | null. */
   value(ref) { const p = parseRef(ref); const c = p && this.cells[refKey(p.r, p.c)]; return c ? c.value : null; }
   /** Display text at 'B3', formatted as the grid paints it. */
@@ -641,12 +709,15 @@ export class Sheet {
   }
 
   /* ---------------- undo ---------------- */
-  snapshot() { return { cells: clone(this.cells), colW: this.colW.slice(), colSet: this.colSet.slice(), rows: this.rows, active: { ...this.active }, sel: this.sel && { ...this.sel },
+  /** The cells as an undo frame: a record unchanged since the last frame is shared with it (frames are never written to). */
+  snapCells() { const out = cloneCells(this.cells, this._snapCells); this._snapCells = out; return out; }
+  snapshot() { return { cells: this.snapCells(), colW: this.colW.slice(), colSet: this.colSet.slice(), rows: this.rows, active: { ...this.active }, sel: this.sel && { ...this.sel },
     rowH: this.rowH.slice(), hiddenRows: [...this.hiddenRows], hiddenCols: [...this.hiddenCols], freeze: { ...this.freeze }, groups: clone(this.groups), condFmt: clone(this.condFmt), names: clone(this.names),
     filter: clone(this.filter), filterRows: [...this.filterRows], validation: clone(this.validation || null), dataTables: clone(this.dataTables || null), breaks: clone(this.breaks), pivots: clone(this.pivots || null), printArea: this.pageSetup.printArea || null }; }
   /** Rewind cells AND the whole selection to one moment, so undo/redo re-select the range the operation touched (Excel). */
   restore(s) {
-    this.cells = clone(s.cells); this.colW = s.colW.slice(); this.colSet = s.colSet.slice(); this.rows = s.rows;
+    if (!sameCells(this.cells, s.cells)) this.cells = cloneCells(s.cells);   // cells already as the frame has them (a ghost that left a sheet alone) are kept
+    this._snapCells = s.cells; this.colW = s.colW.slice(); this.colSet = s.colSet.slice(); this.rows = s.rows;
     if (s.rowH) this.rowH = s.rowH.slice();
     this.hiddenRows = new Set(s.hiddenRows || []); this.hiddenCols = new Set(s.hiddenCols || []);
     this.filter = s.filter ? clone(s.filter) : null; this.filterRows = new Set(s.filterRows || []); this.validation = s.validation ? clone(s.validation) : null; this.dataTables = s.dataTables ? clone(s.dataTables) : null;

@@ -6,9 +6,12 @@
 // The child steps (1, 2b, 2c, 3) start together and are reported in order, so the gate's wall time
 // is its longest step, not their sum. `--full` adds the *.slow.test.js files (the liveness
 // equivalence replay): on demand and in the non-blocking full-check workflow, never in the gate.
+// `--measure` times every test file (and every lesson's replays) on its own and writes
+// check-costs.json, which the gate balances its processes on; rerun it when a chapter lands.
+// CHECK_VERBOSE=1 prints each test process's time and files.
 // No dependencies, no framework, no browser.
 import { spawn } from 'node:child_process';
-import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { join, dirname, resolve, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { availableParallelism } from 'node:os';
@@ -20,6 +23,7 @@ const t0 = Date.now();
 const kids = new Set();
 const fail = (msg) => { for (const c of kids) c.kill(); console.error('\nCHECK FAILED: ' + msg); process.exit(1); };
 const FULL = process.argv.includes('--full');
+const MEASURE = process.argv.includes('--measure');
 /** A child node process, started now; resolves to { status, stdout, stderr } (inherit: streamed to this terminal instead). */
 const run = (args, { inherit = false } = {}) => new Promise(done => {
   const c = spawn(process.execPath, args, { stdio: inherit ? 'inherit' : 'pipe' });
@@ -39,6 +43,41 @@ function walk(dir, out = []) {
   return out;
 }
 const files = walk(app2);
+const base = f => f.slice(f.lastIndexOf('/') + 1).replace(/\.test\.js$/, '');
+const COSTS_FILE = join(here, 'check-costs.json');
+
+// --measure: each test file in a process of its own (two at a time, so the timings stay honest),
+// its tests' durations summed (the shared imports are not counted: a pool pays them once); the
+// replay shards' tests are summed per lesson as well. Writes check-costs.json and stops.
+if (MEASURE) {
+  const list = files.filter(f => f.endsWith('.test.js') && !f.endsWith('.slow.test.js')).sort();
+  const out = { note: 'CPU seconds per test file and per lesson replay, from `node app2/tests/run-checks.js --measure`; the gate balances its processes on these', files: {}, lessons: {} };
+  const queue = [...list];
+  const worker = async () => {
+    for (let f; (f = queue.shift());) {
+      const r = await run(['--test', '--experimental-test-isolation=none', '--no-warnings', '--test-reporter=tap', f]);
+      if (r.status !== 0) fail(`${relative(root, f)} fails; measure a passing tree`);
+      let name = null, sum = 0;
+      for (const l of r.stdout.split('\n')) {
+        const m = /^(?:not )?ok \d+ - (.*)$/.exec(l); if (m) { name = m[1]; continue; }
+        const d = /^ {2}duration_ms: ([\d.]+)/.exec(l); if (!d || name === null) continue;
+        const secs = +d[1] / 1000; sum += secs;
+        const lesson = /^lesson-replay-\d+$/.test(base(f)) && /^([\w.-]+): /.exec(name);
+        if (lesson) out.lessons[lesson[1]] = (out.lessons[lesson[1]] || 0) + secs;
+        name = null;
+      }
+      out.files[base(f)] = sum;
+      process.stdout.write('.');
+    }
+  };
+  await Promise.all([worker(), worker()]);
+  const round = o => Object.fromEntries(Object.entries(o).sort(([a], [b]) => (a < b ? -1 : 1)).map(([k, v]) => [k, Math.round(v * 100) / 100]));
+  out.files = round(out.files); out.lessons = round(out.lessons);
+  for (const k of Object.keys(out.files)) if (/^lesson-replay-\d+$/.test(k)) delete out.files[k];   // a shard's cost is its lessons'
+  writeFileSync(COSTS_FILE, JSON.stringify(out, null, 1) + '\n');
+  console.log(`\nmeasured ${list.length} files and ${Object.keys(out.lessons).length} lessons in ${((Date.now() - t0) / 1000).toFixed(0)}s: ${relative(root, COSTS_FILE)}`);
+  process.exit(0);
+}
 
 // 1. syntax: every file parses as an ES module, in one child process (a node --check per file cost ~7 s of the budget)
 const PARSE = `import vm from 'node:vm'; import { readFileSync } from 'node:fs';
@@ -52,27 +91,40 @@ const copyP = ['copy-build.js', 'copy-check.js', 'css-check.js'].map(script => r
 // builds its states at import, ~1.5 s of CPU) once per file, since node --test gives each file its
 // own process. The gate instead packs the files into one pool per core, each pool one process
 // (--experimental-test-isolation=none), so the content is imported once per core; the pools are
-// balanced longest first on the weights below. Files that set globals or sign an account in run
-// apart, each in its own process. --full runs every file in its own process, the classic way.
+// balanced longest first on the measured costs (check-costs.json, see --measure). Files that set
+// globals or sign an account in run apart, each in its own process. --full runs every file in its
+// own process, the classic way.
 const testFiles = files.filter(f => f.endsWith('.test.js') && (FULL || !f.endsWith('.slow.test.js'))).sort();
-const base = f => f.slice(f.lastIndexOf('/') + 1).replace(/\.test\.js$/, '');
-/** Files that need a process to themselves: they stub globals (localStorage, fetch, a Supabase client) or hold the auth singleton. */
-const OWN_PROCESS = new Set(['auth', 'challenge', 'effects', 'entitlement', 'leaderboard', 'lessons', 'moments', 'records', 'site-pages', 'store', 'store-sync', 'telemetry']);
-/** Rough CPU seconds beyond the shared imports (measured 2026-10-02); an unlisted file counts 0.3. Only the balance depends on them. */
-const WEIGHT = { 'clearcoat-databook': 5.7, 'clearcoat-valuation': 3.6, 'clearcoat-model': 2.7, 'lesson-replay-0': 3.4, 'lesson-replay-1': 2.2, 'lesson-replay-2': 1.5, 'lesson-replay-3': 1.9,
-  'recalc-bench': 2.2, drills: 1.3, 'sheet-standard': 1.1, copy: 1.1, schedule: 0.8, 'module-states': 0.8 };
-const weight = f => WEIGHT[base(f)] ?? 0.3;
+/**
+ * Files that need a process to themselves: they stub globals (localStorage, fetch, a Supabase client)
+ * for the whole file or hold the auth singleton. lessons and challenge stub localStorage only inside
+ * a test and take it away in its finally, so they pool (each would otherwise import the content again).
+ */
+const OWN_PROCESS = new Set(['auth', 'effects', 'entitlement', 'leaderboard', 'moments', 'records', 'site-pages', 'store', 'store-sync', 'telemetry']);
+/**
+ * A file's measured CPU seconds beyond the shared imports; a file not measured yet counts the
+ * median. A replay shard counts an equal part of every measured lesson: lesson-replay.js deals the
+ * lessons to its shards on the same costs, so the shards come out even. Only the balance depends on these.
+ */
+let COSTS = { files: {}, lessons: {} };
+try { COSTS = JSON.parse(readFileSync(COSTS_FILE, 'utf8')); } catch { /* none yet: every file counts the same */ }
+const shardFiles = testFiles.filter(f => /^lesson-replay-\d+$/.test(base(f)));
+const lessonTotal = Object.values(COSTS.lessons || {}).reduce((a, b) => a + b, 0);
+const fileCosts = Object.values(COSTS.files || {}).sort((a, b) => a - b);
+const median = fileCosts.length ? fileCosts[fileCosts.length >> 1] : 0.3;
+const weight = f => (shardFiles.includes(f) ? lessonTotal / shardFiles.length || median : COSTS.files?.[base(f)] ?? median);
 const cores = availableParallelism();
 let testJobs;
 if (FULL) testJobs = [run(['--test', '--test-concurrency=' + cores, ...testFiles])];
 else {
   const pools = Array.from({ length: cores }, () => ({ files: [], w: 0 }));
-  for (const f of testFiles.filter(f => !OWN_PROCESS.has(base(f))).sort((a, b) => weight(b) - weight(a))) {
+  for (const f of testFiles.filter(f => !OWN_PROCESS.has(base(f))).sort((a, b) => weight(b) - weight(a) || (a < b ? -1 : 1))) {
     const p = pools.reduce((a, b) => (b.w < a.w ? b : a)); p.files.push(f); p.w += weight(f);
   }
-  testJobs = pools.filter(p => p.files.length).map(p => run(['--test', '--experimental-test-isolation=none', '--no-warnings', ...p.files]));
+  const verbose = (files, w) => r => { if (process.env.CHECK_VERBOSE) console.log(`${r.secs.toFixed(1)}s (est ${w.toFixed(1)}s) ${files.map(base).join(' ')}`); return r; };
+  testJobs = pools.filter(p => p.files.length).map(p => run(['--test', '--experimental-test-isolation=none', '--no-warnings', ...p.files]).then(verbose(p.files, p.w)));
   const apart = testFiles.filter(f => OWN_PROCESS.has(base(f)));
-  if (apart.length) testJobs.push(run(['--test', '--test-concurrency=2', ...apart]));
+  if (apart.length) testJobs.push(run(['--test', '--test-concurrency=2', ...apart]).then(verbose(apart, apart.reduce((a, f) => a + weight(f), 0))));
 }
 const testP = Promise.all(testJobs);
 

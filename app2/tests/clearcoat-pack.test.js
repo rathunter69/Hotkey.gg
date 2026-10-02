@@ -12,12 +12,12 @@ import { sheetStandard } from '../app/graders.js';
 
 const { STATES, STATE_ORDER, STATE_LESSONS, stateOf, SUMMARY: S, SCENARIOS: C, SITES, ROWS, WEEKS, PLANT, INPUTS, CASE_INPUTS, BREAK_EVEN, exportRow } = wb;
 
-const build = sp => new Sheet({ cells: structuredClone(sp.cells), colW: sp.colW, gridlines: sp.gridlines, freeze: sp.freeze, condFmt: sp.condFmt, hiddenRows: sp.hiddenRows });
+const build = (sp, recalc) => new Sheet({ cells: structuredClone(sp.cells), colW: sp.colW, gridlines: sp.gridlines, freeze: sp.freeze, condFmt: sp.condFmt, hiddenRows: sp.hiddenRows, recalc });   // recalc false: a sheet joining a workbook that is recalculated once, assembled
 function live(st) {
-  const ses = new Session(build(st.sheets[0]), { now: () => 0 });
+  const ses = new Session(build(st.sheets[0], false), { now: () => 0 });
   ses.sheets[0].name = st.sheets[0].name;
-  for (const sh of st.sheets.slice(1)) ses.addSheet(sh.name, build(sh));
-  ses.names = st.names || {};
+  for (const sh of st.sheets.slice(1)) ses.addSheet(sh.name, build(sh, false), undefined, { recalc: false });
+  ses.names = st.names || {};   // the setter recalculates the assembled workbook
   for (const e of ses.sheets) e.sheet.recalc();
   return ses;
 }

@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { Sheet, COLW_DEFAULT } from '../engine/sheet.js';
+import { Sheet, COLW_DEFAULT, cloneCells, cloneCell } from '../engine/sheet.js';
+import { WORKBOOKS, workbookState } from '../content/workbooks/index.js';
 
 // The default sheet is Excel-sized (100 × 26). Tests about the grid's EDGES (whole-row selections
 // such as A2:J2, a push off the bottom, clamping) say their size explicitly: a 20 × 10 grid.
@@ -305,4 +306,47 @@ test('a bracket inside a string literal is text: the auto-close counts only real
   assert.deepEqual(Sheet.classifyInput(mid), { kind: 'formula', formula: mid });
   assert.deepEqual(Sheet.classifyInput('=LEN("(")'), { kind: 'formula', formula: '=LEN("(")' });
   assert.deepEqual(Sheet.classifyInput('=LEN("("'), { kind: 'formula', formula: '=LEN("(")' }, 'a missing close is still added');
+});
+
+// cloneCells / cloneCell: the copy every undo step, restore and cellAt makes is exactly the JSON round trip it replaced
+test('cloneCells copies exactly as JSON.parse(JSON.stringify()) does, and shares nothing', () => {
+  const viaJson = v => JSON.parse(JSON.stringify(v));
+  const odd = { A1: { value: -0, formula: null }, A2: { value: NaN }, A3: { value: Infinity, bold: true }, A4: { value: 'x', gone: undefined, fn: () => 1 },
+    A5: { value: 1, border: { t: 'thin' } }, A6: { value: [1, NaN] }, A7: null, A8: undefined, 10: { value: 'ten' }, 2: { value: 'two' }, A9: { when: new Date(0) } };
+  assert.deepEqual(cloneCells(odd), viaJson(odd));
+  assert.deepEqual(Object.keys(cloneCells(odd)), Object.keys(viaJson(odd)), 'the same keys in the same order');
+  assert.ok(Object.is(cloneCells(odd).A1.value, 0), '-0 becomes 0 as in JSON');
+  for (const k of ['A1', 'A2', 'A5', 'A9']) assert.deepEqual(cloneCell(odd[k]), viaJson(odd[k]), k);
+  const copy = cloneCells(odd); copy.A5.border.t = 'thick'; copy.A1.value = 9;
+  assert.equal(odd.A5.border.t, 'thin'); assert.ok(Object.is(odd.A1.value, -0), 'the source is untouched');
+  let n = 0;
+  for (const [id, wb] of Object.entries(WORKBOOKS)) for (const name of Object.keys(wb.STATES || {})) {
+    for (const sh of workbookState(id, name).sheets) { assert.deepEqual(cloneCells(sh.cells), viaJson(sh.cells), `${id} ${name} ${sh.name}`); n++; }
+  }
+  assert.ok(n > 100, 'every sheet of every state was compared');
+});
+
+test('undo frames share an unchanged record with the frame before, and copy a changed one afresh', () => {
+  const s = new Sheet({ ...SMALL, cells: { A1: { value: 1 }, A2: { value: 'x', bold: true }, A3: { value: 3, border: { t: 'thin' } } } });
+  const f1 = s.snapshot().cells;
+  s.cells.A1.value = 2; delete s.cells.A2.bold; s.cells.A2.bold = true;   // A1 changed; A2 the same fields in another order
+  const f2 = s.snapshot().cells;
+  assert.notEqual(f2.A1, f1.A1); assert.equal(f2.A1.value, 2); assert.equal(f1.A1.value, 1, 'the older frame keeps its value');
+  assert.notEqual(f2.A2, f1.A2, 'a reordered record is copied, so the frame matches a fresh copy key for key');
+  assert.deepEqual(Object.keys(f2.A2), Object.keys(JSON.parse(JSON.stringify(s.cells.A2))));
+  assert.notEqual(f2.A3, f1.A3, 'a record holding an object is always copied');
+  const f3 = s.snapshot().cells;
+  assert.equal(f3.A1, f2.A1, 'unchanged since the last frame: shared'); assert.equal(f3.A2, f2.A2);
+  for (const f of [f1, f2, f3]) for (const k in f) assert.notEqual(f[k], s.cells[k], 'a frame never shares with the live cells');
+  // every frame still equals the JSON copy of the cells it was taken from, through an undo and a redo
+  s.setCell('B1', { value: 5 }); s.pushUndo(); s.setCell('B1', { value: 6 }); s.commit();
+  const live = JSON.parse(JSON.stringify(s.cells));
+  s.undo(); assert.equal(s.value('B1'), 5); s.redo(); assert.deepEqual(JSON.parse(JSON.stringify(s.cells)), live);
+  assert.equal(s.value('B1'), 6);
+  // a restore keeps live cells only when they already are the frame's copy; anything a copy would rewrite is replaced
+  const t = new Sheet({ ...SMALL, cells: { A1: { value: 1 } } }); t.pushUndo();
+  t.cells.A1.value = NaN; t.cells.A2 = { value: -0, note: undefined }; t.undo();
+  assert.deepEqual(JSON.parse(JSON.stringify(t.cells)), { A1: JSON.parse(JSON.stringify(t.cells.A1)) }); assert.equal(t.value('A1'), 1);
+  t.pushUndo(); t.cells.A1.value = NaN; t.pushUndo(); t.undo();
+  assert.equal(t.cells.A1.value, null, 'NaN comes back as the frame holds it (null), as the JSON copy always restored it');
 });

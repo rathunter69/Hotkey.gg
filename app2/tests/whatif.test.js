@@ -41,3 +41,17 @@ test('Data Table (Alt A W T): one and two inputs fill {=TABLE()} results, an ent
   S.goTo(2, 3); s.run('Shift+Right Alt A W T Enter'); assert.equal(s.toasts.at(-1), DATATABLE_INPUT_NOTE);
   const back = new Sheet(JSON.parse(JSON.stringify(S.toJSON()))); assert.equal(back.dataTables.length, 2); assert.equal(back.get(3, 4).table, '{=TABLE(,B1)}');
 });
+
+test('Data Table refills: a change the table reads refills it; a change it cannot see leaves the results standing', () => {
+  const cells = { ...MODEL, D2: { formula: '=B4' }, C3: { value: 10 }, C4: { value: 12 }, C5: { value: 14 }, E1: { value: 'note' }, E9: { formula: '=E1&"!"' } };
+  const s = fresh(cells); const S = s.sheet;
+  S.goTo(2, 3); s.run('Shift+Down Shift+Down Shift+Down Shift+Right Alt A W T Alt+C "B1" Enter');
+  assert.deepEqual([S.value('D3'), S.value('D4'), S.value('D5')], [1000, 3000, 5000]);
+  let fills = 0; const was = s.toolRecalc; s.toolRecalc = function (...a) { if (a[1]) fills++; return was.apply(this, a); };
+  S.goTo(1, 5); s.run('"memo" Enter'); assert.equal(S.value('E9'), 'memo!'); assert.equal(fills, 0, 'an edit outside what the table reads: no refill');
+  S.goTo(3, 2); s.run('"8000" Enter'); assert.ok(fills > 0, 'the cost feeds the profit the table reads: refilled'); assert.deepEqual([S.value('D3'), S.value('D5')], [2000, 6000]);
+  fills = 0; S.goTo(4, 3); s.run('"16" Enter'); assert.ok(fills > 0, 'a new axis value refills'); assert.equal(S.value('D4'), 8000);
+  fills = 0; S.goTo(2, 4); s.run('"=B4*2" Enter'); assert.ok(fills > 0, 'a new formula at the head refills'); assert.equal(S.value('D3'), 4000);
+  fills = 0; S.goTo(2, 2); s.run('"1100" Enter'); assert.ok(fills > 0); assert.deepEqual([S.value('D3'), S.value('D4'), S.value('D5')], [2*(10*1100-8000), 2*(16*1100-8000), 2*(14*1100-8000)], 'an input upstream of the head refills, every result as the head computes it');
+  s.run('Ctrl+Z'); assert.equal(S.value('B2'), 1000); assert.equal(S.value('D3'), 4000, 'undo refills from the restored inputs');
+});

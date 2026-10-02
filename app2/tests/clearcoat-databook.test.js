@@ -12,11 +12,12 @@ import { Sheet } from '../engine/sheet.js';
 import { Session } from '../engine/keyboard.js';
 import { sheetStandard } from '../app/graders.js';
 
-const build = sp => new Sheet({ rows: sp.rows, cols: sp.cols, cells: structuredClone(sp.cells), colW: sp.colW, gridlines: sp.gridlines, freeze: sp.freeze, condFmt: sp.condFmt });
+const build = (sp, recalc) => new Sheet({ rows: sp.rows, cols: sp.cols, cells: structuredClone(sp.cells), colW: sp.colW, gridlines: sp.gridlines, freeze: sp.freeze, condFmt: sp.condFmt, recalc });   // recalc false: a sheet joining a workbook that is recalculated once, assembled
 function live(st) {
-  const ses = new Session(build(st.sheets[0]), { now: () => 0 });
+  const ses = new Session(build(st.sheets[0], false), { now: () => 0 });
   ses.sheets[0].name = st.sheets[0].name;
-  for (const sh of st.sheets.slice(1)) ses.addSheet(sh.name, build(sh));
+  for (const sh of st.sheets.slice(1)) ses.addSheet(sh.name, build(sh, false), undefined, { recalc: false });
+  ses.recalcAll();   // once, assembled (a recalc per added sheet only repeated it)
   for (let i = 0; i < 2; i++) for (const e of ses.sheets) e.sheet.recalc();
   return ses;
 }

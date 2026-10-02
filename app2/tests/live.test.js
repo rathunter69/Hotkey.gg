@@ -136,3 +136,19 @@ test('in place across sheets: the nudge lands on the sibling and comes back; a w
   assert.equal(isLiveFormula(calc, 'C2'), true);
   assert.deepEqual(cellsOf(calc), r0, 'RAND would move on an in-place recalc: the clone answers and the sheet keeps its draw');
 });
+
+test('a workbook with SUBTOTAL is probed in place (it repeats itself), with the clone\'s verdicts, and ends as it started', () => {
+  const s = new Sheet({ cells: { B1: { value: 4 }, B2: { value: 6 }, B3: { value: 9 }, B4: { formula: '=SUBTOTAL(109,B1:B3)' }, C1: { formula: '=B4*2' }, C2: { formula: '=SUBTOTAL(109,B2:B2)*0' }, D1: { value: 3 }, D2: { formula: '=D1+1' } } });
+  s.hiddenRows.add(3); s.recalc();
+  const cellsOf = sh => JSON.parse(JSON.stringify(sh.cells)); const before = cellsOf(s);
+  let probes = 0; const orig = s.book.recalc; s.book.recalc = function (t, only) { if (only) probes++; return orig.call(this, t, only); };
+  for (const [ref, inputs] of [['C1'], ['C2'], ['D2'], ['B4', ['B1']]]) {
+    const opts = inputs ? { inputs } : {};
+    assert.equal(isLiveFormula(s, ref, opts), isLiveFormulaByClone(s, ref, opts), `${ref} ${inputs || ''}`);
+  }
+  assert.ok(probes > 0, 'the nudges ran on the workbook itself, through its graph');
+  // the clone carries the hidden rows, so both ways agree that a row SUBTOTAL 109 skips moves nothing, as in Excel
+  assert.equal(isLiveFormula(s, 'B4', { inputs: ['B3'] }), false, 'a hidden row SUBTOTAL 109 skips moves nothing');
+  assert.equal(isLiveFormulaByClone(s, 'B4', { inputs: ['B3'] }), false, 'the clone sees the hidden row too');
+  assert.deepEqual(cellsOf(s), before, 'every nudge put back');
+});

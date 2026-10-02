@@ -30,7 +30,7 @@ export class LessonRun {
     // the case's "today": a module workbook names it (CASE_TODAY, the Monday of its reporting week) so Ctrl+; and TODAY() date the sheet the way its states do
     const wb = this.lesson.workbook ? WORKBOOKS[this.lesson.workbook] : null;
     const today = this.opts.today || (wb && Number.isFinite(wb.CASE_TODAY) ? () => wb.CASE_TODAY : undefined);
-    const build = sp => new Sheet({ rows: sp.rows, cols: sp.cols, cells: sp.cells ? structuredCloneCells(sp.cells) : undefined, colW: sp.colW, active: sp.active, today, rowH: sp.rowH, hiddenRows: sp.hiddenRows, hiddenCols: sp.hiddenCols, freeze: sp.freeze, gridlines: sp.gridlines, groups: sp.groups, condFmt: sp.condFmt, zoom: sp.zoom, validation: sp.validation, pivots: sp.pivots, dataTables: sp.dataTables });
+    const build = sp => new Sheet({ rows: sp.rows, cols: sp.cols, cells: sp.cells ? structuredCloneCells(sp.cells) : undefined, colW: sp.colW, active: sp.active, today, rowH: sp.rowH, hiddenRows: sp.hiddenRows, hiddenCols: sp.hiddenCols, freeze: sp.freeze, gridlines: sp.gridlines, groups: sp.groups, condFmt: sp.condFmt, zoom: sp.zoom, validation: sp.validation, pivots: sp.pivots, dataTables: sp.dataTables, recalc: false });   // the workbook is recalculated once, assembled, below
     // A module lesson (C2): the starting workbook is a named state of the module workbook — the
     // file the previous lesson left — not an inline sheet. The legacy path stays for drills and
     // the old lessons until the rewrite completes.
@@ -73,6 +73,8 @@ export class LessonRun {
     if (moduleState && this.session.loadWorkbookExtras) this.session.loadWorkbookExtras(moduleState);
     if (moduleState && moduleState.names && typeof moduleState.names === 'object' && Object.keys(moduleState.names).length) this.session.names = moduleState.names;
     else this.session.recalcAll();
+    // the circles the file arrives with are known: no warning until a new one appears (the sheets were not recalculated alone)
+    if (this.session.circularRefs) this.session._circKnown = new Set(this.session.circularRefs());
     this.landedAt = [];   // when each goal landed (the session clock), for split times
     // Demo goals (goal.demo = { script, cadence }): the platform plays the keys itself while the
     // learner watches. The session records which demos have finished so the goal's check can read it.

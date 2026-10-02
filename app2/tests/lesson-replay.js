@@ -1,20 +1,39 @@
 // app2/tests/lesson-replay.js: the per-lesson tests (format, taught concepts, solution replay, and
 // each guided hint walked goal by goal), registered for one shard of the catalogue. The shards are
-// lesson-replay-<n>.test.js, so node --test runs them on separate cores and the gate stays inside
-// its budget as chapters land.
+// lesson-replay-<n>.test.js, so the gate spreads them over its processes and stays inside its
+// budget as chapters land. The lessons are dealt to the shards by measured cost (check-costs.json,
+// written by `run-checks.js --measure`), heaviest first onto the lightest shard, so a chapter of
+// heavy lessons cannot pile onto one shard; a lesson not measured yet counts the median.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { LESSONS, LESSONS_BY_ID } from '../content/index.js';
 import { validateLesson, availableConcepts, SEEDED_KINDS } from '../content/schema.js';
 import { WORKBOOKS, workbookState } from '../content/workbooks/index.js';
 import { LessonRun } from '../app/runner.js';
 import { hintScript } from './hint-rules.js';
 
-export const SHARDS = 4;
+export const SHARDS = 8;
 const fresh = (lesson, opts = {}) => new LessonRun(lesson, { now: () => 0, ...opts });
 
+/** The measured seconds per lesson (both of its tests), from check-costs.json; {} when there is none. */
+export function lessonCosts() {
+  try { return JSON.parse(readFileSync(new URL('./check-costs.json', import.meta.url), 'utf8')).lessons || {}; } catch { return {}; }
+}
+/** The catalogue dealt into SHARDS lists of lessons: costliest first, each onto the lightest shard (ties in catalogue order). */
+export function partition(lessons = LESSONS, costs = lessonCosts()) {
+  const known = Object.values(costs).filter(Number.isFinite).sort((a, b) => a - b);
+  const median = known.length ? known[known.length >> 1] : 1;
+  const cost = l => (Number.isFinite(costs[l.id]) ? costs[l.id] : median);
+  const shards = Array.from({ length: SHARDS }, () => ({ lessons: [], w: 0 }));
+  const order = lessons.map((l, i) => ({ l, i, c: cost(l) })).sort((a, b) => b.c - a.c || a.i - b.i);
+  for (const { l, c } of order) { const s = shards.reduce((a, b) => (b.w < a.w ? b : a)); s.lessons.push(l); s.w += c; }
+  const at = new Map(lessons.map((l, i) => [l, i]));
+  return shards.map(s => s.lessons.sort((a, b) => at.get(a) - at.get(b)));   // each shard runs in catalogue order
+}
+
 export function registerReplays(shard) {
-  const mine = LESSONS.filter((_, i) => i % SHARDS === shard);
+  const mine = partition()[shard];
   for (const lesson of mine) {
     test(`${lesson.id}: validates, requires only taught concepts, solution replays`, () => {
       const errs = validateLesson(lesson);

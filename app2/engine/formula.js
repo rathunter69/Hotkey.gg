@@ -451,7 +451,7 @@ function globTest(toks, str) {
    EVALUATOR
    ============================================================================ */
 // parsed formulas, by text: a recalc evaluates the same formulas again and again (the evaluator never mutates a tree)
-const PARSE_CACHE = new Map(); const PARSE_CACHE_MAX = 4000;
+const PARSE_CACHE = new Map(); const PARSE_CACHE_MAX = 50000;   // every formula of every case workbook fits: a full cache is cleared whole
 function parseCached(expr) {
   const key = String(expr); const hit = PARSE_CACHE.get(key); if (hit) return hit;
   const ast = parseFormula(expr);

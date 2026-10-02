@@ -23,7 +23,8 @@ test('every state builds into a real workbook session without throwing', () => {
     assert.ok(st.sheets.length >= 3, `${id}: a workbook, not a toy`);
     const session = new Session(build(st.sheets[0]), {});
     session.sheets[0].name = st.sheets[0].name;
-    for (const sh of st.sheets.slice(1)) session.addSheet(sh.name, build(sh));
+    for (const sh of st.sheets.slice(1)) session.addSheet(sh.name, build(sh), undefined, { recalc: false });
+    session.recalcAll();   // once, assembled (a recalc per added sheet only repeated it)
     assert.equal(session.sheets.length, st.sheets.length, id);
   }
 });
@@ -176,7 +177,7 @@ test('every module lesson chains: before is the previous lesson\'s after', () =>
 /* ---------------- modules 1.5–1.7 (C2 Run 3): the format, formula, print and check states, and what the lessons plant ---------------- */
 import { PLANT_GRIDS, PLANT_DAILY, PLANT_COSTS_ERRORS, PLANT_AUDIT, REPORT_PAGE_SETUP, PAGE_SETUP_DEFAULT, COUNTS_FMT } from '../content/workbooks/clearcoat-weekly.js';
 import { applyStatePatch } from '../content/workbooks/index.js';
-const liveOf = st => { const build = sp => new Sheet({ cells: structuredClone(sp.cells), colW: sp.colW, hiddenCols: sp.hiddenCols, gridlines: sp.gridlines }); const ses = new Session(build(st.sheets[0]), { now: () => 0 }); ses.sheets[0].name = st.sheets[0].name; for (const sh of st.sheets.slice(1)) ses.addSheet(sh.name, build(sh)); ses.names = st.names; for (let i = 0; i < 2; i++) for (const e of ses.sheets) e.sheet.recalc(); return ses; };
+const liveOf = st => { const build = sp => new Sheet({ cells: structuredClone(sp.cells), colW: sp.colW, hiddenCols: sp.hiddenCols, gridlines: sp.gridlines }); const ses = new Session(build(st.sheets[0]), { now: () => 0 }); ses.sheets[0].name = st.sheets[0].name; for (const sh of st.sheets.slice(1)) ses.addSheet(sh.name, build(sh), undefined, { recalc: false }); ses.recalcAll(); ses.names = st.names; for (let i = 0; i < 2; i++) for (const e of ses.sheets) e.sheet.recalc(); return ses; };
 const sheetIn = (ses, name) => ses.sheets.find(x => x.name === name).sheet;
 const domainThisWeek = WASHES.Domain.slice(6).reduce((t, w) => t + w, 0);
 

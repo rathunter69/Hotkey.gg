@@ -11,11 +11,12 @@ import { Sheet } from '../engine/sheet.js';
 import { Session } from '../engine/keyboard.js';
 import { mulberry32 } from '../engine/rng.js';
 
-const build = sp => new Sheet({ cells: structuredClone(sp.cells), colW: sp.colW, gridlines: sp.gridlines, freeze: sp.freeze });
+const build = (sp, recalc) => new Sheet({ cells: structuredClone(sp.cells), colW: sp.colW, gridlines: sp.gridlines, freeze: sp.freeze, recalc });   // recalc false: a sheet joining a workbook that is recalculated once, assembled
 function live(st) {
-  const ses = new Session(build(st.sheets[0]), { now: () => 0 });
+  const ses = new Session(build(st.sheets[0], false), { now: () => 0 });
   ses.sheets[0].name = st.sheets[0].name;
-  for (const sh of st.sheets.slice(1)) ses.addSheet(sh.name, build(sh));
+  for (const sh of st.sheets.slice(1)) ses.addSheet(sh.name, build(sh, false), undefined, { recalc: false });
+  ses.recalcAll();   // once, assembled (a recalc per added sheet only repeated it)
   for (let i = 0; i < 2; i++) for (const e of ses.sheets) e.sheet.recalc();
   return ses;
 }

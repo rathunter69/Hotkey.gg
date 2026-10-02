@@ -104,6 +104,7 @@ function sameValue(a, b) {
  * starts), and around a circle already in the workbook; those take the clone path.
  */
 const UNSTABLE = /\b(RAND|RANDBETWEEN|RANDARRAY|NOW)\s*\(/i;
+const TODAY = /\bTODAY\s*\(/i;
 function inPlaceOk(sheet) {
   const book = sheet.book;
   if (!book || typeof book.recalc !== 'function') return false;
@@ -116,7 +117,7 @@ function repeatable(book) {
   if (book.calcSig && book.calcSig[0] === '1') return false;   // iterative calculation is on
   for (const fk of book.volatile) {
     const S = book.sheetOf(fk); const c = S && S.cells[fk.slice(fk.indexOf('!') + 1)];
-    if (c && c.formula && (UNSTABLE.test(c.formula) || !S.today)) return false;
+    if (c && c.formula && (UNSTABLE.test(c.formula) || (TODAY.test(c.formula) && !S.today))) return false;   // a TODAY with no case clock; SUBTOTAL is volatile but repeats itself
   }
   return true;
 }
@@ -171,7 +172,14 @@ function probeInPlace(sheet, key, inputs) {
  * land on the cloned Costs, never the real one.
  */
 function cloneSheet(sheet) {
-  const one = src => { const t = new Sheet({ rows: src.rows, cols: src.cols, today: src.today || undefined }); t.cells = clone(src.cells); return t; };
+  // the rows SUBTOTAL skips (hidden, filtered out, folded) come along, so a clone answers as the sheet would
+  const one = src => {
+    const t = new Sheet({ rows: src.rows, cols: src.cols, today: src.today || undefined, recalc: false }); t.cells = clone(src.cells);
+    if (src.hiddenRows) t.hiddenRows = new Set(src.hiddenRows);
+    if (src.filterRows) t.filterRows = new Set(src.filterRows);
+    if (src.groups) t.groups = clone(src.groups);
+    return t;
+  };
   if (typeof sheet.allSheets !== 'function') { const test = one(sheet); test.recalc(); return test; }
   const entries = sheet.allSheets().map(e => ({ name: e.name, sheet: one(e.sheet), src: e.sheet }));
   const lookup = name => { const e = entries.find(x => x.name.toLowerCase() === String(name).toLowerCase()); return e ? e.sheet : null; };

@@ -19,11 +19,12 @@ import { sheetStandard } from '../app/graders.js';
 import { mulberry32 } from '../engine/rng.js';
 import { FIGURE_W } from '../content/workbooks/page.js';
 
-const build = sp => new Sheet({ cells: structuredClone(sp.cells || {}), colW: sp.colW, rowH: sp.rowH, hiddenRows: sp.hiddenRows, hiddenCols: sp.hiddenCols, freeze: sp.freeze, gridlines: sp.gridlines, groups: sp.groups, condFmt: sp.condFmt });
+const build = (sp, recalc) => new Sheet({ cells: structuredClone(sp.cells || {}), colW: sp.colW, rowH: sp.rowH, hiddenRows: sp.hiddenRows, hiddenCols: sp.hiddenCols, freeze: sp.freeze, gridlines: sp.gridlines, groups: sp.groups, condFmt: sp.condFmt, recalc });   // recalc false: a sheet joining a workbook that is recalculated once, assembled
 function live(st) {
-  const ses = new Session(build(st.sheets[0]), { now: () => 0 });
+  const ses = new Session(build(st.sheets[0], false), { now: () => 0 });
   ses.sheets[0].name = st.sheets[0].name;
-  for (const sh of st.sheets.slice(1)) ses.addSheet(sh.name, build(sh));
+  for (const sh of st.sheets.slice(1)) ses.addSheet(sh.name, build(sh, false), undefined, { recalc: false });
+  ses.recalcAll();   // once, assembled (a recalc per added sheet only repeated it)
   if (st.names) ses.names = st.names;
   if (ses.loadWorkbookExtras) ses.loadWorkbookExtras(st);   // the custom cell styles (2.3.6) and whatever else the workbook keeps beside its sheets
   if (st.settings) { ses.settings.calcMode = st.settings.calcMode; ses.settings.iterative = st.settings.iterative; ses.settings.qat = st.settings.qat.slice(); if (st.settings.pageSetup) ses.settings.pageSetup = structuredClone(st.settings.pageSetup); }

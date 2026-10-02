@@ -9,6 +9,8 @@ import { CHAPTERS, LESSONS, LESSONS_BY_ID, sectionsOf, sectionNames } from '../c
 import { validateLesson, availableConcepts, sentenceCount, goalBounds, countedGoals } from '../content/schema.js';
 import { LessonRun, shortcutsUsed } from '../app/runner.js';
 import { hintScript, hintTokens, goToOffence, arrowGrind, anchorBefore } from './hint-rules.js';
+import { SHARDS, partition } from './lesson-replay.js';
+import { existsSync } from 'node:fs';
 
 const byId = id => { const l = LESSONS_BY_ID[id]; assert.ok(l, `lesson ${id} is in the catalogue`); return l; };
 const fresh = (lesson, opts = {}) => new LessonRun(lesson, { now: () => 0, ...opts });
@@ -195,6 +197,20 @@ test('hintScript turns a hint into a replayable script', () => {
 });
 
 // the per-lesson replays and hint walks run sharded in lesson-replay-*.test.js, so they spread over the cores
+test('the replay shards cover the catalogue: every lesson in exactly one shard, every shard a file', () => {
+  const shards = partition();
+  assert.equal(shards.length, SHARDS);
+  const seen = shards.flat().map(l => l.id);
+  assert.equal(seen.length, LESSONS.length, 'no lesson dealt twice or dropped');
+  assert.deepEqual([...seen].sort(), LESSONS.map(l => l.id).sort());
+  for (let i = 0; i < SHARDS; i++) assert.ok(existsSync(new URL(`./lesson-replay-${i}.test.js`, import.meta.url)), `lesson-replay-${i}.test.js registers shard ${i}`);
+  assert.ok(!existsSync(new URL(`./lesson-replay-${SHARDS}.test.js`, import.meta.url)), 'no shard file beyond SHARDS');
+  // a lesson nobody has measured still lands somewhere, and a costly one gets a shard to itself first
+  const fake = [{ id: 'a' }, { id: 'b' }, { id: 'c' }];
+  const dealt = partition(fake, { a: 9 });
+  assert.deepEqual(dealt.flat().map(l => l.id).sort(), ['a', 'b', 'c']);
+  assert.deepEqual(dealt[0].map(l => l.id), ['a']);
+});
 
 /* ---------------- runner contract ---------------- */
 
