@@ -91,7 +91,7 @@ test('the solved workbook ties: cubes to the export, roll-up to the cubes, KPIs 
 test('the chapter states tie on the chapter export: the cube reads 4,245 washes for Domain and the window the last seven days', () => {
   const ses = live(stateOf('S463'));
   const sm = sheetIn(ses, 'Summary');
-  const total = ROWS.reduce((t, r) => t + (r.retail || 0) + (r.member || 0), 0);
+  const total = ROWS.reduce((t, r) => t + (r.retail || 0) + (r.member || 0), 0) + (wb.PIVOT_FIX.value - ROWS[0].member);   // 4.4.3's correction to Domain's first day stays in the file
   assert.equal(sm.value('F' + S.cubeTotal), total);
   assert.equal(sm.value('H' + S.totalRow), total);
   for (const r of S.checkRows) assert.equal(sm.value('C' + r), 0, `check row ${r}`);
@@ -198,7 +198,7 @@ test('each state carries what its lesson reads', () => {
   const cuts = id => stateOf(id).sheets.find(s => s.name === wb.CUTS);
   assert.equal(cuts('S44'), undefined); assert.deepEqual(cuts('S441').pivots[0].spec, { ...wb.PIVOTS.S441 });
   assert.equal(cuts('S442').cells.A4.value, 'AUS-AIR'); assert.equal(cuts('S443').cells.A3.value, 'Sum of Total washes');
-  assert.equal(cells('S443', 'Export').C5.value, wb.PIVOT_FIX.value); assert.match(sm('S443').I14.formula, /^=GETPIVOTDATA\("Total washes",Cuts!\$A\$3,"Site","AUS-DOM"\)$/);
+  assert.equal(cells('S443', 'Export').D5.value, wb.PIVOT_FIX.value); assert.equal(cells('S443', 'Domain').C6.value, cells('S442', 'Domain').C6.value + 10); assert.match(sm('S443').I14.formula, /^=GETPIVOTDATA\("Total washes",Cuts!\$A\$3,"Site","AUS-DOM"\)$/);
   assert.match(sc('S454')['C' + C.breakEven.cpw].formula, /^=G6-/); assert.equal(sc('S454')['C' + C.breakEven.goalSeek].value, BREAK_EVEN.goalSeek);
   assert.equal(cells('S454', 'Inputs').C15, undefined); assert.equal(cells('S455', 'Inputs').C15.value, 14);
   assert.match(sc('S455').C6.formula, /^=Inputs!\$C\$15$/); assert.match(sc('S455')['C' + C.ticketModel].formula, /^=IF\(C13="",Inputs!\$C\$15,C13\)$/); assert.match(sc('S455')['C' + C.outputs.revenue].formula, /\*C14$/);

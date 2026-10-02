@@ -126,6 +126,7 @@ import challenge_text_dump from './lessons/challenge-text-dump.js';
 import build_and_rearrange from './lessons/build-and-rearrange.js';
 import group_dates_and_value_settings from './lessons/group-dates-and-value-settings.js';
 import refresh_and_getpivotdata from './lessons/refresh-and-getpivotdata.js';
+import challenge_an_export_summarized_three_ways from './lessons/challenge-an-export-summarized-three-ways.js';
 
 export const CHAPTERS = [
   {
@@ -227,6 +228,7 @@ export const CHAPTERS = [
       build_and_rearrange,
       group_dates_and_value_settings,
       refresh_and_getpivotdata,
+      challenge_an_export_summarized_three_ways,
     ],
   },
 ];

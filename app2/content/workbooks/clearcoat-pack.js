@@ -892,8 +892,12 @@ export const PIVOTS = {
   S442: { row: 'Site', col: null, value: 'Date', fn: 'count' },
   S443: { row: 'Site', col: 'Week', value: 'Total washes', fn: 'sum' },
 };
-/** 4.4.3's late correction: the controller resent Domain's first day, ten more retail washes. */
-export const PIVOT_FIX = { ref: 'C5', value: ROWS[0].retail + 10 };
+/**
+ * 4.4.3's late correction: the controller resent Domain's first day with ten more member washes
+ * (members pay monthly, so the takings stand). The Domain tab keeps its own copy of the week, so it
+ * takes the ten too (tabRef), or the roll-up check on Summary stops reading zero.
+ */
+export const PIVOT_FIX = { ref: 'D5', value: ROWS[0].member + 10, tab: 'Domain', tabRef: 'C6' };
 /** 4.4.3's reader on Summary: Domain's washes from the pivot by GETPIVOTDATA, and its difference from the cube. */
 export const PIVOT_READ = {
   labels: { H14: { value: 'Domain washes, from the pivot' }, H15: { value: 'Less the cube (reads 0)' } },
@@ -909,6 +913,7 @@ const S442 = derive(S441, s => { withCuts(s, PIVOTS.S442); });
 // 4.4.3 Refresh and GETPIVOTDATA: the correction on Export, the pivot refreshed and turned back to washes by week and site, Summary reading it by name
 const S443 = derive(S442, s => {
   sheetOf(s, 'Export').cells[PIVOT_FIX.ref] = { ...sheetOf(s, 'Export').cells[PIVOT_FIX.ref], value: PIVOT_FIX.value };
+  const tab = sheetOf(s, PIVOT_FIX.tab).cells; tab[PIVOT_FIX.tabRef] = { ...tab[PIVOT_FIX.tabRef], value: tab[PIVOT_FIX.tabRef].value + 10 };
   withCuts(s, PIVOTS.S443);
   plant(s, 'Summary', PIVOT_READ.labels);
   for (const k in PIVOT_READ.formulas) plant(s, 'Summary', { [k]: { formula: PIVOT_READ.formulas[k], ...PIVOT_READ.formats[k] } });
@@ -929,7 +934,8 @@ export const TABLE_INPUTS = {
   S456: { ticket: 'C' + C.driver, share: 'G' + C.inputs.share, sw: 'C' + C.switch },
 };
 const tables = (s, id) => tablesOn(sheetOf(s, 'Scenarios'), C, TABLE_INPUTS[id]);
-const S45 = S436;
+// the module starts where 4.4 ended: the pivot on Cuts, the controller's correction and Summary's reader stay in the file
+const S45 = S443;
 // 4.5.1 A case toggle: the switch, the live column (CHOOSE on the first line, INDEX below), the outputs, the live case lit by a rule, the case in the title
 const S451 = derive(S45, s => {
   take(s, SOLVED, 'Scenarios', ['A1', 'B' + C.switch, 'C' + C.switch, ...rowRefs(4, COLS('G')), ...blockRefs([C.inputs.washes, C.inputs.ticket, C.inputs.share, C.inputs.sites], COLS('G')), 'B' + C.outputs.title, ...blockRefs(Object.values(C.outputs).slice(1), COLS('BC'))]);
@@ -980,7 +986,7 @@ export const CHALLENGES = {
   'challenge-a-three-case-model-with-a-sensitivity-table': { before: 'S45C' },
 };
 /** 4.4.C's late site-day: the row the controller never reported (Riverside, Sep 22), and where the seed leaves its figures. */
-export const LATE = { row: exportRow(PLANT.missing.day, PLANT.missing.site), retail: 'L', member: 'M', label: 'K' };
+export const LATE = { row: exportRow(PLANT.missing.day, PLANT.missing.site), retail: 'M', member: 'N', label: 'L' };   // a column clear of the table, so the pivot's source stops at J
 /**
  * A module challenge's seed patch: content only, never workload. 4.4.C lays a fresh fortnight's
  * washes and revenue over Export (every row, the late one's figures parked beside it); 4.5.C draws
@@ -999,6 +1005,7 @@ export function challengeSeed(id, rng) {
       if (r === LATE.row) {
         p[`Export!${LATE.label}${r}`] = { value: 'Late figures (retail, member)' };
         p[`Export!${LATE.retail}${r}`] = { value: retail, fontColor: 'blue' }; p[`Export!${LATE.member}${r}`] = { value: total - retail, fontColor: 'blue' };
+        p[`Export!E${r}`] = { formula: `=C${r}+D${r}` };   // the total reads the row as soon as its figures land
         return;
       }
       p[`Export!C${r}`] = { ...ex['C' + r], value: retail }; p[`Export!D${r}`] = { ...ex['D' + r], value: total - retail };
